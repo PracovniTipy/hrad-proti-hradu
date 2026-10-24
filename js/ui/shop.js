@@ -54,7 +54,7 @@
       else { save.gear.owned.push(id); got.push({ kind: 'gear', gear: g }); }
     });
     (give.skins || []).forEach(id => { if (!save.skins.ownedUnit.includes(id)) save.skins.ownedUnit.push(id); got.push({ kind: 'skin', id }); });
-    if (give.bigCastle) { save.bigCastle = true; got.push({ kind: 'big' }); }
+    if (give.bigCastle) { save.bigCastle = true; save.castleType = 'velky'; got.push({ kind: 'big' }); }
     (give.decor || []).forEach(id => { if (!save.ownedDecor.includes(id)) { save.ownedDecor.push(id); save.castleCfg.decor = save.castleCfg.decor || {}; save.castleCfg.decor[id] = true; } got.push({ kind: 'decor', id }); });
     App.persist();
     return got;

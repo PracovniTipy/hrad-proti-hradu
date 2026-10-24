@@ -367,4 +367,12 @@
     skin_mount: ['Na koni', 'On horseback', '骑马', 'घोड़े पर', 'A caballo', 'À cheval', 'على الخيل', 'ঘোড়ায়', 'A cavalo', 'Верхом', 'گھوڑے پر', 'Berkuda', 'Zu Pferd', '騎馬', 'Atlı', '기마'],
     weapon_skins: ['Skiny zbraní', 'Weapon skins', '武器皮肤', 'हथियार स्किन', 'Aspectos de armas', 'Apparences d’armes', 'مظاهر الأسلحة', 'অস্ত্রের স্কিন', 'Visuais de armas', 'Облики оружия', 'ہتھیاروں کی سکن', 'Skin senjata', 'Waffen-Skins', '武器スキン', 'Silah kostümleri', '무기 스킨']
   });
+
+  Object.assign(I18N.D, {
+    castle_types: ['Druhy hradu', 'Castle types', '城堡类型', 'किले के प्रकार', 'Tipos de castillo', 'Types de château', 'أنواع القلاع', 'দুর্গের ধরন', 'Tipos de castelo', 'Виды замков', 'قلعوں کی اقسام', 'Jenis kastil', 'Burgtypen', '城の種類', 'Kale türleri', '성 종류'],
+    castle_looks: ['Vzhled hradu', 'Castle looks', '城堡外观', 'किले का रूप', 'Aspecto del castillo', 'Apparence du château', 'مظهر القلعة', 'দুর্গের রূপ', 'Visual do castelo', 'Облик замка', 'قلعے کی شکل', 'Tampilan kastil', 'Burg-Aussehen', '城の見た目', 'Kale görünümü', '성 외형'],
+    small_eyebrow: ['Základní hrad', 'Starter castle', '基础城堡', 'मूल किला', 'Castillo básico', 'Château de base', 'القلعة الأساسية', 'মৌলিক দুর্গ', 'Castelo básico', 'Базовый замок', 'بنیادی قلعہ', 'Kastil dasar', 'Grundburg', '基本の城', 'Temel kale', '기본 성'],
+    small_name: ['Malý hrad', 'Small Castle', '小城堡', 'छोटा किला', 'Castillo pequeño', 'Petit château', 'القلعة الصغيرة', 'ছোট দুর্গ', 'Castelo pequeno', 'Малый замок', 'چھوٹا قلعہ', 'Kastil kecil', 'Kleine Burg', '小さな城', 'Küçük kale', '작은 성'],
+    small_desc: ['Hrad, se kterým začínáš. Na hradbách unese nejvýš 5 obránců.', 'The castle you start with. Its walls hold at most 5 defenders.', '你起步时的城堡。城墙最多容纳 5 名守卫。', 'वह किला जिससे आप शुरू करते हैं। दीवारों पर अधिकतम 5 रक्षक।', 'El castillo con el que empiezas. Sus murallas admiten 5 defensores como máximo.', 'Le château de départ. Ses remparts accueillent 5 défenseurs au maximum.', 'القلعة التي تبدأ بها. تتسع أسوارها لـ5 مدافعين كحد أقصى.', 'যে দুর্গ দিয়ে শুরু করো। দেয়ালে সর্বোচ্চ ৫ জন রক্ষী।', 'O castelo com que você começa. As muralhas comportam no máximo 5 defensores.', 'Замок, с которого ты начинаешь. На стенах не больше 5 защитников.', 'وہ قلعہ جس سے آپ شروع کرتے ہیں۔ دیواروں پر زیادہ سے زیادہ 5 محافظ۔', 'Kastil awalmu. Temboknya muat paling banyak 5 penjaga.', 'Die Burg, mit der du beginnst. Auf ihren Mauern haben höchstens 5 Verteidiger Platz.', '最初の城。城壁には守備兵を最大5人まで。', 'Başladığın kale. Surlarında en fazla 5 savunucu olur.', '처음 시작하는 성. 성벽에 수비병은 최대 5명.']
+  });
 })();

@@ -16,7 +16,7 @@ GameData.defense = {
   maxSlots: 5,
   bigSlots: 10,                    // Velká pevnost z obchodu: až 10 obránců
   slotsFor: (vez, big) => big ? Math.min(10, vez || 0) : Math.min(5, Math.ceil((vez || 0) / 2)),
-  maxFor: save => save && save.bigCastle ? 10 : 5,
+  maxFor: save => GameData.isBigCastle(save) ? 10 : 5,
   unlockAt: (i, big) => big ? i + 1 : i * 2 + 1,
   catapultFrom: 6,                 // úroveň Strážní věže, od které jde postavit katapult
   kinds: {
@@ -25,6 +25,9 @@ GameData.defense = {
     katapult: { name: 'Katapult', desc: 'Těžká střela s účinkem podle druhu. Odemkne se od 6. úrovně Strážní věže.', price: { gold: 2500 }, interval: 4.4, range: 900, dmg: lvl => 38 + lvl * 16 }
   }
 };
+/* Hráč má dva druhy hradu: malý (základní) a Velkou pevnost (koupí se v obchodě) */
+GameData.isBigCastle = save => !!(save && save.bigCastle && save.castleType !== 'maly');
+
 GameData.catapult = {
   elements: [
     { id: 'ohen', name: 'Ohnivý', desc: 'Zraní všechny v okolí a zapálí je.', color: '#ff7a2a', glow: '#ffd27a', price: { gold: 0 } },
@@ -42,7 +45,7 @@ GameData.catapultEl = id => GameData.catapult.elements.find(e => e.id === id) ||
 GameData.defenseOf = save => {
   const d = save.defense || {};
   const vez = save.buildings.vez || 0;
-  const n = GameData.defense.slotsFor(vez, !!save.bigCastle);
+  const n = GameData.defense.slotsFor(vez, GameData.isBigCastle(save));
   const slots = [];
   for (let i = 0; i < n; i++) {
     let kind = (d.slots || [])[i] || 'lucistnik';
@@ -118,17 +121,18 @@ GameData.defenseOf = save => {
     const P2 = spots(img, style, front, groundY, facing);
     const F = GameData.factions[faction] || GameData.factions.kralovstvi;
     const pal = Art.unitPalette(team || 'player', 'zakladni', F.id);
+    const k = img.big ? img.big.S : 1;   // obránci ve stejném měřítku jako hrad
     def.slots.forEach((sl, i) => {
       if (!P2[i]) return;
       const [x, y] = P2[i];
       const since = anim && anim.shot ? t - (anim.shot[i] == null ? -99 : anim.shot[i]) : 99;
       if (sl.kind === 'katapult') {
         const arm = since < 0.25 ? since / 0.25 : since < 1.6 ? 1 - (since - 0.25) / 1.35 : 0;
-        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, i < 3 || i >= 5 ? 0.7 : 0.9, since > 1.2);
+        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, (i < 3 || i >= 5 ? 0.7 : 0.9) * k, since > 1.2);
       } else {
         const atk = since < 0.7 ? since / 0.7 : -1;
         const def2 = sl.kind === 'kuse' ? CROSS : GameData.units[F.roles.strelec];
-        Art.drawUnit(ctx, def2, pal, { x, y, facing, t, atk, scaleMul: 0.72, noShadow: true });
+        Art.drawUnit(ctx, def2, pal, { x, y, facing, t, atk, scaleMul: 0.72 * k, noShadow: true });
       }
     });
   }

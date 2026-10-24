@@ -637,6 +637,7 @@
   /* Vrátí {canvas, flags:[{x,y}], towerTop:{x,y}} – hrad čelem doprava */
   function castleImage(team, skinId, level, res = 2, style = 'evropa', cfg = null) {
     if (cfg && cfg.big) return bigCastleImage(team, skinId, level, res, style, cfg);
+    if (cfg && cfg.small) return smallCastleImage(team, skinId, level, res, style, cfg);
     const key = team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + (cfg ? JSON.stringify(cfg) : '');
     if (castleCache.has(key)) return castleCache.get(key);
     const pal = castlePalette(team, skinId, cfg);
@@ -715,6 +716,26 @@
     const out = { canvas: cv, w: CASTLE_W, h: CASTLE_H, flags, towerTop: { x: 277, y: 170 }, pal, cfg };
     if (cfg && window.Art.decorateCastle) Art.decorateCastle(ctx, out, cfg, style);
     if (cfg && cfg.banner) out.flagColor = cfg.banner;
+    castleCache.set(key, out);
+    return out;
+  }
+
+  /* MALÝ HRAD (základní hrad hráče): stejný hrad zmenšený na 75 %. */
+  function smallCastleImage(team, skinId, level, res, style, cfg) {
+    const key = 'SMALL|' + team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + JSON.stringify(cfg);
+    if (castleCache.has(key)) return castleCache.get(key);
+    const base = castleImage(team, skinId, level, res, style, Object.assign({}, cfg, { small: false }));
+    const S = 0.75, W = Math.round(base.w * S), H = Math.round(base.h * S);
+    const cv = document.createElement('canvas');
+    cv.width = W * res; cv.height = H * res;
+    cv.getContext('2d').drawImage(base.canvas, 0, 0, W * res, H * res);
+    const out = Object.assign({}, base, {
+      canvas: cv, w: W, h: H,
+      flags: (base.flags || []).map(f => ({ x: f.x * S, y: f.y * S })),
+      towerTop: base.towerTop ? { x: base.towerTop.x * S, y: base.towerTop.y * S } : null,
+      gates: base.gates ? base.gates.map(g => Object.assign({}, g, { x: g.x * S })) : base.gates,
+      big: { S, ox: 0, oy: 0, extra: [] }, small: true
+    });
     castleCache.set(key, out);
     return out;
   }

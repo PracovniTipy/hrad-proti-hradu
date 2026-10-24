@@ -133,7 +133,7 @@
     const c = save.castleCfg || {};
     const decor = {};
     Object.keys(c.decor || {}).forEach(k => { if (c.decor[k] && (save.ownedDecor || []).includes(k)) decor[k] = true; });
-    return { banner: c.banner || null, roof: c.roof || 'auto', emblem: c.emblem || GameData.defaultEmblem[save.faction] || 'lilie', decor, big: !!save.bigCastle };
+    return { banner: c.banner || null, roof: c.roof || 'auto', emblem: c.emblem || GameData.defaultEmblem[save.faction] || 'lilie', decor, big: GameData.isBigCastle(save), small: !GameData.isBigCastle(save) };
   }
 
   /* ŽIVÁ SCÉNA – hrad v krajině národa: parallax, mraky, vlajky, stráže,
@@ -192,8 +192,8 @@
       ctx.drawImage(L.near, 0, 0, 1400, 600);
       // hrad
       const img = Art.castleImage('player', st.castleSkin, st.level, 2, F.castleStyle, st.cfg);
-      const cs = 1.12 * (img.big ? 0.84 : 1);
-      ctx.save(); ctx.translate(700 - (img.w * cs) / 2 + (img.big ? 40 : 0), 0); ctx.scale(cs, cs);
+      const cs = 1.12 * (img.small ? 1 : img.big ? 0.84 : 1);
+      ctx.save(); ctx.translate(885 - img.w * cs, 0); ctx.scale(cs, cs);
       Art.drawCastle(ctx, img, img.w, 492 / cs, 1, t, 1, F.color);
       if (window.App && App.save) Art.drawDefense(ctx, img, F.castleStyle, img.w, 492 / cs, 1, t, GameData.defenseOf(App.save), st.faction, 'player', null);
       ctx.restore();
@@ -258,7 +258,7 @@
     const owned = k => k === 'lucistnik' || (d.ownedKinds || []).includes(k);
     const price = p => p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
     const slot = i => {
-      if (i >= n) return `<article class="panel def-slot locked"><div class="def-lock">${ico('lock')}</div><b>${t('def_slot', { n: i + 1 })}</b><small>${t('def_unlock_at', { n: D.unlockAt(i, !!save.bigCastle) })}</small></article>`;
+      if (i >= n) return `<article class="panel def-slot locked"><div class="def-lock">${ico('lock')}</div><b>${t('def_slot', { n: i + 1 })}</b><small>${t('def_unlock_at', { n: D.unlockAt(i, GameData.isBigCastle(save)) })}</small></article>`;
       const sl = def.slots[i];
       const kinds = ['lucistnik', 'kuse', 'katapult'].map(k => {
         const K = D.kinds[k];
@@ -279,7 +279,7 @@
     const cl = d.catLvl || 1, cmax = GameData.catapult.maxLevel;
     return `
       <div class="sec-head"><h2>${t('def_title')}</h2><span class="muted">${t('def_sub', { n, m: D.maxFor(save) })}</span></div>
-      <p class="muted" style="margin:-6px 0 0;font-size:14px">${t('def_note', { n: D.catapultFrom })}${save.bigCastle ? '' : ` <a href="#" data-gobig class="big-link">${t('big_more')}</a>`}</p>
+      <p class="muted" style="margin:-6px 0 0;font-size:14px">${t('def_note', { n: D.catapultFrom })}${GameData.isBigCastle(save) ? '' : ` <a href="#" data-gobig class="big-link">${t('big_more')}</a>`}</p>
       <div class="def-grid">${Array.from({ length: D.maxFor(save) }, (_, i) => slot(i)).join('')}</div>
       ${catOn ? `<section class="panel def-cat"><div><b>${t('def_katapult')} · ${t('level_of', { a: cl, b: cmax })}</b><small class="muted">${t('def_dmg', { n: GameData.defense.kinds.katapult.dmg(cl) })}</small></div>
         <button class="btn btn-gold btn-sm" data-catup ${cl >= cmax || save.gold < GameData.catapult.upgradeCost(cl) ? 'disabled' : ''}>${cl >= cmax ? t('max_level') : `${t('upgrade')} · ${ico('coin')} ${fmt(GameData.catapult.upgradeCost(cl))}`}</button></section>` : ''}`;
@@ -588,12 +588,21 @@
           }).join('')}
         </div>`;
     } else if (tab === 'hrady') {
-      const big = save.bigCastle;
-      body = `<section class="panel big-offer ${big ? 'owned' : ''}">
+      const big = save.bigCastle, useBig = GameData.isBigCastle(save);
+      body = `<div class="sec-head"><h2>${t('castle_types')}</h2></div>
+        <div class="ctype-grid">
+        <section class="panel big-offer small ${!useBig ? 'owned' : ''}">
+          <canvas id="smallCv"></canvas>
+          <div class="big-txt"><div class="eyebrow">${t('small_eyebrow')}</div><h3>${t('small_name')}</h3><p>${t('small_desc')}</p>
+            ${!useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : `<button class="btn btn-blue" data-ctype="maly">${t('use')}</button>`}</div>
+        </section>
+        <section class="panel big-offer ${useBig ? 'owned' : ''}">
           <canvas id="bigCv"></canvas>
           <div class="big-txt"><div class="eyebrow">${t('big_eyebrow')}</div><h3>${t('big_name')}</h3><p>${t('big_desc')}</p>
-            ${big ? `<button class="btn btn-sm" disabled>✓ ${t('owned')}</button>` : `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>`}</div>
+            ${useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : big ? `<button class="btn btn-blue" data-ctype="velky">${t('use')}</button>` : `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>`}</div>
         </section>
+        </div>
+        <div class="sec-head"><h2>${t('castle_looks')}</h2></div>
         <div class="skin-grid">
           ${GameData.castleSkins.map(s => {
             const owned = save.skins.ownedCastle.includes(s.id);
@@ -753,21 +762,25 @@
       cancelAnimationFrame(App.previewRaf);
       anim();
     } else if (tab === 'hrady') {
-      const bc = el.querySelector('#bigCv');
-      if (bc) {
+      // oba druhy hradu ve stejném měřítku, aby byl vidět rozdíl ve velikosti
+      const bigImg = Art.castleImage('player', save.skins.castle, 10, 2, F.castleStyle, Object.assign(castleCfg(save), { big: true, small: false }));
+      [['#smallCv', false], ['#bigCv', true]].forEach(([sel, isBig]) => {
+        const bc = el.querySelector(sel);
+        if (!bc) return;
         const dpr = Math.min(window.devicePixelRatio || 1, 2), w = bc.clientWidth, h = bc.clientHeight;
         bc.width = w * dpr; bc.height = h * dpr;
         const ctx = bc.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const cfg = Object.assign(castleCfg(save), { big: true });
-        const img = Art.castleImage('player', save.skins.castle, 10, 2, F.castleStyle, cfg);
-        const s = Math.min(w / (img.w + 20), h / (img.h + 10));
+        const cfg = Object.assign(castleCfg(save), { big: isBig, small: !isBig });
+        const img = Art.castleImage('player', save.skins.castle, isBig ? 10 : GameData.calc.castleLevel(save), 2, F.castleStyle, cfg);
+        const s = Math.min(w / (bigImg.w + 20), h / (bigImg.h + 10));
         ctx.save(); ctx.scale(s, s);
         const fr = (w / 2 + img.w * s / 2) / s, gy = h / s - 4;
         Art.drawCastle(ctx, img, fr, gy, 1, 0.3, 1, F.color);
-        const demo = { slots: Array.from({ length: 10 }, (_, i) => ({ kind: i === 2 || i === 7 ? 'katapult' : i % 3 === 1 ? 'kuse' : 'lucistnik', el: ['ohen', 'led', 'blesk', 'voda', 'jed'][i % 5] })), vez: 10, catLvl: 1 };
+        const demo = { slots: Array.from({ length: isBig ? 10 : 5 }, (_, i) => ({ kind: i === 2 || i === 7 ? 'katapult' : i % 3 === 1 ? 'kuse' : 'lucistnik', el: ['ohen', 'led', 'blesk', 'voda', 'jed'][i % 5] })), vez: 10, catLvl: 1 };
         Art.drawDefense(ctx, img, F.castleStyle, fr, gy, 1, 0, demo, F.id, 'player', null);
         ctx.restore();
-      }
+      });
+      el.querySelectorAll('[data-ctype]').forEach(b => b.addEventListener('click', () => { save.castleType = b.dataset.ctype; App.persist(); App.go('obchod', { keepScroll: true }); }));
       if (window.Shop && Shop.bindOffers) Shop.bindOffers(App, el);
       el.querySelectorAll('canvas[data-skincastle]').forEach(c => Art.renderCastleIcon(c, 'player', c.dataset.skincastle, GameData.calc.castleLevel(save), F.castleStyle));
       el.querySelectorAll('[data-cequip]').forEach(b => b.addEventListener('click', () => { save.skins.castle = b.dataset.cequip; App.persist(); App.go('obchod', { keepScroll: true }); }));

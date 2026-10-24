@@ -600,3 +600,9 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .skin.nat { position: relative; }
 .skin-tag { position: absolute; top: 8px; left: 8px; z-index: 1; font-family: var(--font-display); font-size: 11px; letter-spacing: .04em; color: #2a1a03;
   padding: 2px 8px; border-radius: 10px; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 1px #05070b; }
+
+/* ===== Dva druhy hradu ===== */
+.ctype-grid { display: grid; grid-template-columns: 1fr 1.35fr; gap: 12px; margin-bottom: 8px; }
+.ctype-grid .big-offer { grid-template-columns: 1fr; margin: 0; align-content: start; }
+.ctype-grid .big-offer canvas { height: 230px; }
+@media (max-width: 640px) { .ctype-grid { grid-template-columns: 1fr; } }
