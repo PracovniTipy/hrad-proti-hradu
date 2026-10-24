@@ -218,14 +218,14 @@
             <button class="auto-tg" data-auto="${g.f}" aria-pressed="false" aria-label="${t('auto_for', { name: esc(F.name) })}"><i></i><span>AUTO</span></button></div>
           <div class="ugrp-b">${g.units.map(id => `
             <button class="ubtn" data-spawn="${id}" aria-label="${esc(GameData.units[id].name)} · ${GameData.units[id].cost}">
-              <canvas></canvas><span class="key">${++k <= 9 ? k : ''}</span><i class="cd" style="height:0"></i>
+              <canvas></canvas><span class="key">${++k <= 9 ? k : ''}</span><i class="cd"></i>
               <span class="cost">${ico('coin')}${GameData.units[id].cost}</span>
             </button>`).join('')}</div>
         </div>`;
       }).join('');
       $('#bAbil').innerHTML = Object.values(GameData.abilities).map((a, i) => `
         <button class="abtn ${a.id === 'ohen' ? 'fire' : 'shield'}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name}: ${a.desc}">
-          ${ico(a.id === 'ohen' ? 'fire' : 'shield')}<i class="cd" style="height:0"></i>
+          ${ico(a.id === 'ohen' ? 'fire' : 'shield')}<i class="cd"></i>
           <span class="cost">${ico('coin')}${a.cost}</span>
         </button>`).join('');
       applyIcons(B);
@@ -320,8 +320,8 @@
     _hud(b, last) {
       const P = b.side.player, E = b.side.enemy;
       const set = (k, v, fn) => { if (last[k] !== v) { last[k] = v; fn(v); } };
-      set('hpMe', Math.ceil(P.castle.hp), v => { $('#hpMe').style.width = (v / P.castle.maxHp * 100) + '%'; $('#hpMeNum').textContent = `${fmt(v)} / ${fmt(P.castle.maxHp)}`; });
-      set('hpFoe', Math.ceil(E.castle.hp), v => { $('#hpFoe').style.width = (v / E.castle.maxHp * 100) + '%'; $('#hpFoeNum').textContent = `${fmt(v)} / ${fmt(E.castle.maxHp)}`; });
+      set('hpMe', Math.ceil(P.castle.hp), v => { $('#hpMe').style.width = $('#hpMeT').style.width = (v / P.castle.maxHp * 100) + '%'; $('#hpMeNum').textContent = `${fmt(v)} / ${fmt(P.castle.maxHp)}`; });
+      set('hpFoe', Math.ceil(E.castle.hp), v => { $('#hpFoe').style.width = $('#hpFoeT').style.width = (v / E.castle.maxHp * 100) + '%'; $('#hpFoeNum').textContent = `${fmt(v)} / ${fmt(E.castle.maxHp)}`; });
       const tl = Math.max(0, Math.ceil(b.timeLeft));
       if (b.bossUnit) {
         const u = b.bossUnit, alive = !u.dead;
@@ -341,7 +341,7 @@
         const val = (P.coins >= def.cost ? 1 : 0) + '|' + Math.round(cd * 40);
         set(key, val, () => {
           btn.classList.toggle('poor', P.coins < def.cost);
-          btn.querySelector('.cd').style.height = (cd * 100) + '%';
+          btn.querySelector('.cd').style.setProperty('--cd', cd.toFixed(3));
         });
       });
       document.querySelectorAll('#bAbil [data-abil]').forEach(btn => {
@@ -349,7 +349,7 @@
         const val = (st.affordable ? 1 : 0) + '|' + Math.round(st.cdLeft / st.cdTotal * 40);
         set('a' + btn.dataset.abil, val, () => {
           btn.classList.toggle('poor', !st.affordable);
-          btn.querySelector('.cd').style.height = (st.cdLeft / st.cdTotal * 100) + '%';
+          btn.querySelector('.cd').style.setProperty('--cd', (st.cdLeft / st.cdTotal).toFixed(3));
         });
       });
     },

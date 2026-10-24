@@ -1013,13 +1013,23 @@
     }
 
     _hpBar(ctx, u) {
-      const w = 40, h = 5.5, x = u.x - w / 2, y = u.y - 88 * (u.def.look.scale || 1) * US();
-      ctx.fillStyle = 'rgba(10,12,18,.8)'; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
-      u.hpShow = u.hpShow == null ? u.hp : u.hpShow + (u.hp - u.hpShow) * 0.15;
-      ctx.fillStyle = 'rgba(255,240,200,.85)';
-      ctx.fillRect(x, y, w * Math.max(0, u.hpShow / u.maxHp), h);
-      ctx.fillStyle = u.team === 'player' ? '#4f9bff' : '#ef5350';
-      ctx.fillRect(x, y, w * Math.max(0, u.hp / u.maxHp), h);
+      const w = 42, h = 7, x = u.x - w / 2, y = u.y - 88 * (u.def.look.scale || 1) * US();
+      const r = h / 2;
+      const pill = (px, py, pw, ph, pr) => { ctx.beginPath(); ctx.moveTo(px + pr, py); ctx.arcTo(px + pw, py, px + pw, py + ph, pr); ctx.arcTo(px + pw, py + ph, px, py + ph, pr); ctx.arcTo(px, py + ph, px, py, pr); ctx.arcTo(px, py, px + pw, py, pr); ctx.closePath(); };
+      // rám: tmavý okraj a jemná zlatá linka
+      pill(x - 2, y - 2, w + 4, h + 4, r + 2); ctx.fillStyle = 'rgba(8,6,4,.88)'; ctx.fill();
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(232,184,74,.55)'; ctx.stroke();
+      u.hpShow = u.hpShow == null ? u.hp : u.hpShow + (u.hp - u.hpShow) * 0.12;
+      const kShow = Math.max(0, u.hpShow / u.maxHp), k = Math.max(0, u.hp / u.maxHp);
+      if (kShow > k) { pill(x, y, Math.max(h, w * kShow), h, r); ctx.fillStyle = 'rgba(255,236,180,.85)'; ctx.fill(); }
+      if (k > 0) {
+        const g = ctx.createLinearGradient(0, y, 0, y + h);
+        if (u.team === 'player') { g.addColorStop(0, '#bfe0ff'); g.addColorStop(0.45, '#4f9bff'); g.addColorStop(1, '#1d4a9a'); }
+        else { g.addColorStop(0, '#ffd0c8'); g.addColorStop(0.45, '#ef5350'); g.addColorStop(1, '#8a1612'); }
+        pill(x, y, Math.max(h, w * k), h, r); ctx.fillStyle = g; ctx.fill();
+        // lesk
+        pill(x + 2, y + 1, Math.max(2, w * k - 4), h * 0.38, h * 0.2); ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.fill();
+      }
     }
 
     _castleFire(ctx, side, facing, t) {

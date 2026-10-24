@@ -8,6 +8,7 @@ html = (root / 'index.html').read_text(encoding='utf-8')
 
 css = (root / 'css/style.css').read_text(encoding='utf-8')
 html = html.replace('<link rel="stylesheet" href="css/style.css">', '<style>\n' + css + '\n</style>')
+html = html.replace('<link rel="stylesheet" href="css/ui-pro.css">', '<style>\n' + (root / 'css/ui-pro.css').read_text(encoding='utf-8') + '\n</style>')
 
 def inline(m):
     src = m.group(1)

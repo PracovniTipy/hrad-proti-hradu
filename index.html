@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@500;700;800;900&family=Cinzel:wght@700;900&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/ui-pro.css">
 </head>
 <body>
 <div id="app">
@@ -42,18 +43,18 @@
 <section id="battle" hidden aria-label="Bitva">
   <div class="b-hud">
     <div class="hpbox me">
-      <div class="lbl" data-i18n="your_castle">Tvůj hrad</div>
-      <div class="hp"><i id="hpMe" style="width:100%"></i></div>
+      <div class="lbl"><span class="hp-crest" data-ico="castle"></span><span data-i18n="your_castle">Tvůj hrad</span></div>
+      <div class="hp"><b id="hpMeT" style="width:100%"></b><i id="hpMe" style="width:100%"></i></div>
       <div class="hpnum" id="hpMeNum">0 / 0</div>
     </div>
     <div class="b-center">
       <button class="hud-btn" id="bSpeed" aria-label="Rychlost hry">×1</button>
-      <div id="bTimer">3:00</div>
+      <div class="timer-medal"><span data-ico="hourglass"></span><b id="bTimer">3:00</b></div>
       <button class="hud-btn" id="bPause" aria-label="Pauza"><span data-ico="pause"></span></button>
     </div>
     <div class="hpbox foe">
-      <div class="lbl" id="foeName">Nepřátelský hrad</div>
-      <div class="hp"><i id="hpFoe" style="width:100%"></i></div>
+      <div class="lbl"><span id="foeName">Nepřátelský hrad</span><span class="hp-crest foe-crest" data-ico="castle"></span></div>
+      <div class="hp"><b id="hpFoeT" style="width:100%"></b><i id="hpFoe" style="width:100%"></i></div>
       <div class="hpnum" id="hpFoeNum">0 / 0</div>
     </div>
   </div>
@@ -86,7 +87,7 @@
   </div>
   <canvas id="bMini" class="b-mini" aria-label="Minimapa bojiště"></canvas>
   <div class="b-bar">
-    <div class="coins" id="bCoins"><div><span data-ico="coin"></span><b id="bCoinNum">0</b><small id="bCoinMax">max 600</small></div></div>
+    <div class="coins" id="bCoins"><div><span data-ico="pouch"></span><b id="bCoinNum">0</b><small id="bCoinMax">max 600</small></div></div>
     <div class="b-units" id="bUnits"></div>
     <div class="b-abil" id="bAbil"></div>
   </div>
