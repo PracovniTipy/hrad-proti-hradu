@@ -538,11 +538,11 @@
       const c = window.Art.weaponColors(pal, BM);
       limb(ctx, -2, -50, sx, sy, 5, shade(pal.tunic, -0.2));
       limb(ctx, 1, -50, gx - 1, gy, 5.2, pal.tunic);
-      const tips = window.Art.drawBowLimbs(ctx, BM.id, c, gx, gy);
+      const tips = window.Art.drawBowLimbs(ctx, BM.id, c, gx, gy, L.weapon === 'yumi');
       ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(sx, sy); ctx.lineTo(tips[1][0], tips[1][1]);
       ctx.lineWidth = 1.3; ctx.strokeStyle = c.string; ctx.stroke();
       if (atk < 0 || atk < 0.6) {
-        const al = BM.id === 'yumi' ? 40 : 34;
+        const al = BM.id === 'yumi' ? 44 : 38;
         ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + al, sy); ctx.lineWidth = 3.6; ctx.strokeStyle = OUT; ctx.stroke();
         ctx.lineWidth = 1.8; ctx.strokeStyle = BM.arrow || '#d8c39a'; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(sx + al, sy - 3.4); ctx.lineTo(sx + al + 6, sy); ctx.lineTo(sx + al, sy + 3.4); ctx.closePath(); fs(ctx, BM.tip || '#c9ced6', 1.1);

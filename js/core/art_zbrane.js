@@ -228,71 +228,49 @@
   };
 
   /* ------------ LUKY: tvar ramen ------------ */
-  /* JUMI – samurajský luk: přes 2 metry vysoký, nesouměrný (úchop ve spodní
-     třetině), černě lakovaný, s bílými ratanovými omotávkami, konce ramen
-     se stáčí dopředu a úchop je omotaný rudou kůží. */
-  function drawYumi(ctx, c, gx, gy) {
-    const top = 86, bot = 38;
-    const T = [gx - 4, gy - top], B = [gx - 4, gy + bot];
-    const lac = c.wood && c.wood !== '#8a5a32' ? c.wood : '#1c1a1e';
-    // tvar: od úchopu mírně dozadu, pak zase dopředu ke konci (typické dvojité prohnutí)
-    const path = () => {
-      ctx.beginPath();
-      ctx.moveTo(T[0] + 6, T[1] - 2);
-      ctx.quadraticCurveTo(T[0] - 2, T[1] + 4, T[0] - 6, T[1] + 18);
-      ctx.bezierCurveTo(gx - 12, gy - top * 0.55, gx + 4, gy - top * 0.25, gx, gy);
-      ctx.bezierCurveTo(gx + 3, gy + bot * 0.35, gx - 8, gy + bot * 0.7, B[0] - 4, B[1] - 6);
-      ctx.quadraticCurveTo(B[0] - 2, B[1] + 2, B[0] + 5, B[1] + 2);
-    };
+  /* LUKY: všechny mají tvar klasického dlouhého luku – jeden plynulý oblouk,
+     zesílený úchop uprostřed a ramena zužující se ke koncům. Samurajský jumi
+     je největší (úchop o kousek níž) a černě lakovaný. Skiny mění barvy a ozdoby. */
+  const BOW = { yumi: [76, 44], dlouhy: [52, 50], reflex: [52, 50], draci: [54, 52], elfi: [52, 50], hvezdny: [54, 52], kost: [52, 50], mesic: [52, 50] };
+  A.bowSize = id => BOW[id] || [52, 50];
+  function drawBowLimbs(ctx, id, c, gx, gy, big) {
+    const [top, bot] = big ? BOW.yumi : (BOW[id] || [52, 50]);
+    const yumi = id === 'yumi';
+    const bend = (top + bot) * 0.2;                     // hloubka oblouku
+    const T = [gx - bend * 0.95, gy - top], B = [gx - bend * 0.95, gy + bot];
+    // bod na oblouku: k = 0 horní konec, 1 dolní konec (kvadratická křivka přes úchop)
+    const cx = 2 * gx - (T[0] + B[0]) / 2 + 0.0, cy = 2 * gy - (T[1] + B[1]) / 2;
+    const at = k => [(1 - k) * (1 - k) * T[0] + 2 * (1 - k) * k * cx + k * k * B[0], (1 - k) * (1 - k) * T[1] + 2 * (1 - k) * k * cy + k * k * B[1]];
+    const wood = yumi && (!c.wood || c.wood === '#8a5a32') ? '#1c1a1e' : c.wood;
+    // zužující se ramena: kreslí se po kouscích s měnící se tloušťkou
+    const N = 26;
     glowOn(ctx, c, 10);
-    path(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 6.4; ctx.strokeStyle = OUT; ctx.stroke();
-    ctx.lineWidth = 3.6; ctx.strokeStyle = lac; ctx.stroke();
-    glowOff(ctx);
-    path(); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.stroke();
-    // ratanové omotávky (bílé pásky) po délce luku
-    ctx.save(); path(); ctx.lineCap = 'butt'; ctx.lineWidth = 3.6; ctx.setLineDash([1.3, 11]); ctx.strokeStyle = '#efe6cf'; ctx.stroke(); ctx.restore();
-    // zlaté konce ramen
-    for (const [x, y] of [[T[0] + 5, T[1] - 1.5], [B[0] + 4, B[1] + 1.5]]) { ctx.beginPath(); ctx.arc(x, y, 2, 0, TAU); fs(ctx, c.guard && c.guard !== '#d9b04a' ? c.guard : '#d9b04a', 1); }
-    // úchop: rudá kůže a bílá omotávka nad ním
-    rr(ctx, gx - 3, gy - 7, 6, 13, 2); fs(ctx, '#a8262a', 1.3);
-    ctx.strokeStyle = '#5a0e10'; ctx.lineWidth = 0.8; for (let y = gy - 5; y < gy + 6; y += 2.4) { ctx.beginPath(); ctx.moveTo(gx - 3, y); ctx.lineTo(gx + 3, y + 1.2); ctx.stroke(); }
-    rr(ctx, gx - 2.6, gy - 11, 5.2, 3.4, 1); fs(ctx, '#efe6cf', 1);
-    return [[T[0] + 6, T[1] - 2], [B[0] + 5, B[1] + 2]];
-  }
-
-  /* gx, gy = úchop. Luky jsou vysoké: dlouhý luk skoro jako postava,
-     samurajský jumi ještě vyšší a nesouměrný (úchop ve spodní třetině). */
-  function drawBowLimbs(ctx, id, c, gx, gy) {
-    if (id === 'yumi') return drawYumi(ctx, c, gx, gy);
-    const S = { yumi: [70, 32, 'yumi'], dlouhy: [44, 40], reflex: [42, 40, 'rec'], draci: [44, 42, 'rec'], elfi: [44, 42, 'rec'], hvezdny: [46, 44, 'rec'], kost: [44, 42], mesic: [44, 42, 'rec'] }[id] || [48, 44];
-    const top = S[0], bot = S[1], rec = S[2] === 'rec';
-    const T = [gx - 13, gy - top], B = [gx - 13, gy + bot];
-    const path = () => {
-      ctx.beginPath();
-      if (rec) ctx.moveTo(T[0] + 7, T[1] - 4), ctx.quadraticCurveTo(T[0] - 1, T[1] - 1, T[0], T[1] + 2);
-      else ctx.moveTo(T[0], T[1]);
-      ctx.quadraticCurveTo(gx + 9, gy - top * 0.5, gx, gy);
-      ctx.quadraticCurveTo(gx + 9, gy + bot * 0.5, B[0], B[1] - (rec ? 2 : 0));
-      if (rec) ctx.quadraticCurveTo(B[0] - 1, B[1] + 1, B[0] + 7, B[1] + 4);
-    };
-    glowOn(ctx, c, 10);
-    path(); ctx.lineCap = 'round'; ctx.lineWidth = 7.4; ctx.strokeStyle = OUT; ctx.stroke();
-    ctx.lineWidth = 4.4; ctx.strokeStyle = c.wood; ctx.stroke();
-    glowOff(ctx);
-    path(); ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.stroke();
-    // jumi: lakované pruhy (černá a rudá omotávka)
-    if (id === 'yumi') {
-      for (const k of [0.25, 0.55, 0.8]) { const y = gy - top * k, x = gx - 13 + 13 * (1 - Math.abs(1 - 2 * k) * 0.0) * 0.9; ctx.beginPath(); ctx.moveTo(x - 1, y - 2); ctx.lineTo(x + 6, y - 1); ctx.lineWidth = 2.6; ctx.strokeStyle = k === 0.55 ? '#c8262a' : '#1a1618'; ctx.stroke(); }
+    for (const pass of [0, 1]) {
+      for (let i = 0; i < N; i++) {
+        const k0 = i / N, k1 = (i + 1) / N, km = (k0 + k1) / 2;
+        const tw = 2.2 + 3.4 * Math.sin(Math.PI * km);   // tenké konce, silný střed
+        const a = at(k0), b = at(k1);
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineCap = 'round';
+        ctx.lineWidth = pass ? tw : tw + 3; ctx.strokeStyle = pass ? wood : OUT; ctx.stroke();
+      }
+      if (!pass) glowOff(ctx);
     }
-    // ozdoby
-    const at = k => [gx - 13 + 13 * Math.sin(Math.PI * k) * 0.95, gy - top + (top + bot) * k];
-    if (id === 'elfi') for (const k of [0.2, 0.8]) { const p = at(k); ctx.beginPath(); ctx.ellipse(p[0] + 3, p[1], 4, 1.6, k < 0.5 ? -0.6 : 0.6, 0, TAU); fs(ctx, '#9be07a', 0.8); }
-    if (id === 'draci') for (const k of [0.15, 0.3, 0.7, 0.85]) { const p = at(k); ctx.beginPath(); ctx.moveTo(p[0], p[1] - 2); ctx.lineTo(p[0] + 7, p[1]); ctx.lineTo(p[0], p[1] + 2); ctx.closePath(); fs(ctx, c.blade, 0.9); }
-    if (id === 'hvezdny' || id === 'mesic') for (const k of [0.3, 0.7]) { const p = at(k); gem(ctx, p[0] + 1, p[1], 1.9, c.gem || '#bfd0ff'); }
+    // lesk dřeva
+    ctx.beginPath(); for (let i = 2; i <= N - 2; i++) { const p = at(i / N); i === 2 ? ctx.moveTo(p[0] - 0.8, p[1]) : ctx.lineTo(p[0] - 0.8, p[1]); }
+    ctx.lineWidth = 0.9; ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.stroke();
+    // jumi: bílé ratanové omotávky
+    if (yumi) for (let k = 0.08; k < 0.95; k += 0.075) { if (Math.abs(k - 0.5) < 0.08) continue; const p = at(k); ctx.beginPath(); ctx.moveTo(p[0] - 2.4, p[1]); ctx.lineTo(p[0] + 2.4, p[1]); ctx.lineWidth = 1.1; ctx.strokeStyle = '#efe6cf'; ctx.stroke(); }
+    // ozdoby skinů
+    if (id === 'elfi') for (const k of [0.2, 0.8]) { const p = at(k); ctx.beginPath(); ctx.ellipse(p[0] - 3, p[1], 4, 1.6, k < 0.5 ? 0.6 : -0.6, 0, TAU); fs(ctx, '#9be07a', 0.8); }
+    if (id === 'draci') for (const k of [0.15, 0.3, 0.7, 0.85]) { const p = at(k); ctx.beginPath(); ctx.moveTo(p[0], p[1] - 2); ctx.lineTo(p[0] - 6, p[1]); ctx.lineTo(p[0], p[1] + 2); ctx.closePath(); fs(ctx, c.blade, 0.9); }
+    if (id === 'hvezdny' || id === 'mesic') for (const k of [0.3, 0.7]) { const p = at(k); gem(ctx, p[0], p[1], 1.9, c.gem || '#bfd0ff'); }
     if (id === 'kost') for (const k of [0.15, 0.3, 0.7, 0.85]) { const p = at(k); ctx.beginPath(); ctx.arc(p[0], p[1], 2, 0, TAU); fs(ctx, '#efe6cf', 0.8); }
-    // omotávka úchopu
-    rr(ctx, gx - 2.8, gy - 5, 5.6, 10, 1.6); fs(ctx, id === 'yumi' ? '#e8e2d0' : '#4a2e18', 1.2);
-    return rec ? [[T[0] + 2, T[1] + 1], [B[0] + 2, B[1] - 1]] : [T, B];
+    // konce ramen (rohové špičky) a kožený úchop
+    for (const p of [T, B]) { ctx.beginPath(); ctx.arc(p[0], p[1], 1.8, 0, TAU); fs(ctx, yumi ? '#d9b04a' : '#e8dcc0', 1); }
+    const g = at(0.5);
+    rr(ctx, g[0] - 3.4, g[1] - 7, 6.8, 14, 2.4); fs(ctx, yumi ? '#a8262a' : '#5a3a1e', 1.3);
+    ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 0.8; for (let y = g[1] - 5; y < g[1] + 6; y += 2.4) { ctx.beginPath(); ctx.moveTo(g[0] - 3.2, y); ctx.lineTo(g[0] + 3.2, y + 1.2); ctx.stroke(); }
+    return [T, B];
   }
 
   /* ------------ PRVKY ZBROJE ------------ */
@@ -446,7 +424,7 @@
   /* výchozí model podle zbraně jednotky (meče teď vypadají jako opravdové meče) */
   const DEFAULT = { sword: 'mec', longsword: 'dlouhy' };
   /* zbraně se kreslí výrazně větší a širší, aby byly v bitvě jasně vidět */
-  function drawMelee(ctx, id, pal, M) { ctx.save(); ctx.scale(1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
+  function drawMelee(ctx, id, pal, M) { ctx.save(); ctx.scale(id === 'katana' || id === 'savle' ? -1.0 : 1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
   function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(0.95, 1.05); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
 
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
@@ -562,9 +540,9 @@
       A.drawPole(ctx, id, pal, M);
     } else if (cat === 'bow') {
       const c = A.weaponColors(pal, M);
-      const tall = id === 'yumi' ? 136 : 108, s = h / tall;
-      ctx.translate(w * 0.48, h * (id === 'yumi' ? 0.69 : 0.52)); ctx.scale(s, s);
-      const tips = A.drawBowLimbs(ctx, id, c, 0, 0);
+      const BB = L.weapon === 'yumi' ? A.bowSize('yumi') : A.bowSize(id), tall = BB[0] + BB[1] + 14, s = h / tall;
+      ctx.translate(w * 0.56, (BB[0] + 7) * s); ctx.scale(s, s);
+      const tips = A.drawBowLimbs(ctx, id, c, 0, 0, L.weapon === 'yumi');
       ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(tips[1][0], tips[1][1]); ctx.lineWidth = 1.3; ctx.strokeStyle = c.string; ctx.stroke();
       // šíp přes luk
       ctx.beginPath(); ctx.moveTo(-26, 0); ctx.lineTo(16, 0); ctx.lineWidth = 3.6; ctx.strokeStyle = A.OUT; ctx.stroke(); ctx.lineWidth = 1.8; ctx.strokeStyle = (M && M.arrow) || '#d8c39a'; ctx.stroke();
