@@ -816,7 +816,7 @@
       towerTop: base.towerTop ? { x: ox + base.towerTop.x * S, y: oy + base.towerTop.y * S } : null,
       gates: base.gates ? base.gates.map(g => Object.assign({}, g, { x: ox + g.x * S })) : base.gates,
       // obrana: místa původního hradu se přepočtou, navíc ochoz nové hradby a věž
-      big: { S, ox, oy, segs: [[tx + tw + 6, EXT - 6, wy + 16], [tx + 6, tx + tw - 6, ty + 16]] }
+      big: { S, ox, oy, segs: [[tx + tw + 6, EXT - 6, wy + 2], [tx + 6, tx + tw - 6, ty + 2]] }
     });
     castleCache.set(key, out);
     return out;

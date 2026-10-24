@@ -62,10 +62,10 @@ GameData.defenseOf = save => {
      Obránci se rozmístí po ochozech podle šířky (katapult potřebuje víc místa),
      takže stojí vždy na hradbě a nepřekrývají se. */
   const SEGS = {
-    evropa: [[16, 230, 262], [246, 312, 196]],
-    japonsko: [[64, 258, 258]],
-    sever: [[22, 230, 268], [246, 310, 200]],
-    peklo: [[22, 222, 292], [246, 314, 196]]
+    evropa: [[16, 230, 248], [246, 312, 180]],
+    japonsko: [[64, 258, 252]],
+    sever: [[22, 230, 254], [246, 310, 186]],
+    peklo: [[22, 222, 278], [246, 314, 182]]
   };
   const widthOf = sl => (sl && sl.kind === 'katapult' ? 52 : 24);
   function spots(img, style, front, groundY, facing, slots) {
@@ -90,7 +90,11 @@ GameData.defenseOf = save => {
       let x = x0 + gap;
       ids.forEach(j => { const wj = widthOf(list[j]) * k * sq; out[j] = [x + wj / 2, y]; x += wj + gap; });
     });
-    return out.map(([lx, ly]) => [facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx), groundY - img.h + ly]);
+    const X = lx => facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx);
+    const res = out.map(([lx, ly]) => [X(lx), groundY - img.h + ly]);
+    // ochozy s obránci – před ně se pak kreslí cimbuří, aby obránci stáli ZA hradbou
+    res.walls = segs.filter((sg, si) => used[si].length).map(([a, b, y]) => [Math.min(X(a), X(b)) - 6, Math.max(X(a), X(b)) + 6, groundY - img.h + y]);
+    return res;
   }
 
   /* Kušiník: helma, kroužková zbroj a kuše */
@@ -156,6 +160,15 @@ GameData.defenseOf = save => {
         const def2 = sl.kind === 'kuse' ? CROSS : GameData.units[F.roles.strelec];
         Art.drawUnit(ctx, def2, pal, { x, y, facing, t, atk, scaleMul: 0.72 * k, noShadow: true });
       }
+    });
+    // cimbuří před obránci: kola katapultů a nohy střelců jsou schované za hradbou
+    const cp = img.pal || {};
+    const wood = style === 'sever';
+    const st = wood ? '#8a5a32' : (cp.stone || '#a3a9b2'), stL = wood ? '#a8703e' : (cp.stoneLight || '#c7ccd3');
+    (P2.walls || []).forEach(([x0, x1, y]) => {
+      const size = 13 * k, step = 20 * k;
+      for (let x = x0; x < x1 - 4; x += step) { ctx.beginPath(); ctx.rect(x, y - size, step * 0.62, size + 2); Art.fs(ctx, stL, 1.8); }
+      ctx.beginPath(); ctx.rect(x0 - 2, y - 2, x1 - x0 + 4, 9 * k); Art.fs(ctx, st, 1.8);
     });
   }
 

@@ -200,3 +200,15 @@ GameData.weaponSkinFits = (w, unitId) => w.cat === 'any' || (window.Art && Art.w
   const R = { 'Základní': 0, 'Vzácný': 1, 'Epický': 2, 'Legendární': 3 };
   GameData.rarityRank = r => R[r] ?? 0;
 })();
+
+/* Samurajové používají jen kopí, meč (katana) a luk – žádné sekery, kladiva ani palcáty. */
+GameData.SAM_OK = { melee: ['mec', 'dlouhy', 'savle', 'katana', 'runovy', 'plamen', 'krystal', 'kostena', 'kral', 'hvezda'], pole: ['kopi', 'partyzana', 'drak', 'hvezdne'], bow: null };
+(function () {
+  const fits0 = GameData.weaponSkinFits;
+  GameData.weaponSkinFits = (w, unitId) => {
+    if (!fits0(w, unitId)) return false;
+    const u = GameData.units[unitId];
+    if (u && u.faction === 'samurajove' && w.model) { const ok = GameData.SAM_OK[w.cat]; if (ok && !ok.includes(w.model.id)) return false; }
+    return true;
+  };
+})();

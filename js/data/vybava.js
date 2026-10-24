@@ -131,14 +131,15 @@ GameData.gearHelpers = {
       if (E.weapon.look.metal && !E.armor) pal.metal = E.weapon.look.metal;
       // lepší výbava = jiný tvar zbraně
       const TM = { melee: [null, 'runovy', 'plamen', 'hvezda'], pole: [null, 'partyzana', 'drak', 'hvezdne'], bow: [null, 'reflex', 'draci', 'hvezdny'] };
-      const mid = cat && TM[cat] && TM[cat][E.weapon.tier];
+      let mid = cat && TM[cat] && TM[cat][E.weapon.tier];
+      if (def.faction === 'samurajove' && cat === 'melee' && mid) mid = 'katana';
       if (mid) pal.wmodel = { id: mid, cat, glow: E.weapon.look.glow };
       key += 'w' + E.weapon.tier;
     }
     const ws = (save.skins.weapon || {})[unitId];
     if (ws && ws !== 'w_zakladni' && GameData.weaponSkinById) {
       const W = GameData.weaponSkinById(ws);
-      if (W.model && (W.cat === cat)) { pal.wmodel = W.model; key += 'ws' + ws; }
+      if (W.model && (W.cat === cat) && GameData.weaponSkinFits(W, unitId)) { pal.wmodel = W.model; key += 'ws' + ws; }
     }
     return { pal, look, key };
   },
