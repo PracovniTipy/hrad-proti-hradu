@@ -1109,7 +1109,7 @@
       if (!this.def || !this.def.slots.length) return;
       const P = this.side.player, cfg = C(), K = GameData.defense.kinds;
       if (P.castle.hp <= 0) return;
-      const pos = Art.defenseSpots(P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1);
+      const pos = Art.defenseSpots(P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1, this.def.slots);
       this.def.slots.forEach((sl, i) => {
         this.defTimer[i] -= dt;
         if (this.defTimer[i] > 0) return;

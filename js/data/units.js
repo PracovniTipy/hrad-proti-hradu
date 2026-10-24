@@ -129,8 +129,8 @@ GameData.battleConfig = {
   groundY: 492,         // úroveň patky hradů
   laneTop: 474,         // rozsah "hloubky", kde chodí vojáci
   laneBottom: 540,
-  playerFront: 262,     // čelo (brána) mého hradu
-  enemyFront: 4738,     // čelo nepřátelského hradu (worldW - 262)
+  playerFront: 470,     // čelo (brána) mého hradu – celý hrad je vidět i s Velkou pevností
+  enemyFront: 4530,     // čelo nepřátelského hradu (worldW - 470)
   timeLimit: 420,       // sekund (7 minut – bojiště je dlouhé)
   startCoins: 120,
   killRewardRatio: 0.3, // podíl ceny jednotky, který dostaneš za zabití

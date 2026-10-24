@@ -58,17 +58,39 @@ GameData.defenseOf = save => {
 
 (function () {
   const TAU = Math.PI * 2;
-  /* 5 míst na hradech jednotlivých stylů (souřadnice v obrázku hradu 320×380) */
-  const SPOTS = {
-    evropa: [[258, 196], [306, 196], [282, 196], [150, 262], [60, 262]],
-    japonsko: [[120, 256], [210, 256], [165, 256], [72, 262], [255, 262]],
-    sever: [[250, 200], [302, 200], [276, 200], [130, 268], [60, 268]],
-    peklo: [[255, 196], [305, 196], [280, 196], [150, 292], [60, 292]]
+  /* OCHOZY na hradbách (souřadnice v obrázku hradu 320×380): [x0, x1, y nohou].
+     Obránci se rozmístí po ochozech podle šířky (katapult potřebuje víc místa),
+     takže stojí vždy na hradbě a nepřekrývají se. */
+  const SEGS = {
+    evropa: [[16, 230, 262], [246, 312, 196]],
+    japonsko: [[64, 258, 258]],
+    sever: [[22, 230, 268], [246, 310, 200]],
+    peklo: [[22, 222, 292], [246, 314, 196]]
   };
-  function spots(img, style, front, groundY, facing) {
-    let pts = SPOTS[style] || SPOTS.evropa;
-    if (img.big) { const B = img.big; pts = pts.map(([x, y]) => [B.ox + x * B.S, B.oy + y * B.S]).concat(B.extra); }
-    return pts.map(([lx, ly]) => [facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx), groundY - img.h + ly]);
+  const widthOf = sl => (sl && sl.kind === 'katapult' ? 52 : 24);
+  function spots(img, style, front, groundY, facing, slots) {
+    const B = img.big || { S: 1, ox: 0, oy: 0, segs: [] };
+    const segs = (SEGS[style] || SEGS.evropa).map(([a, b, y]) => [B.ox + a * B.S, B.ox + b * B.S, B.oy + y * B.S]).concat(B.segs || []);
+    const list = slots && slots.length ? slots : Array.from({ length: 10 }, () => ({ kind: 'lucistnik' }));
+    const k = B.S;
+    const used = segs.map(() => []);
+    // každý obránce na ochoz s nejvíc volného místa
+    list.forEach((sl, i) => {
+      let best = 0, bestFree = -1e9;
+      segs.forEach((sg, si) => { const free = (sg[1] - sg[0]) - used[si].reduce((a, j) => a + widthOf(list[j]) * k, 0); if (free > bestFree) { bestFree = free; best = si; } });
+      used[best].push(i);
+    });
+    const out = [];
+    used.forEach((ids, si) => {
+      if (!ids.length) return;
+      const [x0, x1, y] = segs[si], len = x1 - x0;
+      const tot = ids.reduce((a, j) => a + widthOf(list[j]) * k, 0);
+      const sq = tot > len ? len / tot : 1;                       // když se nevejdou, trochu se stisknou
+      const gap = Math.max(0, (len - tot * sq) / (ids.length + 1));
+      let x = x0 + gap;
+      ids.forEach(j => { const wj = widthOf(list[j]) * k * sq; out[j] = [x + wj / 2, y]; x += wj + gap; });
+    });
+    return out.map(([lx, ly]) => [facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx), groundY - img.h + ly]);
   }
 
   /* Kušiník: helma, kroužková zbroj a kuše */
@@ -118,7 +140,7 @@ GameData.defenseOf = save => {
   /* Obrana na hradě. def = GameData.defenseOf(...), anim = { shot: [čas posledního výstřelu po místech] } */
   function drawDefense(ctx, img, style, front, groundY, facing, t, def, faction, team, anim) {
     if (!def || !def.slots || !def.slots.length) return;
-    const P2 = spots(img, style, front, groundY, facing);
+    const P2 = spots(img, style, front, groundY, facing, def.slots);
     const F = GameData.factions[faction] || GameData.factions.kralovstvi;
     const pal = Art.unitPalette(team || 'player', 'zakladni', F.id);
     const k = img.big ? img.big.S : 1;   // obránci ve stejném měřítku jako hrad
@@ -128,7 +150,7 @@ GameData.defenseOf = save => {
       const since = anim && anim.shot ? t - (anim.shot[i] == null ? -99 : anim.shot[i]) : 99;
       if (sl.kind === 'katapult') {
         const arm = since < 0.25 ? since / 0.25 : since < 1.6 ? 1 - (since - 0.25) / 1.35 : 0;
-        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, (i < 3 || i >= 5 ? 0.7 : 0.9) * k, since > 1.2);
+        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, 0.74 * k, since > 1.2);
       } else {
         const atk = since < 0.7 ? since / 0.7 : -1;
         const def2 = sl.kind === 'kuse' ? CROSS : GameData.units[F.roles.strelec];

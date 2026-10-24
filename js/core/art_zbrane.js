@@ -163,15 +163,6 @@
       ctx.beginPath(); ctx.moveTo(-1.6, 30); ctx.lineTo(-6, 33); ctx.lineTo(-1.6, 36); ctx.closePath(); fs(ctx, c.dark, 1.1);
       rr(ctx, -2.6, 0, 5.2, 4, 1); fs(ctx, c.guard, 1);
     },
-    // obouruční dvojitá sekera
-    dvojsekera(ctx, c) {
-      rr(ctx, -1.9, -12, 3.8, 54, 1.4); fs(ctx, c.wood, 1.4);
-      glowOn(ctx, c);
-      for (const d of [1, -1]) { ctx.beginPath(); ctx.moveTo(d * 1.5, 30); ctx.quadraticCurveTo(d * 15, 24, d * 16, 36); ctx.quadraticCurveTo(d * 15, 46, d * 1.5, 42); ctx.closePath(); fs(ctx, bladeFill(ctx, c, -16, 16), 1.6); }
-      glowOff(ctx);
-      ctx.beginPath(); ctx.moveTo(0, 42); ctx.lineTo(-2, 48); ctx.lineTo(2, 48); ctx.closePath(); fs(ctx, c.dark, 1);
-      rr(ctx, -2.8, 0, 5.6, 4, 1); fs(ctx, c.guard, 1);
-    },
     // válečné kladivo s hrotem
     kladivo(ctx, c) {
       rr(ctx, -1.8, -8, 3.6, 44, 1.4); fs(ctx, c.wood, 1.4);
@@ -240,7 +231,7 @@
   /* gx, gy = úchop. Luky jsou vysoké: dlouhý luk skoro jako postava,
      samurajský jumi ještě vyšší a nesouměrný (úchop ve spodní třetině). */
   function drawBowLimbs(ctx, id, c, gx, gy) {
-    const S = { yumi: [76, 36, 'yumi'], dlouhy: [50, 46], reflex: [42, 40, 'rec'], draci: [44, 42, 'rec'], elfi: [44, 42, 'rec'], hvezdny: [46, 44, 'rec'], kost: [44, 42], mesic: [44, 42, 'rec'] }[id] || [48, 44];
+    const S = { yumi: [70, 32, 'yumi'], dlouhy: [44, 40], reflex: [42, 40, 'rec'], draci: [44, 42, 'rec'], elfi: [44, 42, 'rec'], hvezdny: [46, 44, 'rec'], kost: [44, 42], mesic: [44, 42, 'rec'] }[id] || [48, 44];
     const top = S[0], bot = S[1], rec = S[2] === 'rec';
     const T = [gx - 13, gy - top], B = [gx - 13, gy + bot];
     const path = () => {
@@ -422,8 +413,8 @@
   /* výchozí model podle zbraně jednotky (meče teď vypadají jako opravdové meče) */
   const DEFAULT = { sword: 'mec', longsword: 'dlouhy' };
   /* zbraně se kreslí výrazně větší a širší, aby byly v bitvě jasně vidět */
-  function drawMelee(ctx, id, pal, M) { ctx.save(); ctx.scale(1.55, 1.3); (MELEE[id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
-  function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(1.45, 1.7); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
+  function drawMelee(ctx, id, pal, M) { ctx.save(); ctx.scale(1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
+  function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(0.95, 1.05); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
 
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
     meleeModels: Object.keys(MELEE), poleModels: Object.keys(POLE) });
@@ -506,7 +497,7 @@
    ========================================================================= */
 (function () {
   const A = window.Art, TAU = Math.PI * 2;
-  const DEF = { sword: 'mec', longsword: 'dlouhy', katana: 'katana', katana2: 'katana', axe: 'sekera', daneaxe: 'dvojsekera', flamesword: 'plamen',
+  const DEF = { sword: 'mec', longsword: 'dlouhy', katana: 'katana', katana2: 'katana', axe: 'sekera', daneaxe: 'sekera', flamesword: 'plamen',
     spear: 'kopi', yari: 'kopi', trident: 'trojzubec', bow: 'dlouhy', yumi: 'yumi' };
   function prep(cv) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);

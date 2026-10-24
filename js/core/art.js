@@ -297,7 +297,7 @@
     else if (L.meleeModel) drawSwordArm(ctx, L, pal, atk, w, moving, L.meleeModel);
     else if (L.weapon === 'katana' || L.weapon === 'katana2') drawSwordArm(ctx, L, pal, atk, w, moving, 'katana');
     else if (L.weapon === 'axe') drawSwordArm(ctx, L, pal, atk, w, moving, 'sekera');
-    else if (L.weapon === 'daneaxe') drawSwordArm(ctx, L, pal, atk, w, moving, 'dvojsekera');
+    else if (L.weapon === 'daneaxe') drawSwordArm(ctx, L, pal, atk, w, moving, 'sekera');
     else if (L.weapon === 'yumi') drawBow(ctx, L, pal, atk);
     else if (L.weapon === 'yari') drawSpear(ctx, L, pal, atk, moving, w);
     else if (P.weapon && P.weapon[L.weapon]) P.weapon[L.weapon](ctx, L, pal, atk, w, moving);
@@ -766,7 +766,7 @@
       flags: (base.flags || []).map(f => ({ x: f.x * S, y: f.y * S })),
       towerTop: base.towerTop ? { x: base.towerTop.x * S, y: base.towerTop.y * S } : null,
       gates: base.gates ? base.gates.map(g => Object.assign({}, g, { x: g.x * S })) : base.gates,
-      big: { S, ox: 0, oy: 0, extra: [] }, small: true
+      big: { S, ox: 0, oy: 0, segs: [] }, small: true
     });
     castleCache.set(key, out);
     return out;
@@ -775,36 +775,48 @@
   /* VELKÁ PEVNOST (z obchodu): původní hrad zvětšený o 20 % a za ním
      mohutný donjon se dvěma nárožními věžemi. Má místo pro 10 obránců. */
   function bigCastleImage(team, skinId, level, res, style, cfg) {
-    const key = 'BIG|' + team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + JSON.stringify(cfg);
+    const key = 'BIG2|' + team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + JSON.stringify(cfg);
     if (castleCache.has(key)) return castleCache.get(key);
     const base = castleImage(team, skinId, level, res, style, Object.assign({}, cfg, { big: false }));
-    const S = 1.2, bw = base.w * S, bh = base.h * S;
-    const W = Math.round(bw + 30), H = Math.round(bh + 70), ox = W - bw, oy = H - bh;
+    /* Velká pevnost: původní hrad o 8 % větší a vlevo k němu přistavěná dlouhá hradba
+       s ochozem a nárožní věží. Pevnost je širší, ne vyšší – vejde se do obrazu. */
+    const S = 1.08, bw = base.w * S, bh = base.h * S, EXT = 236;
+    const W = Math.round(EXT + bw), H = Math.round(bh), ox = EXT, oy = H - bh;
     const cv = document.createElement('canvas');
     cv.width = W * res; cv.height = H * res;
     const ctx = cv.getContext('2d'); ctx.scale(res, res);
     const pal = base.pal, rand = rng(skinId.length * 53 + level * 11);
-    // donjon a nárožní věže za hradem
-    const dx = ox + bw * 0.36, dw = 120, dy = 40;
-    stoneBlock(ctx, dx - 70, dy + 70, 52, H - dy - 70, pal, rand);
-    crenels(ctx, dx - 70, dy + 70, 52, pal, 10);
-    roof(ctx, dx - 44, dy + 62, 52, 52, pal);
-    stoneBlock(ctx, dx + dw + 18, dy + 84, 52, H - dy - 84, pal, rand);
-    crenels(ctx, dx + dw + 18, dy + 84, 52, pal, 10);
-    roof(ctx, dx + dw + 44, dy + 76, 52, 48, pal);
-    stoneBlock(ctx, dx, dy, dw, H - dy, pal, rand);
-    crenels(ctx, dx, dy, dw, pal, 12);
-    windowSlit(ctx, dx + 24, dy + 34, 14, 30, pal);
-    windowSlit(ctx, dx + dw - 38, dy + 34, 14, 30, pal);
-    banner(ctx, dx + dw / 2 - 16, dy + 22, 32, 74, pal);
+    const WT = { evropa: 246, japonsko: 242, sever: 252, peklo: 276 }[style] || 246;
+    const wy = oy + WT * S;                       // horní hrana nové hradby
+    const tx = 6, tw = 66, ty = wy - 74;            // nárožní věž
+    if (style === 'sever') {
+      // dřevěná palisáda a věž z kůlů
+      const plank = (x, y, w, h) => { for (let xx = x; xx < x + w; xx += 12) { ctx.beginPath(); ctx.moveTo(xx, H); ctx.lineTo(xx, y + 8); ctx.lineTo(xx + 6, y); ctx.lineTo(xx + 12, y + 8); ctx.lineTo(xx + 12, H); ctx.closePath(); fs(ctx, (xx / 12) % 2 ? '#8a5a32' : '#7a4c2a', 1.6); } };
+      plank(tx + tw - 6, wy, EXT - tw + 20, H - wy);
+      ctx.fillStyle = '#5a3a1e'; ctx.fillRect(tx + tw - 6, wy + 30, EXT - tw + 20, 6);
+      plank(tx, ty, tw, H - ty);
+      ctx.beginPath(); ctx.moveTo(tx - 6, ty + 4); ctx.lineTo(tx + tw / 2, ty - 40); ctx.lineTo(tx + tw + 6, ty + 4); ctx.closePath(); fs(ctx, '#5a7a3a', 2);
+    } else {
+      stoneBlock(ctx, tx + tw - 6, wy, EXT - tw + 20, H - wy, pal, rand);
+      crenels(ctx, tx + tw - 6, wy, EXT - tw + 20, pal, 12);
+      windowSlit(ctx, tx + tw + 30, wy + 40, 12, 26, pal); windowSlit(ctx, tx + tw + 100, wy + 40, 12, 26, pal);
+      stoneBlock(ctx, tx, ty, tw, H - ty, pal, rand);
+      crenels(ctx, tx, ty, tw, pal, 11);
+      windowSlit(ctx, tx + tw / 2 - 6, ty + 30, 12, 26, pal);
+      if (style === 'japonsko') { // pagodová střecha
+        ctx.beginPath(); ctx.moveTo(tx - 12, ty + 2); ctx.quadraticCurveTo(tx + tw / 2, ty - 14, tx + tw + 12, ty + 2); ctx.lineTo(tx + tw - 6, ty - 18); ctx.lineTo(tx + 6, ty - 18); ctx.closePath(); fs(ctx, '#2a2a34', 2);
+      } else if (style === 'peklo') {
+        for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(tx + 6 + k * 16, ty); ctx.lineTo(tx + 13 + k * 16, ty - 22); ctx.lineTo(tx + 20 + k * 16, ty); ctx.closePath(); fs(ctx, '#2a2024', 1.4); }
+      } else roof(ctx, tx + tw / 2, ty - 8, tw, 54, pal);
+    }
     ctx.drawImage(base.canvas, ox, oy, bw, bh);
     const out = Object.assign({}, base, {
       canvas: cv, w: W, h: H,
-      flags: (base.flags || []).map(f => ({ x: ox + f.x * S, y: oy + f.y * S })).concat([{ x: dx - 44, y: dy + 10 }, { x: dx + dw + 44, y: dy + 28 }]),
+      flags: (base.flags || []).map(f => ({ x: ox + f.x * S, y: oy + f.y * S })).concat(style === 'peklo' ? [] : [{ x: tx + tw / 2, y: ty - (style === 'sever' ? 40 : 60) }]),
       towerTop: base.towerTop ? { x: ox + base.towerTop.x * S, y: oy + base.towerTop.y * S } : null,
       gates: base.gates ? base.gates.map(g => Object.assign({}, g, { x: ox + g.x * S })) : base.gates,
-      // pro obranu: přepočet míst původního hradu + 5 nových míst na donjonu a hradbách
-      big: { S, ox, oy, extra: [[dx + 22, dy + 18], [dx + dw / 2, dy + 18], [dx + dw - 22, dy + 18], [dx - 44, dy + 88], [dx + dw + 44, dy + 102]] }
+      // obrana: místa původního hradu se přepočtou, navíc ochoz nové hradby a věž
+      big: { S, ox, oy, segs: [[tx + tw + 6, EXT - 6, wy + 16], [tx + 6, tx + tw - 6, ty + 16]] }
     });
     castleCache.set(key, out);
     return out;
