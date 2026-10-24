@@ -688,3 +688,5 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .armory-line { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin: 4px 2px 6px; font-family: var(--font-display); color: #ffe9a8; }
 .armory-line .gear-bonus { font-family: var(--font-body); color: #9dffb0; font-size: 14px; }
 .gear-card canvas { background: radial-gradient(circle at 50% 45%, rgba(255,233,168,.08), transparent 70%); }
+
+.pname-btn .plvl { margin-left: 12px; }

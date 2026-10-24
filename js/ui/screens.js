@@ -351,14 +351,6 @@
       <div class="scr scr-home">
         <section class="hero-live">
           <canvas id="homeCv" aria-label="Tvůj hrad v krajině"></canvas>
-          <div class="hero-badge">
-            <canvas class="crest" id="crestCv"></canvas>
-            <div>
-              <div class="eyebrow">${esc(F.people)}</div>
-              <h1>${esc(save.name)}</h1>
-              <div class="lvl">${t('castle_level', { n: lvl })}</div>
-            </div>
-          </div>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
           <button class="daily-btn" id="dailyBtn" aria-label="${t('daily_title')}">
             <span class="daily-chest">${Icons.navObchod ? '' : ''}<svg viewBox="0 0 120 100"><path d="M14 46h92v40a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#8a5a32" stroke="#1a0e06" stroke-width="4"/><path d="M14 46c0-20 20-30 46-30s46 10 46 30z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M14 46h92" stroke="#ffd77a" stroke-width="7"/><path d="M30 18v74M90 18v74" stroke="#ffd77a" stroke-width="7"/><rect x="49" y="39" width="22" height="24" rx="3" fill="#ffd77a" stroke="#1a0e06" stroke-width="3"/></svg></span>
@@ -370,7 +362,7 @@
     if (!sprava) {
       el.classList.add('home-mode');
       App._stopLive = liveScene(el.querySelector('#homeCv'), () => sceneState(save));
-      emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
+      if (el.querySelector('#crestCv')) emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
       el.querySelector('#dailyBtn').addEventListener('click', () => Denni.open(App));
       return;
     }

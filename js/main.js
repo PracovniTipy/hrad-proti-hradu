@@ -18,6 +18,7 @@
       const s = this.save;
       $('#pName').textContent = s.name;
       $('#pTrophies').textContent = fmt(s.trophies);
+      $('#pLevel').textContent = t('castle_level', { n: GameData.calc.castleLevel(s) });
       if (s.tester) { s.gold = Math.max(s.gold, 9999999); s.gems = Math.max(s.gems, 9999999); }
       $('#rGold').textContent = s.tester ? '∞' : fmt(s.gold);
       $('#rGems').textContent = s.tester ? '∞' : fmt(s.gems);
