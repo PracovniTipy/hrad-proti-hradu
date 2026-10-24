@@ -64,12 +64,13 @@
 
   /* ------------ MODELY ZBRANÍ NA BLÍZKO (rukojeť v 0, čepel ve směru +y) ------------ */
   const MELEE = {
+    AXE_SIDE: -1,
     // jednoruční meč: široká čepel s žlábkem
     mec(ctx, c) {
       glowOn(ctx, c);
-      ctx.beginPath(); ctx.moveTo(-3.6, 5); ctx.lineTo(-3.2, 30); ctx.lineTo(0, 36); ctx.lineTo(3.2, 30); ctx.lineTo(3.6, 5); ctx.closePath();
+      ctx.beginPath(); ctx.moveTo(-3.6, 5); ctx.lineTo(-3.2, 34); ctx.lineTo(0, 40); ctx.lineTo(3.2, 34); ctx.lineTo(3.6, 5); ctx.closePath();
       fs(ctx, bladeFill(ctx, c, -3.6, 3.6), 1.6); glowOff(ctx);
-      ctx.beginPath(); ctx.moveTo(0, 7); ctx.lineTo(0, 28); ctx.lineWidth = 1.2; ctx.strokeStyle = shade(c.dark, -0.15); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, 7); ctx.lineTo(0, 32); ctx.lineWidth = 1.2; ctx.strokeStyle = shade(c.dark, -0.15); ctx.stroke();
       hilt(ctx, c, 8);
     },
     // dlouhý meč
@@ -154,14 +155,23 @@
       ctx.fillStyle = shade(c.grip, 0.5); for (let y = -10; y < 2; y += 2.6) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1.6, y + 1.3); ctx.lineTo(0, y + 2.6); ctx.lineTo(-1.6, y + 1.3); ctx.closePath(); ctx.fill(); }
       hilt(ctx, c, 6, 'tsuba');
     },
-    // sekera: topůrko s půlměsícovým ostřím
+    // sekera: vikingská „vousatá“ sekera – rovná horní hrana, dlouhé ostří a vous
+    // zatažený dolů k topůrku. SIDE = na kterou stranu míří ostří (dopředu).
     sekera(ctx, c) {
-      rr(ctx, -1.8, -8, 3.6, 46, 1.4); fs(ctx, c.wood, 1.4);
+      const S = MELEE.AXE_SIDE;
+      rr(ctx, -1.8, -10, 3.6, 52, 1.4); fs(ctx, c.wood, 1.4);
+      ctx.strokeStyle = shade(c.wood, -0.3); ctx.lineWidth = 0.7; for (let y = -6; y < 4; y += 2.2) { ctx.beginPath(); ctx.moveTo(-1.8, y); ctx.lineTo(1.8, y + 1); ctx.stroke(); }
       glowOn(ctx, c);
-      ctx.beginPath(); ctx.moveTo(1.5, 28); ctx.quadraticCurveTo(13, 26, 15, 34); ctx.quadraticCurveTo(14, 42, 1.5, 40); ctx.closePath();
-      fs(ctx, bladeFill(ctx, c, 1, 15), 1.6); glowOff(ctx);
-      ctx.beginPath(); ctx.moveTo(-1.6, 30); ctx.lineTo(-6, 33); ctx.lineTo(-1.6, 36); ctx.closePath(); fs(ctx, c.dark, 1.1);
-      rr(ctx, -2.6, 0, 5.2, 4, 1); fs(ctx, c.guard, 1);
+      ctx.beginPath();
+      ctx.moveTo(S * 1.6, 31);                       // horní hrana u topůrka
+      ctx.lineTo(S * 15, 28.5);                      // horní roh ostří
+      ctx.quadraticCurveTo(S * 17.5, 37, S * 14, 47); // zahnuté ostří
+      ctx.quadraticCurveTo(S * 7, 44, S * 4.5, 38.5); // vous
+      ctx.lineTo(S * 1.6, 37.5);
+      ctx.closePath();
+      fs(ctx, bladeFill(ctx, c, S > 0 ? 1 : -17, S > 0 ? 17 : -1), 1.6); glowOff(ctx);
+      ctx.beginPath(); ctx.moveTo(S * 14.6, 29.5); ctx.quadraticCurveTo(S * 16.6, 37, S * 13.4, 45.5); ctx.lineWidth = 1.2; ctx.strokeStyle = c.edge; ctx.stroke();
+      rr(ctx, -2.8, 29.5, 5.6, 9, 1.2); fs(ctx, c.dark, 1.2);   // oko sekery
     },
     // válečné kladivo s hrotem
     kladivo(ctx, c) {
@@ -176,10 +186,10 @@
     palcat(ctx, c) {
       rr(ctx, -1.8, -8, 3.6, 40, 1.4); fs(ctx, c.grip, 1.4);
       glowOn(ctx, c);
-      ctx.beginPath(); ctx.ellipse(0, 38, 6, 8, 0, 0, TAU); fs(ctx, bladeFill(ctx, c, -6, 6), 1.6);
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 3, 38 + Math.sin(a) * 3); ctx.lineTo(Math.cos(a) * 9, 38 + Math.sin(a) * 10); ctx.lineWidth = 2.6; ctx.strokeStyle = c.dark; ctx.stroke(); }
+      ctx.beginPath(); ctx.ellipse(0, 37, 4.6, 6.4, 0, 0, TAU); fs(ctx, bladeFill(ctx, c, -5, 5), 1.6);
+      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 2.4, 37 + Math.sin(a) * 2.4); ctx.lineTo(Math.cos(a) * 7, 37 + Math.sin(a) * 7.6); ctx.lineWidth = 2.6; ctx.strokeStyle = c.dark; ctx.stroke(); }
       glowOff(ctx);
-      ctx.beginPath(); ctx.moveTo(0, 46); ctx.lineTo(0, 50); ctx.lineWidth = 2; ctx.strokeStyle = c.dark; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, 43); ctx.lineTo(0, 46); ctx.lineWidth = 2; ctx.strokeStyle = c.dark; ctx.stroke();
     }
   };
 
@@ -428,7 +438,7 @@
   function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(0.95, 1.05); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
 
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
-    meleeModels: Object.keys(MELEE), poleModels: Object.keys(POLE) });
+    MELEE_REF: MELEE, meleeModels: Object.keys(MELEE).filter(k => k !== 'AXE_SIDE'), poleModels: Object.keys(POLE) });
 })();
 
 /* =========================================================================
