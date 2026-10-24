@@ -334,6 +334,8 @@
         btn.addEventListener('pointerdown', e => {
           e.preventDefault();
           if (battle.over) return;
+          // klepnutí na odznak ×N = zrušit jednoho vojáka ze zásobníku
+          if (e.target.closest('.qn')) { e.stopPropagation(); battle.dequeueOne(btn.dataset.spawn); return; }
           const r = battle.enqueue(btn.dataset.spawn);
           if (r === 'full') this._flash(btn);
           clearTimeout(lp);
@@ -413,7 +415,7 @@
         set('q' + btn.dataset.spawn, n, v => {
           let q = btn.querySelector('.qn');
           if (!q) { q = document.createElement('b'); q.className = 'qn'; btn.appendChild(q); }
-          q.textContent = v ? '×' + v : ''; q.hidden = !v;
+          q.innerHTML = v ? `×${v}<i class="qx">✕</i>` : ''; q.hidden = !v;
         });
       });
       document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {

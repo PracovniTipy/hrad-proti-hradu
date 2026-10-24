@@ -610,7 +610,8 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 /* ===== Zásobník vojáků ===== */
 .ubtn { position: relative; }
 .ubtn .qn { position: absolute; top: -6px; right: -6px; z-index: 3; min-width: 26px; padding: 1px 6px; border-radius: 12px; font-family: var(--font-display); font-size: 13px; font-style: normal;
-  color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 2px #05070b, 0 2px 6px rgba(0,0,0,.6); text-align: center; pointer-events: none; }
+  color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 2px #05070b, 0 2px 6px rgba(0,0,0,.6); text-align: center; pointer-events: auto; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.ubtn .qn .qx { font-style: normal; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #a8262a; color: #fff; font-size: 11px; font-family: var(--font-body); }
 .ubtn .qn[hidden] { display: none; }
 
 /* ===== Výběr národa v obchodě ===== */
@@ -690,3 +691,6 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .gear-card canvas { background: radial-gradient(circle at 50% 45%, rgba(255,233,168,.08), transparent 70%); }
 
 .pname-btn .plvl { margin-left: 12px; }
+/* odznak zásobníku zůstane jasný, i když na vojáka zatím nejsou mince */
+#bUnits .ubtn.poor { filter: none; }
+#bUnits .ubtn.poor > canvas, #bUnits .ubtn.poor > .cost, #bUnits .ubtn.poor > .key { filter: saturate(.25) brightness(.7); }

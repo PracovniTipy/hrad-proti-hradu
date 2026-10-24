@@ -248,6 +248,13 @@
       return 'queued';
     }
     queueCount(unitId) { return (this.queue || []).filter(x => x === unitId).length; }
+    /* zruší jednoho vojáka ze zásobníku (posledního zadaného) */
+    dequeueOne(unitId) {
+      const q = this.queue || [];
+      const i = q.lastIndexOf(unitId);
+      if (i >= 0) q.splice(i, 1);
+      if (this.o.onQueue) this.o.onQueue();
+    }
     clearQueue(unitId) { this.queue = (this.queue || []).filter(x => x !== unitId); if (this.o.onQueue) this.o.onQueue(); }
     _runQueue() {
       const q = this.queue;
