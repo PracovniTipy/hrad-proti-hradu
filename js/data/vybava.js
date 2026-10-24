@@ -144,3 +144,23 @@ GameData.gearHelpers = {
   rarityName: ['Běžná', 'Vzácná', 'Epická', 'Legendární'],
   rarityColor: ['#c9ced6', '#5aa9ff', '#c07cff', '#ffcf4a']
 };
+
+/* ---- Profilové obrázky: lidé i mýtické bytosti ---- */
+GameData.avatars = [
+  { id: 'rytir', unit: 'rytir', name: 'Rytíř', bg: ['#4f8fe8', '#122a5a'] },
+  { id: 'paladin', unit: 'rytir', skin: 'zlaty', name: 'Paladin', bg: ['#ffe9a0', '#7a5410'] },
+  { id: 'lucistnik', unit: 'lucistnik', name: 'Lučištnice', bg: ['#7fc06a', '#1d4a20'] },
+  { id: 'pesak', unit: 'pesak', name: 'Strážný', bg: ['#9aa3b0', '#2a2f3a'] },
+  { id: 'samuraj', unit: 'samuraj', name: 'Samuraj', bg: ['#ff8a7a', '#5a0e0a'] },
+  { id: 'asigaru', unit: 'asigaru', name: 'Ašigaru', bg: ['#f4b3c8', '#5a2a40'] },
+  { id: 'berserk', unit: 'berserk', name: 'Berserk', bg: ['#c9a07a', '#3a2414'] },
+  { id: 'lovec', unit: 'lovec', name: 'Lovec', bg: ['#9fd0ff', '#173a5a'] },
+  { id: 'ledovy', unit: 'rytir', skin: 'ledovy', name: 'Ledový rytíř', bg: ['#e6f8ff', '#245890'] },
+  { id: 'stin', unit: 'pesak', skin: 'stinovy', name: 'Stínový válečník', bg: ['#8a6aa8', '#120a1a'] },
+  { id: 'bes', unit: 'bes', name: 'Běs', bg: ['#ff9a4a', '#3a0a06'] },
+  { id: 'chrlic', unit: 'chrlic', name: 'Okřídlený chrlič', bg: ['#ffcf6a', '#5a1410'] },
+  { id: 'rohac', unit: 'rohac', name: 'Rohatý strážce', bg: ['#e15a4f', '#2a0606'] },
+  { id: 'zatracenec', unit: 'zatracenec', name: 'Zatracený rytíř', bg: ['#ff6a3a', '#120404'] },
+  { id: 'demonkral', unit: 'demonkral', name: 'Démonický král', bg: ['#ff3a2a', '#1a0202'] },
+  { id: 'smaragd', unit: 'samuraj', skin: 'smaragd', name: 'Smaragdový duch', bg: ['#7ee0a8', '#0e3a24'] }
+];

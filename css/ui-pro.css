@@ -434,3 +434,127 @@ h1, h2, h3 { text-shadow: 0 2px 0 rgba(0,0,0,.55); }
   #screen.home-mode .hero-badge .lvl { font-size: 12px; }
   #screen.home-mode .hero-edit { min-height: 34px; padding: 4px 10px; font-size: 13px; }
 }
+
+/* ---------- DENNÍ ODMĚNY ---------- */
+.daily-btn { position: absolute; left: 12px; top: 110px; display: grid; justify-items: center; gap: 0; background: none; border: 0; padding: 0; z-index: 2; }
+.daily-chest svg { width: 62px; height: 52px; filter: drop-shadow(0 4px 4px rgba(0,0,0,.7)); animation: chestBob 2.4s ease-in-out infinite; }
+.daily-lbl { font-family: var(--font-display); font-weight: 900; font-size: 13px; color: #fff3cf; text-shadow: 0 2px 0 #000, 0 0 6px #000; margin-top: -2px; }
+.daily-dot { position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-weight: 900; color: #fff; font-size: 14px; background: radial-gradient(circle at 40% 30%, #ff8a7a, #c8261c); box-shadow: 0 0 0 2px #fff3cf, 0 2px 4px #000; animation: lowPulse 1.2s infinite; }
+@media (max-width: 480px) { .daily-btn { top: 92px; } .daily-chest svg { width: 52px; height: 44px; } }
+.dd-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.dd { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; padding: 6px 2px; min-height: 76px; border-radius: 10px; text-align: center;
+  background: linear-gradient(180deg, #2a2420, #15110e); box-shadow: inset 0 0 0 1px rgba(232,184,74,.3); }
+.dd small { font-size: 10px; color: var(--muted); font-weight: 800; }
+.dd b { font-family: var(--font-display); font-size: 12px; color: #ffe9a8; }
+.dd-ico .ico, .dd-ico svg { width: 26px; height: 26px; }
+.dd.done { opacity: .55; }
+.dd-check { position: absolute; inset: 0; display: grid; place-items: center; font-style: normal; font-size: 30px; color: #8fe07a; text-shadow: 0 2px 4px #000; }
+.dd.now { box-shadow: inset 0 0 0 2px #ffd77a, 0 0 16px rgba(255,215,122,.55); animation: pop .6s ease-out; background: linear-gradient(180deg, #4a3a18, #241a08); }
+.dd.big { background: radial-gradient(circle at 50% 40%, #4a2a7a, #15110e); box-shadow: inset 0 0 0 2px #c9a0ff, 0 0 18px rgba(201,160,255,.4); }
+.dd.big canvas { width: 100%; height: 46px; }
+.dd-streak { text-align: center; font-family: var(--font-display); color: #ffd77a; }
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; max-height: 50vh; overflow: auto; }
+.pick-u { display: grid; justify-items: center; gap: 2px; padding: 6px; border-radius: 12px; border: 2px solid transparent; background: linear-gradient(180deg, #2a2440, #15111e) padding-box, var(--steel-rim) border-box; }
+.pick-u canvas { width: 70px; height: 80px; }
+.pick-u b { font-size: 12px; }
+.pick-u:hover { box-shadow: 0 0 14px rgba(201,160,255,.5); }
+@media (max-width: 480px) { .dd-grid { gap: 4px; } .dd { min-height: 64px; } .dd b { font-size: 10px; } .dd.big canvas { width: 100%; height: 40px; } }
+.dd.big.now { box-shadow: inset 0 0 0 2px #ffd77a, 0 0 22px rgba(201,160,255,.8); } .dd.big b { font-size: 9px; line-height: 1.05; }
+
+/* ---------- OBRANA HRADU ---------- */
+.def-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.def-slot { padding: 10px; display: grid; gap: 6px; align-content: start; }
+.def-slot canvas { width: 100%; height: 96px; border-radius: 10px; }
+.def-slot.locked { place-items: center; text-align: center; min-height: 120px; opacity: .65; }
+.def-lock .ico { width: 34px; height: 34px; }
+.def-slot small { color: var(--muted); font-size: 12px; }
+.def-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.def-kind { display: grid; gap: 1px; padding: 5px 2px; border-radius: 9px; border: 2px solid transparent; font-size: 12px; font-weight: 800;
+  background: linear-gradient(180deg, #2a3550, #161e2e) padding-box, var(--steel-rim) border-box; }
+.def-kind small { font-size: 10px; display: inline-flex; gap: 2px; justify-content: center; align-items: center; }
+.def-kind small .ico { width: 12px; height: 12px; }
+.def-kind.on { background: linear-gradient(180deg, #ffe9a0, #c88a1c) padding-box, linear-gradient(#fff6d0, #6b4508) border-box; color: #2a1a03; }
+.def-kind.on small { color: #4a3008; }
+.def-kind[disabled] { opacity: .5; }
+.def-els { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; }
+.def-el { display: grid; justify-items: center; gap: 1px; padding: 4px 1px; border-radius: 8px; border: 2px solid rgba(255,255,255,.08); background: #0d121c; font-size: 10px; font-weight: 800; }
+.def-el i { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, var(--ec)); box-shadow: 0 0 8px var(--ec); }
+.def-el small { font-size: 9px; display: inline-flex; align-items: center; }
+.def-el small .ico { width: 10px; height: 10px; }
+.def-el.on { border-color: var(--ec); box-shadow: 0 0 10px var(--ec); }
+.def-cat { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; }
+.def-cat > div { display: grid; }
+
+/* =====================================================================
+   PÍSMO: kované dekorativní nadpisy (Cinzel Decorative) a pohádkové
+   písmo rozhraní (Metamorphous) – vložená, fungují i bez internetu
+   ===================================================================== */
+:root {
+  --font-display: "Cinzel Decorative", "Cinzel", Georgia, serif;
+  --font-body: "Metamorphous", "Alegreya Sans", Georgia, serif;
+}
+body, button, input, select, textarea { font-family: var(--font-body); }
+h1, h2, h3, .btn, .tab, .act-tab, .nav-lbl, .pill, .eyebrow, .tag, .hpbox .lbl, #bTimer, .coins b, .ugrp-h b, .saga-nm, .chest-body h3, .offer h3, .gear-card h3, .region-label, .result-title, .scene-title span { font-family: var(--font-display); }
+.eyebrow { letter-spacing: .08em; }
+p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
+/* železné kované písmo */
+.iron, .hero-badge h1, .sec-head h1, .modal-card h2 {
+  background: linear-gradient(180deg, #ffffff 0%, #c9d0d8 28%, #6e7682 48%, #aeb6c1 60%, #e6eaef 74%, #5c6470 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1px rgba(10,12,16,.9);
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.25)) drop-shadow(0 2px 0 #000) drop-shadow(0 4px 6px rgba(0,0,0,.6));
+  letter-spacing: .03em;
+}
+
+/* =====================================================================
+   HORNÍ ČÁST BEZ LIŠTY: profil vlevo a peníze vpravo volně nad obrazovkou
+   ===================================================================== */
+#app { position: relative; grid-template-rows: 1fr; }
+#topbar {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 15;
+  background: none !important; box-shadow: none !important; border: 0 !important; pointer-events: none;
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+}
+#topbar::before { content: ""; position: absolute; inset: 0 0 -26px 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, rgba(6,8,12,.55), rgba(6,8,12,0)); }
+#topbar > * { pointer-events: auto; }
+#screen { padding-top: calc(78px + env(safe-area-inset-top, 0px)); }
+#screen.home-mode { padding-top: 0; }
+.profile-chip { gap: 10px; }
+.avatar-btn { padding: 0; border: 0; background: none; border-radius: 14px; }
+.avatar { width: 54px; height: 54px; border-radius: 14px; border: 3px solid transparent;
+  background: linear-gradient(#2c3a55, #1a2336) padding-box, var(--gold-rim) border-box; box-shadow: 0 0 0 2px #05070b, 0 4px 12px rgba(0,0,0,.6); }
+.pname-btn { padding: 0; border: 0; background: none; text-align: left; display: grid; }
+.pname-btn b { font-family: var(--font-display); font-size: 18px; font-weight: 900;
+  background: linear-gradient(180deg, #ffffff, #c9d0d8 35%, #7d8794 55%, #e6eaef 75%, #8a93a2); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: .6px #0a0c10; filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 6px rgba(0,0,0,.7)); }
+.pname-btn small { color: #ffd77a; font-weight: 900; font-size: 15px; display: flex; gap: 4px; align-items: center; text-shadow: 0 2px 0 #000, 0 0 6px #000; }
+.pill { background: linear-gradient(180deg, rgba(15,20,30,.78), rgba(7,10,16,.78)) padding-box, var(--gold-rim) border-box; backdrop-filter: blur(3px); }
+
+/* Odznak velitele na hradě: bez rámečku, jen znak a kované písmo */
+#screen.home-mode .hero-badge { background: none !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; padding: 0; top: calc(78px + env(safe-area-inset-top, 0px)); left: 14px; }
+#screen.home-mode .hero-badge .crest { width: 52px; height: 62px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.7)); }
+#screen.home-mode .hero-badge h1 { font-size: 30px; line-height: 1.05; }
+#screen.home-mode .hero-badge .eyebrow { color: #f3e6c4; text-shadow: 0 2px 0 #000, 0 0 8px #000; }
+#screen.home-mode .hero-badge .lvl { color: #ffd77a; text-shadow: 0 2px 0 #000, 0 0 8px #000; font-family: var(--font-display); }
+#screen.home-mode .hero-edit { top: calc(82px + env(safe-area-inset-top, 0px)) !important; }
+#screen.home-mode .daily-btn { top: calc(158px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 480px) {
+  #screen.home-mode .hero-badge .crest { width: 40px; height: 48px; }
+  #screen.home-mode .hero-badge h1 { font-size: 22px; }
+  #screen.home-mode .daily-btn { top: calc(140px + env(safe-area-inset-top, 0px)); }
+  .avatar { width: 48px; height: 48px; }
+  .pname-btn b { font-size: 16px; }
+}
+/* výběr profilového obrázku */
+.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; max-height: 56vh; overflow: auto; padding: 2px; }
+.av-opt { display: grid; justify-items: center; gap: 3px; padding: 4px; border: 0; background: none; }
+.av-opt canvas { width: 70px; height: 70px; border-radius: 14px; border: 3px solid transparent; background: linear-gradient(#000,#000) padding-box, var(--steel-rim) border-box; box-shadow: 0 4px 10px rgba(0,0,0,.5); }
+.av-opt.on canvas { background: linear-gradient(#000,#000) padding-box, var(--gold-rim) border-box; box-shadow: 0 0 16px rgba(255,215,122,.6); }
+.av-opt small { font-size: 11px; text-align: center; line-height: 1.1; }
+/* bitva má vlastní horní HUD – profil se tam neukazuje (je v #app) */
+#nav .nav-lbl { font-family: var(--font-body); font-weight: 400; letter-spacing: 0; }
+@media (max-width: 480px) { #nav .nav-lbl { font-size: 10.5px; } #nav .nav-big .nav-lbl { font-size: 12.5px; } }
+.iron, .hero-badge h1, .sec-head h1, .modal-card h2 {
+  background: linear-gradient(180deg, #ffffff 0%, #e8ecf1 30%, #8d96a3 50%, #d5dbe2 64%, #ffffff 80%, #9aa3b0 100%);
+  -webkit-background-clip: text; background-clip: text;
+}

@@ -39,7 +39,8 @@
       settings: { speed: 1, auto: {} },
       gear: { owned: [], eq: {} },
       purchases: {},
-      chests: {}
+      chests: {},
+      defense: { slots: [], slotEl: [], ownedKinds: [], ownedEl: ['ohen'], catLvl: 1 }
     };
   }
 

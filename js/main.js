@@ -20,7 +20,7 @@
       $('#pTrophies').textContent = fmt(s.trophies);
       $('#rGold').textContent = fmt(s.gold);
       $('#rGems').textContent = fmt(s.gems);
-      Art.renderUnitIcon($('#avatarCv'), s.avatar, 'player', s.skins.unit[s.avatar], { headshot: true, noShadow: true });
+      App.paintAvatar($('#avatarCv'), s.avatar);
     },
 
     go(name, opts = {}) {
@@ -46,6 +46,44 @@
       this.screenEl.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
       this.screenEl.scrollTop = opts.keepScroll ? scroll : 0;
       if (location.hash.slice(1) !== name) { try { history.replaceState(null, '', '#' + name); } catch (e) { /* nic */ } }
+    },
+
+    /* Profilový obrázek: portrét s pozadím podle tématu */
+    paintAvatar(cv, id, size) {
+      const A = GameData.avatars.find(a => a.id === id) || GameData.avatars[0];
+      const def = GameData.units[A.unit];
+      if (!def) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = cv.clientWidth || size || 44, h = cv.clientHeight || size || 44;
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = ctx.createRadialGradient(w * 0.5, h * 0.35, 2, w * 0.5, h * 0.5, w * 0.75);
+      g.addColorStop(0, A.bg[0]); g.addColorStop(1, A.bg[1]);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      // paprsky v pozadí
+      ctx.save(); ctx.globalAlpha = 0.18; ctx.translate(w / 2, h * 0.4);
+      for (let i = 0; i < 12; i++) { ctx.rotate(Math.PI / 6); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-w * 0.08, -w); ctx.lineTo(w * 0.08, -w); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); }
+      ctx.restore();
+      const sc = def.look.scale || 1, top = (def.look.helmet === 'demonking' ? 98 : 86) * sc, bottom = 40 * sc;
+      const k = h / (top - bottom);
+      ctx.save(); ctx.translate(w / 2 - 3 * sc * k, top * k); ctx.scale(k, k);
+      const team = A.team || 'player';
+      Art.drawUnit(ctx, def, Art.unitPalette(team, A.skin || 'zakladni', def.faction), { x: 0, y: 0, facing: 1, t: 0, noShadow: true });
+      ctx.restore();
+    },
+    pickAvatar() {
+      const s = this.save;
+      this.modal(`
+        <div class="eyebrow">${t('profile')}</div>
+        <h2>${t('pick_avatar')}</h2>
+        <div class="av-grid">${GameData.avatars.map(a => `<button class="av-opt ${s.avatar === a.id ? 'on' : ''}" data-av="${a.id}"><canvas></canvas><small>${esc(a.name)}</small></button>`).join('')}</div>
+        <div class="modal-actions"><button class="btn" id="avProfile">${t('profile')}</button><button class="btn" data-close>${t('back')}</button></div>`, (c, close) => {
+        c.querySelectorAll('[data-av]').forEach(b => {
+          requestAnimationFrame(() => this.paintAvatar(b.querySelector('canvas'), b.dataset.av));
+          b.addEventListener('click', () => { s.avatar = b.dataset.av; s.avatarChosen = true; this.persist(); close(); });
+        });
+        c.querySelector('#avProfile').addEventListener('click', () => { close(); this.go('profil'); });
+      });
     },
 
     toast(msg) {
@@ -76,7 +114,7 @@
       if (!GameData.campaignHelpers.factionUnlocked(s, f)) { this.toast(t('t_nation_locked')); return; }
       const changed = s.faction !== f;
       s.faction = f;
-      if (!GameData.factionUnits(f).includes(s.avatar)) s.avatar = GameData.factions[f].roles.tezka;
+      if (!s.avatarChosen && !GameData.factionUnits(f).includes(s.avatar)) s.avatar = GameData.factions[f].roles.tezka;
       this.persist();
       if (changed && !opts.silent) this.toast(t('t_playing', { name: GameData.factions[f].name }));
       if (opts.go) this.go(opts.go, { keepScroll: true });
@@ -255,7 +293,8 @@
         speed: save.settings.speed || 1,
         seed: (cfg.title || '').length * 31 + 7,
         player: { stats, unitSkins: save.skins.unit, castleSkin: save.skins.castle, castleLevel: GameData.calc.castleLevel(save), castleCfg: Screens.castleCfg(save),
-          loadout: id => ({ bonus: GameData.gearHelpers.bonus(save, id), lk: GameData.gearHelpers.look(save, id) }) },
+          loadout: id => ({ bonus: GameData.gearHelpers.bonus(save, id), lk: GameData.gearHelpers.look(save, id) }),
+          defense: GameData.defenseOf(save) },
         onUpdateHud: b => this._hud(b, lastHud),
         onEnd: res => this._battleEnd(cfg, res),
         onFormation: mode => this._formUi(mode),
@@ -457,7 +496,8 @@
       applyIcons(document);
       this.refreshTop();
       document.querySelectorAll('#nav [data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
-      $('#profileBtn').addEventListener('click', () => this.go('profil'));
+      $('#avatarBtn').addEventListener('click', () => this.pickAvatar());
+      $('#profileName').addEventListener('click', () => this.go('profil'));
       $('#bPause').addEventListener('click', () => { if (!this.battle || this.battle.over) return; this.battle.togglePause(true); $('#bPauseMenu').hidden = false; });
       $('#bResume').addEventListener('click', () => { $('#bPauseMenu').hidden = true; this.battle && this.battle.togglePause(false); });
       $('#bQuit').addEventListener('click', () => {
@@ -527,7 +567,11 @@
       if (!this.save.lang) {
         this.go('hrad');
         Tutorial.pickLanguage(l => this.setLang(l));
-      } else this.go('hrad');   // po spuštění vždy hrad
+      } else {
+        this.go('hrad');   // po spuštění vždy hrad
+        // denní odměna zdarma: hráč, který už má tutoriál za sebou, ji uvidí hned
+        if ((this.save.tut || {}).home && Denni.available(this.save)) setTimeout(() => { if (!this.battle && !Tutorial.active) Denni.open(this); }, 700);
+      }
       // fonty se načítají asynchronně – po načtení překresli plátna s textem
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.battle) this.go(this.current, { keepScroll: true }); });
     }

@@ -79,6 +79,10 @@ Na telefonu je nejlepší hrát **na šířku**, protože pak je vidět celé bo
 - **Počítačový soupeř**: posílá jednotky podle toho, co posíláš ty (proti lučištníkům rytíře, proti rytířům kopiníky). Na vyšší obtížnost používá i Ohnivý déšť a jeho hrad má střílející věž.
 - **Vítězství a prohra**: pád hradu, nebo po vypršení času rozhodne, kdo má hrad méně poškozený.
 - **Správa hradu**: 5 budov s úrovněmi (Hradby, Pokladnice, Kasárna, Strážní věž, Zbrojnice). Platí se zlatem a hrad se s úrovní vizuálně mění.
+- **Úvodní obrazovka**: po spuštění jen hrad přes celou obrazovku. Profil vlevo nahoře (profilový obrázek si hráč vybere z 16 portrétů lidí i mýtických bytostí) a peníze vpravo, bez lišt. Menu je ze samostatných znaků nad scénou.
+- **Denní odměny zdarma**: 14 dní v kuse; 14. den exkluzivní skin „Věrný strážce“, který se jinak nedá získat – hráč si vybere postavu, která ho dostane. Vynechaný den = začíná se znovu.
+- **Obrana hradu** (Vylepšení): až 5 míst na hradbách (1 místo za každé 2 úrovně Strážní věže). Na každé místo lučištník, kušiník (probije 2 nepřátele) nebo od 6. úrovně věže katapult – ohnivý (hoření), ledový (zpomalení), bleskový (přeskočí na další), vodní (odhodí zpět) nebo jedovatý (jedovatý mrak). Obránci jsou vidět na hradě v bitvě i na úvodní obrazovce.
+- **Písmo**: kované dekorativní nadpisy (Cinzel Decorative) a pohádkové písmo rozhraní (Metamorphous), vložené do hry (licence SIL OFL, css/FONTS-LICENSE-OFL.txt).
 - **Spodní menu**: pět ilustrovaných dlaždic přes celou šířku obrazovky (hrad, mapa se svitkem, meče se štítem, stupně vítězů s pohárem, tržní stánek).
 - **Aplikace a offline**: hru jde nainstalovat jako PWA (funguje bez internetu) a je připravená pro Capacitor (Android a iOS). Postup do Google Play, App Store a dalších obchodů je v `STORE_NAVOD.md`.
 - **PvP obrazovka**: 5 soupeřů na sezónu a na každého **maximálně 3 útoky**. Obtížnost roste (×1,0 → ×1,3 → ×1,65) a stejně tak odměna (+30 / +45 / +70 trofejí). U každého soupeře je jasně vidět počet zbývajících útoků, obtížnost a odměna.

@@ -164,7 +164,7 @@
       if (w / sc > 1400) { sc = w / 1400; top = bottom - h / sc; }
       // úzká obrazovka (telefon na výšku): celý hrad se musí vejít na šířku,
       // nad krajinou pokračuje obloha
-      if (w / sc < 540) { sc = w / 540; bottom = 600; top = bottom - h / sc; }
+      if (w / sc < 470) { sc = w / 470; bottom = 600; top = bottom - h / sc; }
       const viewW = w / sc;
       const camX = Math.max(0, Math.min(1400 - viewW, 700 - viewW / 2 + Math.sin(t * 0.08) * Math.min(60, (1400 - viewW) / 2)));
       const k = sc * dpr;
@@ -195,6 +195,7 @@
       const cs = 1.12;
       ctx.save(); ctx.translate(700 - (img.w * cs) / 2, 0); ctx.scale(cs, cs);
       Art.drawCastle(ctx, img, img.w, 492 / cs, 1, t, 1, F.color);
+      if (window.App && App.save) Art.drawDefense(ctx, img, F.castleStyle, img.w, 492 / cs, 1, t, GameData.defenseOf(App.save), st.faction, 'player', null);
       ctx.restore();
       // stráže a hlídka
       const GHs = GameData.gearHelpers, sv = window.App && App.save;
@@ -249,6 +250,87 @@
     Art.drawEmblem(ctx, id, w / 2, h * (bg ? 0.46 : 0.5), Math.min(w, h) * (bg ? 0.27 : 0.38), color);
   }
 
+  /* ---------- OBRANA HRADU (ve Vylepšení) ---------- */
+  function defenseHtml(save) {
+    const D = GameData.defense, d = save.defense || {}, vez = save.buildings.vez || 0;
+    const def = GameData.defenseOf(save);
+    const n = def.slots.length;
+    const owned = k => k === 'lucistnik' || (d.ownedKinds || []).includes(k);
+    const price = p => p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
+    const slot = i => {
+      if (i >= n) return `<article class="panel def-slot locked"><div class="def-lock">${ico('lock')}</div><b>${t('def_slot', { n: i + 1 })}</b><small>${t('def_unlock_at', { n: i * 2 + 1 })}</small></article>`;
+      const sl = def.slots[i];
+      const kinds = ['lucistnik', 'kuse', 'katapult'].map(k => {
+        const K = D.kinds[k];
+        const lockedLvl = k === 'katapult' && vez < D.catapultFrom;
+        const on = sl.kind === k;
+        return `<button class="def-kind ${on ? 'on' : ''}" data-dslot="${i}" data-dkind="${k}" ${lockedLvl ? 'disabled' : ''}>
+          <span>${t('def_' + k)}</span>
+          <small>${lockedLvl ? `${ico('lock')} ${t('def_from_lvl', { n: D.catapultFrom })}` : owned(k) ? (on ? t('in_use') : t('use')) : price(K.price)}</small>
+        </button>`;
+      }).join('');
+      const els = sl.kind === 'katapult' ? `<div class="def-els">${GameData.catapult.elements.map(e => {
+        const ownedEl = (d.ownedEl || ['ohen']).includes(e.id);
+        return `<button class="def-el ${sl.el === e.id ? 'on' : ''}" style="--ec:${e.color}" data-dslot="${i}" data-del="${e.id}" title="${esc(e.desc)}"><i></i><span>${esc(e.name)}</span><small>${ownedEl ? '' : price(e.price)}</small></button>`;
+      }).join('')}</div>` : '';
+      return `<article class="panel def-slot"><canvas data-defcv="${i}"></canvas><b>${t('def_slot', { n: i + 1 })}</b><div class="def-kinds">${kinds}</div>${els}</article>`;
+    };
+    const catOn = def.slots.some(s => s.kind === 'katapult');
+    const cl = d.catLvl || 1, cmax = GameData.catapult.maxLevel;
+    return `
+      <div class="sec-head"><h2>${t('def_title')}</h2><span class="muted">${t('def_sub', { n, m: D.maxSlots })}</span></div>
+      <p class="muted" style="margin:-6px 0 0;font-size:14px">${t('def_note', { n: D.catapultFrom })}</p>
+      <div class="def-grid">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
+      ${catOn ? `<section class="panel def-cat"><div><b>${t('def_katapult')} · ${t('level_of', { a: cl, b: cmax })}</b><small class="muted">${t('def_dmg', { n: GameData.defense.kinds.katapult.dmg(cl) })}</small></div>
+        <button class="btn btn-gold btn-sm" data-catup ${cl >= cmax || save.gold < GameData.catapult.upgradeCost(cl) ? 'disabled' : ''}>${cl >= cmax ? t('max_level') : `${t('upgrade')} · ${ico('coin')} ${fmt(GameData.catapult.upgradeCost(cl))}`}</button></section>` : ''}`;
+  }
+  function bindDefense(App, el) {
+    const save = App.save;
+    const d = save.defense || (save.defense = {});
+    d.slots = d.slots || []; d.slotEl = d.slotEl || []; d.ownedKinds = d.ownedKinds || []; d.ownedEl = d.ownedEl || ['ohen'];
+    const def = GameData.defenseOf(save);
+    const F = GameData.factions[save.faction];
+    el.querySelectorAll('canvas[data-defcv]').forEach(cv => {
+      const i = +cv.dataset.defcv, sl = def.slots[i];
+      const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
+      cv.width = w * dpr; cv.height = h * dpr;
+      const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = ctx.createRadialGradient(w / 2, h * 0.8, 4, w / 2, h * 0.7, w * 0.7);
+      g.addColorStop(0, sl.kind === 'katapult' ? GameData.catapultEl(sl.el).color + '66' : '#4a5a7866'); g.addColorStop(1, '#0d121c'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      const one = { slots: [sl], vez: def.vez, catLvl: def.catLvl };
+      const fake = { w: 320, h: 380 };
+      // vykresli obránce do středu náhledu
+      const s = h / (sl.kind === 'katapult' ? 70 : 92);
+      ctx.save(); ctx.translate(w / 2, h - 6); ctx.scale(s, s);
+      if (sl.kind === 'katapult') Art.drawCatapult(ctx, 0, 0, 1, 0, sl.el, 1, true);
+      else Art.drawDefense(ctx, fake, 'evropa', fake.w - 2 - 258, 380 - 196, 1, 0, one, F.id, 'player', null);
+      ctx.restore();
+    });
+    const pay = (p, done) => {
+      if (p.gems) { if (save.gems < p.gems) { App.toast(t('not_enough')); return; } save.gems -= p.gems; }
+      else if (p.gold) { if (save.gold < p.gold) { App.toast(t('not_enough')); return; } save.gold -= p.gold; }
+      done();
+    };
+    el.querySelectorAll('[data-dkind]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.dslot, k = b.dataset.dkind;
+      const set = () => { d.slots[i] = k; App.persist(); App.go('sprava', { keepScroll: true }); };
+      if (k === 'lucistnik' || d.ownedKinds.includes(k)) return set();
+      pay(GameData.defense.kinds[k].price, () => { d.ownedKinds.push(k); App.toast(t('t_bought', { name: t('def_' + k) })); set(); });
+    }));
+    el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.dslot, id = b.dataset.del, E = GameData.catapultEl(id);
+      const set = () => { d.slotEl[i] = id; App.persist(); App.go('sprava', { keepScroll: true }); };
+      if (d.ownedEl.includes(id)) return set();
+      pay(E.price, () => { d.ownedEl.push(id); App.toast(t('t_bought', { name: E.name })); set(); });
+    }));
+    const up = el.querySelector('[data-catup]');
+    if (up) up.addEventListener('click', () => {
+      const cl = d.catLvl || 1, cost = GameData.catapult.upgradeCost(cl);
+      if (cl >= GameData.catapult.maxLevel || save.gold < cost) return;
+      save.gold -= cost; d.catLvl = cl + 1; App.persist(); App.go('sprava', { keepScroll: true });
+    });
+  }
+
   /* HRAD = jen živá scéna přes celou obrazovku (první, co hráč po spuštění uvidí).
      SPRÁVA = pokračování příběhu, sága, vylepšení hradu a organizace armády. */
   function screenSprava(App, opts = {}) { return screenHrad(App, Object.assign({}, opts, { sprava: true })); }
@@ -276,12 +358,18 @@
             </div>
           </div>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
+          <button class="daily-btn" id="dailyBtn" aria-label="${t('daily_title')}">
+            <span class="daily-chest">${Icons.navObchod ? '' : ''}<svg viewBox="0 0 120 100"><path d="M14 46h92v40a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#8a5a32" stroke="#1a0e06" stroke-width="4"/><path d="M14 46c0-20 20-30 46-30s46 10 46 30z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M14 46h92" stroke="#ffd77a" stroke-width="7"/><path d="M30 18v74M90 18v74" stroke="#ffd77a" stroke-width="7"/><rect x="49" y="39" width="22" height="24" rx="3" fill="#ffd77a" stroke="#1a0e06" stroke-width="3"/></svg></span>
+            <span class="daily-lbl">${t('daily_short')}</span>
+            ${Denni.available(save) ? '<i class="daily-dot">!</i>' : ''}
+          </button>
         </section>
       </div>`;
     if (!sprava) {
       el.classList.add('home-mode');
       App._stopLive = liveScene(el.querySelector('#homeCv'), () => sceneState(save));
       emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
+      el.querySelector('#dailyBtn').addEventListener('click', () => Denni.open(App));
       return;
     }
     el.innerHTML = `
@@ -334,6 +422,8 @@
           }).join('')}
         </div>
 
+        ${defenseHtml(save)}
+
         <div class="sec-head"><h2>${t('organization')}</h2><span class="muted">${esc(F.name)} · ${t('army_power', { n: Math.round((st.unitMult - 1) * 100) })}</span></div>
         ${orgHtml(F, save, st)}
       </div>`;
@@ -354,6 +444,7 @@
       App.toast(t('t_upgraded', { name: bd.name, n: l + 1 }));
       App.go('sprava', { keepScroll: true });
     }));
+    bindDefense(App, el);
     const story = el.querySelector('[data-act="story"]');
     if (story) story.addEventListener('click', () => App.openLevel(cur.id));
     el.querySelector('[data-act="training"]').addEventListener('click', () => App.startTraining());
@@ -458,8 +549,9 @@
         </div>
         <section class="panel skin-preview"><canvas id="skinPrev" aria-label="Náhled jednotky"></canvas></section>
         <div class="skin-grid">
-          ${GameData.unitSkins.map(s => {
+          ${GameData.unitSkins.filter(s => !s.exclusive || save.skins.ownedUnit.includes(s.id)).map(s => {
             const owned = save.skins.ownedUnit.includes(s.id);
+            const onlyFor = s.exclusive && save.loyalSkinUnit && save.loyalSkinUnit !== unitSel ? save.loyalSkinUnit : null;
             const eq = save.skins.unit[unitSel] === s.id;
             const price = deal && deal.skin.id === s.id ? deal.price : s.price;
             return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''}">
@@ -467,6 +559,7 @@
               <h3>${s.name}</h3>${rar(s.rarity)}<p>${s.desc}</p>
               ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
               ${eq ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
+                : onlyFor ? `<button class="btn btn-sm" disabled>${t('only_for', { name: esc(GameData.units[onlyFor].name) })}</button>`
                 : owned ? `<button class="btn btn-sm btn-blue" data-equip="${s.id}">${t('use')}</button>`
                 : s.czk ? `<button class="btn btn-sm btn-green" data-skinczk="${s.id}">${s.czk} Kč</button>`
                 : `<button class="btn btn-sm btn-gold" data-buy="${s.id}" data-price="${price}" ${save.gems < price ? 'disabled' : ''}>${t('buy')} ${ico('gem')} ${price}</button>`}
@@ -581,6 +674,7 @@
       }));
       el.querySelector('#equipAll').addEventListener('click', () => {
         const sk = save.skins.unit[unitSel];
+        if ((GameData.unitSkins.find(x => x.id === sk) || {}).exclusive) { App.toast(t('only_for', { name: GameData.units[unitSel].name })); return; }
         Object.keys(GameData.units).forEach(u => (save.skins.unit[u] = sk));
         App.persist(); App.toast(t('equip_all')); App.go('obchod', { keepScroll: true });
       });
@@ -823,7 +917,7 @@
   /* --------------------------------------------------------------- ŽEBŘÍČEK */
   function screenZebricek(App) {
     const save = App.save;
-    const me = { id: 'me', name: save.name, trophies: save.trophies, castleLevel: GameData.calc.castleLevel(save), unitSkin: save.skins.unit[save.avatar], avatar: save.avatar, me: true };
+    const me = { id: 'me', name: save.name, trophies: save.trophies, castleLevel: GameData.calc.castleLevel(save), unitSkin: (GameData.avatars.find(a => a.id === save.avatar) || {}).skin || 'zakladni', avatar: (GameData.avatars.find(a => a.id === save.avatar) || {}).unit || 'rytir', me: true };
     const list = GameData.demoPlayers.map(p => Object.assign({ avatar: GameData.factionUnits(p.faction)[[3, 0, 1, 2][p.id.charCodeAt(2) % 4]] }, p)).concat([me]);
     list.sort((a, b) => b.trophies - a.trophies);
     const myRank = list.findIndex(p => p.me) + 1;
@@ -869,7 +963,7 @@
         <section class="panel" style="padding:12px 14px;display:grid;gap:8px">
           <b>${t('portrait')}</b>
           <div class="av-pick">
-            ${GameData.factionUnits(save.faction).map(id => `<button data-avatar="${id}" aria-pressed="${save.avatar === id}" aria-label="${GameData.units[id].name}"><canvas data-avc="${id}"></canvas></button>`).join('')}
+            ${GameData.avatars.map(a => `<button data-avatar="${a.id}" aria-pressed="${save.avatar === a.id}" aria-label="${esc(a.name)}"><canvas data-avc="${a.id}"></canvas></button>`).join('')}
           </div>
         </section>
         <div class="stat-grid">
@@ -892,8 +986,8 @@
         </section>
       </div>`;
     const drawAv = () => {
-      Art.renderUnitIcon(el.querySelector('#profAv'), save.avatar, 'player', save.skins.unit[save.avatar], { headshot: true, noShadow: true });
-      el.querySelectorAll('canvas[data-avc]').forEach(c => Art.renderUnitIcon(c, c.dataset.avc, 'player', save.skins.unit[c.dataset.avc], { headshot: true, noShadow: true }));
+      App.paintAvatar(el.querySelector('#profAv'), save.avatar);
+      el.querySelectorAll('canvas[data-avc]').forEach(c => App.paintAvatar(c, c.dataset.avc));
     };
     drawAv();
     el.querySelector('#nameInput').addEventListener('change', e => {
@@ -901,7 +995,7 @@
       save.name = v || 'Velitel'; App.persist(); App.refreshTop(); App.toast(t('done'));
     });
     el.querySelectorAll('[data-avatar]').forEach(b => b.addEventListener('click', () => {
-      save.avatar = b.dataset.avatar; App.persist(); App.refreshTop();
+      save.avatar = b.dataset.avatar; save.avatarChosen = true; App.persist(); App.refreshTop();
       el.querySelectorAll('[data-avatar]').forEach(x => x.setAttribute('aria-pressed', x === b));
       drawAv();
     }));

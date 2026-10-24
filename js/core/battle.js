@@ -97,6 +97,14 @@
       this.auto = {};
       this.autoState = {};
       this.bossPlan = opts.boss ? { id: opts.boss, at: 18, spawned: false } : null;
+      // obrana hradu hráče (lučištníci, kušiníci, katapulty na hradbách)
+      this.def = opts.player.defense || null;
+      this.defShot = []; this.defTimer = [];
+      this.clouds = []; this.bolts = [];
+      if (this.def && this.def.slots.length) {
+        this.side.player.castle.tower = 0;   // věž nahrazují obránci na hradbách
+        this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
+      }
       this.palCache = {};
 
       // pozadí
@@ -438,6 +446,7 @@
       }
       this._ai(dt);
       this._autoPlayer(dt);
+      this._updateDefense(dt);
       if (this.bossPlan && !this.bossPlan.spawned && this.time >= this.bossPlan.at) {
         this.bossPlan.spawned = true;
         this.spawn('enemy', this.bossPlan.id, true);
@@ -452,6 +461,11 @@
       for (const u of this.units) {
         if (u.dead) { u.dead += dt; continue; }
         if (u.hurt > 0) u.hurt -= dt;
+        if (u.dot && this.time < u.dot.until) {
+          u.dotTick = (u.dotTick || 0) - dt;
+          if (u.dotTick <= 0) { u.dotTick = 0.5; this._damage(u, u.dot.dps * 0.5, null, true); if (u.dead) continue; }
+        }
+        const slowK = u.slowUntil > this.time ? 0.5 : 1;
         if (u === this.hero) { this._updateHero(u, dt); continue; }
         const foeTeam = u.team === 'player' ? 'enemy' : 'player';
         const reach = u.def.range * (C().rangeScale || 1) + 18;
@@ -481,7 +495,7 @@
           }
         } else {
           u.target = null; u.castleTarget = false;
-          const sp = u.def.speed * (C().speedScale || 1);
+          const sp = u.def.speed * (C().speedScale || 1) * slowK;
           const mode = this.side[u.team].formation;
           if (mode !== 'utok' && u.slotX != null) {
             // pochod na své místo v šiku
@@ -543,6 +557,11 @@
         if (p.t >= 1 && !p.done) {
           p.done = true;
           if (p.kind === 'fire') this._sparks(p.tx, p.ty, '#ff9a3c', 6);
+          if (p.kind === 'cat') { this._catImpact(p); continue; }
+          if (p.pierce && p.target) {
+            const second = this.units.find(e => e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 70);
+            if (second) this._damage(second, p.dmg * 0.6, null);
+          }
           if (p.target && !p.target.dead) this._damage(p.target, p.dmg, p.from, p.kind === 'fire');
           else if (p.castle) this._damageCastle(p.castle, p.dmg);
         }
@@ -773,6 +792,78 @@
       for (const [id, x] of pool) { if ((r -= x) <= 0) return id; }
       return allowed[0];
     }
+    /* ---------------- OBRANA HRADU ---------------- */
+    _updateDefense(dt) {
+      if (!this.def || !this.def.slots.length) return;
+      const P = this.side.player, cfg = C(), K = GameData.defense.kinds;
+      if (P.castle.hp <= 0) return;
+      const pos = Art.defenseSpots(P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1);
+      this.def.slots.forEach((sl, i) => {
+        this.defTimer[i] -= dt;
+        if (this.defTimer[i] > 0) return;
+        const k = K[sl.kind];
+        const foes = this.units.filter(e => e.team === 'enemy' && !e.dead && e.x - P.castle.front < k.range);
+        if (!foes.length) { this.defTimer[i] = 0.3; return; }
+        this.defTimer[i] = k.interval;
+        this.defShot[i] = this.time;
+        const [ox, oy] = pos[i];
+        if (sl.kind === 'katapult') {
+          // cíl: místo, kde je nejvíc nepřátel
+          let best = foes[0], bestN = 0;
+          for (const f of foes) { const n = foes.filter(g => Math.abs(g.x - f.x) < 110).length; if (n > bestN) { bestN = n; best = f; } }
+          const tx = best.x + 20, ty = best.y - 4;
+          const dist = Math.hypot(tx - ox, ty - oy);
+          this.projectiles.push({ team: 'player', kind: 'cat', el: sl.el, x0: ox, y0: oy - 40, tx, ty, target: null, castle: null, dmg: k.dmg(this.def.catLvl) * P.dmgMult, from: null, t: 0, dur: Math.max(0.7, dist / 480), arc: Math.min(220, dist * 0.35), done: false });
+        } else {
+          foes.sort((a, b) => a.x - b.x);
+          const dmg = k.dmg(this.def.vez);
+          this._shoot('player', ox + 14, oy - 46, foes[0], dmg, sl.kind === 'kuse' ? 760 : 620, null);
+          if (sl.kind === 'kuse') this.projectiles[this.projectiles.length - 1].pierce = true;
+        }
+      });
+      // jedovaté mraky
+      for (const c of this.clouds) {
+        c.tick -= dt;
+        if (c.tick <= 0) { c.tick = 0.5; for (const e of this.units) if (e.team === 'enemy' && !e.dead && Math.abs(e.x - c.x) < c.r) this._damage(e, c.dps * 0.5, null); }
+      }
+      this.clouds = this.clouds.filter(c => c.until > this.time);
+      for (const b of this.bolts) b.t += dt;
+      this.bolts = this.bolts.filter(b => b.t < 0.35);
+    }
+    _catImpact(p) {
+      const t = this.time, x = p.tx, y = p.ty, dmg = p.dmg;
+      const near = r => this.units.filter(e => e.team !== p.team && !e.dead && Math.hypot(e.x - x, (e.y - y) * 1.5) < r);
+      const E = GameData.catapultEl(p.el);
+      const burst = (n, col) => { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 180; this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 80, g: 300, t: 0, life: 0.6, r: 2 + Math.random() * 3, color: col }); } };
+      this.particles.push({ x, y, vx: 0, vy: 0, g: 0, t: 0, life: 0.4, r: 12, ring: true, color: E.color });
+      if (p.el === 'ohen') {
+        burst(20, '#ff9a3c'); near(95).forEach(e => { this._damage(e, dmg, null, true); e.dot = { until: t + 3, dps: dmg * 0.18, c: 'rgba(255,120,40,.45)' }; });
+      } else if (p.el === 'led') {
+        burst(18, '#cfeeff'); near(95).forEach(e => { this._damage(e, dmg * 0.8, null); e.slowUntil = t + 2.5; });
+      } else if (p.el === 'blesk') {
+        burst(12, '#fffbe0');
+        let cur = near(110).sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
+        const hit = [];
+        let px = x, py = y - 260;
+        for (let n = 0; cur && n < 4; n++) {
+          hit.push(cur);
+          const pts = [[px, py]];
+          for (let k = 1; k < 6; k++) pts.push([px + (cur.x - px) * k / 6 + (Math.random() - 0.5) * 24, py + (cur.y - 40 - py) * k / 6 + (Math.random() - 0.5) * 18]);
+          pts.push([cur.x, cur.y - 40]);
+          this.bolts.push({ pts, t: 0 });
+          this._damage(cur, dmg * (n ? 0.75 : 1), null);
+          px = cur.x; py = cur.y - 40;
+          const from = cur;
+          cur = this.units.filter(e => e.team !== p.team && !e.dead && !hit.includes(e) && Math.abs(e.x - from.x) < 170).sort((a, b) => Math.abs(a.x - from.x) - Math.abs(b.x - from.x))[0];
+        }
+      } else if (p.el === 'voda') {
+        burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = Math.min(C().enemyFront - 20, e.x + 70); e.slotX = null; } });
+      } else if (p.el === 'jed') {
+        burst(10, '#9be07a'); near(90).forEach(e => this._damage(e, dmg * 0.5, null));
+        this.clouds.push({ x, y, r: 105, until: t + 4, dps: dmg * 0.3, tick: 0.2 });
+      }
+    }
+
     _bossDown(u) {
       const ec = this.side.enemy.castle;
       const dmg = ec.maxHp * 0.3;
@@ -833,6 +924,16 @@
       Art.drawCastle(ctx, E.castleImg, E.castle.front, cfg.groundY, -1, t, E.castle.hp / E.castle.maxHp, '#a8262a');
       this._castleFire(ctx, P, 1, t);
       this._castleFire(ctx, E, -1, t);
+      if (this.def && this.def.slots.length) Art.drawDefense(ctx, P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1, t, this.def, P.faction, 'player', { shot: this.defShot });
+      // jedovaté mraky
+      for (const c of this.clouds) {
+        const a = Math.min(1, (c.until - t) / 0.6);
+        for (let k = 0; k < 6; k++) {
+          const ox = Math.sin(t * 1.3 + k * 1.7) * c.r * 0.55, oy = Math.cos(t * 1.1 + k) * 10;
+          ctx.globalAlpha = 0.28 * a; ctx.beginPath(); ctx.ellipse(c.x + ox, c.y - 18 + oy, c.r * 0.45, 22, 0, 0, Math.PI * 2); ctx.fillStyle = k % 2 ? '#7be04a' : '#4aa02a'; ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
 
       // prapory formací
       for (const team of ['player', 'enemy']) {
@@ -854,6 +955,15 @@
         else if (!u.dead && u.hp < u.maxHp) this._hpBar(ctx, u);
       }
 
+      // blesky
+      for (const b of this.bolts) {
+        ctx.globalAlpha = Math.max(0, 1 - b.t / 0.35);
+        ctx.beginPath(); ctx.moveTo(b.pts[0][0], b.pts[0][1]);
+        for (let i = 1; i < b.pts.length; i++) ctx.lineTo(b.pts[i][0], b.pts[i][1]);
+        ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(255,240,150,.5)'; ctx.stroke();
+        ctx.lineWidth = 2.4; ctx.strokeStyle = '#fffbe0'; ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
       // projektily
       for (const p of this.projectiles) {
         if (p.done) continue;
@@ -863,6 +973,7 @@
         const dx = (p.tx - p.x0), dy = (p.ty - p.y0) - p.arc * 4 * (1 - 2 * k);
         const a = Math.atan2(dy, dx);
         if (p.kind === 'fire') { Art.drawFireball(ctx, x, y, a, this.time); continue; }
+        if (p.kind === 'cat') { Art.drawCatShot(ctx, x, y, p.el, this.time); continue; }
         ctx.save(); ctx.translate(x, y); ctx.rotate(a);
         ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(8, 0); ctx.lineWidth = 3.2; ctx.strokeStyle = Art.OUT; ctx.stroke();
         ctx.lineWidth = 1.6; ctx.strokeStyle = '#e1cfa6'; ctx.stroke();
@@ -971,6 +1082,11 @@
       else { frame = 'i'; st = {}; }
       const palKey = u.team + (u.pal.__k || (u.pal.__k = Math.random().toString(36).slice(2)));
       const e = this.sprites.get(u.drawDef || u.def, u.pal, palKey, frame, st, US());
+      if (!u.dead && (u.slowUntil > this.time || (u.dot && this.time < u.dot.until))) {
+        const icy = u.slowUntil > this.time;
+        ctx.beginPath(); ctx.ellipse(u.x, u.y - 2, 22 * US(), 7 * US(), 0, 0, Math.PI * 2);
+        ctx.fillStyle = icy ? 'rgba(127,211,255,.45)' : (u.dot.c || 'rgba(255,140,60,.45)'); ctx.fill();
+      }
       const f = u.face || u.dir;
       if (shield && !u.dead) {
         const s = US() * (u.def.look.scale || 1);

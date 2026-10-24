@@ -15,16 +15,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@500;700;800;900&family=Cinzel:wght@700;900&display=swap">
+<link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/ui-pro.css">
 </head>
 <body>
 <div id="app">
   <header id="topbar">
-    <button id="profileBtn" class="profile-chip" aria-label="Profil hráče">
-      <canvas id="avatarCv" class="avatar" width="44" height="44"></canvas>
-      <span><b id="pName">Velitel</b><small><span data-ico="trophy"></span><span id="pTrophies" class="num">0</span></small></span>
-    </button>
+    <div id="profileBtn" class="profile-chip">
+      <button id="avatarBtn" class="avatar-btn" aria-label="Profilový obrázek"><canvas id="avatarCv" class="avatar" width="44" height="44"></canvas></button>
+      <button id="profileName" class="pname-btn" aria-label="Profil hráče"><b id="pName">Velitel</b><small><span data-ico="trophy"></span><span id="pTrophies" class="num">0</span></small></button>
+    </div>
     <div class="res">
       <span class="pill" title="Zlato – na vylepšení hradu"><span data-ico="coin"></span><b id="rGold" class="num">0</b></span>
       <span class="pill" title="Drahokamy – na skiny"><span data-ico="gem"></span><b id="rGems" class="num">0</b></span>
@@ -129,11 +130,13 @@
 <script src="js/core/art_narody.js"></script>
 <script src="js/core/art_svet.js"></script>
 <script src="js/core/art_peklo.js"></script>
+<script src="js/core/obrana.js"></script>
 <script src="js/core/battle.js"></script>
 <script src="js/core/platby.js"></script>
 <!-- Rozhraní -->
 <script src="js/ui/icons.js"></script>
 <script src="js/ui/shop.js"></script>
+<script src="js/ui/denni.js"></script>
 <script src="js/ui/screens.js"></script>
 <script src="js/ui/tutorial.js"></script>
 <script src="js/ui/scene.js"></script>
