@@ -157,8 +157,11 @@
       if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
       const ctx = cv.getContext('2d');
       // výřez světa: od nebe po trávu pod cestou
-      const top = 120, bottom = 560;
-      const sc = Math.max(h / (bottom - top), w / 1400);
+      // trochu z větší dálky, aby byl vidět celý hrad i se špičkami věží
+      const bottom = 560;
+      let top = 30;
+      let sc = h / (bottom - top);
+      if (w / sc > 1400) { sc = w / 1400; top = bottom - h / sc; }
       const viewW = w / sc;
       const camX = Math.max(0, Math.min(1400 - viewW, 700 - viewW / 2 + Math.sin(t * 0.08) * Math.min(60, (1400 - viewW) / 2)));
       const k = sc * dpr;

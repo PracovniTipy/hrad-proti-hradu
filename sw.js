@@ -1,5 +1,5 @@
 /* Service worker: hra funguje i bez internetu (PWA). Při změně souborů zvyš VERZE. */
-const VERZE = 'hrad-v11';
+const VERZE = 'hrad-v12';
 const SOUBORY = ['./', './index.html', './css/style.css', './css/ui-pro.css', './manifest.webmanifest',
   './js/i18n.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/demoni.js', './js/data/castle.js',
   './js/data/campaign.js', './js/data/pvp.js', './js/data/obchod.js', './js/i18n_obsah.js', './js/core/save.js', './js/core/art.js',
