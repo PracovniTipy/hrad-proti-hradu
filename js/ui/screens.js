@@ -562,7 +562,7 @@
         <section class="panel skin-preview"><canvas id="skinPrev" aria-label="Náhled jednotky"></canvas></section>
         <div class="skin-grid">
           ${GameData.unitSkins.filter(s => (!s.exclusive || save.skins.ownedUnit.includes(s.id)) && GameData.skinFits(s, unitSel))
-            .sort((a, b) => (b.only ? 1 : 0) - (a.only ? 1 : 0)).map(s => {
+            .sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity) || (b.only ? 1 : 0) - (a.only ? 1 : 0)).map(s => {
             const owned = save.skins.ownedUnit.includes(s.id);
             const onlyFor = s.exclusive && save.loyalSkinUnit && save.loyalSkinUnit !== unitSel ? save.loyalSkinUnit : null;
             const eq = save.skins.unit[unitSel] === s.id;
@@ -583,7 +583,7 @@
         <button class="btn" id="equipAll">${t('equip_all')}</button>
 ` : `        
         <div class="skin-grid">
-          ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel)).map(w => {
+          ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel)).sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity)).map(w => {
             const ownedW = (save.skins.ownedWeapon || ['w_zakladni']).includes(w.id) || w.id === 'w_zakladni';
             const eqW = ((save.skins.weapon || {})[unitSel] || 'w_zakladni') === w.id;
             return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''}">
@@ -604,7 +604,7 @@
       const pr = p => p.czk ? `${p.czk} Kč` : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
       body = `<section class="panel sk-eq"><div><div class="eyebrow">${t('skills_eq')}</div><p class="muted" style="margin:2px 0 0">${t('skills_help')}</p></div>
           <div class="sk-slots">${[0, 1, 2].map(i => { const k = SK.eq[i] && GameData.skillById(SK.eq[i]); return `<div class="sk-slot">${k ? GameData.skillIcon(k, 54) + `<small>${esc(k.name)}</small>` : `<span class="sk-empty">${i + 1}</span>`}</div>`; }).join('')}</div></section>
-        <div class="sk-grid">${GameData.skills.map(k => {
+        <div class="sk-grid">${GameData.skills.slice().sort((a, b) => a.rarity - b.rarity).map(k => {
           const own = SK.owned.includes(k.id), on = SK.eq.includes(k.id);
           return `<article class="panel sk-card ${rarClass(rarN[k.rarity])} ${on ? 'equipped' : ''}" style="--ac:${k.color}">
             <div class="sk-top">${GameData.skillIcon(k, 58)}<div><h3>${esc(k.name)}</h3>${rar(rarN[k.rarity])}</div></div>
@@ -697,6 +697,7 @@
           ${[['nabidky', t('tab_offers'), 'crown'], ['vojaci', t('tab_units'), 'helmet'], ['zbrojnice', t('tab_armory'), 'shield'], ['utoky', t('tab_skills'), 'fire'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
         </div>
         <p class="shop-hint muted">${t('shop_hint_' + tab)}</p>
+        ${['vojaci', 'zbrojnice', 'utoky', 'hrady'].includes(tab) ? `<div class="rar-legend">${['Základní', 'Vzácný', 'Epický', 'Legendární'].map((r, i) => `<span style="--rc:${GameData.rarityColors[r]}">${t('rar_' + i)}</span>`).join('<i>‹</i>')}<small>${t('rarity_legend')}</small></div>` : ''}
         ${body}
       </div>`;
     el.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: b.dataset.tab, keepScroll: true })));

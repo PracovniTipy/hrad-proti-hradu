@@ -1,7 +1,7 @@
 /* Service worker: hra funguje i bez internetu (PWA). Při změně souborů zvyš VERZE. */
-const VERZE = 'hrad-v22';
+const VERZE = 'hrad-v23';
 const SOUBORY = ['./', './index.html', './css/fonts.css', './css/style.css', './css/ui-pro.css', './manifest.webmanifest',
-  './js/i18n.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/demoni.js', './js/data/castle.js',
+  './js/i18n.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/jednotky_plus.js', './js/data/demoni.js', './js/data/castle.js',
   './js/data/campaign.js', './js/data/pvp.js', './js/data/obchod.js', './js/data/vybava.js', './js/data/skiny_plus.js', './js/data/skills.js', './js/i18n_obsah.js', './js/core/save.js', './js/core/art.js',
   './js/core/art_narody.js', './js/core/art_svet.js', './js/core/art_peklo.js', './js/core/art_zbrane.js', './js/core/obrana.js', './js/core/battle.js', './js/core/platby.js', './js/ui/shop.js', './js/ui/denni.js', './js/ui/icons.js',
   './js/ui/screens.js', './js/ui/tutorial.js', './js/ui/scene.js', './js/main.js', './icons/icon-192.png', './icons/icon-512.png'];

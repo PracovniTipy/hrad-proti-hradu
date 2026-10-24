@@ -254,8 +254,8 @@
       document.querySelector('#battle .b-bar').classList.toggle('ally', facs.length > 1);
       $('#bUnits').innerHTML = groups.map(g => {
         const F = GameData.factions[g.f];
-        return `<div class="ugrp" style="--c:${F.color}" data-grp="${g.f}">
-          <div class="ugrp-h"><b>${esc(F.name)}</b>
+        return `<div class="ugrp ${g === groups[0] ? 'open' : ''}" style="--c:${F.color}" data-grp="${g.f}">
+          <div class="ugrp-h"><b class="ugrp-pick">${esc(F.name)}</b>
             <button class="auto-tg" data-auto="${g.f}" aria-pressed="false" aria-label="${t('auto_for', { name: esc(F.name) })}"><i></i><span>AUTO</span></button></div>
           <div class="ugrp-b">${g.units.map(id => `
             <button class="ubtn" data-spawn="${id}" aria-label="${esc(GameData.units[id].name)} · ${GameData.units[id].cost}">
@@ -340,6 +340,15 @@
         });
         ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, () => clearTimeout(lp)));
       });
+      // spojenectví: vojáci jednoho národa najednou, klepnutím na jméno národa se přepne
+      B.querySelectorAll('.ugrp-pick').forEach(n => n.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        B.querySelectorAll('.ugrp').forEach(g => g.classList.toggle('open', g === n.closest('.ugrp')));
+        requestAnimationFrame(() => B.querySelectorAll('.ugrp.open [data-spawn]').forEach(btn => {
+          const id = btn.dataset.spawn, def = GameData.units[id], GHp = GameData.gearHelpers, lk = GHp.look(save, id);
+          Art.renderUnitIcon(btn.querySelector('canvas'), id, 'player', save.skins.unit[id], { zoom: 0.92, pad: 3, def: GHp.drawDef(def, lk), pal: GHp.palette('player', save.skins.unit[id], def.faction, lk) });
+        }));
+      }));
       B.querySelectorAll('[data-auto]').forEach(btn => {
         const f = btn.dataset.auto;
         const setUi = on => { btn.setAttribute('aria-pressed', on); btn.closest('.ugrp').classList.toggle('auto-on', on); };

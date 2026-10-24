@@ -7,7 +7,7 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n).toLocaleString('cs-CZ');
   const GH = () => GameData.gearHelpers;
-  const ROLES = ['pech', 'strelec', 'kopi', 'tezka'];
+  const ROLES = ['pech', 'strelec', 'kopi', 'jizda', 'tezka', 'mag', 'velitel'];
   const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
   const weekKey = () => { const d = new Date(); const j = new Date(d.getFullYear(), 0, 1); return d.getFullYear() + '-w' + Math.ceil(((d - j) / 864e5 + j.getDay() + 1) / 7); };
 

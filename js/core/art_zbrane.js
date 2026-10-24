@@ -420,3 +420,75 @@
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
     meleeModels: Object.keys(MELEE), poleModels: Object.keys(POLE) });
 })();
+
+/* =========================================================================
+   MÁGOVÉ: hůl s magickou koulí a klobouky (čarodějný klobouk, eboši, kápě völvy)
+   ========================================================================= */
+(function () {
+  const A = window.Art, P = window.ArtParts, TAU = Math.PI * 2, OUT = A.OUT;
+  const fs = (ctx, f, lw) => A.fs(ctx, f, lw);
+  P.weapon.staff = (ctx, L, pal, atk, w, moving) => {
+    const mc = L.magic || '#7fc8ff';
+    const raise = atk >= 0 ? Math.sin(Math.min(1, atk / 0.6) * Math.PI * 0.5) : 0;
+    const back = atk >= 0.6 ? (atk - 0.6) / 0.4 : 0;
+    const hx = 12 + raise * 6 - back * 6, hy = -46 - raise * 8 + back * 8;
+    // hůl
+    ctx.save(); ctx.translate(hx, hy); ctx.rotate(-0.12 - raise * 0.5 + back * 0.5);
+    ctx.beginPath(); ctx.moveTo(0, 26); ctx.lineTo(0, -30); ctx.lineCap = 'round'; ctx.lineWidth = 5.4; ctx.strokeStyle = OUT; ctx.stroke();
+    ctx.lineWidth = 3; ctx.strokeStyle = L.staffWood || '#7a4c2a'; ctx.stroke();
+    // hlavice: vidlice držící kouli
+    ctx.beginPath(); ctx.moveTo(-5, -30); ctx.quadraticCurveTo(-6, -38, 0, -40); ctx.quadraticCurveTo(6, -38, 5, -30); ctx.lineWidth = 2.2; ctx.strokeStyle = pal.trim; ctx.stroke();
+    const glow = 0.6 + raise * 0.4 + Math.sin((w || 0) * 2) * 0.05;
+    ctx.save(); ctx.shadowColor = mc; ctx.shadowBlur = 10 + raise * 14;
+    const g = ctx.createRadialGradient(-1.5, -36.5, 0.5, 0, -35, 6);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.45, mc); g.addColorStop(1, A.shade(mc, -0.4));
+    ctx.globalAlpha = Math.min(1, glow + 0.2);
+    ctx.beginPath(); ctx.arc(0, -35, 5 + raise * 1.5, 0, TAU); ctx.fillStyle = g; ctx.fill();
+    ctx.restore();
+    ctx.restore();
+    // paže
+    A.limb(ctx, 1, -50, hx - 1, hy + 2, 5.2, pal.tunic);
+    A.fist(ctx, hx, hy + 2, pal.skin, 0);
+  };
+  // čarodějný klobouk
+  P.helmet.wizard = (ctx, L, pal) => {
+    const c = pal.hat || pal.tunic;
+    ctx.beginPath(); ctx.ellipse(1, -68, 15, 3.6, -0.08, 0, TAU); fs(ctx, A.shade(c, -0.15), 1.6);
+    ctx.beginPath(); ctx.moveTo(-8, -69); ctx.quadraticCurveTo(-6, -84, -12, -96); ctx.quadraticCurveTo(2, -88, 10, -69); ctx.closePath(); fs(ctx, c, 1.8);
+    ctx.beginPath(); ctx.moveTo(-7.5, -71.5); ctx.quadraticCurveTo(1, -73.5, 9.5, -71.5); ctx.lineWidth = 2.4; ctx.strokeStyle = pal.trim; ctx.stroke();
+    ctx.fillStyle = pal.trim;
+    for (const [x, y] of [[-3, -80], [2, -76]]) { ctx.beginPath(); for (let k = 0; k < 10; k++) { const a = k / 10 * TAU - Math.PI / 2, r = k % 2 ? 0.9 : 2.2; ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } ctx.closePath(); ctx.fill(); }
+  };
+  // eboši: vysoký černý klobouk dvorního mága
+  P.helmet.eboshi = (ctx, L, pal) => {
+    ctx.beginPath(); ctx.moveTo(-7, -69); ctx.quadraticCurveTo(-9, -82, -4, -90); ctx.quadraticCurveTo(4, -92, 8, -86); ctx.quadraticCurveTo(9, -76, 8, -69); ctx.closePath(); fs(ctx, '#1a1618', 1.6);
+    ctx.beginPath(); ctx.moveTo(-7, -71); ctx.lineTo(8, -71); ctx.lineWidth = 2; ctx.strokeStyle = pal.trim; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-6.5, -60); ctx.lineTo(-7, -69); ctx.lineWidth = 1; ctx.strokeStyle = OUT; ctx.stroke();
+  };
+  // kápě völvy s kožešinou a havraními pery
+  P.helmet.seidhood = (ctx, L, pal) => {
+    const c = pal.hood || pal.tunic;
+    ctx.beginPath(); ctx.arc(1.2, -63, 11.4, -0.35, 2.1, true); ctx.lineTo(-12, -50); ctx.lineTo(-3, -51.5); ctx.quadraticCurveTo(-2, -63, 9.6, -69.8); ctx.closePath(); fs(ctx, c, 1.8);
+    ctx.beginPath(); ctx.arc(1.2, -63, 11.6, -1.1, -2.6, true); ctx.lineWidth = 4; ctx.strokeStyle = '#d8d2c4'; ctx.stroke();
+    for (const [x, a] of [[-7, -0.9], [-4, -0.6]]) { ctx.save(); ctx.translate(x, -73); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(0, -5, 1.8, 6, 0, 0, TAU); fs(ctx, '#1a1a22', 1); ctx.restore(); }
+  };
+})();
+/* róba mága: dlouhá suknice až k zemi a halena se zlatým lemem */
+(function () {
+  const A = window.Art, P = window.ArtParts;
+  const fs = (ctx, f, lw) => A.fs(ctx, f, lw);
+  P.skirt = P.skirt || {}; P.torso = P.torso || {};
+  P.skirt.robe = (ctx, L, pal) => {
+    ctx.beginPath(); ctx.moveTo(-10, -35); ctx.lineTo(10, -35); ctx.lineTo(15, -6); ctx.quadraticCurveTo(1, -3, -14, -6); ctx.closePath();
+    const g = ctx.createLinearGradient(-14, 0, 15, 0); g.addColorStop(0, A.shade(pal.robe || pal.tunic, 0.1)); g.addColorStop(1, A.shade(pal.robe || pal.tunic, -0.3));
+    fs(ctx, g, 1.8);
+    ctx.beginPath(); ctx.moveTo(-14, -7.5); ctx.quadraticCurveTo(1, -4.5, 15, -7.5); ctx.lineWidth = 2.4; ctx.strokeStyle = pal.trim; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(1, -34); ctx.lineTo(1, -5); ctx.lineWidth = 1.6; ctx.strokeStyle = pal.trim; ctx.stroke();
+  };
+  P.noBelt = P.noBelt || {}; P.noBelt.robe = true;
+  P.torso.robe = (ctx, L, pal) => {
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-9.5, -54, 19, 22, 6) : ctx.rect(-9.5, -54, 19, 22); fs(ctx, pal.robe || pal.tunic, 1.8);
+    ctx.beginPath(); ctx.moveTo(-6, -54); ctx.lineTo(1, -44); ctx.lineTo(8, -54); ctx.lineWidth = 2.2; ctx.strokeStyle = pal.trim; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-9, -36); ctx.lineTo(10, -36); ctx.lineWidth = 3; ctx.strokeStyle = pal.sash || pal.trim; ctx.stroke();
+  };
+})();

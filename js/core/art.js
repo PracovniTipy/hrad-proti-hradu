@@ -146,6 +146,7 @@
   function drawUnit(ctx, def, pal, st) {
     const L = def.look;
     if (def.pal && !pal.__gen) pal = Object.assign({}, pal, def.pal, { __gen: 1 });
+    if (L.feat && !pal.feat) pal = Object.assign({}, pal, { feat: L.feat });
     const s = (L.scale || 1) * (st.scaleMul || 1);
     ctx.save();
     ctx.translate(st.x, st.y);
@@ -171,16 +172,17 @@
     SH.on = !st.flat; SH.root = ctx.getTransform(); SH.grad = null; SH.f = 1;
 
     const moving0 = st.moving && !st.dead;
-    const moving = pal.mount ? false : moving0;   // na koni jde kůň, jezdec sedí
+    const MT = pal.mount || L.mount || null;   // kůň: ze skinu nebo jízdní jednotka
+    const moving = MT ? false : moving0;   // na koni jde kůň, jezdec sedí
     const w = st.walk || 0;
     const swing = moving ? Math.sin(w) * 0.5 : 0;
     const bob = moving ? -Math.abs(Math.cos(w)) * 2.2 : 0;
     const atk = st.atk == null ? -1 : st.atk;
     let mountBob = 0;
-    if (pal.mount) {
+    if (MT) {
       mountBob = moving0 ? -Math.abs(Math.sin(w)) * 2.4 : 0;
       ctx.translate(0, mountBob);
-      drawHorse(ctx, pal.mount, w, moving0, st.t || 0, 'back');
+      drawHorse(ctx, MT, w, moving0, st.t || 0, 'back', pal);
       ctx.translate(-6, -27);
     }
 
@@ -335,7 +337,7 @@
       ctx.beginPath(); ctx.moveTo(-4, -52); ctx.lineTo(-7, -60); ctx.lineTo(-1, -54); ctx.lineTo(1, -61); ctx.lineTo(3, -53); ctx.closePath();
       fs(ctx, '#dff4ff', 1.2);
     }
-    if (pal.mount) { ctx.translate(6, 27); drawHorse(ctx, pal.mount, w, moving0, st.t || 0, 'front'); }
+    if (MT) { ctx.translate(6, 27); drawHorse(ctx, MT, w, moving0, st.t || 0, 'front', pal); }
 
     SH.on = prevSH;
     ctx.restore();
@@ -344,7 +346,7 @@
 
   /* Válečný kůň pod velitelem. layer 'back' = nohy, ocas, tělo, krk a hlava;
      'front' = čabraka a sedlo přes nohy jezdce. Kůň hledí doprava (facing řeší drawUnit). */
-  function drawHorse(ctx, M, w, moving, t, layer) {
+  function drawHorse(ctx, M, w, moving, t, layer, pal) {
     const coat = M.coat, dark = M.coatDark || shade(coat, -0.3);
     if (layer === 'back') {
       const g = moving ? w : 0;
@@ -384,7 +386,7 @@
       leg(-14, 0, coat); leg(26, Math.PI, coat);
     } else {
       // čabraka a sedlo – zakryje nohy jezdce
-      const b = M.barding, tr = M.bardingTrim || '#e8b84a';
+      const b = M.barding || (pal && pal.tunic) || '#2f62b8', tr = M.bardingTrim || (pal && pal.trim) || '#e8b84a';
       ctx.beginPath(); ctx.moveTo(-24, -56); ctx.quadraticCurveTo(-4, -60, 16, -56);
       ctx.lineTo(20, -30); ctx.quadraticCurveTo(-2, -24, -26, -30); ctx.closePath(); fs(ctx, b, 2);
       ctx.beginPath(); ctx.moveTo(-26, -32); ctx.quadraticCurveTo(-2, -26, 20, -32); ctx.lineWidth = 3; ctx.strokeStyle = tr; ctx.stroke();
@@ -1047,7 +1049,8 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
     const def = opts.def || GameData.units[unitId];
-    const sk0 = GameData.unitSkins.find(x => x.id === skinId);
+    const sk00 = GameData.unitSkins.find(x => x.id === skinId);
+    const sk0 = (sk00 && sk00.mount) ? sk00 : ((opts.def || GameData.units[unitId] || {}).look || {}).mount ? { mount: true } : sk00;
     let s = (opts.zoom || 1) * Math.min(cw / 70, ch / 92) * (sk0 && sk0.mount && !opts.headshot ? 0.66 : 1);
     ctx.save();
     if (opts.headshot) { s = ch / 27; ctx.translate(cw / 2 - 2 * s - (sk0 && sk0.mount ? 6 * s : 0), ch / 2 + (64 + (sk0 && sk0.mount ? 27 : 0)) * s); }

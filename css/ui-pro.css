@@ -643,7 +643,7 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .story-map.huge .node { transform: translate(-50%, -50%) scale(.9); }
 /* Spojenecké bitvy: 3 útoky nad lištou vpravo, aby se vešly */
 .b-bar.ally { position: relative; }
-.b-bar.ally .b-abil { position: absolute; right: 10px; bottom: calc(100% + 8px); flex-direction: row !important; gap: 8px; margin: 0; padding: 0; z-index: 3; }
+.b-bar.ally .b-abil { flex-direction: row !important; gap: 8px; margin-left: auto; }
 .b-bar.ally .abtn.skill { width: 66px !important; height: 66px !important; border-radius: 50%; }
 .b-bar.ally .abtn.skill .skill-ico { width: 40px; height: 40px; top: 4px; left: 50%; transform: translateX(-50%); }
 .b-bar.ally .abtn.skill .cost { left: 2px !important; right: 2px !important; top: auto !important; bottom: -8px !important; height: 20px; font-size: 12px; }
@@ -670,3 +670,17 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .scr .skin-grid .skin .gear-bonus { -webkit-line-clamp: 1; color: #9dffb0; font-weight: 700; }
 .scr .skin-grid .skin .btn { margin-top: auto; }
 .skin-preview canvas { height: 150px !important; }
+
+/* Spojenectví: rozbalený je jen jeden národ, ostatní ukazují jméno a AUTO */
+.b-bar.ally .ugrp:not(.open) .ugrp-b { display: none; }
+.b-bar.ally .ugrp:not(.open) { min-width: 0; cursor: pointer; }
+.b-bar.ally .ugrp:not(.open) .ugrp-h { flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: center; }
+.b-bar.ally .ugrp-pick { cursor: pointer; text-decoration: underline dotted rgba(255,233,168,.4); }
+.b-bar.ally .ugrp.open { flex: 1 1 auto; }
+#bUnits { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+#bUnits::-webkit-scrollbar { display: none; }
+
+.rar-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: -4px 2px 10px; font-family: var(--font-display); font-size: 13px; }
+.rar-legend span { color: var(--rc); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--rc); background: rgba(0,0,0,.35); }
+.rar-legend i { color: #8a7a5a; font-style: normal; }
+.rar-legend small { font-family: var(--font-body); color: #a89a7a; font-size: 12px; margin-left: 4px; }

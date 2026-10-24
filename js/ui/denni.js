@@ -13,8 +13,8 @@
 
   /* Exkluzivní skin (nedá se koupit) */
   GameData.unitSkins.push({
-    id: 'verny', name: 'Věrný strážce', rarity: 'Vzácný', price: 0, exclusive: true,
-    bonus: { hp: 0.08, dmg: 0.06 },
+    id: 'verny', name: 'Věrný strážce', rarity: 'Legendární', price: 0, exclusive: true,
+    bonus: { hp: 0.11, dmg: 0.09 },
     desc: 'Odměna za 14 dní hraní v kuse. Nedá se koupit.',
     palette: { tunic: '#4a2a7a', tunicDark: '#2e1850', trim: '#ffd77a', metal: '#dcd4ef', metalDark: '#7a6ea0', cape: '#3a1f66', plume: '#b98cff', lace: '#ffd77a', mask: '#ffd77a' },
     ornament: 'crystal', glow: '#c9a0ff'

@@ -182,7 +182,7 @@
       fields.forEach(f => { if (obj.__cs[f] === undefined) return; obj[f] = (cs || !en || en[f] == null) ? obj.__cs[f] : en[f]; });
     };
     Object.values(GameData.units).forEach(u => {
-      apply(u, ['name', 'role', 'desc'], EN.units[u.id]);
+      apply(u, ['name', 'role', 'desc'], EN.units[u.id] || u.en);
       if (u.unlock) apply(u.unlock, ['text'], { text: 'Unlocks after level 1-3 of Act ' + ({ s: 'II', v: 'III' }[u.unlock.campaign[0]] || 'I') + '.' });
     });
     Object.values(GameData.factions).forEach(F => {
@@ -409,5 +409,16 @@
     shop_hint_hrady: ["Malý hrad, Velká pevnost a vzhledy hradu.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks.", "Small castle, Great Fortress and castle looks."],
     shop_hint_dekorace: ["Ozdoby na tvůj hrad.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle.", "Decorations for your castle."],
     shop_hint_drahokamy: ["Drahokamy a denní odměna.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward.", "Gems and the daily reward."]
+  });
+
+  Object.assign(I18N.D, {
+    charge: ['Náraz!', 'Charge!', '冲锋！', 'धावा!', '¡Carga!', 'Charge !', 'هجوم!', 'আক্রমণ!', 'Investida!', 'Натиск!', 'دھاوا!', 'Serbu!', 'Ansturm!', '突撃！', 'Hücum!', '돌격!'],
+    role_jizda: ['Jízda', 'Cavalry', '骑兵', 'घुड़सवार', 'Caballería', 'Cavalerie', 'فرسان', 'অশ্বারোহী', 'Cavalaria', 'Конница', 'گھڑسوار', 'Kavaleri', 'Reiterei', '騎兵', 'Süvari', '기병'],
+    role_mag: ['Mágové', 'Mages', '法师', 'जादूगर', 'Magos', 'Mages', 'السحرة', 'জাদুকর', 'Magos', 'Маги', 'جادوگر', 'Penyihir', 'Magier', '魔術師', 'Büyücüler', '마법사'],
+    role_velitel: ['Velitelé', 'Commanders', '指挥官', 'सेनापति', 'Comandantes', 'Commandants', 'القادة', 'সেনাপতি', 'Comandantes', 'Командиры', 'سپہ سالار', 'Komandan', 'Befehlshaber', '指揮官', 'Komutanlar', '지휘관']
+  });
+
+  Object.assign(I18N.D, {
+    rarity_legend: ['čím vzácnější, tím silnější bonus', 'the rarer, the stronger the bonus', '越稀有，加成越强', 'जितना दुर्लभ, उतना मज़बूत बोनस', 'cuanto más raro, mejor bonificación', 'plus c’est rare, plus le bonus est fort', 'كلما كان أندر كانت المكافأة أقوى', 'যত বিরল, তত শক্তিশালী বোনাস', 'quanto mais raro, maior o bônus', 'чем реже, тем сильнее бонус', 'جتنا نایاب، اتنا مضبوط بونس', 'makin langka, makin kuat bonusnya', 'je seltener, desto stärker der Bonus', 'レアなほどボーナスが強い', 'ne kadar nadir, o kadar güçlü bonus', '희귀할수록 보너스가 강합니다']
   });
 })();

@@ -23,6 +23,7 @@ window.GameData = window.GameData || {};
 
 const R1 = ['pech'], R2 = ['pech', 'strelec'], R3 = ['pech', 'strelec', 'tezka'], R4 = ['pech', 'strelec', 'kopi', 'tezka'], R5 = ['pech', 'strelec', 'kopi'];
 const DEM = r => ({ faction: 'demoni', roles: r });
+const R6 = ['pech', 'strelec', 'kopi', 'jizda', 'tezka'], R7 = ['pech', 'strelec', 'kopi', 'jizda', 'tezka', 'mag'];
 
 GameData.saga = [
   { id: 'kralovstvi', n: 'I', faction: 'kralovstvi', mapTheme: 'evropa', scene: 'prolog', name: 'Lví koruna' },
@@ -59,8 +60,8 @@ GameData.campaigns = {
         { id: '2-1', name: 'Průsmyk vran', diff: 0.95, enemy: 'kralovstvi', roles: R5, reward: { gold: 650, gems: 20 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [18, 58], story: 'Úzký průsmyk hlídají kopiníci Stínové legie.' },
         { id: '2-2', name: 'Opuštěný důl', diff: 1.02, enemy: 'kralovstvi', roles: R5, reward: { gold: 700, gems: 20 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [42, 54], story: 'V dole se kuje černá ocel pro Morvanovy rytíře. Zastav výrobu zbraní.' },
         { id: '2-3', name: 'Kamenný most', diff: 1.1, enemy: 'kralovstvi', roles: R4, reward: { gold: 780, gems: 25 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [68, 50], story: 'Jediná cesta dál vede přes most nad propastí.' },
-        { id: '2-4', name: 'Horská brána', diff: 1.18, enemy: 'kralovstvi', roles: R4, reward: { gold: 860, gems: 25 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [80, 41], story: 'Brána do srdce hor je vytesaná do skály. Morvanovi strážci ji neopustí bez boje.', en: { name: 'Mountain Gate', story: 'The gate to the heart of the mountains is carved into the rock. Morvan’s guards will not leave it without a fight.' } },
-        { id: '2-5', name: 'Tvrz Černý zub', diff: 1.26, enemy: 'kralovstvi', roles: R4, reward: { gold: 1100, gems: 50 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [56, 37], boss: true, story: 'Vévoda Morvan vede Stínovou legii osobně. Tohle bude těžká bitva.', en: { name: 'Black Fang Keep', story: 'Duke Morvan leads the Shadow Legion himself. This will be a hard battle.' } }
+        { id: '2-4', name: 'Horská brána', diff: 1.18, enemy: 'kralovstvi', roles: R6, reward: { gold: 860, gems: 25 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [80, 41], story: 'Brána do srdce hor je vytesaná do skály. Morvanovi strážci ji neopustí bez boje.', en: { name: 'Mountain Gate', story: 'The gate to the heart of the mountains is carved into the rock. Morvan’s guards will not leave it without a fight.' } },
+        { id: '2-5', name: 'Tvrz Černý zub', diff: 1.26, enemy: 'kralovstvi', roles: R6, reward: { gold: 1100, gems: 50 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [56, 37], boss: true, story: 'Vévoda Morvan vede Stínovou legii osobně. Tohle bude těžká bitva.', en: { name: 'Black Fang Keep', story: 'Duke Morvan leads the Shadow Legion himself. This will be a hard battle.' } }
       ]
     },
     {
@@ -71,9 +72,9 @@ GameData.campaigns = {
       levels: [
         { id: '3-1', name: 'Hořící pole', diff: 1.3, enemy: 'kralovstvi', roles: R4, reward: { gold: 1150, gems: 30 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [30, 28], story: 'Valdemarova garda pálí pole kolem města, aby ti nezbylo jídlo. Zastav ji.', en: { name: 'Burning Fields', story: 'Valdemar’s guard burns the fields around the city to starve you. Stop it.' } },
         { id: '3-2', name: 'Klášter na kopci', diff: 1.36, enemy: 'kralovstvi', roles: R2, reward: { gold: 1250, gems: 30 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [14, 18], story: 'Mniši ukrývají korunovační klenoty. Valdemarovi muži je chtějí ukrást.', en: { name: 'Hilltop Monastery', story: 'The monks hide the crown jewels. Valdemar’s men want to steal them.' } },
-        { id: '3-3', name: 'Městské hradby', diff: 1.42, enemy: 'kralovstvi', roles: R4, reward: { gold: 1350, gems: 35 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [40, 13], story: 'Zlatá garda drží vnější hradby. Získej je.', en: { name: 'City Walls', story: 'The Golden Guard holds the outer walls. Take them.' } },
-        { id: '3-4', name: 'Královská zahrada', diff: 1.48, enemy: 'kralovstvi', roles: R5, reward: { gold: 1450, gems: 40 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [66, 16], story: 'Věrní služebníci ti otevřeli tajnou bránu v zahradě. Pronikni k paláci.', en: { name: 'Royal Garden', story: 'Loyal servants opened the secret garden gate for you. Break through to the palace.' } },
-        { id: '3-5', name: 'Trůnní sál', diff: 1.55, enemy: 'kralovstvi', roles: R4, theme: 'evropa', reward: { gold: 1900, gems: 80 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [84, 7], boss: true, story: 'Valdemar Zlatý brání trůn s celou Zlatou gardou. Poraz ho a staneš se králem!', en: { name: 'Throne Room', story: 'Valdemar the Golden defends the throne with his whole Golden Guard. Defeat him and you will be king!' } }
+        { id: '3-3', name: 'Městské hradby', diff: 1.42, enemy: 'kralovstvi', roles: R7, reward: { gold: 1350, gems: 35 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [40, 13], story: 'Zlatá garda drží vnější hradby. Získej je.', en: { name: 'City Walls', story: 'The Golden Guard holds the outer walls. Take them.' } },
+        { id: '3-4', name: 'Královská zahrada', diff: 1.48, enemy: 'kralovstvi', roles: R6, reward: { gold: 1450, gems: 40 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [66, 16], story: 'Věrní služebníci ti otevřeli tajnou bránu v zahradě. Pronikni k paláci.', en: { name: 'Royal Garden', story: 'Loyal servants opened the secret garden gate for you. Break through to the palace.' } },
+        { id: '3-5', name: 'Trůnní sál', diff: 1.55, enemy: 'kralovstvi', roles: R7, theme: 'evropa', reward: { gold: 1900, gems: 80 }, castleSkin: 'kralovsky', unitSkin: 'zlaty', pos: [84, 7], boss: true, story: 'Valdemar Zlatý brání trůn s celou Zlatou gardou. Poraz ho a staneš se králem!', en: { name: 'Throne Room', story: 'Valdemar the Golden defends the throne with his whole Golden Guard. Defeat him and you will be king!' } }
       ]
     }
   ],
@@ -102,8 +103,8 @@ GameData.campaigns = {
         { id: 's2-1', name: 'Průsmyk mlhy', diff: 1.26, enemy: 'samurajove', roles: R5, reward: { gold: 1350, gems: 25 }, castleSkin: 'pisecna', unitSkin: 'lesni', pos: [82, 58], story: 'Mlha je tak hustá, že nepřítele uslyšíš dřív, než ho uvidíš.' },
         { id: 's2-2', name: 'Klášter válečných mnichů', diff: 1.32, enemy: 'samurajove', roles: R5, reward: { gold: 1400, gems: 25 }, castleSkin: 'pisecna', unitSkin: 'lesni', pos: [58, 54], story: 'Mniši sóhei se přidali k nepříteli. Ukaž jim sílu klanu Kazehana.' },
         { id: 's2-3', name: 'Most přes Rudou řeku', diff: 1.38, enemy: 'samurajove', roles: R4, reward: { gold: 1450, gems: 30 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [32, 50], story: 'Na mostě se objevují černí samurajové regenta Kuroganeho.', en: { name: 'Red River Bridge', story: 'The black samurai of Regent Kurogane appear on the bridge.' } },
-        { id: 's2-4', name: 'Pevnost v oblacích', diff: 1.44, enemy: 'samurajove', roles: R4, reward: { gold: 1500, gems: 30 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [20, 41], story: 'Hrad nad mraky hlídá jedinou cestu do hlavního města.' },
-        { id: 's2-5', name: 'Generál Kurogane', diff: 1.5, enemy: 'samurajove', roles: R4, reward: { gold: 1800, gems: 50 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [44, 37], boss: true, story: 'Regentův bratr velí černé armádě. Poraz ho a cesta bude volná.', en: { name: 'General Kurogane', story: 'The regent’s brother commands the black army. Defeat him and the road will be open.' } }
+        { id: 's2-4', name: 'Pevnost v oblacích', diff: 1.44, enemy: 'samurajove', roles: R6, reward: { gold: 1500, gems: 30 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [20, 41], story: 'Hrad nad mraky hlídá jedinou cestu do hlavního města.' },
+        { id: 's2-5', name: 'Generál Kurogane', diff: 1.5, enemy: 'samurajove', roles: R6, reward: { gold: 1800, gems: 50 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [44, 37], boss: true, story: 'Regentův bratr velí černé armádě. Poraz ho a cesta bude volná.', en: { name: 'General Kurogane', story: 'The regent’s brother commands the black army. Defeat him and the road will be open.' } }
       ]
     },
     {
@@ -114,9 +115,9 @@ GameData.campaigns = {
       levels: [
         { id: 's3-1', name: 'Silnice Tókaidó', diff: 1.55, enemy: 'samurajove', roles: R4, reward: { gold: 1900, gems: 30 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [70, 28], story: 'Po hlavní silnici táhnou regentovy posily.' },
         { id: 's3-2', name: 'Sakurový průsmyk', diff: 1.6, enemy: 'samurajove', roles: R4, reward: { gold: 2000, gems: 30 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [86, 18], story: 'Mezi kvetoucími sakurami se rozhodne, kdo projde.' },
-        { id: 's3-3', name: 'Noční útok', diff: 1.66, enemy: 'samurajove', roles: R5, reward: { gold: 2100, gems: 35 }, castleSkin: 'temna', unitSkin: 'pulnoc', pos: [60, 13], story: 'Regent zaútočil v noci se svými stínovými bojovníky. Drž formaci.', en: { name: 'Night Attack', story: 'The regent attacked at night with his shadow warriors. Hold the formation.' } },
-        { id: 's3-4', name: 'Brány paláce', diff: 1.72, enemy: 'samurajove', roles: R4, reward: { gold: 2200, gems: 40 }, castleSkin: 'temna', unitSkin: 'zlaty', pos: [34, 16], story: 'Zlatá garda regenta brání vnější brány paláce.' },
-        { id: 's3-5', name: 'Regent Kurogane', diff: 1.8, enemy: 'samurajove', roles: R4, reward: { gold: 2800, gems: 80 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [16, 7], boss: true, story: 'Regent velí svým nejlepším samurajům. Osvoboď císaře.', en: { name: 'Regent Kurogane', story: 'The regent commands his finest samurai. Free the emperor.' } }
+        { id: 's3-3', name: 'Noční útok', diff: 1.66, enemy: 'samurajove', roles: R6, reward: { gold: 2100, gems: 35 }, castleSkin: 'temna', unitSkin: 'pulnoc', pos: [60, 13], story: 'Regent zaútočil v noci se svými stínovými bojovníky. Drž formaci.', en: { name: 'Night Attack', story: 'The regent attacked at night with his shadow warriors. Hold the formation.' } },
+        { id: 's3-4', name: 'Brány paláce', diff: 1.72, enemy: 'samurajove', roles: R7, reward: { gold: 2200, gems: 40 }, castleSkin: 'temna', unitSkin: 'zlaty', pos: [34, 16], story: 'Zlatá garda regenta brání vnější brány paláce.' },
+        { id: 's3-5', name: 'Regent Kurogane', diff: 1.8, enemy: 'samurajove', roles: R7, reward: { gold: 2800, gems: 80 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [16, 7], boss: true, story: 'Regent velí svým nejlepším samurajům. Osvoboď císaře.', en: { name: 'Regent Kurogane', story: 'The regent commands his finest samurai. Free the emperor.' } }
       ]
     }
   ],
@@ -145,8 +146,8 @@ GameData.campaigns = {
         { id: 'v2-1', name: 'Zamrzlé jezero', diff: 1.56, enemy: 'vikingove', roles: R5, theme: 'sever', reward: { gold: 2100, gems: 25 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [20, 58], story: 'Led praská pod nohama. Postupuj opatrně.' },
         { id: 'v2-2', name: 'Sněžná hlídka', diff: 1.62, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 2200, gems: 25 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [44, 54], story: 'Hlídka Ledové stráže tě už vyhlíží.' },
         { id: 'v2-3', name: 'Křišťálová rokle', diff: 1.68, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 2300, gems: 30 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [70, 50], story: 'Rokle plná krystalů odráží každý šíp.' },
-        { id: 'v2-4', name: 'Bouřná výšina', diff: 1.74, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 2400, gems: 30 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [82, 41], story: 'Vichr a sníh. Nepřítel má výhodu výšky.' },
-        { id: 'v2-5', name: 'Ledová brána', diff: 1.8, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 2900, gems: 55 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [58, 37], boss: true, story: 'Velitel Ledové stráže brání jedinou bránu do srdce pustiny.' }
+        { id: 'v2-4', name: 'Bouřná výšina', diff: 1.74, enemy: 'vikingove', roles: R6, theme: 'sever', reward: { gold: 2400, gems: 30 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [82, 41], story: 'Vichr a sníh. Nepřítel má výhodu výšky.' },
+        { id: 'v2-5', name: 'Ledová brána', diff: 1.8, enemy: 'vikingove', roles: R6, theme: 'sever', reward: { gold: 2900, gems: 55 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [58, 37], boss: true, story: 'Velitel Ledové stráže brání jedinou bránu do srdce pustiny.' }
       ]
     },
     {
@@ -157,9 +158,9 @@ GameData.campaigns = {
       levels: [
         { id: 'v3-1', name: 'Konec světa', diff: 1.85, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 3000, gems: 30 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [28, 28], story: 'Na kraji známého světa stojí první Ragnvaldova pevnost.', en: { name: 'End of the World', story: 'Ragnvald’s first fortress stands at the edge of the known world.' } },
         { id: 'v3-2', name: 'Duhový most', diff: 1.9, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 3100, gems: 30 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [12, 18], story: 'Pod polární září se most mezi světy chvěje.' },
-        { id: 'v3-3', name: 'Obři severu', diff: 1.95, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 3200, gems: 35 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [40, 12], story: 'Ragnvaldovi berserkové jsou silní jako obři ze ság.', en: { name: 'Giants of the North', story: 'Ragnvald’s berserkers are as strong as giants from the sagas.' } },
-        { id: 'v3-4', name: 'Bouřné moře', diff: 2.0, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 3300, gems: 40 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [66, 16], story: 'Zamrzlým mořem připlouvají Ragnvaldovy dračí lodě.', en: { name: 'Stormy Sea', story: 'Ragnvald’s dragon ships sail across the frozen sea.' } },
-        { id: 'v3-5', name: 'Citadela Mrazivé koruny', diff: 2.05, enemy: 'vikingove', roles: R4, theme: 'sever', reward: { gold: 4000, gems: 90 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [84, 7], boss: true, story: 'Poraz krále Ragnvalda a sjednoť sever.', en: { name: 'Citadel of the Frost Crown', story: 'Defeat King Ragnvald and unite the north.' } }
+        { id: 'v3-3', name: 'Obři severu', diff: 1.95, enemy: 'vikingove', roles: R7, theme: 'sever', reward: { gold: 3200, gems: 35 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [40, 12], story: 'Ragnvaldovi berserkové jsou silní jako obři ze ság.', en: { name: 'Giants of the North', story: 'Ragnvald’s berserkers are as strong as giants from the sagas.' } },
+        { id: 'v3-4', name: 'Bouřné moře', diff: 2.0, enemy: 'vikingove', roles: R6, theme: 'sever', reward: { gold: 3300, gems: 40 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [66, 16], story: 'Zamrzlým mořem připlouvají Ragnvaldovy dračí lodě.', en: { name: 'Stormy Sea', story: 'Ragnvald’s dragon ships sail across the frozen sea.' } },
+        { id: 'v3-5', name: 'Citadela Mrazivé koruny', diff: 2.05, enemy: 'vikingove', roles: R7, theme: 'sever', reward: { gold: 4000, gems: 90 }, castleSkin: 'ledova', unitSkin: 'ledovy', pos: [84, 7], boss: true, story: 'Poraz krále Ragnvalda a sjednoť sever.', en: { name: 'Citadel of the Frost Crown', story: 'Defeat King Ragnvald and unite the north.' } }
       ]
     }
   ],

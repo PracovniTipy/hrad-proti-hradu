@@ -38,7 +38,7 @@ GameData.gearTiers = {
 
 /* Všechny předměty: 4 role × 2 sloty × 4 úrovně */
 GameData.gear = [];
-['pech', 'strelec', 'kopi', 'tezka'].forEach(role => {
+['pech', 'strelec', 'kopi', 'tezka', 'jizda', 'mag', 'velitel'].forEach(role => {
   ['weapon', 'armor'].forEach(slot => {
     GameData.gearTiers[slot].forEach(T => GameData.gear.push(Object.assign({ id: `${slot}_${role}_${T.tier}`, slot, role }, T)));
   });

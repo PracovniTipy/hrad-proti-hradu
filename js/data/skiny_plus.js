@@ -174,3 +174,30 @@ GameData.weaponSkinById = id => GameData.weaponSkins.find(w => w.id === id) || G
 GameData.skinFits = (s, unitId) => !s.only || s.only.includes(unitId);
 /* hodí se skin zbraně této jednotce? (podle druhu její zbraně) */
 GameData.weaponSkinFits = (w, unitId) => w.cat === 'any' || (window.Art && Art.weaponCat && Art.weaponCat(GameData.units[unitId].look.weapon) === w.cat);
+
+/* VZÁCNOST = SÍLA: legendární > epický > vzácný > základní.
+   Bonus každého skinu se srovná podle vzácnosti (poměr útok/životy zůstává). */
+(function () {
+  const TOTAL = { 'Základní': 0.03, 'Vzácný': 0.07, 'Epický': 0.12, 'Legendární': 0.2 };
+  const norm = (b, total) => {
+    const keys = Object.keys(b || {}); const sum = keys.reduce((a, k) => a + b[k], 0);
+    if (!sum) return { hp: total / 2, dmg: total / 2 };
+    const o = {}; keys.forEach(k => (o[k] = Math.round(b[k] / sum * total * 100) / 100)); return o;
+  };
+  GameData.unitSkins.forEach(s => {
+    if (s.id === 'zakladni') { s.bonus = null; return; }
+    let t = TOTAL[s.rarity] || 0.05;
+    if (s.mount) t += 0.04;          // jezdecký skin je nejvzácnější
+    if (s.exclusive) t = TOTAL['Legendární'];
+    s.bonus = norm(s.bonus, t);
+  });
+  const WT = { 'Základní': 0.03, 'Vzácný': 0.06, 'Epický': 0.09, 'Legendární': 0.13 };
+  GameData.weaponSkins.forEach(w => {
+    if (!w.model) return;
+    w.bonus = { dmg: WT[w.rarity] || 0.05 };
+    if (w.rarity === 'Legendární') w.bonus.crit = 0.05;
+  });
+  // obchod řadí od nejslabšího k nejsilnějšímu
+  const R = { 'Základní': 0, 'Vzácný': 1, 'Epický': 2, 'Legendární': 3 };
+  GameData.rarityRank = r => R[r] ?? 0;
+})();

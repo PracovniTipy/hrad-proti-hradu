@@ -21,7 +21,7 @@
       let e = this.map.get(key);
       if (e) { this.map.delete(key); this.map.set(key, e); return e; }
       const s = (def.look.scale || 1) * scaleMul;
-      const M = !!pal.mount;
+      const M = !!(pal.mount || def.look.mount);
       const bx0 = (M ? -62 : -40) * s, by0 = (M ? -170 : -132) * s, bw = (M ? 172 : 130) * s, bh = (M ? 186 : 148) * s;
       const cv = document.createElement('canvas');
       cv.width = Math.ceil(bw * this.r); cv.height = Math.ceil(bh * this.r);
@@ -645,6 +645,12 @@
         if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
       }
       this._updateSkillFx(dt);
+      // aura velení: vojáci v okolí velitele mají vyšší útok
+      this._auraT = (this._auraT || 0) - dt;
+      if (this._auraT <= 0) {
+        this._auraT = 0.4;
+        for (const c of this.units) if (!c.dead && c.def.aura) for (const u of this.units) if (u.team === c.team && !u.dead && Math.abs(u.x - c.x) < 200) { u.inspired = this.time + 0.6; u.inspiredBy = c.def.aura; }
+      }
       this._ai(dt);
       this._autoPlayer(dt);
       this._updateDefense(dt);
@@ -760,6 +766,13 @@
         if (p.t >= 1 && !p.done) {
           p.done = true;
           if (p.kind === 'fire') this._sparks(p.tx, p.ty, '#ff9a3c', 6);
+          if (p.kind === 'magic') {
+            const mc = (p.from && p.from.def.look.magic) || '#7fc8ff';
+            this._sparks(p.tx, p.ty, mc, 10);
+            this.particles.push({ x: p.tx, y: p.ty, vx: 0, vy: 0, g: 0, t: 0, life: 0.35, r: 10, ring: true, color: mc });
+            const sp = p.from && p.from.def.splash;
+            if (sp && p.target) for (const e of this.units) if (e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 60) this._damage(e, p.dmg * sp, null);
+          }
           if (p.kind === 'cat') { this._catImpact(p); continue; }
           if (p.pierce && p.target) {
             const second = this.units.find(e => e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 70);
@@ -970,7 +983,7 @@
       if (target) { tx = target.x; ty = target.y - 32 * US(); }
       else { tx = castle.front + (team === 'player' ? 30 : -30); ty = cfg.groundY - 120 - this.rand() * 80; }
       const dist = Math.hypot(tx - ox, ty - oy);
-      const kind = from && from.def && from.def.projectile === 'fire' ? 'fire' : 'arrow';
+      const kind = from && from.def && (from.def.projectile === 'fire' || from.def.projectile === 'magic') ? from.def.projectile : 'arrow';
       const burn = (this.side[team].fireArrowsUntil || 0) > this.time;
       this.projectiles.push({ burn, team, kind, x0: ox, y0: oy, tx, ty, target, castle: target ? null : castle, dmg, from, t: 0, dur: Math.max(0.25, dist / speed), arc: kind === 'fire' ? Math.min(50, dist * 0.12) : Math.min(90, dist * 0.22), done: false });
     }
@@ -992,6 +1005,8 @@
       if (s.shieldUntil > this.time) dmg *= 1 - GameData.abilities.stit.reduction;
       if ((s.curseUntil || 0) > this.time) dmg *= 1.5;
       if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
+      if (from && from.inspired > this.time) dmg *= 1 + (from.inspiredBy || 0.15);
+      if (from && from.def && from.def.charge && !from.charged) { from.charged = true; dmg *= from.def.charge; this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('charge'), color: '#ffd77a', t: 0, life: 0.9 }); }
       target.hp -= dmg;
       target.hurt = 0.15;
       this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
@@ -1257,6 +1272,7 @@
       for (const u of list) {
         const shield = this.side[u.team].shieldUntil > t;
         if (u === this.hero) this._heroMarkBelow(ctx, u, t);
+        if (u.def.aura && !u.dead) { ctx.save(); ctx.globalAlpha = 0.18 + Math.sin(t * 3) * 0.05; ctx.beginPath(); ctx.ellipse(u.x, u.y, 190, 26, 0, 0, Math.PI * 2); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd77a'; ctx.stroke(); ctx.restore(); }
         const age = t - (u.born || 0);
         const pop = age < 0.25 ? 0.6 + 0.4 * Art.ease(age / 0.25) : 1;
         this._drawUnitSprite(ctx, u, pop, shield);
@@ -1282,6 +1298,14 @@
         const dx = (p.tx - p.x0), dy = (p.ty - p.y0) - p.arc * 4 * (1 - 2 * k);
         const a = Math.atan2(dy, dx);
         if (p.kind === 'fire') { Art.drawFireball(ctx, x, y, a, this.time); continue; }
+        if (p.kind === 'magic') {
+          const mc = (p.from && p.from.def.look.magic) || '#7fc8ff';
+          ctx.save(); ctx.shadowColor = mc; ctx.shadowBlur = 16;
+          const g = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, 9); g.addColorStop(0, '#ffffff'); g.addColorStop(0.5, mc); g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+          ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.arc(x - Math.cos(a) * 10, y - Math.sin(a) * 10, 5, 0, Math.PI * 2); ctx.fillStyle = mc; ctx.fill();
+          ctx.restore(); continue;
+        }
         if (p.kind === 'cat') { Art.drawCatShot(ctx, x, y, p.el, this.time); continue; }
         ctx.save(); ctx.translate(x, y); ctx.rotate(a);
         ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(8, 0); ctx.lineWidth = 3.2; ctx.strokeStyle = Art.OUT; ctx.stroke();
