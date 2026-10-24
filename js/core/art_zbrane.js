@@ -228,9 +228,42 @@
   };
 
   /* ------------ LUKY: tvar ramen ------------ */
+  /* JUMI – samurajský luk: přes 2 metry vysoký, nesouměrný (úchop ve spodní
+     třetině), černě lakovaný, s bílými ratanovými omotávkami, konce ramen
+     se stáčí dopředu a úchop je omotaný rudou kůží. */
+  function drawYumi(ctx, c, gx, gy) {
+    const top = 86, bot = 38;
+    const T = [gx - 4, gy - top], B = [gx - 4, gy + bot];
+    const lac = c.wood && c.wood !== '#8a5a32' ? c.wood : '#1c1a1e';
+    // tvar: od úchopu mírně dozadu, pak zase dopředu ke konci (typické dvojité prohnutí)
+    const path = () => {
+      ctx.beginPath();
+      ctx.moveTo(T[0] + 6, T[1] - 2);
+      ctx.quadraticCurveTo(T[0] - 2, T[1] + 4, T[0] - 6, T[1] + 18);
+      ctx.bezierCurveTo(gx - 12, gy - top * 0.55, gx + 4, gy - top * 0.25, gx, gy);
+      ctx.bezierCurveTo(gx + 3, gy + bot * 0.35, gx - 8, gy + bot * 0.7, B[0] - 4, B[1] - 6);
+      ctx.quadraticCurveTo(B[0] - 2, B[1] + 2, B[0] + 5, B[1] + 2);
+    };
+    glowOn(ctx, c, 10);
+    path(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 6.4; ctx.strokeStyle = OUT; ctx.stroke();
+    ctx.lineWidth = 3.6; ctx.strokeStyle = lac; ctx.stroke();
+    glowOff(ctx);
+    path(); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.stroke();
+    // ratanové omotávky (bílé pásky) po délce luku
+    ctx.save(); path(); ctx.lineCap = 'butt'; ctx.lineWidth = 3.6; ctx.setLineDash([1.3, 11]); ctx.strokeStyle = '#efe6cf'; ctx.stroke(); ctx.restore();
+    // zlaté konce ramen
+    for (const [x, y] of [[T[0] + 5, T[1] - 1.5], [B[0] + 4, B[1] + 1.5]]) { ctx.beginPath(); ctx.arc(x, y, 2, 0, TAU); fs(ctx, c.guard && c.guard !== '#d9b04a' ? c.guard : '#d9b04a', 1); }
+    // úchop: rudá kůže a bílá omotávka nad ním
+    rr(ctx, gx - 3, gy - 7, 6, 13, 2); fs(ctx, '#a8262a', 1.3);
+    ctx.strokeStyle = '#5a0e10'; ctx.lineWidth = 0.8; for (let y = gy - 5; y < gy + 6; y += 2.4) { ctx.beginPath(); ctx.moveTo(gx - 3, y); ctx.lineTo(gx + 3, y + 1.2); ctx.stroke(); }
+    rr(ctx, gx - 2.6, gy - 11, 5.2, 3.4, 1); fs(ctx, '#efe6cf', 1);
+    return [[T[0] + 6, T[1] - 2], [B[0] + 5, B[1] + 2]];
+  }
+
   /* gx, gy = úchop. Luky jsou vysoké: dlouhý luk skoro jako postava,
      samurajský jumi ještě vyšší a nesouměrný (úchop ve spodní třetině). */
   function drawBowLimbs(ctx, id, c, gx, gy) {
+    if (id === 'yumi') return drawYumi(ctx, c, gx, gy);
     const S = { yumi: [70, 32, 'yumi'], dlouhy: [44, 40], reflex: [42, 40, 'rec'], draci: [44, 42, 'rec'], elfi: [44, 42, 'rec'], hvezdny: [46, 44, 'rec'], kost: [44, 42], mesic: [44, 42, 'rec'] }[id] || [48, 44];
     const top = S[0], bot = S[1], rec = S[2] === 'rec';
     const T = [gx - 13, gy - top], B = [gx - 13, gy + bot];
@@ -529,8 +562,8 @@
       A.drawPole(ctx, id, pal, M);
     } else if (cat === 'bow') {
       const c = A.weaponColors(pal, M);
-      const tall = id === 'yumi' ? 128 : 108, s = h / tall;
-      ctx.translate(w * 0.48, h * (id === 'yumi' ? 0.66 : 0.52)); ctx.scale(s, s);
+      const tall = id === 'yumi' ? 136 : 108, s = h / tall;
+      ctx.translate(w * 0.48, h * (id === 'yumi' ? 0.69 : 0.52)); ctx.scale(s, s);
       const tips = A.drawBowLimbs(ctx, id, c, 0, 0);
       ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(tips[1][0], tips[1][1]); ctx.lineWidth = 1.3; ctx.strokeStyle = c.string; ctx.stroke();
       // šíp přes luk
