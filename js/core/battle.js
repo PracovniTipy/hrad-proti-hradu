@@ -21,7 +21,8 @@
       let e = this.map.get(key);
       if (e) { this.map.delete(key); this.map.set(key, e); return e; }
       const s = (def.look.scale || 1) * scaleMul;
-      const bx0 = -40 * s, by0 = -132 * s, bw = 130 * s, bh = 148 * s;
+      const M = !!pal.mount;
+      const bx0 = (M ? -62 : -40) * s, by0 = (M ? -170 : -132) * s, bw = (M ? 172 : 130) * s, bh = (M ? 186 : 148) * s;
       const cv = document.createElement('canvas');
       cv.width = Math.ceil(bw * this.r); cv.height = Math.ceil(bh * this.r);
       const c = cv.getContext('2d');
@@ -72,7 +73,7 @@
         player: {
           coins: cfg.startCoins, income: ps.income, maxCoins: ps.maxCoins,
           hpMult: ps.unitMult, dmgMult: ps.unitMult,
-          castle: { hp: ps.castleHp, maxHp: ps.castleHp, front: cfg.playerFront, tower: ps.towerDmg, towerTimer: 1 },
+          castle: { hp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), maxHp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), front: cfg.playerFront, tower: ps.towerDmg, towerTimer: 1 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
           formation: 'utok', flagX: cfg.playerFront + 380,
           castleImg: Art.castleImage('player', opts.player.castleSkin, opts.player.castleLevel, 2, (GameData.factions[opts.playerFaction] || {}).castleStyle || 'evropa', opts.player.castleCfg || null),

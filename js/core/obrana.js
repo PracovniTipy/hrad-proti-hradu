@@ -14,7 +14,10 @@ window.GameData = window.GameData || {};
 
 GameData.defense = {
   maxSlots: 5,
-  slotsFor: vez => Math.min(5, Math.ceil((vez || 0) / 2)),
+  bigSlots: 10,                    // Velká pevnost z obchodu: až 10 obránců
+  slotsFor: (vez, big) => big ? Math.min(10, vez || 0) : Math.min(5, Math.ceil((vez || 0) / 2)),
+  maxFor: save => save && save.bigCastle ? 10 : 5,
+  unlockAt: (i, big) => big ? i + 1 : i * 2 + 1,
   catapultFrom: 6,                 // úroveň Strážní věže, od které jde postavit katapult
   kinds: {
     lucistnik: { name: 'Lučištník', desc: 'Rychle střílí šípy na nepřátele u hradu.', price: { gold: 0 }, interval: 1.35, range: 430, dmg: vez => 6 + vez * 2.4 },
@@ -39,7 +42,7 @@ GameData.catapultEl = id => GameData.catapult.elements.find(e => e.id === id) ||
 GameData.defenseOf = save => {
   const d = save.defense || {};
   const vez = save.buildings.vez || 0;
-  const n = GameData.defense.slotsFor(vez);
+  const n = GameData.defense.slotsFor(vez, !!save.bigCastle);
   const slots = [];
   for (let i = 0; i < n; i++) {
     let kind = (d.slots || [])[i] || 'lucistnik';
@@ -60,7 +63,9 @@ GameData.defenseOf = save => {
     peklo: [[255, 196], [305, 196], [280, 196], [150, 292], [60, 292]]
   };
   function spots(img, style, front, groundY, facing) {
-    return (SPOTS[style] || SPOTS.evropa).map(([lx, ly]) => [facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx), groundY - img.h + ly]);
+    let pts = SPOTS[style] || SPOTS.evropa;
+    if (img.big) { const B = img.big; pts = pts.map(([x, y]) => [B.ox + x * B.S, B.oy + y * B.S]).concat(B.extra); }
+    return pts.map(([lx, ly]) => [facing === 1 ? front - img.w + 2 + lx : front - 2 + (img.w - lx), groundY - img.h + ly]);
   }
 
   /* Kušiník: helma, kroužková zbroj a kuše */
@@ -114,11 +119,12 @@ GameData.defenseOf = save => {
     const F = GameData.factions[faction] || GameData.factions.kralovstvi;
     const pal = Art.unitPalette(team || 'player', 'zakladni', F.id);
     def.slots.forEach((sl, i) => {
+      if (!P2[i]) return;
       const [x, y] = P2[i];
       const since = anim && anim.shot ? t - (anim.shot[i] == null ? -99 : anim.shot[i]) : 99;
       if (sl.kind === 'katapult') {
         const arm = since < 0.25 ? since / 0.25 : since < 1.6 ? 1 - (since - 0.25) / 1.35 : 0;
-        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, i < 3 ? 0.7 : 0.9, since > 1.2);
+        drawCatapult(ctx, x, y, facing, Math.max(0, arm), sl.el, i < 3 || i >= 5 ? 0.7 : 0.9, since > 1.2);
       } else {
         const atk = since < 0.7 ? since / 0.7 : -1;
         const def2 = sl.kind === 'kuse' ? CROSS : GameData.units[F.roles.strelec];

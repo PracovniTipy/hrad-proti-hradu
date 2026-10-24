@@ -585,3 +585,18 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
   #app { visibility: hidden; }
 }
 @keyframes rotPhone { 0%, 20% { transform: rotate(0); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+
+/* ===== Velká pevnost v obchodě ===== */
+.big-offer { display: grid; grid-template-columns: minmax(180px, 42%) 1fr; gap: 16px; align-items: center; margin-bottom: 14px; padding: 14px;
+  background: var(--tex-noise), radial-gradient(120% 140% at 20% 100%, rgba(232,184,74,.22), transparent 60%), linear-gradient(180deg, #2a2016, #15100b); border: 2px solid #e8b84a; }
+.big-offer canvas { width: 100%; height: 220px; display: block; }
+.big-offer h3 { font-family: var(--font-display); font-size: 24px; margin: 2px 0 6px; color: #ffe9a8; }
+.big-offer p { margin: 0 0 12px; color: #d9c9a0; font-size: 14px; }
+.big-offer.owned { border-color: #4fd27a; }
+.big-link { color: #ffd77a; text-decoration: underline; }
+@media (max-width: 560px) { .big-offer { grid-template-columns: 1fr; } }
+
+/* ===== Skiny národů a zbraní ===== */
+.skin.nat { position: relative; }
+.skin-tag { position: absolute; top: 8px; left: 8px; z-index: 1; font-family: var(--font-display); font-size: 11px; letter-spacing: .04em; color: #2a1a03;
+  padding: 2px 8px; border-radius: 10px; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 1px #05070b; }

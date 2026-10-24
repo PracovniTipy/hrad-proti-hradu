@@ -76,6 +76,7 @@ GameData.offers = [
   { id: 'hradni', name: 'Hradní balíček', desc: 'Pochodně a velké prapory na hrad a zlato.', czk: 29, limit: 1, give: { gold: 800, decor: ['pochodne', 'prapory'] }, art: 'castle' },
   { id: 'kopinik', name: 'Balíček kopiníků', desc: 'Ocelová zbroj a runová zbraň pro kopiníky.', czk: 29, limit: 1, give: { gear: ['armor_kopi_1', 'weapon_kopi_1'] }, art: 'armor' },
   { id: 'hrdina', name: 'Balíček hrdiny', desc: 'Dračí oheň pro těžkou jednotku a drahokamy.', czk: 59, limit: 1, badge: 'Epická zbraň', give: { gems: 100, gear: ['weapon_tezka_2'] }, art: 'weapon' },
+  { id: 'pevnost', name: 'Velká pevnost', desc: 'Větší hrad s donjonem: až 10 obránců na hradbách (na max. Strážní věži), +25 % životů hradu.', czk: 149, limit: 1, badge: 'Až 10 obránců', give: { bigCastle: true }, art: 'castle' },
   { id: 'kral', name: 'Královský balíček', desc: 'Zbroj krále pro těžkou jednotku, 5 000 zlata a 400 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 5000, gems: 400, gear: ['armor_tezka_3'] }, art: 'crown' }
 ];
 
@@ -111,7 +112,9 @@ GameData.gearHelpers = {
     const E = this.equipped(save, def.roleKey);
     add(E.weapon && E.weapon.bonus); add(E.armor && E.armor.bonus);
     const sk = GameData.unitSkins.find(s => s.id === (save.skins.unit[unitId] || 'zakladni'));
-    add(sk && sk.bonus);
+    if (sk && GameData.skinFits(sk, unitId)) add(sk.bonus);
+    const ws = (save.skins.weapon || {})[unitId];
+    if (ws && GameData.weaponSkinById) add(GameData.weaponSkinById(ws).bonus);
     return b;
   },
   /* Úpravy vzhledu: barvy (paleta), ozdoba, plášť, delší zbraň */
@@ -127,6 +130,8 @@ GameData.gearHelpers = {
       if (E.weapon.upgrade && def.look.weapon === 'sword') look.weapon = 'longsword';
       key += 'w' + E.weapon.tier;
     }
+    const ws = (save.skins.weapon || {})[unitId];
+    if (ws && ws !== 'w_zakladni' && GameData.weaponSkinById) { pal.wpn = GameData.weaponSkinById(ws).wpal; key += 'ws' + ws; }
     return { pal, look, key };
   },
   /* Upravená definice pro kreslení (statistiky zůstávají v původní) */

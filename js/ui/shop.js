@@ -17,6 +17,8 @@
     save.gear.eq = save.gear.eq || {};
     save.purchases = save.purchases || {};
     save.chests = save.chests || {};
+    save.skins.weapon = save.skins.weapon || {};
+    save.skins.ownedWeapon = save.skins.ownedWeapon || ['w_zakladni'];
     return save;
   }
   const roleName = r => t('role_' + r);
@@ -52,6 +54,7 @@
       else { save.gear.owned.push(id); got.push({ kind: 'gear', gear: g }); }
     });
     (give.skins || []).forEach(id => { if (!save.skins.ownedUnit.includes(id)) save.skins.ownedUnit.push(id); got.push({ kind: 'skin', id }); });
+    if (give.bigCastle) { save.bigCastle = true; got.push({ kind: 'big' }); }
     (give.decor || []).forEach(id => { if (!save.ownedDecor.includes(id)) { save.ownedDecor.push(id); save.castleCfg.decor = save.castleCfg.decor || {}; save.castleCfg.decor[id] = true; } got.push({ kind: 'decor', id }); });
     App.persist();
     return got;
@@ -62,6 +65,7 @@
       if (r.kind === 'gems') return `<div class="rw"><span class="rw-ico">${ico('gem')}</span><b>+${fmt(r.n)}</b><small>${t('gems')}</small></div>`;
       if (r.kind === 'gear' || r.kind === 'dup') return `<div class="rw rw-gear" style="--rc:${GH().rarityColor[r.gear.tier]}"><canvas data-rwgear="${r.gear.id}"></canvas><b>${esc(r.gear.name)}</b><small>${roleName(r.gear.role)}${r.kind === 'dup' ? ` · ${t('dup_comp', { n: fmt(r.n) })}` : ''}</small></div>`;
       if (r.kind === 'skin') { const s = GameData.unitSkins.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('brush')}</span><b>${esc(s.name)}</b><small>${t('skin')}</small></div>`; }
+      if (r.kind === 'big') return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${t('big_name')}</b><small>${t('big_short')}</small></div>`;
       if (r.kind === 'decor') { const d = GameData.castleCustom.decorations.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${esc(d.name)}</b><small>${t('decor_word')}</small></div>`; }
       return '';
     };
@@ -266,6 +270,6 @@
     tabs: ['nabidky', 'zbrojnice'],
     body(App, tab, opts) { return tab === 'zbrojnice' ? bodyArmory(App, opts || {}) : bodyOffers(App); },
     bind(App, tab, el) { if (tab === 'zbrojnice') bindArmory(App, el); else bindOffers(App, el); },
-    grant, rewardsModal, ensure, bonusText
+    grant, rewardsModal, ensure, bonusText, bindOffers
   };
 })();

@@ -116,6 +116,7 @@
     const p = Object.assign({}, base, skin.palette || {});
     p.ornament = skin.ornament || null;
     p.glow = skin.glow || null;
+    p.mount = skin.mount || null;
     return p;
   }
   function castlePalette(team, skinId, cfg) {
@@ -167,11 +168,19 @@
     const prevSH = SH.on;
     SH.on = !st.flat; SH.root = ctx.getTransform(); SH.grad = null; SH.f = 1;
 
-    const moving = st.moving && !st.dead;
+    const moving0 = st.moving && !st.dead;
+    const moving = pal.mount ? false : moving0;   // na koni jde kůň, jezdec sedí
     const w = st.walk || 0;
     const swing = moving ? Math.sin(w) * 0.5 : 0;
     const bob = moving ? -Math.abs(Math.cos(w)) * 2.2 : 0;
     const atk = st.atk == null ? -1 : st.atk;
+    let mountBob = 0;
+    if (pal.mount) {
+      mountBob = moving0 ? -Math.abs(Math.sin(w)) * 2.4 : 0;
+      ctx.translate(0, mountBob);
+      drawHorse(ctx, pal.mount, w, moving0, st.t || 0, 'back');
+      ctx.translate(-6, -27);
+    }
 
     const legCol = (L.armor === 'plate' || L.armor === 'hellplate') ? pal.metal : (pal.legs || pal.tunicDark);
     const bootCol = (L.armor === 'plate' || L.armor === 'hellplate') ? pal.metalDark : (pal.boots || pal.leatherDark);
@@ -270,11 +279,14 @@
     // Hlava
     drawHead(ctx, L, pal, st);
 
-    // Zbraň a paže
+    // Zbraň a paže (skin zbraně mění barvy čepele, dřeva a záři)
+    const palMain = pal;
+    if (pal.wpn) pal = Object.assign({}, pal, pal.wpn);
     if (P.weapon && P.weapon[L.weapon]) P.weapon[L.weapon](ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'sword' || L.weapon === 'longsword') drawSwordArm(ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'bow') drawBow(ctx, L, pal, atk);
     else if (L.weapon === 'spear') drawSpear(ctx, L, pal, atk, moving, w);
+    pal = palMain;
 
     // Štít (před tělem) – při bloku zvednutý před obličej
     ctx.save();
@@ -314,10 +326,65 @@
       ctx.beginPath(); ctx.moveTo(-4, -52); ctx.lineTo(-7, -60); ctx.lineTo(-1, -54); ctx.lineTo(1, -61); ctx.lineTo(3, -53); ctx.closePath();
       fs(ctx, '#dff4ff', 1.2);
     }
+    if (pal.mount) { ctx.translate(6, 27); drawHorse(ctx, pal.mount, w, moving0, st.t || 0, 'front'); }
 
     SH.on = prevSH;
     ctx.restore();
     ctx.restore();
+  }
+
+  /* Válečný kůň pod velitelem. layer 'back' = nohy, ocas, tělo, krk a hlava;
+     'front' = čabraka a sedlo přes nohy jezdce. Kůň hledí doprava (facing řeší drawUnit). */
+  function drawHorse(ctx, M, w, moving, t, layer) {
+    const coat = M.coat, dark = M.coatDark || shade(coat, -0.3);
+    if (layer === 'back') {
+      const g = moving ? w : 0;
+      const leg = (x, ph, col) => {
+        const a = moving ? Math.sin(g + ph) * 0.5 : 0, k = moving ? Math.max(0, Math.sin(g + ph + 1.2)) * 0.6 : 0;
+        ctx.save(); ctx.translate(x, -34); ctx.rotate(a);
+        rr(ctx, -4, -2, 8, 18, 3.4); fs(ctx, col);
+        ctx.translate(0, 15); ctx.rotate(-k);
+        rr(ctx, -2.8, 0, 5.6, 17, 2.4); fs(ctx, col);
+        rr(ctx, -3.6, 14, 7.6, 5, 1.6); fs(ctx, '#2a2420', 1.4);
+        ctx.restore();
+      };
+      // vzdálené nohy
+      leg(-20, Math.PI, dark); leg(20, 0, dark);
+      // ocas
+      const sw = Math.sin(t * 3 + w) * 3;
+      ctx.beginPath(); ctx.moveTo(-32, -50); ctx.quadraticCurveTo(-46 - sw, -44, -42 - sw, -18);
+      ctx.quadraticCurveTo(-38, -30, -30, -44); ctx.closePath(); fs(ctx, M.mane, 1.8);
+      // tělo
+      ctx.beginPath(); ctx.ellipse(0, -46, 34, 14, 0, 0, TAU); fs(ctx, coat, 2.2);
+      ctx.beginPath(); ctx.ellipse(-2, -41, 28, 7, 0, 0, Math.PI); ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fill();
+      // krk a hlava
+      const nod = moving ? Math.sin(w * 2) * 1.5 : Math.sin(t * 1.5) * 0.8;
+      ctx.beginPath(); ctx.moveTo(18, -56); ctx.lineTo(34, -80 + nod); ctx.lineTo(46, -76 + nod); ctx.lineTo(32, -42); ctx.closePath(); fs(ctx, coat, 2.2);
+      ctx.save(); ctx.translate(44, -76 + nod); ctx.rotate(0.55);
+      rr(ctx, -6, -6, 26, 12, 6); fs(ctx, coat, 2);
+      ctx.beginPath(); ctx.ellipse(18, 1, 5, 5.5, 0, 0, TAU); fs(ctx, shade(coat, -0.15), 1.4);
+      ctx.beginPath(); ctx.arc(19, 2, 1.1, 0, TAU); ctx.fillStyle = '#1b1b1b'; ctx.fill();
+      ctx.beginPath(); ctx.arc(3, -2, 1.8, 0, TAU); ctx.fillStyle = '#1b1b1b'; ctx.fill();
+      // uzda
+      ctx.beginPath(); ctx.moveTo(12, -6); ctx.lineTo(12, 6); ctx.moveTo(0, -5); ctx.lineTo(14, 4); ctx.lineWidth = 1.6; ctx.strokeStyle = M.bardingTrim || '#c9a06a'; ctx.stroke();
+      ctx.restore();
+      // ucho a hříva
+      ctx.beginPath(); ctx.moveTo(38, -84 + nod); ctx.lineTo(41, -93 + nod); ctx.lineTo(44, -83 + nod); ctx.closePath(); fs(ctx, coat, 1.6);
+      ctx.beginPath(); ctx.moveTo(16, -58); ctx.quadraticCurveTo(24, -78 + nod, 38, -84 + nod); ctx.lineTo(33, -74 + nod); ctx.quadraticCurveTo(26, -64, 22, -54); ctx.closePath(); fs(ctx, M.mane, 1.6);
+      // blízké nohy
+      leg(-14, 0, coat); leg(26, Math.PI, coat);
+    } else {
+      // čabraka a sedlo – zakryje nohy jezdce
+      const b = M.barding, tr = M.bardingTrim || '#e8b84a';
+      ctx.beginPath(); ctx.moveTo(-24, -56); ctx.quadraticCurveTo(-4, -60, 16, -56);
+      ctx.lineTo(20, -30); ctx.quadraticCurveTo(-2, -24, -26, -30); ctx.closePath(); fs(ctx, b, 2);
+      ctx.beginPath(); ctx.moveTo(-26, -32); ctx.quadraticCurveTo(-2, -26, 20, -32); ctx.lineWidth = 3; ctx.strokeStyle = tr; ctx.stroke();
+      for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(-14 + i * 12, -40, 2.4, 0, TAU); ctx.fillStyle = tr; ctx.fill(); }
+      rr(ctx, -16, -61, 26, 7, 3); fs(ctx, '#5a3a1e', 1.6);
+      // třmen
+      ctx.beginPath(); ctx.moveTo(-2, -54); ctx.lineTo(-2, -26); ctx.lineWidth = 1.4; ctx.strokeStyle = '#3a2414'; ctx.stroke();
+      rr(ctx, -6, -27, 9, 3.4, 1.2); fs(ctx, '#9aa3b0', 1.2);
+    }
   }
 
   function drawLeg(ctx, x, ang, col, boot) {
@@ -569,6 +636,7 @@
 
   /* Vrátí {canvas, flags:[{x,y}], towerTop:{x,y}} – hrad čelem doprava */
   function castleImage(team, skinId, level, res = 2, style = 'evropa', cfg = null) {
+    if (cfg && cfg.big) return bigCastleImage(team, skinId, level, res, style, cfg);
     const key = team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + (cfg ? JSON.stringify(cfg) : '');
     if (castleCache.has(key)) return castleCache.get(key);
     const pal = castlePalette(team, skinId, cfg);
@@ -647,6 +715,44 @@
     const out = { canvas: cv, w: CASTLE_W, h: CASTLE_H, flags, towerTop: { x: 277, y: 170 }, pal, cfg };
     if (cfg && window.Art.decorateCastle) Art.decorateCastle(ctx, out, cfg, style);
     if (cfg && cfg.banner) out.flagColor = cfg.banner;
+    castleCache.set(key, out);
+    return out;
+  }
+
+  /* VELKÁ PEVNOST (z obchodu): původní hrad zvětšený o 20 % a za ním
+     mohutný donjon se dvěma nárožními věžemi. Má místo pro 10 obránců. */
+  function bigCastleImage(team, skinId, level, res, style, cfg) {
+    const key = 'BIG|' + team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + JSON.stringify(cfg);
+    if (castleCache.has(key)) return castleCache.get(key);
+    const base = castleImage(team, skinId, level, res, style, Object.assign({}, cfg, { big: false }));
+    const S = 1.2, bw = base.w * S, bh = base.h * S;
+    const W = Math.round(bw + 30), H = Math.round(bh + 70), ox = W - bw, oy = H - bh;
+    const cv = document.createElement('canvas');
+    cv.width = W * res; cv.height = H * res;
+    const ctx = cv.getContext('2d'); ctx.scale(res, res);
+    const pal = base.pal, rand = rng(skinId.length * 53 + level * 11);
+    // donjon a nárožní věže za hradem
+    const dx = ox + bw * 0.36, dw = 120, dy = 40;
+    stoneBlock(ctx, dx - 70, dy + 70, 52, H - dy - 70, pal, rand);
+    crenels(ctx, dx - 70, dy + 70, 52, pal, 10);
+    roof(ctx, dx - 44, dy + 62, 52, 52, pal);
+    stoneBlock(ctx, dx + dw + 18, dy + 84, 52, H - dy - 84, pal, rand);
+    crenels(ctx, dx + dw + 18, dy + 84, 52, pal, 10);
+    roof(ctx, dx + dw + 44, dy + 76, 52, 48, pal);
+    stoneBlock(ctx, dx, dy, dw, H - dy, pal, rand);
+    crenels(ctx, dx, dy, dw, pal, 12);
+    windowSlit(ctx, dx + 24, dy + 34, 14, 30, pal);
+    windowSlit(ctx, dx + dw - 38, dy + 34, 14, 30, pal);
+    banner(ctx, dx + dw / 2 - 16, dy + 22, 32, 74, pal);
+    ctx.drawImage(base.canvas, ox, oy, bw, bh);
+    const out = Object.assign({}, base, {
+      canvas: cv, w: W, h: H,
+      flags: (base.flags || []).map(f => ({ x: ox + f.x * S, y: oy + f.y * S })).concat([{ x: dx - 44, y: dy + 10 }, { x: dx + dw + 44, y: dy + 28 }]),
+      towerTop: base.towerTop ? { x: ox + base.towerTop.x * S, y: oy + base.towerTop.y * S } : null,
+      gates: base.gates ? base.gates.map(g => Object.assign({}, g, { x: ox + g.x * S })) : base.gates,
+      // pro obranu: přepočet míst původního hradu + 5 nových míst na donjonu a hradbách
+      big: { S, ox, oy, extra: [[dx + 22, dy + 18], [dx + dw / 2, dy + 18], [dx + dw - 22, dy + 18], [dx - 44, dy + 88], [dx + dw + 44, dy + 102]] }
+    });
     castleCache.set(key, out);
     return out;
   }
@@ -903,9 +1009,10 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
     const def = opts.def || GameData.units[unitId];
-    let s = (opts.zoom || 1) * Math.min(cw / 70, ch / 92);
+    const sk0 = GameData.unitSkins.find(x => x.id === skinId);
+    let s = (opts.zoom || 1) * Math.min(cw / 70, ch / 92) * (sk0 && sk0.mount && !opts.headshot ? 0.66 : 1);
     ctx.save();
-    if (opts.headshot) { s = ch / 27; ctx.translate(cw / 2 - 2 * s, ch / 2 + 64 * s); }
+    if (opts.headshot) { s = ch / 27; ctx.translate(cw / 2 - 2 * s - (sk0 && sk0.mount ? 6 * s : 0), ch / 2 + (64 + (sk0 && sk0.mount ? 27 : 0)) * s); }
     else ctx.translate(cw / 2 - 2 * s, ch - (opts.pad || 6) * s);
     ctx.scale(s, s);
     drawUnit(ctx, def, opts.pal || unitPalette(team, skinId, faction), { x: 0, y: 0, facing: 1, walk: opts.walk || 0, moving: !!opts.moving, atk: opts.atk == null ? -1 : opts.atk, t: opts.t || 0, noShadow: !!opts.noShadow });

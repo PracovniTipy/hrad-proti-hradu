@@ -133,7 +133,7 @@
     const c = save.castleCfg || {};
     const decor = {};
     Object.keys(c.decor || {}).forEach(k => { if (c.decor[k] && (save.ownedDecor || []).includes(k)) decor[k] = true; });
-    return { banner: c.banner || null, roof: c.roof || 'auto', emblem: c.emblem || GameData.defaultEmblem[save.faction] || 'lilie', decor };
+    return { banner: c.banner || null, roof: c.roof || 'auto', emblem: c.emblem || GameData.defaultEmblem[save.faction] || 'lilie', decor, big: !!save.bigCastle };
   }
 
   /* ŽIVÁ SCÉNA – hrad v krajině národa: parallax, mraky, vlajky, stráže,
@@ -192,8 +192,8 @@
       ctx.drawImage(L.near, 0, 0, 1400, 600);
       // hrad
       const img = Art.castleImage('player', st.castleSkin, st.level, 2, F.castleStyle, st.cfg);
-      const cs = 1.12;
-      ctx.save(); ctx.translate(700 - (img.w * cs) / 2, 0); ctx.scale(cs, cs);
+      const cs = 1.12 * (img.big ? 0.84 : 1);
+      ctx.save(); ctx.translate(700 - (img.w * cs) / 2 + (img.big ? 40 : 0), 0); ctx.scale(cs, cs);
       Art.drawCastle(ctx, img, img.w, 492 / cs, 1, t, 1, F.color);
       if (window.App && App.save) Art.drawDefense(ctx, img, F.castleStyle, img.w, 492 / cs, 1, t, GameData.defenseOf(App.save), st.faction, 'player', null);
       ctx.restore();
@@ -258,7 +258,7 @@
     const owned = k => k === 'lucistnik' || (d.ownedKinds || []).includes(k);
     const price = p => p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
     const slot = i => {
-      if (i >= n) return `<article class="panel def-slot locked"><div class="def-lock">${ico('lock')}</div><b>${t('def_slot', { n: i + 1 })}</b><small>${t('def_unlock_at', { n: i * 2 + 1 })}</small></article>`;
+      if (i >= n) return `<article class="panel def-slot locked"><div class="def-lock">${ico('lock')}</div><b>${t('def_slot', { n: i + 1 })}</b><small>${t('def_unlock_at', { n: D.unlockAt(i, !!save.bigCastle) })}</small></article>`;
       const sl = def.slots[i];
       const kinds = ['lucistnik', 'kuse', 'katapult'].map(k => {
         const K = D.kinds[k];
@@ -278,9 +278,9 @@
     const catOn = def.slots.some(s => s.kind === 'katapult');
     const cl = d.catLvl || 1, cmax = GameData.catapult.maxLevel;
     return `
-      <div class="sec-head"><h2>${t('def_title')}</h2><span class="muted">${t('def_sub', { n, m: D.maxSlots })}</span></div>
-      <p class="muted" style="margin:-6px 0 0;font-size:14px">${t('def_note', { n: D.catapultFrom })}</p>
-      <div class="def-grid">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
+      <div class="sec-head"><h2>${t('def_title')}</h2><span class="muted">${t('def_sub', { n, m: D.maxFor(save) })}</span></div>
+      <p class="muted" style="margin:-6px 0 0;font-size:14px">${t('def_note', { n: D.catapultFrom })}${save.bigCastle ? '' : ` <a href="#" data-gobig class="big-link">${t('big_more')}</a>`}</p>
+      <div class="def-grid">${Array.from({ length: D.maxFor(save) }, (_, i) => slot(i)).join('')}</div>
       ${catOn ? `<section class="panel def-cat"><div><b>${t('def_katapult')} · ${t('level_of', { a: cl, b: cmax })}</b><small class="muted">${t('def_dmg', { n: GameData.defense.kinds.katapult.dmg(cl) })}</small></div>
         <button class="btn btn-gold btn-sm" data-catup ${cl >= cmax || save.gold < GameData.catapult.upgradeCost(cl) ? 'disabled' : ''}>${cl >= cmax ? t('max_level') : `${t('upgrade')} · ${ico('coin')} ${fmt(GameData.catapult.upgradeCost(cl))}`}</button></section>` : ''}`;
   }
@@ -317,6 +317,8 @@
       if (k === 'lucistnik' || d.ownedKinds.includes(k)) return set();
       pay(GameData.defense.kinds[k].price, () => { d.ownedKinds.push(k); App.toast(t('t_bought', { name: t('def_' + k) })); set(); });
     }));
+    const gb = el.querySelector('[data-gobig]');
+    if (gb) gb.addEventListener('click', e => { e.preventDefault(); App.go('obchod', { tab: 'hrady' }); });
     el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
       const i = +b.dataset.dslot, id = b.dataset.del, E = GameData.catapultEl(id);
       const set = () => { d.slotEl[i] = id; App.persist(); App.go('sprava', { keepScroll: true }); };
@@ -549,12 +551,14 @@
         </div>
         <section class="panel skin-preview"><canvas id="skinPrev" aria-label="Náhled jednotky"></canvas></section>
         <div class="skin-grid">
-          ${GameData.unitSkins.filter(s => !s.exclusive || save.skins.ownedUnit.includes(s.id)).map(s => {
+          ${GameData.unitSkins.filter(s => (!s.exclusive || save.skins.ownedUnit.includes(s.id)) && GameData.skinFits(s, unitSel))
+            .sort((a, b) => (b.only ? 1 : 0) - (a.only ? 1 : 0)).map(s => {
             const owned = save.skins.ownedUnit.includes(s.id);
             const onlyFor = s.exclusive && save.loyalSkinUnit && save.loyalSkinUnit !== unitSel ? save.loyalSkinUnit : null;
             const eq = save.skins.unit[unitSel] === s.id;
             const price = deal && deal.skin.id === s.id ? deal.price : s.price;
-            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''}">
+            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''} ${s.only ? 'nat' : ''}">
+              ${s.only ? `<span class="skin-tag">${s.mount ? t('skin_mount') : t('skin_nation')}</span>` : ''}
               <canvas data-skinunit="${s.id}"></canvas>
               <h3>${s.name}</h3>${rar(s.rarity)}<p>${s.desc}</p>
               ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
@@ -566,9 +570,31 @@
             </article>`;
           }).join('')}
         </div>
-        <button class="btn" id="equipAll">${t('equip_all')}</button>`;
+        <button class="btn" id="equipAll">${t('equip_all')}</button>
+        <div class="sec-head" style="margin-top:18px"><h2>${t('weapon_skins')}</h2><span class="muted">${esc(GameData.units[unitSel].name)}</span></div>
+        <div class="skin-grid">
+          ${GameData.weaponSkins.filter(w => w.roles.includes(GameData.units[unitSel].roleKey)).map(w => {
+            const ownedW = (save.skins.ownedWeapon || ['w_zakladni']).includes(w.id) || w.id === 'w_zakladni';
+            const eqW = ((save.skins.weapon || {})[unitSel] || 'w_zakladni') === w.id;
+            return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''}">
+              <canvas data-wskin="${w.id}"></canvas>
+              <h3>${esc(w.name)}</h3>${rar(w.rarity)}${w.desc ? `<p>${esc(w.desc)}</p>` : ''}
+              ${w.bonus ? `<p class="gear-bonus">${Shop.bonusText(w.bonus)}</p>` : ''}
+              ${eqW ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
+                : ownedW ? `<button class="btn btn-sm btn-blue" data-wequip="${w.id}">${t('use')}</button>`
+                : w.czk ? `<button class="btn btn-sm btn-green" data-wczk="${w.id}">${w.czk} Kč</button>`
+                : `<button class="btn btn-sm btn-gold" data-wbuy="${w.id}" ${save.gems < w.price ? 'disabled' : ''}>${t('buy')} ${ico('gem')} ${w.price}</button>`}
+            </article>`;
+          }).join('')}
+        </div>`;
     } else if (tab === 'hrady') {
-      body = `<div class="skin-grid">
+      const big = save.bigCastle;
+      body = `<section class="panel big-offer ${big ? 'owned' : ''}">
+          <canvas id="bigCv"></canvas>
+          <div class="big-txt"><div class="eyebrow">${t('big_eyebrow')}</div><h3>${t('big_name')}</h3><p>${t('big_desc')}</p>
+            ${big ? `<button class="btn btn-sm" disabled>✓ ${t('owned')}</button>` : `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>`}</div>
+        </section>
+        <div class="skin-grid">
           ${GameData.castleSkins.map(s => {
             const owned = save.skins.ownedCastle.includes(s.id);
             const eq = save.skins.castle === s.id;
@@ -663,6 +689,23 @@
     if (tab === 'vojaci') {
       el.querySelectorAll('canvas[data-chip]').forEach(c => Art.renderUnitIcon(c, c.dataset.chip, 'player', save.skins.unit[c.dataset.chip], { headshot: true, noShadow: true }));
       el.querySelectorAll('canvas[data-skinunit]').forEach(c => Art.renderUnitIcon(c, unitSel, 'player', c.dataset.skinunit));
+      Shop.ensure(save);
+      el.querySelectorAll('canvas[data-wskin]').forEach(c => {
+        const p = Art.unitPalette('player', save.skins.unit[unitSel], save.faction);
+        p.wpn = GameData.weaponSkinById(c.dataset.wskin).wpal;
+        Art.renderUnitIcon(c, unitSel, 'player', save.skins.unit[unitSel], { pal: p, atk: 0.35 });
+      });
+      const wset = id => { save.skins.weapon[unitSel] = id; App.persist(); App.go('obchod', { keepScroll: true }); };
+      el.querySelectorAll('[data-wequip]').forEach(b => b.addEventListener('click', () => wset(b.dataset.wequip)));
+      el.querySelectorAll('[data-wbuy]').forEach(b => b.addEventListener('click', () => {
+        const w = GameData.weaponSkinById(b.dataset.wbuy);
+        if (save.gems < w.price) return;
+        save.gems -= w.price; save.skins.ownedWeapon.push(w.id); App.toast(t('t_bought', { name: w.name })); App.refreshTop(); wset(w.id);
+      }));
+      el.querySelectorAll('[data-wczk]').forEach(b => b.addEventListener('click', () => {
+        const w = GameData.weaponSkinById(b.dataset.wczk);
+        Platby.buy(App, { id: 'wskin_' + w.id, name: w.name, czk: w.czk }, () => { if (!save.skins.ownedWeapon.includes(w.id)) save.skins.ownedWeapon.push(w.id); App.toast(t('t_bought', { name: w.name })); wset(w.id); });
+      }));
       el.querySelectorAll('[data-sel]').forEach(b => b.addEventListener('click', () => App.go('obchod', { unit: b.dataset.sel, keepScroll: true })));
       el.querySelectorAll('[data-equip]').forEach(b => b.addEventListener('click', () => { save.skins.unit[unitSel] = b.dataset.equip; App.persist(); App.go('obchod', { keepScroll: true }); }));
       el.querySelectorAll('[data-skinczk]').forEach(b => b.addEventListener('click', () => {
@@ -674,7 +717,8 @@
       }));
       el.querySelector('#equipAll').addEventListener('click', () => {
         const sk = save.skins.unit[unitSel];
-        if ((GameData.unitSkins.find(x => x.id === sk) || {}).exclusive) { App.toast(t('only_for', { name: GameData.units[unitSel].name })); return; }
+        const skd = GameData.unitSkins.find(x => x.id === sk) || {};
+        if (skd.exclusive || skd.only) { App.toast(t('only_for', { name: GameData.units[unitSel].name })); return; }
         Object.keys(GameData.units).forEach(u => (save.skins.unit[u] = sk));
         App.persist(); App.toast(t('equip_all')); App.go('obchod', { keepScroll: true });
       });
@@ -696,7 +740,10 @@
         const attacking = phase > 2.4;
         const atk = attacking ? ((phase - 2.4) / 0.8) % 1 : -1;
         ctx.save(); ctx.translate(w / 2 - 30 * sc, h * 0.88); ctx.scale(sc, sc);
-        Art.drawUnit(ctx, def, Art.unitPalette('player', save.skins.unit[unitSel], save.faction), { x: 0, y: 0, facing: 1, walk: t * 8, moving: !attacking, atk, t, ring: true });
+        const pPal = Art.unitPalette('player', save.skins.unit[unitSel], save.faction);
+        const wsk = (save.skins.weapon || {})[unitSel]; if (wsk && GameData.weaponSkinById) pPal.wpn = GameData.weaponSkinById(wsk).wpal;
+        if (pPal.mount) { ctx.translate(-10, 0); ctx.scale(0.78, 0.78); }
+        Art.drawUnit(ctx, def, pPal, { x: 0, y: 0, facing: 1, walk: t * 8, moving: !attacking, atk, t, ring: true });
         ctx.restore();
         ctx.save(); ctx.translate(w / 2 + 70 * sc, h * 0.88); ctx.scale(sc * 0.85, sc * 0.85);
         Art.drawUnit(ctx, def, Art.unitPalette('enemy', 'zakladni', save.faction), { x: 0, y: 0, facing: -1, t, ring: true });
@@ -706,6 +753,22 @@
       cancelAnimationFrame(App.previewRaf);
       anim();
     } else if (tab === 'hrady') {
+      const bc = el.querySelector('#bigCv');
+      if (bc) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2), w = bc.clientWidth, h = bc.clientHeight;
+        bc.width = w * dpr; bc.height = h * dpr;
+        const ctx = bc.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cfg = Object.assign(castleCfg(save), { big: true });
+        const img = Art.castleImage('player', save.skins.castle, 10, 2, F.castleStyle, cfg);
+        const s = Math.min(w / (img.w + 20), h / (img.h + 10));
+        ctx.save(); ctx.scale(s, s);
+        const fr = (w / 2 + img.w * s / 2) / s, gy = h / s - 4;
+        Art.drawCastle(ctx, img, fr, gy, 1, 0.3, 1, F.color);
+        const demo = { slots: Array.from({ length: 10 }, (_, i) => ({ kind: i === 2 || i === 7 ? 'katapult' : i % 3 === 1 ? 'kuse' : 'lucistnik', el: ['ohen', 'led', 'blesk', 'voda', 'jed'][i % 5] })), vez: 10, catLvl: 1 };
+        Art.drawDefense(ctx, img, F.castleStyle, fr, gy, 1, 0, demo, F.id, 'player', null);
+        ctx.restore();
+      }
+      if (window.Shop && Shop.bindOffers) Shop.bindOffers(App, el);
       el.querySelectorAll('canvas[data-skincastle]').forEach(c => Art.renderCastleIcon(c, 'player', c.dataset.skincastle, GameData.calc.castleLevel(save), F.castleStyle));
       el.querySelectorAll('[data-cequip]').forEach(b => b.addEventListener('click', () => { save.skins.castle = b.dataset.cequip; App.persist(); App.go('obchod', { keepScroll: true }); }));
       el.querySelectorAll('[data-cbuy]').forEach(b => b.addEventListener('click', () => {
