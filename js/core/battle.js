@@ -102,7 +102,7 @@
       this.def = opts.player.defense || null;
       this.defShot = []; this.defTimer = [];
       this.clouds = []; this.bolts = [];
-      this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0;
+      this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0; this.blasts = []; this.flash = null;
       if (this.def && this.def.slots.length) {
         this.side.player.castle.tower = 0;   // věž nahrazují obránci na hradbách
         this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
@@ -438,7 +438,26 @@
           break;
         }
       }
-      say(a.name, a.color === '#0b0907' ? '#fff' : '#fff1c4', a.kind === 'meteors' || a.kind === 'element' || a.kind === 'stun' || a.kind === 'holy' ? tx : null);
+      // VÝRAZNÉ EFEKTY: kamera se podívá na místo útoku, záblesk obrazovky,
+      // velká tlaková vlna na zemi a sloup světla v barvě útoku
+      const AREA = { meteors: 1, meteor: 1, element: 1, volley: 1, storm: 1, stun: 1, holy: 1, barrage: 1, wall: 1, tornado: 0, breath: 0, quake: 0 };
+      const SELF = { heal: 1, buff: 1, shield: 1, repair: 1, gold: 1, summon: 1, firearrows: 1, curse: 0 };
+      const col = a.color || '#ffd77a';
+      if (team === 'player') {
+        if (a.kind in AREA && AREA[a.kind]) {
+          this.cam.x = this._clampCam(tx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 2.5;
+          const delay = a.kind === 'meteor' ? 1.1 : a.kind === 'meteors' ? 0.7 : a.kind === 'volley' ? 0.9 : a.kind === 'barrage' ? 0.8 : 0;
+          this.later(delay, () => { this.blasts.push({ x: tx, y: midY, r: (a.radius || 160) * (a.kind === 'meteor' ? 1.4 : 1.15), color: col, t: 0, life: 1.0 }); this.shake = Math.max(this.shake, a.kind === 'meteor' ? 1 : 0.45); puff(tx, midY, col, 40, 160); });
+        } else if (a.kind in SELF) {
+          const my = mine(); if (my.length) { const mx = my.reduce((q, u) => q + u.x, 0) / my.length; this.cam.x = this._clampCam(mx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 2.5; }
+          mine().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 46, color: col, t: 0, life: 0.9, small: true }));
+        } else if (a.kind === 'curse' || a.kind === 'quake') {
+          foes().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 50, color: col, t: 0, life: 1.0, small: true }));
+          if (a.kind === 'quake') this.shake = 1.4;
+        } else if (a.kind === 'breath' || a.kind === 'tornado') this.shake = Math.max(this.shake, 0.6);
+        this.flash = { color: col, t: 0, life: 0.45 };
+      }
+      this.later(0.05, () => this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.5, txt: a.name, color: '#fff1c4', t: 0, life: 1.8, big: true, huge: true }));
       if (team === 'player' && this.o.onSkill) this.o.onSkill(a);
       return true;
     }
@@ -858,6 +877,9 @@
       }
       this.tornados = this.tornados.filter(o => o.until > t && o.x > 0 && o.x < this.W);
       for (const b of this.beams) b.t += dt;
+      for (const b of this.blasts) b.t += dt;
+      this.blasts = this.blasts.filter(b => b.t < b.life);
+      if (this.flash) { this.flash.t += dt; if (this.flash.t > this.flash.life) this.flash = null; }
       this.beams = this.beams.filter(b => b.t < b.life);
       for (const k of this.spikes) k.t += dt;
       this.spikes = this.spikes.filter(k => k.t < k.life);
@@ -884,6 +906,37 @@
       }
     }
     _drawSkillFx(ctx, t) {
+      // tlakové vlny a sloupy světla
+      for (const b of this.blasts) {
+        const k = b.t / b.life, a = 1 - k;
+        ctx.save();
+        ctx.globalAlpha = 0.7 * a;
+        ctx.beginPath(); ctx.ellipse(b.x, b.y, b.r * (0.3 + k * 0.9), b.r * 0.28 * (0.3 + k * 0.9), 0, 0, Math.PI * 2);
+        ctx.fillStyle = b.color; ctx.fill();
+        ctx.globalAlpha = 0.95 * a; ctx.lineWidth = b.small ? 3 : 7; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        if (!b.small) {
+          const g = ctx.createLinearGradient(b.x, b.y - 420, b.x, b.y);
+          g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, b.color);
+          ctx.globalAlpha = 0.5 * a; ctx.fillStyle = g; ctx.fillRect(b.x - b.r * 0.35 * (1 - k * 0.5), b.y - 420, b.r * 0.7 * (1 - k * 0.5), 420);
+        } else {
+          const g = ctx.createLinearGradient(b.x, b.y - 130, b.x, b.y);
+          g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, b.color);
+          ctx.globalAlpha = 0.55 * a; ctx.fillStyle = g; ctx.fillRect(b.x - 22, b.y - 130, 44, 130);
+        }
+        ctx.restore();
+      }
+      // trvalé aury: válečný roh (zlatá), kletba (fialová), štít (modrá)
+      for (const u of this.units) {
+        if (u.dead) continue;
+        const sd = this.side[u.team], foe = this.side[u.team === 'player' ? 'enemy' : 'player'];
+        let c = null;
+        if ((sd.hornUntil || 0) > t) c = 'rgba(255,190,60,'; else if ((sd.curseUntil || 0) > t) c = 'rgba(190,90,255,'; else if (sd.shieldUntil > t) c = 'rgba(120,190,255,';
+        if (!c) continue;
+        const pulse = 0.35 + Math.sin(t * 6 + u.id) * 0.12;
+        ctx.beginPath(); ctx.ellipse(u.x, u.y - 2, 26, 8, 0, 0, Math.PI * 2); ctx.fillStyle = c + pulse + ')'; ctx.fill();
+        ctx.beginPath(); ctx.ellipse(u.x, u.y - 44, 18, 46, 0, 0, Math.PI * 2); ctx.fillStyle = c + (pulse * 0.35) + ')'; ctx.fill();
+        void foe;
+      }
       const cfg = C();
       for (const w of this.walls) {
         const a = Math.min(1, (w.until - t) / 0.5);
@@ -1330,8 +1383,8 @@
         const g = ctx.createLinearGradient(x - 70, y - 90, x, y);
         g.addColorStop(0, 'rgba(255,120,40,0)'); g.addColorStop(1, 'rgba(255,170,60,.85)');
         ctx.beginPath(); ctx.moveTo(x - 80, y - 110); ctx.lineTo(x - 6, y - 8); ctx.lineTo(x + 6, y + 4); ctx.closePath();
-        ctx.lineWidth = 12; ctx.strokeStyle = g; ctx.stroke();
-        const mr = m.big ? 34 : 11;
+        ctx.lineWidth = m.big ? 30 : 18; ctx.strokeStyle = g; ctx.stroke();
+        const mr = m.big ? 46 : 20;
         ctx.beginPath(); ctx.arc(x, y, mr, 0, Math.PI * 2);
         const rg = ctx.createRadialGradient(x - mr * 0.3, y - mr * 0.3, 2, x, y, mr + 1);
         rg.addColorStop(0, '#fff4c2'); rg.addColorStop(0.5, '#ffb347'); rg.addColorStop(1, '#e2531c');
@@ -1358,11 +1411,11 @@
       for (const tx of this.texts) {
         const a = 1 - tx.t / tx.life;
         ctx.globalAlpha = Math.max(0, Math.min(1, a * 1.5));
-        const size = tx.big ? 30 : (tx.coin ? 17 : 14);
+        const size = tx.huge ? 54 : tx.big ? 30 : (tx.coin ? 17 : 14);
         ctx.font = `800 ${size}px "Alegreya Sans", system-ui, sans-serif`;
         ctx.textAlign = 'center';
         const y = tx.y - tx.t * (tx.big ? 20 : 34);
-        ctx.lineWidth = tx.big ? 5 : 3.5; ctx.strokeStyle = 'rgba(10,12,18,.9)';
+        ctx.lineWidth = tx.huge ? 8 : tx.big ? 5 : 3.5; ctx.strokeStyle = 'rgba(10,12,18,.9)';
         ctx.strokeText(tx.txt, tx.x, y);
         ctx.fillStyle = tx.color; ctx.fillText(tx.txt, tx.x, y);
       }
@@ -1375,6 +1428,12 @@
         ctx.beginPath();
         if (p.petal) ctx.ellipse(0, 0, p.s * 1.6, p.s * 0.9, 0, 0, Math.PI * 2); else ctx.arc(0, 0, p.s, 0, Math.PI * 2);
         ctx.fill(); ctx.restore();
+      }
+      if (this.flash) {
+        const a = 1 - this.flash.t / this.flash.life;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 0.35 * a; ctx.fillStyle = this.flash.color; ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.globalAlpha = 1;
       }
       this._renderMini();
     }
