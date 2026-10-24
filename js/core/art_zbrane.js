@@ -231,7 +231,7 @@
   /* LUKY: všechny mají tvar klasického dlouhého luku – jeden plynulý oblouk,
      zesílený úchop uprostřed a ramena zužující se ke koncům. Samurajský jumi
      je největší (úchop o kousek níž) a černě lakovaný. Skiny mění barvy a ozdoby. */
-  const BOW = { yumi: [76, 44], dlouhy: [52, 50], reflex: [52, 50], draci: [54, 52], elfi: [52, 50], hvezdny: [54, 52], kost: [52, 50], mesic: [52, 50] };
+  const BOW = { yumi: [46, 32], dlouhy: [34, 31], reflex: [34, 31], draci: [35, 32], elfi: [34, 31], hvezdny: [35, 32], kost: [34, 31], mesic: [34, 31] };
   A.bowSize = id => BOW[id] || [52, 50];
   function drawBowLimbs(ctx, id, c, gx, gy, big) {
     const [top, bot] = big ? BOW.yumi : (BOW[id] || [52, 50]);
@@ -248,7 +248,7 @@
     for (const pass of [0, 1]) {
       for (let i = 0; i < N; i++) {
         const k0 = i / N, k1 = (i + 1) / N, km = (k0 + k1) / 2;
-        const tw = 2.2 + 3.4 * Math.sin(Math.PI * km);   // tenké konce, silný střed
+        const tw = 1.8 + 2.6 * Math.sin(Math.PI * km);   // tenké konce, silný střed
         const a = at(k0), b = at(k1);
         ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineCap = 'round';
         ctx.lineWidth = pass ? tw : tw + 3; ctx.strokeStyle = pass ? wood : OUT; ctx.stroke();
@@ -268,8 +268,8 @@
     // konce ramen (rohové špičky) a kožený úchop
     for (const p of [T, B]) { ctx.beginPath(); ctx.arc(p[0], p[1], 1.8, 0, TAU); fs(ctx, yumi ? '#d9b04a' : '#e8dcc0', 1); }
     const g = at(0.5);
-    rr(ctx, g[0] - 3.4, g[1] - 7, 6.8, 14, 2.4); fs(ctx, yumi ? '#a8262a' : '#5a3a1e', 1.3);
-    ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 0.8; for (let y = g[1] - 5; y < g[1] + 6; y += 2.4) { ctx.beginPath(); ctx.moveTo(g[0] - 3.2, y); ctx.lineTo(g[0] + 3.2, y + 1.2); ctx.stroke(); }
+    rr(ctx, g[0] - 2.8, g[1] - 5.5, 5.6, 11, 2); fs(ctx, yumi ? '#a8262a' : '#5a3a1e', 1.3);
+    ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 0.8; for (let y = g[1] - 4; y < g[1] + 5; y += 2.4) { ctx.beginPath(); ctx.moveTo(g[0] - 3.2, y); ctx.lineTo(g[0] + 3.2, y + 1.2); ctx.stroke(); }
     return [T, B];
   }
 
