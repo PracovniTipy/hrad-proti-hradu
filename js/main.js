@@ -18,8 +18,9 @@
       const s = this.save;
       $('#pName').textContent = s.name;
       $('#pTrophies').textContent = fmt(s.trophies);
-      $('#rGold').textContent = fmt(s.gold);
-      $('#rGems').textContent = fmt(s.gems);
+      if (s.tester) { s.gold = Math.max(s.gold, 9999999); s.gems = Math.max(s.gems, 9999999); }
+      $('#rGold').textContent = s.tester ? '∞' : fmt(s.gold);
+      $('#rGems').textContent = s.tester ? '∞' : fmt(s.gems);
       App.paintAvatar($('#avatarCv'), s.avatar);
     },
 
@@ -182,7 +183,7 @@
           <dt>${t('enemy')}</dt><dd>${esc(EF.name)}${lv.mix ? ' + ' + esc(GameData.factions[lv.mix.faction].name) : ''}</dd>
           <dt>${t('status')}</dt><dd>${cleared ? t('cleared') : t('not_cleared')}</dd>
         </dl>
-        <div><div class="eyebrow" style="margin-bottom:6px">${t('enemy_units')}</div><div class="enemy-icons">${lv.enemyUnits.concat(lv.boss === 'demonkral' ? ['demonkral'] : []).map(u => `<canvas data-eu="${u}" title="${GameData.units[u].name}"></canvas>`).join('')}</div></div>
+        <div><div class="eyebrow" style="margin-bottom:6px">${t('enemy_units')}</div><div class="enemy-icons">${lv.enemyUnits.concat(typeof lv.boss === 'string' ? [lv.boss] : []).map(u => `<canvas data-eu="${u}" title="${GameData.units[u].name}"></canvas>`).join('')}</div></div>
         <div class="modal-actions">
           <button class="btn btn-green btn-big" id="goFight">${t('to_battle')}</button>
           <button class="btn" data-close>${t('back')}</button>
@@ -196,9 +197,10 @@
             enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
             alliance: !!lv.alliance, playFaction: lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
             ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: GameData.battleConfig.worldW + 640 } } : {}),
+            hostages: lv.hostages || 0,
             level: lv
           });
-          if (lv.boss === 'demonkral') this.playScene('finale', go); else go();
+          if (lv.scene && GameData.scenes[lv.scene]) this.playScene(lv.scene, go); else go();
         });
       });
     },
@@ -262,10 +264,11 @@
             </button>`).join('')}</div>
         </div>`;
       }).join('');
-      $('#bAbil').innerHTML = Object.values(GameData.abilities).map((a, i) => `
-        <button class="abtn ${a.id === 'ohen' ? 'fire' : 'shield'}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name}: ${a.desc}">
-          ${ico(a.id === 'ohen' ? 'fire' : 'shield')}<i class="cd"></i>
-          <span class="cost">${ico('coin')}${a.cost}</span>
+      // 3 speciální útoky, které si hráč vybral v obchodě
+      $('#bAbil').innerHTML = GameData.skillsOf(save).eq.map(id => GameData.abilities[id]).map(a => `
+        <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name}: ${a.desc}">
+          ${GameData.skillIcon(a, 46)}<i class="cd"></i>
+          <span class="cost">${a.cost ? ico('coin') + a.cost : t('free')}</span>
         </button>`).join('');
       applyIcons(B);
 
@@ -287,7 +290,7 @@
         canvas: $('#bCanvas'), mini: $('#bMini'),
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
         world: cfg.world || null, enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
-        playerUnits: units, boss: cfg.boss || null,
+        playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0,
         playerFaction: save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
@@ -298,6 +301,7 @@
         onUpdateHud: b => this._hud(b, lastHud),
         onEnd: res => this._battleEnd(cfg, res),
         onFormation: mode => this._formUi(mode),
+        onSpawned: () => { save.stats.unitsSent++; },
         onSquad: (n, mode) => this._squadUi(n, mode),
         onSelectMode: on => { $('#bSelect').setAttribute('aria-pressed', on); $('#bSelHint').hidden = !on; },
         onHero: (u, died) => this._heroUi(u, died),
@@ -323,14 +327,19 @@
         });
         battle.resize();
       });
-      B.querySelectorAll('[data-spawn]').forEach(btn => btn.addEventListener('pointerdown', e => {
-        e.preventDefault();
-        if (battle.spawn('player', btn.dataset.spawn)) { save.stats.unitsSent++; }
-        else if (!battle.over) {
-          const chk = battle.canSpawn('player', btn.dataset.spawn);
-          if (chk.why === 'mince') this._flash(btn);
-        }
-      }));
+      // klepnutí = přidat do zásobníku (až 50×), podržení = vyprázdnit zásobník toho vojáka
+      B.querySelectorAll('[data-spawn]').forEach(btn => {
+        let lp = null;
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          if (battle.over) return;
+          const r = battle.enqueue(btn.dataset.spawn);
+          if (r === 'full') this._flash(btn);
+          clearTimeout(lp);
+          lp = setTimeout(() => { battle.clearQueue(btn.dataset.spawn); this.toast(t('queue_cleared')); }, 650);
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, () => clearTimeout(lp)));
+      });
       B.querySelectorAll('[data-auto]').forEach(btn => {
         const f = btn.dataset.auto;
         const setUi = on => { btn.setAttribute('aria-pressed', on); btn.closest('.ugrp').classList.toggle('auto-on', on); };
@@ -386,8 +395,17 @@
       if (b.hero) { const r = Math.max(0, b.hero.hp / b.hero.maxHp); set('heroHp', Math.round(r * 100), v => ($('#heroHp').style.width = v + '%')); }
       set('time', tl, v => { const el = $('#bTimer'); el.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`; el.classList.toggle('low', v <= 30); });
       const coins = Math.floor(P.coins);
-      set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', (v / P.maxCoins * 100) + '%'); });
-      set('max', P.maxCoins, v => ($('#bCoinMax').textContent = 'max ' + v));
+      set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', ((v % 500) / 5) + '%'); });
+      const qn = (b.queue || []).length;
+      set('max', qn, v => ($('#bCoinMax').textContent = v ? t('queue_n', { n: v }) : ''));
+      document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
+        const n = b.queueCount(btn.dataset.spawn);
+        set('q' + btn.dataset.spawn, n, v => {
+          let q = btn.querySelector('.qn');
+          if (!q) { q = document.createElement('b'); q.className = 'qn'; btn.appendChild(q); }
+          q.textContent = v ? '×' + v : ''; q.hidden = !v;
+        });
+      });
       document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
         const def = GameData.units[btn.dataset.spawn];
         const cdEnd = P.cooldowns[def.id] || 0;
@@ -443,9 +461,11 @@
             if (next && next.act !== lv.act) {
               const na = H.act(next.act);
               this.storyAct = next.act;
-              note += (note ? '<br>' : '') + `<b>${t('act_done', { n: H.act(lv.act).n })}</b> ` + t('act_unlocked', { n: na.n, name: esc(na.faction === 'spojenectvi' ? t('alliance') : GameData.factions[na.faction].name) });
+              note += (note ? '<br>' : '') + `<b>${t('act_done', { n: H.act(lv.act).n })}</b> ` + t('act_unlocked', { n: na.n, name: esc(na.huge ? na.name : na.faction === 'spojenectvi' ? t('alliance') : GameData.factions[na.faction].name) });
             } else if (next) note += (note ? '<br>' : '') + t('level_unlocked', { name: `<b>${next.label} ${esc(next.name)}</b>` });
-            else { note += (note ? '<br>' : '') + `<b>${t('campaign_done')}</b>`; cfg.epilog = true; }
+            else { note += (note ? '<br>' : '') + `<b>${t('campaign_done')}</b>`; }
+            if (lv.afterScene) cfg.afterScene = lv.afterScene;
+            if (lv.hostages) { save.gems += lv.hostages * 10; note += (note ? '<br>' : '') + t('hostages_saved', { n: lv.hostages, g: lv.hostages * 10 }); }
           }
         } else note = t('note_tip');
       } else if (cfg.mode === 'pvp') {
@@ -485,7 +505,7 @@
         </div>`, (c, close) => {
         c.querySelector('#resBack').addEventListener('click', () => {
           close(); this._closeBattle(); this.go(back);
-          if (cfg.epilog) this.playScene('epilog', null, true);
+          if (cfg.afterScene) this.playScene(cfg.afterScene, null, true);
         });
       });
     },
@@ -521,6 +541,17 @@
       document.querySelectorAll('#nav [data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
       $('#avatarBtn').addEventListener('click', () => this.pickAvatar());
       $('#profileName').addEventListener('click', () => this.go('profil'));
+      // tajný testovací režim: 7× rychle klepnout na zlato = neomezené zlato a drahokamy (znovu 7× = vypnout)
+      let taps = [];
+      $('#rGold').parentElement.addEventListener('click', () => {
+        const now = Date.now(); taps = taps.filter(x => now - x < 2500); taps.push(now);
+        if (taps.length >= 7) {
+          taps = []; this.save.tester = !this.save.tester;
+          if (!this.save.tester) { this.save.gold = 50000; this.save.gems = 5000; }
+          this.persist(); this.toast(this.save.tester ? t('tester_on') : t('tester_off'));
+          if (this.current) this.go(this.current, { keepScroll: true });
+        }
+      });
       $('#bPause').addEventListener('click', () => { if (!this.battle || this.battle.over) return; this.battle.togglePause(true); $('#bPauseMenu').hidden = false; });
       $('#bResume').addEventListener('click', () => { $('#bPauseMenu').hidden = true; this.battle && this.battle.togglePause(false); });
       $('#bQuit').addEventListener('click', () => {
@@ -584,9 +615,9 @@
         if (e.code === 'Space') { e.preventDefault(); $('#bPause').click(); return; }
         const n = parseInt(e.key, 10);
         const btns = document.querySelectorAll('#bUnits [data-spawn]');
-        if (n >= 1 && n <= btns.length && !b.paused) { if (b.spawn('player', btns[n - 1].dataset.spawn)) this.save.stats.unitsSent++; }
-        if (e.key === 'q' || e.key === 'Q') b.useAbility('player', 'ohen');
-        if (e.key === 'w' || e.key === 'W') b.useAbility('player', 'stit');
+        if (n >= 1 && n <= btns.length && !b.paused) b.enqueue(btns[n - 1].dataset.spawn);
+        const ab = document.querySelectorAll('#bAbil [data-abil]'), ki = { q: 0, w: 1, e: 2 }[e.key.toLowerCase()];
+        if (ki != null && ab[ki]) b.useAbility('player', ab[ki].dataset.abil);
         const fk = { a: 'utok', s: 'formace', d: 'ustup' }[e.key.toLowerCase()];
         if (fk) b.setFormation('player', fk);
       });

@@ -22,6 +22,7 @@
     return save;
   }
   const roleName = r => t('role_' + r);
+  const shopNation = save => (window.App && App.shopNation) || save.faction;
   const priceHtml = p => p.czk ? `${p.czk} Kč` : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
   const canAfford = (save, p) => p.czk ? true : p.gems ? save.gems >= p.gems : save.gold >= p.gold;
   const rarityTag = tier => `<span class="rar" style="color:${GH().rarityColor[tier]}">${t('rar_' + tier)}</span>`;
@@ -97,7 +98,7 @@
   }
   function paintGear(cv, g, save) {
     const role = g.role;
-    const uid = GameData.unitForRole(save.faction, role);
+    const uid = GameData.unitForRole(shopNation(save), role);
     const def = GameData.units[uid];
     const fake = { gear: { eq: { [role]: { [g.slot]: g.id } } }, skins: save.skins };
     const lk = GH().look(fake, uid);
@@ -187,7 +188,7 @@
     const role = ROLES.includes(opts.role) ? opts.role : (App.armoryRole || 'tezka');
     App.armoryRole = role;
     const E = save.gear.eq[role] || {};
-    const uid = GameData.unitForRole(save.faction, role);
+    const uid = GameData.unitForRole(shopNation(save), role);
     const b = GH().bonus(save, uid);
     const card = g => {
       const owned = save.gear.owned.includes(g.id);
@@ -207,7 +208,7 @@
     const list = slot => GameData.gear.filter(g => g.role === role && g.slot === slot).map(card).join('');
     return `
       <div class="chips" role="tablist">
-        ${ROLES.map(r => { const id = GameData.unitForRole(save.faction, r); return `<button class="chip" role="tab" data-role="${r}" aria-selected="${r === role}"><canvas data-chip="${id}"></canvas>${roleName(r)}</button>`; }).join('')}
+        ${ROLES.map(r => { const id = GameData.unitForRole(shopNation(save), r); return `<button class="chip" role="tab" data-role="${r}" aria-selected="${r === role}"><canvas data-chip="${id}"></canvas>${roleName(r)}</button>`; }).join('')}
       </div>
       <section class="panel armory-top">
         <canvas id="armoryPrev"></canvas>
@@ -226,7 +227,7 @@
   function bindArmory(App, el) {
     const save = ensure(App.save);
     const role = App.armoryRole;
-    const uid = GameData.unitForRole(save.faction, role);
+    const uid = GameData.unitForRole(shopNation(save), role);
     el.querySelectorAll('canvas[data-chip]').forEach(c => Art.renderUnitIcon(c, c.dataset.chip, 'player', save.skins.unit[c.dataset.chip], { headshot: true, noShadow: true }));
     el.querySelectorAll('canvas[data-gear]').forEach(c => paintGear(c, GameData.gearById(c.dataset.gear), save));
     el.querySelectorAll('[data-role]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: 'zbrojnice', role: b.dataset.role, keepScroll: true })));

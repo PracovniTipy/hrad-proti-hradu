@@ -55,15 +55,29 @@
 
   window.Save = {
     data: null,
+    /* Postup se při aktualizaci hry NIKDY nemaže: nové verze jen doplní chybějící
+       klíče (merge). Navíc se drží záloha posledního dobrého uložení. */
     load() {
       let raw = null;
       try { raw = localStorage.getItem(KEY); } catch (e) { raw = null; }
-      try { this.data = raw ? merge(defaults(), JSON.parse(raw)) : defaults(); }
+      let parsed = null;
+      try { parsed = raw ? JSON.parse(raw) : null; } catch (e) { parsed = null; }
+      if (!parsed) {
+        // poškozené nebo chybějící uložení → obnovit ze zálohy
+        try { const b = localStorage.getItem(KEY + '-zaloha'); parsed = b ? JSON.parse(b) : null; } catch (e) { parsed = null; }
+        if (raw && !parsed) try { localStorage.setItem(KEY + '-poskozene-' + Date.now(), raw); } catch (e) { /* nic */ }
+      }
+      try { this.data = parsed ? merge(defaults(), parsed) : defaults(); }
       catch (e) { this.data = defaults(); }
+      if (parsed) try { localStorage.setItem(KEY + '-zaloha', JSON.stringify(parsed)); } catch (e) { /* nic */ }
       return this.data;
     },
     save() {
+      // testovací režim: neomezené zlato a drahokamy
+      if (this.data && this.data.tester) { this.data.gold = Math.max(this.data.gold, 9999999); this.data.gems = Math.max(this.data.gems, 9999999); }
       try { localStorage.setItem(KEY, JSON.stringify(this.data)); } catch (e) { /* prohlížeč ukládání nepovolil */ }
+      clearTimeout(this._bt);
+      this._bt = setTimeout(() => { try { localStorage.setItem(KEY + '-zaloha', JSON.stringify(this.data)); } catch (e) { /* nic */ } }, 3000);
     },
     reset() {
       this.data = defaults();

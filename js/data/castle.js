@@ -10,7 +10,7 @@ GameData.buildings = [
   { id: 'pokladnice', name: 'Pokladnice', desc: 'Rychlejší příjem mincí během boje.', maxLevel: 10, baseCost: 300, growth: 1.6 },
   { id: 'kasarna', name: 'Kasárna', desc: '+6 % životů a útoku všech vojáků za úroveň.', maxLevel: 10, baseCost: 350, growth: 1.62 },
   { id: 'vez', name: 'Strážní věž', desc: 'Lučištníci na věži střílí na nepřátele u brány.', maxLevel: 10, baseCost: 280, growth: 1.58 },
-  { id: 'zbrojnice', name: 'Zbrojnice', desc: 'Vyšší limit mincí, které uneseš v boji.', maxLevel: 8, baseCost: 220, growth: 1.5 }
+  { id: 'zbrojnice', name: 'Zbrojnice', desc: 'Víc mincí hned na začátku boje.', maxLevel: 8, baseCost: 220, growth: 1.5 }
 ];
 
 GameData.calc = {
@@ -22,6 +22,7 @@ GameData.calc = {
   unitMult: (l) => 1 + l * 0.06,
   towerDmg: (l) => (l > 0 ? 8 + l * 5 : 0),
   maxCoins: (l) => 600 + l * 100,
+  startCoins: (l) => 120 + l * 60,     // Zbrojnice: mince na začátku boje (v boji už žádný strop)
 
   /* Popis efektu budovy pro danou úroveň */
   effectText(id, l) {
@@ -31,7 +32,7 @@ GameData.calc = {
       case 'pokladnice': return t('eff_income', { n: c.income(l).toFixed(1) });
       case 'kasarna': return t('eff_power', { n: Math.round((c.unitMult(l) - 1) * 100) });
       case 'vez': return l > 0 ? t('eff_tower', { n: c.towerDmg(l) }) : t('eff_tower0');
-      case 'zbrojnice': return t('eff_limit', { n: c.maxCoins(l) });
+      case 'zbrojnice': return t('eff_limit', { n: c.startCoins(l) });
       default: return '';
     }
   },
@@ -50,7 +51,8 @@ GameData.calc = {
       income: c.income(b.pokladnice || 0),
       unitMult: c.unitMult(b.kasarna || 0),
       towerDmg: c.towerDmg(b.vez || 0),
-      maxCoins: c.maxCoins(b.zbrojnice || 0)
+      maxCoins: Infinity,
+      startCoins: c.startCoins(b.zbrojnice || 0)
     };
   },
 

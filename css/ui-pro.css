@@ -606,3 +606,44 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .ctype-grid .big-offer { grid-template-columns: 1fr; margin: 0; align-content: start; }
 .ctype-grid .big-offer canvas { height: 230px; }
 @media (max-width: 640px) { .ctype-grid { grid-template-columns: 1fr; } }
+
+/* ===== Zásobník vojáků ===== */
+.ubtn { position: relative; }
+.ubtn .qn { position: absolute; top: -6px; right: -6px; z-index: 3; min-width: 26px; padding: 1px 6px; border-radius: 12px; font-family: var(--font-display); font-size: 13px; font-style: normal;
+  color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 2px #05070b, 0 2px 6px rgba(0,0,0,.6); text-align: center; pointer-events: none; }
+.ubtn .qn[hidden] { display: none; }
+
+/* ===== Výběr národa v obchodě ===== */
+.nat-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; }
+.nat-btn { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 22px 8px 22px 8px; font-family: var(--font-display); font-size: 14px; color: #d9c9a0;
+  border: 2px solid transparent; background: var(--tex-noise) padding-box, linear-gradient(180deg, rgba(42,36,32,.94), rgba(21,17,14,.94)) padding-box, var(--steel-rim) border-box; }
+.nat-btn[aria-selected="true"] { color: #2a1a03; background: var(--tex-noise) padding-box, linear-gradient(180deg, #ffe9a0, #e0a83a 55%, #b07a1c) padding-box, var(--gold-rim) border-box; }
+.nat-emb { width: 14px; height: 14px; border-radius: 50%; background: var(--nc); box-shadow: 0 0 0 2px #05070b; }
+
+/* ===== Speciální útoky ===== */
+.abtn.skill { background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--ac) 70%, #000), #0b0907 80%); }
+.abtn.skill .skill-ico { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); }
+.sk-eq { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.sk-slots { display: flex; gap: 10px; }
+.sk-slot { width: 86px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.sk-slot small { font-size: 11px; color: #d9c9a0; line-height: 1.1; }
+.sk-empty { width: 54px; height: 54px; border-radius: 50%; border: 2px dashed #6b5a3a; display: grid; place-items: center; color: #8a7a5a; font-family: var(--font-display); }
+.sk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.sk-card { display: flex; flex-direction: column; gap: 6px; padding: 12px; background: var(--tex-noise), radial-gradient(120% 70% at 20% 0%, color-mix(in srgb, var(--ac) 28%, transparent), transparent 70%), linear-gradient(180deg, #1c1712, #110d0a); }
+.sk-card .sk-top { display: flex; gap: 10px; align-items: center; }
+.sk-card h3 { margin: 0; font-family: var(--font-display); font-size: 16px; color: #ffe9a8; }
+.sk-card p { margin: 0; font-size: 13px; color: #d9c9a0; }
+.sk-card .sk-stats { color: #ffd77a; font-size: 13px; }
+.sk-card .btn { margin-top: auto; }
+.sk-card.equipped { box-shadow: 0 0 0 2px #4fd27a, 0 0 18px rgba(79,210,122,.35); }
+.sk-eq { padding: 18px 26px !important; }
+
+/* Obrovská mapa Démonské říše */
+.story-map.huge { aspect-ratio: 10 / 46 !important; }
+.story-map.huge .node { transform: translate(-50%, -50%) scale(.9); }
+/* Spojenecké bitvy: 3 útoky nad lištou vpravo, aby se vešly */
+.b-bar.ally { position: relative; }
+.b-bar.ally .b-abil { position: absolute; right: 10px; bottom: calc(100% + 8px); flex-direction: row !important; gap: 8px; margin: 0; padding: 0; z-index: 3; }
+.b-bar.ally .abtn.skill { width: 66px !important; height: 66px !important; border-radius: 50%; }
+.b-bar.ally .abtn.skill .skill-ico { width: 40px; height: 40px; top: 4px; left: 50%; transform: translateX(-50%); }
+.b-bar.ally .abtn.skill .cost { left: 2px !important; right: 2px !important; top: auto !important; bottom: -8px !important; height: 20px; font-size: 12px; }

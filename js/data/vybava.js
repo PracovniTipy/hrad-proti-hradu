@@ -26,12 +26,13 @@ GameData.gearTiers = {
   armor: [
     { tier: 0, name: 'Kroužková vesta', desc: 'Pevná kroužková vesta pod tunikou.', bonus: { hp: 0.1 }, price: { gold: 900 },
       look: { metal: '#dfe5ee', metalDark: '#8b96a6' } },
-    { tier: 1, name: 'Ocelová zbroj', desc: 'Leštěná ocel s modrým lemem.', bonus: { hp: 0.18, armor: 0.04 }, price: { gems: 140 },
-      look: { metal: '#eef3fa', metalDark: '#7d8ea8', trim: '#9fc4ff' } },
-    { tier: 2, name: 'Stínová zbroj', desc: 'Černá ocel s rohatou přilbou a pláštěm.', bonus: { hp: 0.25, armor: 0.07 }, price: { czk: 59 },
-      look: { metal: '#4d4857', metalDark: '#29252f', trim: '#c4262e', cape: '#5a1014', plume: '#c4262e' }, ornament: 'horns', cape: true },
-    { tier: 3, name: 'Zbroj krále', desc: 'Zlatá zbroj s korunou a královským pláštěm.', bonus: { hp: 0.35, armor: 0.1 }, price: { czk: 99 },
-      look: { metal: '#e8c45c', metalDark: '#a47a24', trim: '#fff1b8', cape: '#7a1414', plume: '#ffffff' }, ornament: 'crown', cape: true }
+    { tier: 1, name: 'Ocelová zbroj', desc: 'Leštěná ocel s plátovými nárameníky.', bonus: { hp: 0.18, armor: 0.04 }, price: { gems: 140 },
+      look: { metal: '#eef3fa', metalDark: '#7d8ea8', trim: '#9fc4ff' }, feat: { pauldron: 'plate' } },
+    { tier: 2, name: 'Stínová zbroj', desc: 'Černá ocel, ostnaté nárameníky, roztrhaný plášť a rohatá přilba.', bonus: { hp: 0.25, armor: 0.07 }, price: { czk: 59 },
+      look: { metal: '#4d4857', metalDark: '#29252f', trim: '#c4262e', cape: '#5a1014', plume: '#c4262e' }, ornament: 'horns', feat: { pauldron: 'spiky', cape: 'tattered', capeColor: '#3a0a10', aura: 'shadow', chest: 'skull' } },
+    { tier: 3, name: 'Zbroj krále', desc: 'Zlacená plátová zbroj, nárameníky s rubíny, karmínový plášť s hermelínem, zlatý lev na hrudi a bílozlatý chochol.', bonus: { hp: 0.35, armor: 0.1 }, price: { czk: 99 },
+      look: { metal: '#f0cf6a', metalDark: '#9a6e1c', trim: '#fff1b8', cape: '#7a0f1e', plume: '#ffffff', tunic: '#7a0f1e', tunicDark: '#4a0812' },
+      feat: { cape: 'ermine', capeColor: '#7a0f1e', collar: 'ermine', chest: 'lion', emblemColor: '#ffe08a', pauldron: 'gold', gem: '#d6243a', crest: 'royalplume', plumeColor: '#ffffff', trim: '#ffe08a' } }
   ]
 };
 
@@ -123,15 +124,22 @@ GameData.gearHelpers = {
     const E = this.equipped(save, def.roleKey);
     const pal = {}, look = {};
     let key = '';
-    if (E.armor) { Object.assign(pal, E.armor.look); if (E.armor.ornament) pal.ornament = E.armor.ornament; if (E.armor.cape && !def.look.cape) { look.cape = true; look.capeColor = E.armor.look.cape; } key += 'a' + E.armor.tier; }
+    if (E.armor) { Object.assign(pal, E.armor.look); if (E.armor.ornament) pal.ornament = E.armor.ornament; if (E.armor.feat) pal.feat = E.armor.feat; if (E.armor.cape && !def.look.cape) { look.cape = true; look.capeColor = E.armor.look.cape; } key += 'a' + E.armor.tier; }
+    const cat = window.Art && Art.weaponCat ? Art.weaponCat(def.look.weapon) : null;
     if (E.weapon) {
       if (E.weapon.look.glow) pal.glow = E.weapon.look.glow;
       if (E.weapon.look.metal && !E.armor) pal.metal = E.weapon.look.metal;
-      if (E.weapon.upgrade && def.look.weapon === 'sword') look.weapon = 'longsword';
+      // lepší výbava = jiný tvar zbraně
+      const TM = { melee: [null, 'runovy', 'plamen', 'hvezda'], pole: [null, 'partyzana', 'drak', 'hvezdne'], bow: [null, 'reflex', 'draci', 'hvezdny'] };
+      const mid = cat && TM[cat] && TM[cat][E.weapon.tier];
+      if (mid) pal.wmodel = { id: mid, cat, glow: E.weapon.look.glow };
       key += 'w' + E.weapon.tier;
     }
     const ws = (save.skins.weapon || {})[unitId];
-    if (ws && ws !== 'w_zakladni' && GameData.weaponSkinById) { pal.wpn = GameData.weaponSkinById(ws).wpal; key += 'ws' + ws; }
+    if (ws && ws !== 'w_zakladni' && GameData.weaponSkinById) {
+      const W = GameData.weaponSkinById(ws);
+      if (W.model && (W.cat === cat)) { pal.wmodel = W.model; key += 'ws' + ws; }
+    }
     return { pal, look, key };
   },
   /* Upravená definice pro kreslení (statistiky zůstávají v původní) */
@@ -143,7 +151,8 @@ GameData.gearHelpers = {
   },
   palette(team, skinId, faction, lk) {
     const p = Art.unitPalette(team, skinId, faction);
-    if (lk) { Object.assign(p, lk.pal); }
+    const sf = p.feat;
+    if (lk) { Object.assign(p, lk.pal); if (lk.pal.feat) p.feat = Object.assign({}, sf || {}, lk.pal.feat); }
     return p;
   },
   rarityName: ['Běžná', 'Vzácná', 'Epická', 'Legendární'],

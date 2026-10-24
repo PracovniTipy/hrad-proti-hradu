@@ -117,6 +117,7 @@
     p.ornament = skin.ornament || null;
     p.glow = skin.glow || null;
     p.mount = skin.mount || null;
+    p.feat = skin.feat || null;
     return p;
   }
   function castlePalette(team, skinId, cfg) {
@@ -144,6 +145,7 @@
      --------------------------------------------------------------------- */
   function drawUnit(ctx, def, pal, st) {
     const L = def.look;
+    if (def.pal && !pal.__gen) pal = Object.assign({}, pal, def.pal, { __gen: 1 });
     const s = (L.scale || 1) * (st.scaleMul || 1);
     ctx.save();
     ctx.translate(st.x, st.y);
@@ -189,8 +191,10 @@
     // Věci na zádech (praporek sašimono apod.)
     if (P.back) P.back(ctx, L, pal, st, moving, w, bob);
 
+    // Aura a plášť ze skinu (tvarové prvky)
+    if (pal.feat && window.Art.drawFeatures) window.Art.drawFeatures(ctx, L, pal, st, 'back', moving0, w);
     // Plášť (za tělem)
-    if (L.cape) {
+    if (L.cape && !(pal.feat && pal.feat.cape)) {
       const flow = moving ? Math.sin(w * 0.9) * 3 : Math.sin((st.t || 0) * 2) * 1.2;
       ctx.beginPath();
       ctx.moveTo(-6, -52 + bob);
@@ -276,13 +280,17 @@
       rr(ctx, -1.5, -37.6, 5, 5.8, 1); fs(ctx, pal.trim, 1.1);
     }
 
+    if (pal.feat && window.Art.drawFeatures) window.Art.drawFeatures(ctx, L, pal, st, 'chest', moving0, w);
     // Hlava
     drawHead(ctx, L, pal, st);
 
     // Zbraň a paže (skin zbraně mění barvy čepele, dřeva a záři)
     const palMain = pal;
-    if (pal.wpn) pal = Object.assign({}, pal, pal.wpn);
-    if (P.weapon && P.weapon[L.weapon]) P.weapon[L.weapon](ctx, L, pal, atk, w, moving);
+    const WM = pal.wmodel, wcat = window.Art.weaponCat ? window.Art.weaponCat(L.weapon) : null;
+    if (WM && WM.cat === wcat && wcat === 'melee') drawSwordArm(ctx, L, pal, atk, w, moving);
+    else if (WM && WM.cat === wcat && wcat === 'pole') drawSpear(ctx, L, pal, atk, moving, w);
+    else if (WM && WM.cat === wcat && wcat === 'bow') drawBow(ctx, L, pal, atk);
+    else if (P.weapon && P.weapon[L.weapon]) P.weapon[L.weapon](ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'sword' || L.weapon === 'longsword') drawSwordArm(ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'bow') drawBow(ctx, L, pal, atk);
     else if (L.weapon === 'spear') drawSpear(ctx, L, pal, atk, moving, w);
@@ -321,6 +329,7 @@
 
     ctx.restore();
 
+    if (pal.feat && window.Art.drawFeatures) window.Art.drawFeatures(ctx, L, pal, st, 'top', moving0, w);
     // Ozdoby skinu na ramenou
     if (pal.ornament === 'crystal') {
       ctx.beginPath(); ctx.moveTo(-4, -52); ctx.lineTo(-7, -60); ctx.lineTo(-1, -54); ctx.lineTo(1, -61); ctx.lineTo(3, -53); ctx.closePath();
@@ -474,7 +483,7 @@
     }
   }
 
-  function drawSwordArm(ctx, L, pal, atk, w, moving) {
+  function drawSwordArm(ctx, L, pal, atk, w, moving, forceModel) {
     const idle = 5.6 + (moving ? Math.sin(w) * 0.12 : 0);
     let ang = idle;
     if (atk >= 0) {
@@ -491,18 +500,10 @@
     fist(ctx, 0, 17, L.armor === 'plate' ? pal.metalDark : pal.leather, -0.55);
     // meč (zápěstí lehce ohnuté dopředu)
     ctx.translate(0, 17); ctx.rotate(-0.55);
-    const long = L.weapon === 'longsword';
-    const bl = long ? 38 : 28, bw = long ? 2.9 : 2.4;
-    if (pal.glow) { ctx.shadowColor = pal.glow; ctx.shadowBlur = 10; }
-    ctx.beginPath(); ctx.moveTo(-bw, 5); ctx.lineTo(-bw, 5 + bl); ctx.lineTo(0, 9 + bl); ctx.lineTo(bw, 5 + bl); ctx.lineTo(bw, 5); ctx.closePath();
-    const g = ctx.createLinearGradient(-bw, 0, bw, 0);
-    g.addColorStop(0, '#f6f8fb'); g.addColorStop(1, '#9aa3b0');
-    fs(ctx, pal.glow ? shade(pal.metal, 0.5) : g, 1.6);
-    ctx.shadowBlur = 0;
-    ctx.beginPath(); ctx.moveTo(0, 7); ctx.lineTo(0, 3 + bl); ctx.lineWidth = 0.9; ctx.strokeStyle = 'rgba(80,90,105,.8)'; ctx.stroke();
-    rr(ctx, -7, 2.5, 14, 3.4, 1.4); fs(ctx, pal.trim, 1.4);
-    rr(ctx, -1.6, -4, 3.2, 7, 1); fs(ctx, pal.leatherDark, 1.2);
-    ctx.beginPath(); ctx.arc(0, -4.5, 2.1, 0, TAU); fs(ctx, pal.trim, 1.1);
+    // model zbraně: ze skinu zbraně / výbavy, jinak opravdový meč podle druhu
+    const M = pal.wmodel || null;
+    const id = forceModel || (M && M.id) || (L.weapon === 'longsword' ? 'dlouhy' : 'mec');
+    window.Art.drawMelee(ctx, id, pal, M);
     ctx.restore();
     if (L.armor === 'plate') {
       ctx.beginPath(); ctx.ellipse(1, -50, 7.5, 6, -0.2, Math.PI, TAU + 0.2); ctx.closePath();
@@ -511,12 +512,31 @@
   }
 
   function drawBow(ctx, L, pal, atk) {
+    const BM = pal.wmodel && pal.wmodel.cat === 'bow' ? pal.wmodel : null;
     let pull = 0.15;
     if (atk >= 0) pull = atk < 0.6 ? ease(atk / 0.6) : 0;
     const cx = 3, cy = -47, r = 18;
     const tipTop = [cx + r * Math.cos(-1.12), cy + r * Math.sin(-1.12)];
     const tipBot = [cx + r * Math.cos(1.12), cy + r * Math.sin(1.12)];
     const px = tipTop[0] - pull * 15, py = cy;
+    if (BM) {
+      // model luku: nejdřív ramena, pak tětiva a paže
+      limb(ctx, -2, -50, px, py, 5, shade(pal.tunic, -0.2));
+      const c = window.Art.weaponColors(pal, BM);
+      limb(ctx, 1, -50, cx + r - 1, cy, 5.2, pal.tunic);
+      const tips = window.Art.drawBowLimbs(ctx, BM.id, c, cx, cy, r);
+      ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(px, py); ctx.lineTo(tips[1][0], tips[1][1]);
+      ctx.lineWidth = 1.1; ctx.strokeStyle = c.string; ctx.stroke();
+      if (atk < 0 || atk < 0.6) {
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + 27, py); ctx.lineWidth = 3.4; ctx.strokeStyle = OUT; ctx.stroke();
+        ctx.lineWidth = 1.6; ctx.strokeStyle = BM.arrow || '#d8c39a'; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px + 27, py - 3); ctx.lineTo(px + 32, py); ctx.lineTo(px + 27, py + 3); ctx.closePath(); fs(ctx, BM.tip || '#c9ced6', 1.1);
+      }
+      fist(ctx, px, py, pal.leather, 1.57);
+      rr(ctx, cx + r - 2.5, cy - 4, 5, 8, 1.5); fs(ctx, pal.leatherDark, 1.2);
+      fist(ctx, cx + r, cy, pal.skin, 0);
+      return;
+    }
     // zadní (natahující) paže
     limb(ctx, -2, -50, px, py, 5, shade(pal.tunic, -0.2));
     fist(ctx, px, py, pal.leather, 1.57);
@@ -548,12 +568,9 @@
     ctx.save();
     ctx.translate(-4 + tx, -44);
     ctx.rotate(ang);
-    if (pal.glow) { ctx.shadowColor = pal.glow; ctx.shadowBlur = 8; }
-    limb(ctx, -18, 0, 46, 0, 2.6, pal.glow ? pal.metalDark : pal.wood);
-    ctx.beginPath(); ctx.moveTo(45, -3.6); ctx.quadraticCurveTo(54, -2, 60, 0); ctx.quadraticCurveTo(54, 2, 45, 3.6); ctx.closePath();
-    fs(ctx, shade(pal.metal, 0.25), 1.5);
-    ctx.shadowBlur = 0;
-    rr(ctx, 42, -2.4, 4, 4.8, 1); fs(ctx, pal.trim, 1);
+    const PM = pal.wmodel && pal.wmodel.cat === 'pole' ? pal.wmodel : null;
+    limb(ctx, -18, 0, 46, 0, 2.6, (PM && PM.wood) || pal.wood);
+    window.Art.drawPole(ctx, (PM && PM.id) || 'kopi', pal, PM);
     ctx.restore();
     // přední paže
     const hx = -4 + tx + 16 * Math.cos(ang), hy = -44 + 16 * Math.sin(ang);
@@ -1034,7 +1051,7 @@
     let s = (opts.zoom || 1) * Math.min(cw / 70, ch / 92) * (sk0 && sk0.mount && !opts.headshot ? 0.66 : 1);
     ctx.save();
     if (opts.headshot) { s = ch / 27; ctx.translate(cw / 2 - 2 * s - (sk0 && sk0.mount ? 6 * s : 0), ch / 2 + (64 + (sk0 && sk0.mount ? 27 : 0)) * s); }
-    else ctx.translate(cw / 2 - 2 * s, ch - (opts.pad || 6) * s);
+    else ctx.translate(cw / 2 - 2 * s - (opts.offsetX || 0) * cw, ch - (opts.pad || 6) * s);
     ctx.scale(s, s);
     drawUnit(ctx, def, opts.pal || unitPalette(team, skinId, faction), { x: 0, y: 0, facing: 1, walk: opts.walk || 0, moving: !!opts.moving, atk: opts.atk == null ? -1 : opts.atk, t: opts.t || 0, noShadow: !!opts.noShadow });
     ctx.restore();

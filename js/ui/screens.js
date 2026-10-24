@@ -393,7 +393,7 @@
             const H = GameData.campaignHelpers;
             const un = H.actUnlocked(save, x.id), done = H.actDone(save, x.id), here = H.currentAct(save) === x.id && !done;
             const p = H.progress(save, x.id);
-            const nm = x.faction === 'spojenectvi' ? t('saga_finale') : GameData.factions[x.faction].name;
+            const nm = x.huge ? x.name : x.faction === 'spojenectvi' ? t('saga_finale') : GameData.factions[x.faction].name;
             const state = done ? `${ico('crown')} ${t('saga_done')}` : here ? t('saga_now') : un ? t('completed_of', { a: p.done, b: p.total }) : `${ico('lock')} ${t('saga_locked')}`;
             return `${i ? '<div class="saga-arrow" aria-hidden="true">➜</div>' : ''}
             <button class="saga-act ${done ? 'done' : ''} ${here ? 'here' : ''} ${un ? '' : 'locked'}" data-saga="${x.id}" ${un ? '' : 'aria-disabled="true"'}>
@@ -534,7 +534,9 @@
     const F = GameData.factions[save.faction];
     const tab = opts.tab || App.shopTab || 'nabidky';
     App.shopTab = tab;
-    const fUnits = GameData.factionUnits(save.faction);
+    const nation = App.shopNation || save.faction;
+    App.shopNation = nation;
+    const fUnits = GameData.factionUnits(nation);
     let unitSel = opts.unit || App.skinUnit;
     if (!fUnits.includes(unitSel)) unitSel = fUnits[3];
     App.skinUnit = unitSel;
@@ -542,10 +544,12 @@
     const rarClass = r => ({ 'Základní': 'r0', 'Vzácný': 'r1', 'Epický': 'r2', 'Legendární': 'r3' }[r] || 'r0');
     const rar = r => `<span class="rar" style="color:${GameData.rarityColors[r]}">${t('rar_' + ['Základní', 'Vzácný', 'Epický', 'Legendární'].indexOf(r))}</span>`;
     let body = '';
+    // výběr národa: v obchodě jsou vidět skiny a výbava všech tří národů
+    const natBar = (tab === 'vojaci' || tab === 'zbrojnice') ? `<div class="nat-bar" role="tablist">${GameData.factionOrder.filter(f => !GameData.factions[f].enemyOnly).map(f => `<button class="nat-btn" data-nation="${f}" aria-selected="${f === nation}"><span class="nat-emb" style="--nc:${GameData.factions[f].color}"></span>${esc(GameData.factions[f].name)}</button>`).join('')}</div>` : '';
     if (Shop.tabs.includes(tab)) {
-      body = Shop.body(App, tab, opts);
+      body = natBar + Shop.body(App, tab, opts);
     } else if (tab === 'vojaci') {
-      body = `
+      body = natBar + `
         <div class="chips" role="tablist">
           ${fUnits.map(id => `<button class="chip" role="tab" data-sel="${id}" aria-selected="${id === unitSel}"><canvas data-chip="${id}"></canvas>${GameData.units[id].name}</button>`).join('')}
         </div>
@@ -573,7 +577,7 @@
         <button class="btn" id="equipAll">${t('equip_all')}</button>
         <div class="sec-head" style="margin-top:18px"><h2>${t('weapon_skins')}</h2><span class="muted">${esc(GameData.units[unitSel].name)}</span></div>
         <div class="skin-grid">
-          ${GameData.weaponSkins.filter(w => w.roles.includes(GameData.units[unitSel].roleKey)).map(w => {
+          ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel)).map(w => {
             const ownedW = (save.skins.ownedWeapon || ['w_zakladni']).includes(w.id) || w.id === 'w_zakladni';
             const eqW = ((save.skins.weapon || {})[unitSel] || 'w_zakladni') === w.id;
             return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''}">
@@ -583,10 +587,29 @@
               ${eqW ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : ownedW ? `<button class="btn btn-sm btn-blue" data-wequip="${w.id}">${t('use')}</button>`
                 : w.czk ? `<button class="btn btn-sm btn-green" data-wczk="${w.id}">${w.czk} Kč</button>`
-                : `<button class="btn btn-sm btn-gold" data-wbuy="${w.id}" ${save.gems < w.price ? 'disabled' : ''}>${t('buy')} ${ico('gem')} ${w.price}</button>`}
+                : w.gold ? `<button class="btn btn-sm btn-gold" data-wbuy="${w.id}">${t('buy')} ${ico('coin')} ${fmt(w.gold)}</button>`
+                : `<button class="btn btn-sm btn-gold" data-wbuy="${w.id}">${t('buy')} ${ico('gem')} ${w.price}</button>`}
             </article>`;
           }).join('')}
         </div>`;
+    } else if (tab === 'utoky') {
+      const SK = GameData.skillsOf(save);
+      const rarN = ['Základní', 'Vzácný', 'Epický', 'Legendární'];
+      const pr = p => p.czk ? `${p.czk} Kč` : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
+      body = `<section class="panel sk-eq"><div><div class="eyebrow">${t('skills_eq')}</div><p class="muted" style="margin:2px 0 0">${t('skills_help')}</p></div>
+          <div class="sk-slots">${[0, 1, 2].map(i => { const k = SK.eq[i] && GameData.skillById(SK.eq[i]); return `<div class="sk-slot">${k ? GameData.skillIcon(k, 54) + `<small>${esc(k.name)}</small>` : `<span class="sk-empty">${i + 1}</span>`}</div>`; }).join('')}</div></section>
+        <div class="sk-grid">${GameData.skills.map(k => {
+          const own = SK.owned.includes(k.id), on = SK.eq.includes(k.id);
+          return `<article class="panel sk-card ${rarClass(rarN[k.rarity])} ${on ? 'equipped' : ''}" style="--ac:${k.color}">
+            <div class="sk-top">${GameData.skillIcon(k, 58)}<div><h3>${esc(k.name)}</h3>${rar(rarN[k.rarity])}</div></div>
+            <p>${esc(k.desc)}</p>
+            <p class="sk-stats">${ico('coin')} ${k.cost || t('free')} · ⏱ ${k.cooldown} s</p>
+            ${on ? `<button class="btn btn-sm" data-skoff="${k.id}">✓ ${t('skill_on')}</button>`
+              : own ? `<button class="btn btn-sm btn-blue" data-skon="${k.id}">${t('skill_take')}</button>`
+              : k.price.czk ? `<button class="btn btn-sm btn-green" data-skczk="${k.id}">${k.price.czk} Kč</button>`
+              : `<button class="btn btn-sm btn-gold" data-skbuy="${k.id}">${t('buy')} ${pr(k.price)}</button>`}
+          </article>`;
+        }).join('')}</div>`;
     } else if (tab === 'hrady') {
       const big = save.bigCastle, useBig = GameData.isBigCastle(save);
       body = `<div class="sec-head"><h2>${t('castle_types')}</h2></div>
@@ -665,7 +688,7 @@
           </div>
         </section>` : ''}
         <div class="tabs" role="tablist">
-          ${[['nabidky', t('tab_offers')], ['zbrojnice', t('tab_armory')], ['vojaci', t('tab_units')], ['hrady', t('tab_castles')], ['dekorace', t('tab_decor')], ['drahokamy', t('tab_gems')]].map(([id, n]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${n}</button>`).join('')}
+          ${[['nabidky', t('tab_offers')], ['utoky', t('tab_skills')], ['zbrojnice', t('tab_armory')], ['vojaci', t('tab_units')], ['hrady', t('tab_castles')], ['dekorace', t('tab_decor')], ['drahokamy', t('tab_gems')]].map(([id, n]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${n}</button>`).join('')}
         </div>
         ${body}
       </div>`;
@@ -695,21 +718,24 @@
       App.persist(); App.toast(`Skin „${s.name}“ koupen`); App.go('obchod', { keepScroll: true });
     };
     el.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => buySkin(b.dataset.buy, +b.dataset.price)));
+    el.querySelectorAll('[data-nation]').forEach(b => b.addEventListener('click', () => { App.shopNation = b.dataset.nation; App.skinUnit = null; App.go('obchod', { keepScroll: true }); }));
     if (tab === 'vojaci') {
       el.querySelectorAll('canvas[data-chip]').forEach(c => Art.renderUnitIcon(c, c.dataset.chip, 'player', save.skins.unit[c.dataset.chip], { headshot: true, noShadow: true }));
       el.querySelectorAll('canvas[data-skinunit]').forEach(c => Art.renderUnitIcon(c, unitSel, 'player', c.dataset.skinunit));
       Shop.ensure(save);
       el.querySelectorAll('canvas[data-wskin]').forEach(c => {
-        const p = Art.unitPalette('player', save.skins.unit[unitSel], save.faction);
-        p.wpn = GameData.weaponSkinById(c.dataset.wskin).wpal;
-        Art.renderUnitIcon(c, unitSel, 'player', save.skins.unit[unitSel], { pal: p, atk: 0.35 });
+        const p = Art.unitPalette('player', save.skins.unit[unitSel], nation);
+        p.wmodel = GameData.weaponSkinById(c.dataset.wskin).model;
+        const cat = Art.weaponCat(GameData.units[unitSel].look.weapon);
+        Art.renderUnitIcon(c, unitSel, 'player', save.skins.unit[unitSel], { pal: p, atk: cat === 'bow' ? 0.35 : -1, zoom: cat === 'pole' ? 0.62 : cat === 'bow' ? 0.85 : 0.72, offsetX: cat === 'pole' ? 0.2 : cat === 'bow' ? 0.04 : 0.12 });
       });
       const wset = id => { save.skins.weapon[unitSel] = id; App.persist(); App.go('obchod', { keepScroll: true }); };
       el.querySelectorAll('[data-wequip]').forEach(b => b.addEventListener('click', () => wset(b.dataset.wequip)));
       el.querySelectorAll('[data-wbuy]').forEach(b => b.addEventListener('click', () => {
         const w = GameData.weaponSkinById(b.dataset.wbuy);
-        if (save.gems < w.price) return;
-        save.gems -= w.price; save.skins.ownedWeapon.push(w.id); App.toast(t('t_bought', { name: w.name })); App.refreshTop(); wset(w.id);
+        if (w.gold) { if (save.gold < w.gold) { App.toast(t('not_enough')); return; } save.gold -= w.gold; }
+        else { if (save.gems < w.price) { App.toast(t('not_enough')); return; } save.gems -= w.price; }
+        save.skins.ownedWeapon.push(w.id); App.toast(t('t_bought', { name: w.name })); App.refreshTop(); wset(w.id);
       }));
       el.querySelectorAll('[data-wczk]').forEach(b => b.addEventListener('click', () => {
         const w = GameData.weaponSkinById(b.dataset.wczk);
@@ -749,8 +775,8 @@
         const attacking = phase > 2.4;
         const atk = attacking ? ((phase - 2.4) / 0.8) % 1 : -1;
         ctx.save(); ctx.translate(w / 2 - 30 * sc, h * 0.88); ctx.scale(sc, sc);
-        const pPal = Art.unitPalette('player', save.skins.unit[unitSel], save.faction);
-        const wsk = (save.skins.weapon || {})[unitSel]; if (wsk && GameData.weaponSkinById) pPal.wpn = GameData.weaponSkinById(wsk).wpal;
+        const pPal = Art.unitPalette('player', save.skins.unit[unitSel], nation);
+        const wsk = (save.skins.weapon || {})[unitSel]; if (wsk && GameData.weaponSkinById && GameData.weaponSkinById(wsk).model) pPal.wmodel = GameData.weaponSkinById(wsk).model;
         if (pPal.mount) { ctx.translate(-10, 0); ctx.scale(0.78, 0.78); }
         Art.drawUnit(ctx, def, pPal, { x: 0, y: 0, facing: 1, walk: t * 8, moving: !attacking, atk, t, ring: true });
         ctx.restore();
@@ -761,6 +787,22 @@
       };
       cancelAnimationFrame(App.previewRaf);
       anim();
+    } else if (tab === 'utoky') {
+      const SK = GameData.skillsOf(save);
+      const re = () => { App.persist(); App.go('obchod', { keepScroll: true }); };
+      const equip = id => { if (SK.eq.length >= 3) SK.eq.shift(); SK.eq.push(id); re(); };
+      el.querySelectorAll('[data-skon]').forEach(b => b.addEventListener('click', () => equip(b.dataset.skon)));
+      el.querySelectorAll('[data-skoff]').forEach(b => b.addEventListener('click', () => { if (SK.eq.length <= 1) { App.toast(t('skill_min')); return; } SK.eq = SK.eq.filter(x => x !== b.dataset.skoff); re(); }));
+      el.querySelectorAll('[data-skbuy]').forEach(b => b.addEventListener('click', () => {
+        const k = GameData.skillById(b.dataset.skbuy), p = k.price;
+        if (p.gems) { if (save.gems < p.gems) { App.toast(t('not_enough')); return; } save.gems -= p.gems; }
+        else if (p.gold) { if (save.gold < p.gold) { App.toast(t('not_enough')); return; } save.gold -= p.gold; }
+        SK.owned.push(k.id); App.toast(t('t_bought', { name: k.name })); equip(k.id);
+      }));
+      el.querySelectorAll('[data-skczk]').forEach(b => b.addEventListener('click', () => {
+        const k = GameData.skillById(b.dataset.skczk);
+        Platby.buy(App, { id: 'skill_' + k.id, name: k.name, czk: k.price.czk }, () => { if (!SK.owned.includes(k.id)) SK.owned.push(k.id); equip(k.id); });
+      }));
     } else if (tab === 'hrady') {
       // oba druhy hradu ve stejném měřítku, aby byl vidět rozdíl ve velikosti
       const bigImg = Art.castleImage('player', save.skins.castle, 10, 2, F.castleStyle, Object.assign(castleCfg(save), { big: true, small: false }));
@@ -847,7 +889,7 @@
     const curHere = cur && cur.act === a ? cur : null;
     const curCh = curHere ? chapters.find(c => c.id === curHere.chapter) : chapters[chapters.length - 1];
     const chDone = curCh.levels.filter(l => save.campaign.cleared[l.id]).length;
-    const actName = x => x.faction === 'spojenectvi' ? t('alliance') : GameData.factions[x.faction].name;
+    const actName = x => x.huge ? x.name : x.faction === 'spojenectvi' ? t('alliance') : GameData.factions[x.faction].name;
     const people = act.faction === 'spojenectvi' ? GameData.factionOrder.map(f => GameData.factions[f].name).join(' · ') : GameData.factions[act.faction].people;
     const el = App.screenEl;
     el.innerHTML = `
@@ -862,14 +904,14 @@
           }).join('<i class="act-arrow">›</i>')}
         </div>
         <div class="story-wrap">
-          <section class="panel story-map" id="storyMap">
+          <section class="panel story-map ${act.huge ? 'huge' : ''}" id="storyMap">
             <canvas id="storyCv"></canvas>
             ${chapters.map(ch => `<div class="region-label" style="top:${ch.label.top}%;${ch.label.left != null ? 'left:' + ch.label.left : 'right:' + ch.label.right}%">${t('chapter', { n: ch.id })} · ${esc(ch.name)}</div>`).join('')}
             ${all.map(l => {
               const cleared = !!save.campaign.cleared[l.id];
               const unlocked = H.isUnlocked(save, l.id);
               const isCur = cur && cur.id === l.id;
-              const cls = ['node', l.boss ? 'boss' : '', l.boss === 'demonkral' ? 'final' : '', cleared ? 'cleared' : '', isCur ? 'current' : '', unlocked ? '' : 'lockednode'].join(' ');
+              const cls = ['node', l.boss ? 'boss' : '', typeof l.boss === 'string' ? 'final' : '', cleared ? 'cleared' : '', isCur ? 'current' : '', unlocked ? '' : 'lockednode'].join(' ');
               return `<button class="${cls}" style="left:${l.pos[0]}%;top:${l.pos[1]}%" data-lv="${l.id}" aria-label="${l.label} ${esc(l.name)}${cleared ? ' ✓' : ''}">
                 ${cleared || isCur ? ico('crown') : ''}${unlocked ? l.label : ico('lock')}
               </button>`;

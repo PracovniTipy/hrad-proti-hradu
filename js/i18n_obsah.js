@@ -121,8 +121,8 @@
       'd2-4': { name: 'The Crater', story: 'The crater’s rim. Lava bubbles below you, Azgaroth’s whole legion stands before you.' },
       'd2-5': { name: 'Throne of the Hell General', story: 'The final battle. The giant hell fortress has three gates and demons pour out of all of them. Azgaroth himself enters the field. When he falls, his fortress will shake.' }
     },
-    saga: { kralovstvi: 'Lion Crown', samurajove: 'Kazehana Clan', vikingove: 'Storm Fjord', spojenectvi: 'Alliance' },
-    cast: { vypravec: 'Narrator', aldrik: 'King Aldric', rju: 'Daimyō Ryū', sigrun: 'Jarl Sigrun', azgaroth: 'Azgaroth' },
+    saga: { kralovstvi: 'Lion Crown', samurajove: 'Kazehana Clan', vikingove: 'Storm Fjord', spojenectvi: 'Alliance', risedemonu: 'Demon Realm' },
+    cast: { vypravec: 'Narrator', aldrik: 'King Aldric', kancler: 'Chancellor Edmund', rju: 'Shōgun Ryū', sigrun: 'Queen Sigrun', azgaroth: 'Azgaroth', malakor: 'Malakor' },
     scenes: {
       prolog: { title: 'Prologue', pages: ['A thousand years ago Azgaroth, the Hell General, descended from the Fire Mountain. Knights, samurai and Vikings defeated him together and sealed him with three seals.', 'Then the nations forgot their alliance. The seals are weakening and Azgaroth’s whisper turns rulers against each other again.', 'Marshal! Villages burn on the border and the Shadow Legion stirs in the mountains. Defend the kingdom before it is too late.'] },
       akt2: { title: 'Act II · Kazehana Clan', pages: ['Dark Lord Morvan did not serve himself. His seal bears the sign of the Hell General. The second seal is kept by the Kazehana clan in the east.', 'The marshal sails across the sea to the Land of the Rising Sun. Young daimyō Ryū welcomes him – but his land is torn by war.', 'We will help you, knights, once we unite the provinces. Regent Kurogane locked himself in the capital and since then he speaks with a voice that is not his own.'] },
@@ -136,7 +136,7 @@
       pokladnice: { name: 'Treasury', desc: 'Faster coin income during battle.' },
       kasarna: { name: 'Barracks', desc: '+6% health and attack for all soldiers per level.' },
       vez: { name: 'Watchtower', desc: 'Archers on the tower shoot enemies at the gate.' },
-      zbrojnice: { name: 'Armory', desc: 'Higher coin limit in battle.' }
+      zbrojnice: { name: 'Armory', desc: 'More coins at the start of every battle.' }
     },
     unitSkins: {
       zakladni: { name: 'Team Armor', desc: 'The classic colors of your realm.' },
@@ -193,12 +193,12 @@
       });
     });
     Object.keys(GameData.campaigns).forEach(f => GameData.campaigns[f].forEach(ch => {
-      apply(ch, ['name', 'intro', 'outro'], EN.chapters[f + ':' + ch.id]);
-      ch.levels.forEach(l => apply(l, ['name', 'story'], EN.levels[l.id]));
+      apply(ch, ['name', 'intro', 'outro'], ch.en || EN.chapters[f + ':' + ch.id]);
+      ch.levels.forEach(l => apply(l, ['name', 'story'], l.en || EN.levels[l.id]));
     }));
     GameData.buildings.forEach(b => apply(b, ['name', 'desc'], EN.buildings[b.id]));
     const GEN = { 'weapon:0': ['Tempered Steel', 'Better tempered blade and point.'], 'weapon:1': ['Rune Weapon', 'Runes on the blade glow blue.'], 'weapon:2': ['Dragonfire', 'Forged in dragon fire. Burns orange.'], 'weapon:3': ['Starsteel', 'Legendary weapon from a fallen star. Shines gold.'],
-      'armor:0': ['Mail Vest', 'Sturdy chainmail under the tunic.'], 'armor:1': ['Steel Armor', 'Polished steel with blue trim.'], 'armor:2': ['Shadow Armor', 'Black steel with a horned helm and cloak.'], 'armor:3': ['King’s Armor', 'Golden armor with a crown and royal cloak.'] };
+      'armor:0': ['Mail Vest', 'Sturdy chainmail under the tunic.'], 'armor:1': ['Steel Armor', 'Polished steel with blue trim.'], 'armor:2': ['Shadow Armor', 'Black steel with spiked pauldrons, a torn cloak and a horned helm.'], 'armor:3': ['King’s Armor', 'Gilded plate, ruby pauldrons, a crimson ermine cloak, a golden lion on the chest and a white-gold plume.'] };
     (GameData.gear || []).forEach(g => { const e = GEN[g.slot + ':' + g.tier]; apply(g, ['name', 'desc'], e && { name: e[0], desc: e[1] }); });
     const OEN = { pevnost: ['Great Fortress', 'A bigger castle with a keep: up to 10 defenders on the walls (at max Watchtower), +25% castle health.'], start: ['Starter Pack', 'Best start: gold, gems and a better infantry weapon.'], mesec: ['Bag of Gold', 'Gold for castle upgrades.'], hrst: ['Handful of Gems', 'Gems for skins and gear.'], kovar: ['Blacksmith Pack', 'A random rare or better weapon plus gold.'], zbrojir: ['Armorer Pack', 'Steel armor for the heavy unit plus gold.'], lucist: ['Archer Pack', 'Rune weapon for archers plus gems.'], valecny: ['War Pack', 'Gold and gems for the next campaign.'], hraniceri: ['Ranger Pack', 'Two soldier skins: Forest Rangers and Midnight Watch.'], hradni: ['Castle Pack', 'Torches and great banners for your castle plus gold.'], kopinik: ['Spearman Pack', 'Steel armor and a rune weapon for spearmen.'], hrdina: ['Hero Pack', 'Dragonfire for the heavy unit plus gems.'], kral: ['Royal Pack', 'King’s Armor for the heavy unit, 5,000 gold and 400 gems.'] };
     (GameData.offers || []).forEach(o => apply(o, ['name', 'desc'], OEN[o.id] && { name: OEN[o.id][0], desc: OEN[o.id][1] }));
@@ -206,7 +206,7 @@
     (GameData.saga || []).forEach(a => apply(a, ['name'], { name: EN.saga[a.id] }));
     Object.keys(GameData.cast || {}).forEach(k => apply(GameData.cast[k], ['name'], { name: EN.cast[k] }));
     Object.keys(GameData.scenes || {}).forEach(k => {
-      const sc = GameData.scenes[k], e = EN.scenes[k] || {};
+      const sc = GameData.scenes[k], e = (GameData.scenesEn || {})[k] || EN.scenes[k] || {};
       apply(sc, ['title'], { title: e.title });
       sc.pages.forEach((pg, i) => apply(pg, ['text'], { text: (e.pages || [])[i] }));
     });
@@ -229,7 +229,7 @@
     eff_power: ['+{n} % síla vojáků', '+{n}% soldier power', '士兵战力 +{n}%', 'सैनिक शक्ति +{n}%', '+{n} % de poder', '+{n} % de puissance', '+{n}% قوة الجنود', 'সৈন্যশক্তি +{n}%', '+{n}% de poder', '+{n}% к силе', '+{n}% طاقت', '+{n}% kekuatan', '+{n} % Stärke', '戦力 +{n}%', '+%{n} güç', '전투력 +{n}%'],
     eff_tower: ['{n} zranění/šíp', '{n} damage/arrow', '每箭伤害 {n}', '{n} क्षति/तीर', '{n} daño/flecha', '{n} dégâts/flèche', '{n} ضرر/سهم', '{n} ক্ষতি/তীর', '{n} dano/flecha', '{n} урона/стрела', '{n} نقصان/تیر', '{n} kerusakan/panah', '{n} Schaden/Pfeil', '矢1本 {n} ダメージ', '{n} hasar/ok', '화살당 피해 {n}'],
     eff_tower0: ['Věž je prázdná', 'Tower is empty', '箭塔无人', 'मीनार खाली', 'Torre vacía', 'Tour vide', 'البرج فارغ', 'মিনার খালি', 'Torre vazia', 'Башня пуста', 'مینار خالی', 'Menara kosong', 'Turm ist leer', '塔は空', 'Kule boş', '탑이 비어 있음'],
-    eff_limit: ['Limit {n} mincí', 'Limit {n} coins', '上限 {n} 金币', 'सीमा {n} सिक्के', 'Límite {n} monedas', 'Limite {n} pièces', 'الحد {n} عملة', 'সীমা {n} মুদ্রা', 'Limite {n} moedas', 'Лимит {n} монет', 'حد {n} سکے', 'Batas {n} koin', 'Limit {n} Münzen', '上限 {n} コイン', 'Sınır {n} para', '한도 {n} 코인']
+    eff_limit: ['Na začátku boje {n} mincí', 'Start battles with {n} coins', '战斗开始时 {n} 金币', 'युद्ध की शुरुआत में {n} सिक्के', 'Empiezas con {n} monedas', 'Début de combat : {n} pièces', 'تبدأ المعركة بـ{n} عملة', 'যুদ্ধের শুরুতে {n} মুদ্রা', 'Começa com {n} moedas', 'В начале боя {n} монет', 'جنگ کے آغاز میں {n} سکے', 'Mulai perang dengan {n} koin', 'Kampfbeginn mit {n} Münzen', '開戦時 {n} コイン', 'Savaş başında {n} altın', '전투 시작 시 {n} 코인'],
   });
 
   // Sága, spojenectví, AUTO a boss (všechny jazyky: cs,en,zh,hi,es,fr,ar,bn,pt,ru,ur,id,de,ja,tr,ko)
@@ -374,5 +374,29 @@
     small_eyebrow: ['Základní hrad', 'Starter castle', '基础城堡', 'मूल किला', 'Castillo básico', 'Château de base', 'القلعة الأساسية', 'মৌলিক দুর্গ', 'Castelo básico', 'Базовый замок', 'بنیادی قلعہ', 'Kastil dasar', 'Grundburg', '基本の城', 'Temel kale', '기본 성'],
     small_name: ['Malý hrad', 'Small Castle', '小城堡', 'छोटा किला', 'Castillo pequeño', 'Petit château', 'القلعة الصغيرة', 'ছোট দুর্গ', 'Castelo pequeno', 'Малый замок', 'چھوٹا قلعہ', 'Kastil kecil', 'Kleine Burg', '小さな城', 'Küçük kale', '작은 성'],
     small_desc: ['Hrad, se kterým začínáš. Na hradbách unese nejvýš 5 obránců.', 'The castle you start with. Its walls hold at most 5 defenders.', '你起步时的城堡。城墙最多容纳 5 名守卫。', 'वह किला जिससे आप शुरू करते हैं। दीवारों पर अधिकतम 5 रक्षक।', 'El castillo con el que empiezas. Sus murallas admiten 5 defensores como máximo.', 'Le château de départ. Ses remparts accueillent 5 défenseurs au maximum.', 'القلعة التي تبدأ بها. تتسع أسوارها لـ5 مدافعين كحد أقصى.', 'যে দুর্গ দিয়ে শুরু করো। দেয়ালে সর্বোচ্চ ৫ জন রক্ষী।', 'O castelo com que você começa. As muralhas comportam no máximo 5 defensores.', 'Замок, с которого ты начинаешь. На стенах не больше 5 защитников.', 'وہ قلعہ جس سے آپ شروع کرتے ہیں۔ دیواروں پر زیادہ سے زیادہ 5 محافظ۔', 'Kastil awalmu. Temboknya muat paling banyak 5 penjaga.', 'Die Burg, mit der du beginnst. Auf ihren Mauern haben höchstens 5 Verteidiger Platz.', '最初の城。城壁には守備兵を最大5人まで。', 'Başladığın kale. Surlarında en fazla 5 savunucu olur.', '처음 시작하는 성. 성벽에 수비병은 최대 5명.']
+  });
+
+  Object.assign(I18N.D, {
+    queue_n: ['zásobník {n}', 'queue {n}', '队列 {n}', 'कतार {n}', 'cola {n}', 'file {n}', 'طابور {n}', 'সারি {n}', 'fila {n}', 'очередь {n}', 'قطار {n}', 'antrean {n}', 'Warteschl. {n}', '待機 {n}', 'sıra {n}', '대기 {n}'],
+    queue_cleared: ['Zásobník vyprázdněn', 'Queue cleared', '队列已清空', 'कतार खाली', 'Cola vaciada', 'File vidée', 'تم إفراغ الطابور', 'সারি খালি', 'Fila esvaziada', 'Очередь очищена', 'قطار خالی', 'Antrean dikosongkan', 'Warteschlange geleert', '待機を解除', 'Sıra temizlendi', '대기열 비움']
+  });
+
+  Object.assign(I18N.D, {
+    tester_on: ['Testovací režim: neomezené zlato a drahokamy', 'Test mode: unlimited gold and gems', '测试模式：无限金币和宝石', 'परीक्षण मोड: असीमित सोना और रत्न', 'Modo prueba: oro y gemas ilimitados', 'Mode test : or et gemmes illimités', 'وضع الاختبار: ذهب وجواهر بلا حدود', 'পরীক্ষা মোড: সীমাহীন সোনা ও রত্ন', 'Modo teste: ouro e gemas ilimitados', 'Тест-режим: бесконечное золото и самоцветы', 'ٹیسٹ موڈ: لامحدود سونا اور جواہرات', 'Mode uji: emas dan permata tanpa batas', 'Testmodus: unbegrenzt Gold und Edelsteine', 'テストモード：ゴールドとジェム無制限', 'Test modu: sınırsız altın ve mücevher', '테스트 모드: 무제한 골드와 보석'],
+    tester_off: ['Testovací režim vypnut', 'Test mode off', '测试模式已关闭', 'परीक्षण मोड बंद', 'Modo prueba desactivado', 'Mode test désactivé', 'تم إيقاف وضع الاختبار', 'পরীক্ষা মোড বন্ধ', 'Modo teste desligado', 'Тест-режим выключен', 'ٹیسٹ موڈ بند', 'Mode uji mati', 'Testmodus aus', 'テストモード終了', 'Test modu kapalı', '테스트 모드 꺼짐']
+  });
+
+  Object.assign(I18N.D, {
+    tab_skills: ['Útoky', 'Attacks', '技能', 'हमले', 'Ataques', 'Attaques', 'الهجمات', 'আক্রমণ', 'Ataques', 'Атаки', 'حملے', 'Serangan', 'Angriffe', '必殺技', 'Saldırılar', '공격'],
+    skills_eq: ['Do bitvy si bereš 3 útoky', 'You take 3 attacks into battle', '你可带 3 个技能参战', 'युद्ध में 3 हमले ले जाते हैं', 'Llevas 3 ataques a la batalla', 'Tu emportes 3 attaques au combat', 'تأخذ 3 هجمات إلى المعركة', 'যুদ্ধে ৩টি আক্রমণ নাও', 'Você leva 3 ataques à batalha', 'В бой берёшь 3 атаки', 'جنگ میں 3 حملے لے جاتے ہو', 'Bawa 3 serangan ke pertempuran', 'Du nimmst 3 Angriffe mit in die Schlacht', '戦闘には3つ持っていける', 'Savaşa 3 saldırı götürürsün', '전투에 공격 3개를 가져갑니다'],
+    skills_help: ['Kup si speciální útoky a vyber 3, které budou v bitvě vpravo dole.', 'Buy special attacks and choose 3 to appear at the bottom right in battle.', '购买特殊技能，选择 3 个显示在战斗右下角。', 'विशेष हमले खरीदें और 3 चुनें जो युद्ध में नीचे दाईं ओर होंगे।', 'Compra ataques especiales y elige 3 para la esquina inferior derecha.', 'Achète des attaques spéciales et choisis-en 3 pour le coin inférieur droit.', 'اشترِ هجمات خاصة واختر 3 تظهر أسفل اليمين في المعركة.', 'বিশেষ আক্রমণ কিনে ৩টি বেছে নাও, যুদ্ধে নিচে ডানে থাকবে।', 'Compre ataques especiais e escolha 3 para o canto inferior direito.', 'Купи особые атаки и выбери 3 – они будут справа внизу в бою.', 'خاص حملے خریدیں اور 3 چنیں جو جنگ میں نیچے دائیں ہوں گے۔', 'Beli serangan khusus dan pilih 3 untuk kanan bawah saat bertempur.', 'Kaufe Spezialangriffe und wähle 3 für unten rechts im Kampf.', '必殺技を買って3つ選ぶと、戦闘の右下に並ぶ。', 'Özel saldırılar al ve savaşta sağ altta olacak 3 tanesini seç.', '특수 공격을 사서 3개를 고르면 전투 오른쪽 아래에 나옵니다.'],
+    skill_on: ['V bitvě', 'Equipped', '已装备', 'चयनित', 'Equipado', 'Équipé', 'مجهز', 'নির্বাচিত', 'Equipado', 'Выбрано', 'منتخب', 'Dipakai', 'Ausgerüstet', '装備中', 'Takılı', '장착됨'],
+    skill_take: ['Vzít do bitvy', 'Take into battle', '带入战斗', 'युद्ध में लें', 'Llevar', 'Emporter', 'خذه للمعركة', 'যুদ্ধে নাও', 'Levar', 'Взять в бой', 'جنگ میں لیں', 'Bawa', 'Mitnehmen', '持っていく', 'Savaşa al', '전투에 가져가기'],
+    skill_min: ['Aspoň jeden útok musíš mít', 'You need at least one attack', '至少需要一个技能', 'कम से कम एक हमला चाहिए', 'Necesitas al menos uno', 'Il en faut au moins une', 'تحتاج هجومًا واحدًا على الأقل', 'অন্তত একটি দরকার', 'Precisa de pelo menos um', 'Нужна хотя бы одна атака', 'کم از کم ایک حملہ چاہیے', 'Minimal satu serangan', 'Mindestens ein Angriff nötig', '最低1つは必要', 'En az bir saldırı gerekli', '최소 하나는 필요합니다'],
+    free: ['zdarma', 'free', '免费', 'मुफ़्त', 'gratis', 'gratuit', 'مجانًا', 'বিনামূল্যে', 'grátis', 'бесплатно', 'مفت', 'gratis', 'gratis', '無料', 'ücretsiz', '무료']
+  });
+
+  Object.assign(I18N.D, {
+    hostages_saved: ['Zachránil jsi {n} rukojmí! +{g} drahokamů', 'You rescued {n} hostages! +{g} gems', '你救出了 {n} 名人质！+{g} 宝石', 'आपने {n} बंधकों को बचाया! +{g} रत्न', '¡Rescataste {n} rehenes! +{g} gemas', 'Tu as sauvé {n} otages ! +{g} gemmes', 'أنقذت {n} رهائن! +{g} جوهرة', 'তুমি {n} জন বন্দিকে উদ্ধার করেছ! +{g} রত্ন', 'Você resgatou {n} reféns! +{g} gemas', 'Ты спас {n} заложников! +{g} самоцветов', 'آپ نے {n} یرغمالیوں کو بچایا! +{g} جواہرات', 'Kamu menyelamatkan {n} sandera! +{g} permata', 'Du hast {n} Geiseln gerettet! +{g} Edelsteine', '人質を{n}人救出！+{g}ジェム', '{n} rehineyi kurtardın! +{g} mücevher', '인질 {n}명을 구출했습니다! +{g} 보석']
   });
 })();

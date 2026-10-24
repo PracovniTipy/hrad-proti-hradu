@@ -165,3 +165,14 @@ Do `GameData.unitSkins` nebo `GameData.castleSkins` v `js/data/skins.js` přidej
 Projekt je připravený pro **Capacitor** (`npm install`, `npx cap add android`, `npm run android`). Celý postup včetně podpisu, poplatků, testování a dalších obchodů (itch.io, CrazyGames, Poki, Microsoft Store, Steam) je v **`STORE_NAVOD.md`**.
 
 Dlouhodobě se dá hra přepsat do **Godot 4**: data jednotek, skinů a kampaně jsou oddělená a logika boje (`battle.js`, metoda `update`) je oddělená od kreslení.
+
+## Novinky (verze 21)
+- **Postup se nikdy nesmaže**: uložení se při aktualizaci jen doplní, navíc se drží automatická záloha.
+- **Mince v bitvě bez stropu** (Zbrojnice teď dává víc mincí na začátku boje).
+- **Zásobník vojáků**: na vojáka jde klepnout až 50×, pošlou se postupně, jakmile na ně jsou mince. Podržením se zásobník vyprázdní.
+- **26 speciálních útoků** (Obchod → Útoky): oheň, led, blesk, jed, šípová salva, vlna, bouře, zemětřesení, meteor, léčení, válečný roh, kletba, mráz, posily, zedníci, ohnivá zeď, vichřice, svaté světlo, dračí dech… Do bitvy si hráč vybere 3.
+- **Skutečné modely zbraní** (js/core/art_zbrane.js): meče se záštitou, flamberk, katana, šavle, sekery, kladivo, palcát, trojzubce, halapartna, glefa, partyzána, reflexní a dlouhé luky…
+- **Skiny mění tvar**: pláště (královský, hermelín, roztrhaný, kožešina), límce, znaky na hrudi, nárameníky, chocholy, rohy kuwagata, křídla, aury. Zbroj krále bez koruny.
+- **Obchod ukazuje všechny tři národy.**
+- **Příběh**: Akt I–III jsou lidé proti lidem (rytíř se stává králem, pak samurajové a vikingové), Akt IV spojenectví proti Pekelnému generálovi, **Akt V Démonská říše** – obří mapa s 50 bitvami, každá 10. generál (Skarnath, Vargul, Belzar, Hrimgar), na konci Démonický král Malakor. Některé bitvy mají rukojmí v klecích.
+- Tajný testovací režim: 7× rychle klepnout na zlato = neomezené zlato a drahokamy.

@@ -67,36 +67,110 @@ GameData.unitSkins.push(
     palette: { trim: '#e8b84a', cape: '#3a5a8a' }, ornament: 'crown' }
 );
 
+/* ---------- další skiny: kopiníci (trojzubce!) a nové podoby velitelů ---------- */
+GameData.unitSkins.push(
+  { id: 'r_kopi', only: ['kopinik'], name: 'Strážce brány', rarity: 'Vzácný', price: 150, bonus: { hp: 0.06 },
+    desc: 'Plátové nárameníky, krátký plášť a znak lva na hrudi.', en: { name: 'Gate Warden', desc: 'Plate pauldrons, a short cloak and a lion on the chest.' },
+    palette: { tunic: '#1f3a6a', tunicDark: '#122444', trim: '#e0c060', cape: '#7a1414', plume: '#e0c060' } },
+  { id: 'r_templar', only: ['rytir'], name: 'Templář', rarity: 'Epický', price: 260, bonus: { hp: 0.08, armor: 0.03 },
+    desc: 'Bílý plášť s rudým křížem a široké nárameníky.', en: { name: 'Templar', desc: 'A white cloak with a red cross and broad pauldrons.' },
+    palette: { tunic: '#f1ede2', tunicDark: '#c9c1ad', trim: '#c8262a', cape: '#f4efe0', plume: '#c8262a' } },
+  { id: 's_kopi', only: ['jari'], name: 'Mnich sóhei', rarity: 'Vzácný', price: 150, bonus: { hp: 0.06 },
+    desc: 'Bílá kápě válečného mnicha, zbroj sode a mon na hrudi.', en: { name: 'Sōhei Monk', desc: 'The white hood of a warrior monk, sode armor and a mon on the chest.' },
+    palette: { tunic: '#e8e2d6', tunicDark: '#b8b0a0', trim: '#7a1414', metal: '#3a3438', metalDark: '#1a1618', cape: '#e8e2d6', plume: '#7a1414' } },
+  { id: 's_ronin', only: ['samuraj'], name: 'Toulavý rónin', rarity: 'Epický', price: 260, bonus: { dmg: 0.09 },
+    desc: 'Samuraj bez pána: roztrhaný plášť a rudé rohy kuwagata.', en: { name: 'Wandering Rōnin', desc: 'A masterless samurai: a torn cloak and red kuwagata horns.' },
+    palette: { tunic: '#4a3a5a', tunicDark: '#2a2034', trim: '#c8262a', metal: '#4a4048', metalDark: '#201a20', cape: '#3a2a4a', plume: '#c8262a' } },
+  { id: 'v_kopi', only: ['stitonos'], name: 'Štítonoš Valhaly', rarity: 'Vzácný', price: 150, bonus: { hp: 0.06 },
+    desc: 'Kožešinový límec, runa na hrudi a křídla na přilbě.', en: { name: 'Valhalla Shieldbearer', desc: 'A fur collar, a rune on the chest and wings on the helmet.' },
+    palette: { tunic: '#3a5a7a', tunicDark: '#24384c', trim: '#e0c060', cape: '#2a4a6a', plume: '#ffffff' } },
+  { id: 'v_medved', only: ['berserk'], name: 'Medvědí berserk', rarity: 'Epický', price: 260, bonus: { hp: 0.1, dmg: 0.04 },
+    desc: 'Hnědá medvědí kůže přes záda, kožešinové nárameníky a válečné barvy.', en: { name: 'Bear Berserker', desc: 'A brown bear hide over the back, fur pauldrons and war paint.' },
+    palette: { tunic: '#5a3a24', tunicDark: '#3a2414', trim: '#c9a06a', cape: '#5a3a24' } }
+);
+
+/* TVAROVÉ PRVKY SKINŮ – skiny mění tvar, ne jen barvy:
+   plášť (royal/ermine/tattered/short/pelt), límec (ermine/fur/wolf/chain), znak na hrudi,
+   nárameníky (plate/spiky/gold/samurai/fur), chochol/rohy/křídla na přilbě a aura. */
+const FEAT = {
+  lesni: { cape: 'short', collar: 'fur', crest: 'feather', plumeColor: '#4a8a3a' },
+  pulnoc: { cape: 'royal', capeColor: '#1a2a5a', chest: 'moon', pauldron: 'plate', trim: '#c9d8ff' },
+  stinovy: { pauldron: 'spiky', cape: 'tattered', capeColor: '#2a0a10', aura: 'shadow', chest: 'skull' },
+  zlaty: { crest: 'wings', pauldron: 'gold', chest: 'sun', cape: 'royal', capeColor: '#f4efe0', aura: 'holy' },
+  ledovy: { pauldron: 'spiky', spikeColor: '#e6f8ff', collar: 'fur', furColor: '#f4f8ff', aura: 'frost', chest: 'star', emblemColor: '#dff4ff' },
+  smaragd: { pauldron: 'plate', chest: 'dragon', emblemColor: '#7be0a0', cape: 'short' },
+  rudy_drak: { pauldron: 'spiky', chest: 'dragon', crest: 'dragon', aura: 'flame' },
+  krvavy: { pauldron: 'spiky', chest: 'skull', aura: 'flame', cape: 'tattered', capeColor: '#3a060a' },
+  nebesky: { crest: 'wings', pauldron: 'gold', aura: 'holy', cape: 'royal', capeColor: '#cfe4ff', chest: 'star' },
+  verny: { cape: 'royal', capeColor: '#3a1f66', collar: 'chain', chest: 'star', pauldron: 'gold', crest: 'royalplume', plumeColor: '#b98cff' },
+  r_velitel: { cape: 'ermine', capeColor: '#7a1218', collar: 'ermine', chest: 'lion', pauldron: 'gold', crest: 'royalplume', plumeColor: '#ffffff' },
+  r_luk: { cape: 'short', capeColor: '#2f62b8', crest: 'feather', plumeColor: '#e0a83a', chest: 'lion' },
+  r_mec: { pauldron: 'plate', chest: 'cross', emblemColor: '#bff7ef', cape: 'short', capeColor: '#2ab0a8', aura: 'frost' },
+  r_kopi: { pauldron: 'plate', chest: 'lion', cape: 'short', crest: 'mohawk', plumeColor: '#e0c060' },
+  r_templar: { pauldron: 'plate', chest: 'cross', emblemColor: '#c8262a', cape: 'royal', capeColor: '#f4efe0', trim: '#c8262a', crest: 'plume', plumeColor: '#ffffff' },
+  r_kun: { cape: 'ermine', capeColor: '#234a9c', collar: 'ermine', chest: 'lion', pauldron: 'gold', crest: 'royalplume' },
+  s_velitel: { crest: 'kuwagata', pauldron: 'samurai', chest: 'mon', cape: 'royal', capeColor: '#8a1414' },
+  s_luk: { aura: 'petals', crest: 'feather', plumeColor: '#ff9ac0', chest: 'mon', emblemColor: '#fff0f5' },
+  s_mec: { pauldron: 'samurai', chest: 'mon', crest: 'kuwagata', trim: '#e6d38a' },
+  s_kopi: { pauldron: 'samurai', chest: 'mon', emblemColor: '#7a1414', collar: 'fur', furColor: '#f4f0e8' },
+  s_ronin: { cape: 'tattered', capeColor: '#3a2a4a', crest: 'kuwagata', trim: '#c8262a', pauldron: 'samurai' },
+  s_kun: { crest: 'kuwagata', pauldron: 'samurai', chest: 'mon', cape: 'royal', capeColor: '#8a1414' },
+  v_velitel: { collar: 'wolf', cape: 'pelt', furColor: '#9aa0aa', pauldron: 'fur', chest: 'rune', emblemColor: '#7fd3ff' },
+  v_luk: { aura: 'aurora', collar: 'fur', furColor: '#cfe8e8', chest: 'rune', emblemColor: '#9dffd0', crest: 'feather', plumeColor: '#9dffd0' },
+  v_mec: { aura: 'storm', pauldron: 'plate', chest: 'rune', emblemColor: '#ffe14a', crest: 'wings' },
+  v_kopi: { collar: 'fur', chest: 'rune', emblemColor: '#e0c060', crest: 'wings', pauldron: 'plate' },
+  v_medved: { cape: 'pelt', furColor: '#6a4428', pauldron: 'fur', furColor2: '#6a4428', collar: 'fur', crest: 'antlers' },
+  v_kun: { collar: 'wolf', cape: 'pelt', furColor: '#9aa0aa', pauldron: 'fur', chest: 'rune' }
+};
+GameData.unitSkins.forEach(s => {
+  if (FEAT[s.id]) s.feat = FEAT[s.id];
+  // královské skiny už nemají korunu – vznešenost dělá plášť, hermelín a zlato
+  if (['r_velitel', 'v_velitel', 'r_kun', 'v_kun', 'zlaty'].includes(s.id) && s.ornament === 'crown') s.ornament = null;
+});
+
 /* ---------- SKINY ZBRANÍ ----------
-   roles – pro které druhy jednotek se zbraň hodí (pech = meč/sekera, strelec = luk,
-   kopi = kopí, tezka = zbraň velitele). wpal – barvy čepele, dřeva a záře. */
+   Každý skin zbraně má vlastní TVAR (model) – meč, katanu, sekeru, kladivo,
+   trojzubec, halapartnu, luk… cat = druh zbraně (melee = meče a sekery,
+   pole = kopí, bow = luky). Hodí se jen jednotkám se stejným druhem zbraně. */
+const WS = (id, name, rarity, price, cat, model, bonus, desc, en) => Object.assign({ id, name, rarity, cat, model: Object.assign({ cat }, model), bonus, desc, en }, price);
 GameData.weaponSkins = [
-  { id: 'w_zakladni', name: 'Původní zbraň', rarity: 'Základní', price: 0, roles: ['pech', 'strelec', 'kopi', 'tezka'], wpal: {},
-    en: { name: 'Original Weapon' } },
-  { id: 'w_plamen', name: 'Plamenná čepel', rarity: 'Epický', price: 140, roles: ['pech', 'kopi', 'tezka'], bonus: { dmg: 0.04 },
-    wpal: { metal: '#ffb27a', metalDark: '#a8401a', glow: '#ff7a2a' }, desc: 'Čepel rozžhavená do ruda.',
-    en: { name: 'Flame Blade', desc: 'A blade heated red-hot.' } },
-  { id: 'w_led', name: 'Ledová čepel', rarity: 'Epický', price: 140, roles: ['pech', 'kopi', 'tezka'], bonus: { dmg: 0.04 },
-    wpal: { metal: '#d6f2ff', metalDark: '#5a9ac8', glow: '#7fd3ff' }, desc: 'Krystalová ocel z věčného ledu.',
-    en: { name: 'Frost Blade', desc: 'Crystal steel of eternal ice.' } },
-  { id: 'w_stin', name: 'Stínová čepel', rarity: 'Epický', price: 0, czk: 29, roles: ['pech', 'kopi', 'tezka'], bonus: { dmg: 0.05 },
-    wpal: { metal: '#4d4857', metalDark: '#1a161e', glow: '#b25cff' }, desc: 'Černá ocel s fialovou září.',
-    en: { name: 'Shadow Blade', desc: 'Black steel with a violet glow.' } },
-  { id: 'w_zlato', name: 'Zlatá zbraň krále', rarity: 'Legendární', price: 0, czk: 59, roles: ['pech', 'kopi', 'tezka'], bonus: { dmg: 0.07 },
-    wpal: { metal: '#ffe08a', metalDark: '#a47a24', glow: '#ffe28a' }, desc: 'Ryzí zlato a drahokamy v jílci.',
-    en: { name: 'King’s Golden Weapon', desc: 'Pure gold with jewels in the hilt.' } },
-  { id: 'w_hrom', name: 'Hromová zbraň', rarity: 'Legendární', price: 0, czk: 59, roles: ['pech', 'kopi', 'tezka'], bonus: { dmg: 0.07 },
-    wpal: { metal: '#f4f8ff', metalDark: '#7a8ab0', glow: '#fff36a' }, desc: 'Zbraň, ve které hřmí bouře.',
-    en: { name: 'Thunder Weapon', desc: 'A weapon with a storm rumbling inside.' } },
-  { id: 'l_elfi', name: 'Elfí luk', rarity: 'Vzácný', price: 120, roles: ['strelec'], bonus: { dmg: 0.04 },
-    wpal: { wood: '#cfe8a0', metal: '#e6f6d0', metalDark: '#7a9a50', string: '#f4ffe6', glow: '#b8ff8a' }, desc: 'Světlé dřevo a tětiva z vlasů lesní víly.',
-    en: { name: 'Elven Bow', desc: 'Pale wood and a string spun from a forest fairy’s hair.' } },
-  { id: 'l_drak', name: 'Dračí luk', rarity: 'Epický', price: 0, czk: 29, roles: ['strelec'], bonus: { dmg: 0.05 },
-    wpal: { wood: '#7a1a14', metal: '#ff9a5a', metalDark: '#8a2a10', string: '#ffd2a0', glow: '#ff6a2a' }, desc: 'Luk z dračí kosti, šípy hoří.',
-    en: { name: 'Dragon Bow', desc: 'A bow of dragon bone; its arrows burn.' } },
-  { id: 'l_mesic', name: 'Měsíční luk', rarity: 'Legendární', price: 0, czk: 59, roles: ['strelec'], bonus: { dmg: 0.07 },
-    wpal: { wood: '#dfe6ff', metal: '#f4f8ff', metalDark: '#8a9ad0', string: '#ffffff', glow: '#bfd0ff' }, desc: 'Stříbrný luk, který svítí jako úplněk.',
-    en: { name: 'Moon Bow', desc: 'A silver bow that shines like the full moon.' } }
+  { id: 'w_zakladni', name: 'Původní zbraň', rarity: 'Základní', price: 0, cat: 'any', model: null, en: { name: 'Original Weapon' } },
+  /* meče, šavle, katany, sekery, kladiva */
+  WS('w_rytirsky', 'Rytířský meč', 'Základní', { price: 0, gold: 1500 }, 'melee', { id: 'mec', guard: '#c9ced6', pommel: '#c9ced6', grip: '#2a3a6a' }, { dmg: 0.02 }, 'Poctivý široký meč se záštitou a žlábkem.', { name: 'Knight’s Sword', desc: 'An honest broad sword with a crossguard and fuller.' }),
+  WS('w_dlouhy', 'Obouruční meč', 'Vzácný', { price: 0, gold: 3000 }, 'melee', { id: 'dlouhy', guard: '#8a8f99', grip: '#4a2a14' }, { dmg: 0.04 }, 'Dlouhá čepel pro obě ruce.', { name: 'Greatsword', desc: 'A long blade for both hands.' }),
+  WS('w_savle', 'Pouštní šavle', 'Vzácný', { price: 0, gold: 2500 }, 'melee', { id: 'savle', guard: '#e0a83a', grip: '#7a1a14' }, { dmg: 0.04 }, 'Zahnutá čepel, rychlá jako vítr.', { name: 'Desert Sabre', desc: 'A curved blade, quick as the wind.' }),
+  WS('w_katana', 'Katana mistra', 'Vzácný', { price: 120 }, 'melee', { id: 'katana', guard: '#2a2a2a', grip: '#7a1414' }, { dmg: 0.05 }, 'Štíhlá zahnutá čepel s tsubou a omotanou rukojetí.', { name: 'Master’s Katana', desc: 'A slender curved blade with tsuba and wrapped grip.' }),
+  WS('w_sekera', 'Bojová sekera', 'Vzácný', { price: 0, gold: 2800 }, 'melee', { id: 'sekera', wood: '#6b4528', guard: '#8a8f99' }, { dmg: 0.04 }, 'Těžká sekera s půlměsícovým ostřím.', { name: 'Battle Axe', desc: 'A heavy axe with a crescent edge.' }),
+  WS('w_palcat', 'Palcát', 'Vzácný', { price: 0, gold: 3500 }, 'melee', { id: 'palcat', grip: '#3a2414' }, { dmg: 0.05 }, 'Ocelová hlava s břity drtí zbroj.', { name: 'Flanged Mace', desc: 'A flanged steel head that crushes armor.' }),
+  WS('w_dvojsekera', 'Dvojitá sekera', 'Epický', { price: 160 }, 'melee', { id: 'dvojsekera', wood: '#4a2e18', guard: '#c9a06a' }, { dmg: 0.06 }, 'Obouruční sekera se dvěma ostřími.', { name: 'Double Axe', desc: 'A two-handed axe with two blades.' }),
+  WS('w_kladivo', 'Válečné kladivo', 'Epický', { price: 160 }, 'melee', { id: 'kladivo', wood: '#5a3a1e' }, { dmg: 0.06 }, 'Kladivo s bodcem prorazí každou přilbu.', { name: 'War Hammer', desc: 'A spiked hammer that breaks any helm.' }),
+  WS('w_runovy', 'Runový meč', 'Epický', { price: 180 }, 'melee', { id: 'runovy', glow: '#7fc8ff', guard: '#9aa3b0' }, { dmg: 0.06 }, 'Široká čepel s modře zářícími runami.', { name: 'Rune Sword', desc: 'A broad blade with glowing blue runes.' }),
+  WS('w_plamen', 'Plamenný meč', 'Epický', { price: 0, czk: 29 }, 'melee', { id: 'plamen', blade: '#ffd2a0', dark: '#a8401a', edge: '#fff2d8', glow: '#ff7a2a', guard: '#5a1a0a' }, { dmg: 0.06 }, 'Vlnitá čepel flamberku rozžhavená do ruda.', { name: 'Flame Sword', desc: 'A wavy flamberge blade heated red-hot.' }),
+  WS('w_led', 'Ledová čepel', 'Epický', { price: 200 }, 'melee', { id: 'krystal', blade: '#d6f2ff', dark: '#5a9ac8', glow: '#7fd3ff', guard: '#bfe6ff' }, { dmg: 0.06 }, 'Krystalová čepel z věčného ledu.', { name: 'Frost Blade', desc: 'A crystal blade of eternal ice.' }),
+  WS('w_stin', 'Stínová čepel', 'Epický', { price: 0, czk: 29 }, 'melee', { id: 'kostena', blade: '#5a5068', dark: '#1a161e', edge: '#c8b8e8', glow: '#b25cff', guard: '#2a2030' }, { dmg: 0.06 }, 'Zubatá černá čepel s fialovou září.', { name: 'Shadow Blade', desc: 'A jagged black blade with a violet glow.' }),
+  WS('w_hrom', 'Hromová sekera', 'Legendární', { price: 0, czk: 59 }, 'melee', { id: 'dvojsekera', blade: '#f4f8ff', dark: '#7a8ab0', glow: '#fff36a', wood: '#2a3a5a', guard: '#ffe14a' }, { dmg: 0.08 }, 'Dvojitá sekera, ve které hřmí bouře.', { name: 'Thunder Axe', desc: 'A double axe with a storm rumbling inside.' }),
+  WS('w_zlato', 'Meč krále', 'Legendární', { price: 0, czk: 59 }, 'melee', { id: 'kral', guard: '#ffd24a', pommel: '#ffd24a', gem: '#d6243a', grip: '#5a0a14', glow: '#ffe28a' }, { dmg: 0.08 }, 'Zlatá záštita, rubín v jílci a čepel, která nikdy netupí.', { name: 'King’s Sword', desc: 'A golden guard, a ruby in the hilt and a blade that never dulls.' }),
+  WS('w_hvezda', 'Hvězdná čepel', 'Legendární', { price: 0, czk: 99 }, 'melee', { id: 'hvezda', guard: '#cfd8ff', gem: '#7fd3ff', glow: '#bfd0ff' }, { dmg: 0.1, crit: 0.05 }, 'Čepel ukovaná ze spadlé hvězdy.', { name: 'Star Blade', desc: 'A blade forged from a fallen star.' }),
+  /* kopí, trojzubce, halapartny */
+  WS('k_kopi', 'Okřídlené kopí', 'Základní', { price: 0, gold: 1500 }, 'pole', { id: 'kopi', wood: '#7a4c2a' }, { dmg: 0.02 }, 'Široký listovitý hrot.', { name: 'Winged Spear', desc: 'A broad leaf-shaped head.' }),
+  WS('k_trojzubec', 'Trojzubec', 'Vzácný', { price: 150 }, 'pole', { id: 'trojzubec', wood: '#5a3a1e' }, { dmg: 0.05 }, 'Tři hroty drží nepřítele v odstupu.', { name: 'Trident', desc: 'Three prongs keep the enemy at bay.' }),
+  WS('k_morsky', 'Trojzubec moří', 'Epický', { price: 0, czk: 29 }, 'pole', { id: 'trojzubec', blade: '#9fe8e0', dark: '#2a7a8a', glow: '#5adfe0', wood: '#1f4a5a', guard: '#e0c060' }, { dmg: 0.06 }, 'Trojzubec mořského boha, září jako vlny.', { name: 'Sea Trident', desc: 'The sea god’s trident, shining like waves.' }),
+  WS('k_halapartna', 'Halapartna', 'Vzácný', { price: 0, gold: 3000 }, 'pole', { id: 'halapartna', wood: '#6b4528' }, { dmg: 0.05 }, 'Sekera, hrot a hák v jedné zbrani.', { name: 'Halberd', desc: 'Axe, spike and hook in one weapon.' }),
+  WS('k_glefa', 'Glefa', 'Vzácný', { price: 0, gold: 3500 }, 'pole', { id: 'glefa', wood: '#5a3a1e', guard: '#9aa3b0' }, { dmg: 0.05 }, 'Dlouhá zahnutá čepel na násadě.', { name: 'Glaive', desc: 'A long curved blade on a pole.' }),
+  WS('k_naginata', 'Naginata', 'Epický', { price: 150 }, 'pole', { id: 'glefa', wood: '#2a1a1a', guard: '#e8b84a', glow: '#ffd2e0' }, { dmg: 0.06 }, 'Zbraň samurajských mnichů s lakovanou násadou.', { name: 'Naginata', desc: 'The weapon of samurai monks with a lacquered shaft.' }),
+  WS('k_partyzana', 'Partyzána', 'Epický', { price: 140 }, 'pole', { id: 'partyzana', wood: '#4a2e18', guard: '#c9a06a' }, { dmg: 0.06 }, 'Široký hrot s křidélky.', { name: 'Partisan', desc: 'A broad head with side wings.' }),
+  WS('k_drak', 'Dračí kopí', 'Legendární', { price: 0, czk: 59 }, 'pole', { id: 'drak', blade: '#ffb27a', dark: '#8a2a10', glow: '#ff6a2a', wood: '#3a1208', guard: '#e8b84a' }, { dmg: 0.08 }, 'Zubatý hrot z dračího zubu a dračí hlava u násady.', { name: 'Dragon Spear', desc: 'A jagged dragon-tooth head with a dragon’s head at the shaft.' }),
+  WS('k_zlate', 'Zlaté kopí krále', 'Legendární', { price: 0, czk: 59 }, 'pole', { id: 'partyzana', blade: '#ffe08a', dark: '#a47a24', glow: '#ffe28a', wood: '#5a0a14', guard: '#ffd24a', gem: '#d6243a' }, { dmg: 0.08 }, 'Partyzána z ryzího zlata s rubínem.', { name: 'King’s Golden Spear', desc: 'A partisan of pure gold with a ruby.' }),
+  /* luky */
+  WS('l_reflex', 'Reflexní luk', 'Základní', { price: 0, gold: 2200 }, 'bow', { id: 'reflex', wood: '#6b3a1e' }, { dmg: 0.03 }, 'Ramena stočená dopředu – silnější výstřel.', { name: 'Recurve Bow', desc: 'Limbs curved forward – a stronger shot.' }),
+  WS('l_dlouhy', 'Dlouhý luk', 'Vzácný', { price: 0, gold: 2600 }, 'bow', { id: 'dlouhy', wood: '#8a5a32' }, { dmg: 0.04 }, 'Vysoký tisový luk s velkým dostřelem.', { name: 'Longbow', desc: 'A tall yew bow with great range.' }),
+  WS('l_elfi', 'Elfí luk', 'Vzácný', { price: 120 }, 'bow', { id: 'elfi', wood: '#cfe8a0', string: '#f4ffe6', glow: '#b8ff8a' }, { dmg: 0.04 }, 'Světlé dřevo, listy na ramenou a tětiva z vlasů lesní víly.', { name: 'Elven Bow', desc: 'Pale wood, leaves on the limbs and a string of fairy hair.' }),
+  WS('l_kost', 'Kostěný luk', 'Epický', { price: 140 }, 'bow', { id: 'kost', wood: '#e8dcc0', string: '#c9b48a' }, { dmg: 0.05 }, 'Luk z obratlů dávné bestie.', { name: 'Bone Bow', desc: 'A bow made from the vertebrae of an ancient beast.' }),
+  WS('l_drak', 'Dračí luk', 'Epický', { price: 0, czk: 29 }, 'bow', { id: 'draci', wood: '#7a1a14', blade: '#ff9a5a', string: '#ffd2a0', glow: '#ff6a2a', arrow: '#ff9a3c', tip: '#ffd27a' }, { dmg: 0.06 }, 'Luk z dračí kosti s ostny, šípy hoří.', { name: 'Dragon Bow', desc: 'A spiked bow of dragon bone; its arrows burn.' }),
+  WS('l_mesic', 'Měsíční luk', 'Legendární', { price: 0, czk: 59 }, 'bow', { id: 'reflex', wood: '#dfe6ff', string: '#ffffff', glow: '#bfd0ff', gem: '#bfd0ff' }, { dmg: 0.08 }, 'Stříbrný luk, který svítí jako úplněk.', { name: 'Moon Bow', desc: 'A silver bow that shines like the full moon.' }),
+  WS('l_hvezdny', 'Hvězdný luk', 'Legendární', { price: 0, czk: 99 }, 'bow', { id: 'hvezdny', wood: '#2a2f5a', string: '#cfd8ff', glow: '#bfd0ff', gem: '#ffe28a', arrow: '#cfd8ff', tip: '#ffe28a' }, { dmg: 0.1, crit: 0.05 }, 'Luk z nebeské oceli s hvězdnými drahokamy.', { name: 'Star Bow', desc: 'A bow of heavenly steel with star gems.' })
 ];
 GameData.weaponSkinById = id => GameData.weaponSkins.find(w => w.id === id) || GameData.weaponSkins[0];
 GameData.skinFits = (s, unitId) => !s.only || s.only.includes(unitId);
+/* hodí se skin zbraně této jednotce? (podle druhu její zbraně) */
+GameData.weaponSkinFits = (w, unitId) => w.cat === 'any' || (window.Art && Art.weaponCat && Art.weaponCat(GameData.units[unitId].look.weapon) === w.cat);

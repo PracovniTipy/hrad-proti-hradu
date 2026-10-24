@@ -39,7 +39,7 @@ GameData.catapult = {
   maxLevel: 5,
   upgradeCost: lvl => 900 * lvl
 };
-GameData.catapultEl = id => GameData.catapult.elements.find(e => e.id === id) || GameData.catapult.elements[0];
+GameData.catapultEl = id => id === 'kamen' ? { id: 'kamen', name: 'Kámen', color: '#8a7a68', glow: '#d8ccb8' } : (GameData.catapult.elements.find(e => e.id === id) || GameData.catapult.elements[0]);
 
 /* Obrana hráče z uloženého postupu → { slots: [{kind, el}], vez, catLvl } */
 GameData.defenseOf = save => {

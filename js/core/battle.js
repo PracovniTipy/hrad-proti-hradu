@@ -71,7 +71,7 @@
       const es = GameData.calc.enemyStats(opts.difficulty);
       this.side = {
         player: {
-          coins: cfg.startCoins, income: ps.income, maxCoins: ps.maxCoins,
+          coins: ps.startCoins || cfg.startCoins, income: ps.income, maxCoins: Infinity,
           hpMult: ps.unitMult, dmgMult: ps.unitMult,
           castle: { hp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), maxHp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), front: cfg.playerFront, tower: ps.towerDmg, towerTimer: 1 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
@@ -102,6 +102,7 @@
       this.def = opts.player.defense || null;
       this.defShot = []; this.defTimer = [];
       this.clouds = []; this.bolts = [];
+      this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0;
       if (this.def && this.def.slots.length) {
         this.side.player.castle.tower = 0;   // věž nahrazují obránci na hradbách
         this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
@@ -236,6 +237,28 @@
       if ((s.cooldowns[unitId] || 0) > this.time) return { ok: false, why: 'cooldown' };
       return { ok: true };
     }
+    /* ZÁSOBNÍK: hráč může klepnout na vojáka až 50× i bez peněz.
+       Vojáci se pak posílají postupně, jakmile na ně jsou mince. */
+    enqueue(unitId) {
+      this.queue = this.queue || [];
+      if (!this.queue.length && this.spawn('player', unitId)) { if (this.o.onSpawned) this.o.onSpawned(unitId); return 'sent'; }
+      if (this.queueCount(unitId) >= 50) return 'full';
+      this.queue.push(unitId);
+      if (this.o.onQueue) this.o.onQueue();
+      return 'queued';
+    }
+    queueCount(unitId) { return (this.queue || []).filter(x => x === unitId).length; }
+    clearQueue(unitId) { this.queue = (this.queue || []).filter(x => x !== unitId); if (this.o.onQueue) this.o.onQueue(); }
+    _runQueue() {
+      const q = this.queue;
+      if (!q || !q.length) return;
+      // první ve frontě má přednost; když čeká jen na obnovení, může jít další, na kterého jsou peníze
+      for (let i = 0; i < Math.min(q.length, 6); i++) {
+        const id = q[i], chk = this.canSpawn('player', id);
+        if (chk.ok) { this.spawn('player', id); q.splice(i, 1); if (this.o.onSpawned) this.o.onSpawned(id); if (this.o.onQueue) this.o.onQueue(); return; }
+        if (chk.why === 'mince') return;
+      }
+    }
     spawn(team, unitId, free) {
       const chk = free ? { ok: !this.over } : this.canSpawn(team, unitId);
       if (!chk.ok) return false;
@@ -270,7 +293,7 @@
         dmg: def.dmg * s.dmgMult,
         atkTimer: 0.2, atk: -1, atkDur: Math.min(0.55, def.attackInterval * 0.7), hitDone: false,
         walk: this.rand() * 6, moving: true, dead: 0, target: null,
-        pal: this.palCache[key], hurt: 0, born: this.time
+        pal: def.pal ? (this.palCache[key + def.id] || (this.palCache[key + def.id] = Object.assign({}, this.palCache[key], def.pal))) : this.palCache[key], hurt: 0, born: this.time
       };
       if (L) {
         const b = L.bonus;
@@ -297,33 +320,123 @@
       const st = this.abilityState(team, id);
       if (!st.ready) return false;
       const s = this.side[team], a = GameData.abilities[id];
-      const foeTeam = team === 'player' ? 'enemy' : 'player';
-      if (id === 'ohen') {
-        // cíl: nepřítel nejblíže mému hradu, jinak před nepřátelskou bránou
-        const foes = this.units.filter(u => u.team === foeTeam && !u.dead);
-        let tx;
-        if (foes.length) {
-          foes.sort((p, q) => team === 'player' ? p.x - q.x : q.x - p.x);
-          tx = foes[0].x + (team === 'player' ? 40 : -40);
-        } else tx = this.side[foeTeam].castle.front + (team === 'player' ? -60 : 60);
-        s.coins -= a.cost;
-        s.abilityCd[id] = this.time + a.cooldown;
-        for (let i = 0; i < 7; i++) {
-          const ox = (this.rand() - 0.5) * a.radius * 1.6;
-          this.meteors.push({ team, x0: tx + ox - 260, y0: -60 - i * 30, x1: tx + ox, y1: C().laneTop + this.rand() * 60, t: -i * 0.12, dur: 0.75, done: false, dmg: a.damage / 2.6, radius: a.radius * 0.55 });
+      const foeTeam = team === 'player' ? 'enemy' : 'player', dir = team === 'player' ? 1 : -1, cfg = C();
+      const foes = () => this.units.filter(u => u.team === foeTeam && !u.dead);
+      const mine = () => this.units.filter(u => u.team === team && !u.dead);
+      const midY = (cfg.laneTop + cfg.laneBottom) / 2;
+      // cíl: nepřítel nejblíž mému hradu, jinak před nepřátelskou bránou
+      const frontX = () => {
+        const f = foes();
+        if (!f.length) return this.side[foeTeam].castle.front - dir * 60;
+        f.sort((p, q) => dir === 1 ? p.x - q.x : q.x - p.x);
+        return f[0].x + dir * 40;
+      };
+      const say = (txt, color, x) => this.texts.push({ x: x == null ? this.cam.x + this.cam.viewW / 2 : x, y: 380, txt, color, t: 0, life: 1.5, big: true });
+      const near = (x, r) => foes().filter(e => Math.hypot(e.x - x, (e.y - midY) * 0.7) < r);
+      const ring = (x, y, col, r) => this.particles.push({ x, y, vx: 0, vy: 0, g: 0, t: 0, life: 0.5, r: r || 14, ring: true, color: col });
+      const puff = (x, y, col, n, up) => { for (let i = 0; i < n; i++) { const an = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 160; this.particles.push({ x: x + (Math.random() - 0.5) * 40, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - (up || 80), g: 260, t: 0, life: 0.7, r: 2 + Math.random() * 3.5, color: col }); } };
+      s.coins -= a.cost;
+      s.abilityCd[id] = this.time + a.cooldown;
+      const tx = frontX();
+      switch (a.kind) {
+        case 'meteors':
+          for (let i = 0; i < 7; i++) {
+            const ox = (this.rand() - 0.5) * a.radius * 1.6;
+            this.meteors.push({ team, x0: tx + ox - 260 * dir, y0: -60 - i * 30, x1: tx + ox, y1: cfg.laneTop + this.rand() * 60, t: -i * 0.12, dur: 0.75, done: false, dmg: a.power / 2.6, radius: a.radius * 0.55 });
+          }
+          break;
+        case 'meteor':
+          this.meteors.push({ team, x0: tx - 420 * dir, y0: -240, x1: tx + dir * 30, y1: midY, t: 0, dur: 1.15, done: false, dmg: a.power, radius: a.radius, big: true });
+          break;
+        case 'shield': s.shieldUntil = this.time + a.duration; break;
+        case 'element': this._catImpact({ team, tx, ty: midY, dmg: a.power * (team === 'player' ? s.dmgMult : 1), el: a.el, slow: a.slow }); break;
+        case 'volley': {
+          const pool = near(tx, a.radius).concat(foes()).slice(0, 12);
+          const ox = s.castle.front - dir * 40, oy = cfg.groundY - 260;
+          for (let i = 0; i < 24; i++) {
+            const tgt = pool.length ? pool[i % pool.length] : null;
+            const delay = i * 0.05;
+            this.later(delay, () => {
+              if (tgt && !tgt.dead) {
+                this._shoot(team, ox + (Math.random() - 0.5) * 60, oy + (Math.random() - 0.5) * 40, tgt, a.power, 700, null);
+                const pr = this.projectiles[this.projectiles.length - 1];
+                pr.arc = 180; if (a.poison) pr.poison = true;
+              } else {
+                const x = tx + (Math.random() - 0.5) * a.radius * 2;
+                this.projectiles.push({ team, kind: 'arrow', x0: ox, y0: oy, tx: x, ty: midY + (Math.random() - 0.5) * 60, target: null, castle: null, dmg: 0, from: null, t: 0, dur: 0.9, arc: 180, done: false });
+              }
+            });
+          }
+          break;
         }
-        this.texts.push({ x: tx, y: 380, txt: t('fire_rain'), color: '#ffb347', t: 0, life: 1.4, big: true });
-        return true;
+        case 'storm':
+          for (let i = 0; i < 6; i++) this.later(i * 0.5, () => {
+            const f = foes().sort((p, q) => q.hp - p.hp)[Math.floor(Math.random() * 2)];
+            if (!f) return;
+            const pts = [[f.x + (Math.random() - 0.5) * 80, -40]];
+            for (let k = 1; k < 7; k++) pts.push([f.x + (Math.random() - 0.5) * 34, -40 + (f.y - 20) * k / 7]);
+            pts.push([f.x, f.y - 30]);
+            this.bolts.push({ pts, t: 0 }); ring(f.x, f.y - 20, '#fffbe0', 20); puff(f.x, f.y - 20, '#fff6b0', 10);
+            near(f.x, 70).forEach(e => this._damage(e, a.power * (e === f ? 1 : 0.5), null));
+          });
+          break;
+        case 'heal':
+          mine().forEach(u => { u.hp = Math.min(u.maxHp, u.hp + u.maxHp * a.power); puff(u.x, u.y - 40, '#9dffb0', 4, 120); });
+          break;
+        case 'buff': s.hornUntil = this.time + a.duration; mine().forEach(u => puff(u.x, u.y - 50, '#ffd77a', 3, 120)); break;
+        case 'curse': this.side[foeTeam].curseUntil = this.time + a.duration; foes().forEach(u => puff(u.x, u.y - 60, '#c07cff', 4, 60)); break;
+        case 'stun':
+          near(tx, a.radius).forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? a.duration * 0.4 : a.duration); e.frozen = a.icon === 'snow' || a.icon === 'icespike'; });
+          ring(tx, midY, '#cfeeff', 30); puff(tx, midY, '#e6f8ff', 26);
+          for (let i = 0; i < 9; i++) this.spikes.push({ x: tx + (i - 4) * a.radius / 4.5, y: midY + (Math.random() - 0.5) * 70, t: 0, life: a.duration + 0.4, h: 30 + Math.random() * 30 });
+          break;
+        case 'quake':
+          this.shake = 0.9;
+          foes().forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? 0.5 : a.duration); puff(e.x, e.y, '#a08060', 5, 40); });
+          break;
+        case 'summon': {
+          const uid = GameData.unitForRole(s.faction, a.role);
+          for (let i = 0; i < a.count; i++) this.later(i * 0.35, () => this.spawn(team, uid, true));
+          break;
+        }
+        case 'repair': s.castle.hp = Math.min(s.castle.maxHp, s.castle.hp + s.castle.maxHp * a.power); puff(s.castle.front - dir * 80, cfg.groundY - 140, '#ffe9a0', 20, 60); break;
+        case 'gold': s.coins += a.power; puff(s.castle.front - dir * 60, cfg.groundY - 200, '#ffd24a', 24, 140); break;
+        case 'firearrows': s.fireArrowsUntil = this.time + a.duration; break;
+        case 'barrage': {
+          const f = foes().sort((p, q) => dir === 1 ? p.x - q.x : q.x - p.x).slice(0, 5);
+          const ox = s.castle.front - dir * 120, oy = cfg.groundY - 220;
+          for (let i = 0; i < 5; i++) this.later(i * 0.3, () => {
+            const g = f[i] && !f[i].dead ? f[i] : null, x = g ? g.x : tx + dir * i * 50, y = g ? g.y : midY;
+            const dist = Math.abs(x - ox);
+            this.projectiles.push({ team, kind: 'cat', el: 'kamen', x0: ox, y0: oy, tx: x, ty: y, target: null, castle: null, dmg: a.power, from: null, t: 0, dur: Math.max(0.7, dist / 520), arc: Math.min(240, dist * 0.35), done: false });
+          });
+          break;
+        }
+        case 'wall': this.walls.push({ team, x: tx - dir * 30, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
+        case 'tornado': this.tornados.push({ team, x: s.castle.front + dir * 120, y: midY, vx: dir * 320, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
+        case 'holy':
+          this.beams.push({ x: tx, t: 0, life: 1.1, color: '#fff3b0' });
+          near(tx, a.radius).forEach(e => this._damage(e, a.power, null));
+          mine().filter(u => Math.abs(u.x - tx) < a.radius * 1.4).forEach(u => { u.hp = Math.min(u.maxHp, u.hp + u.maxHp * 0.3); });
+          puff(tx, midY, '#fff6c4', 24, 120);
+          break;
+        case 'breath': {
+          const lim = (this.side.player.castle.front + this.side.enemy.castle.front) / 2;
+          const sx = s.castle.front - dir * 30, sy = cfg.groundY - 300;
+          for (let i = 0; i < 70; i++) this.later(i * 0.012, () => {
+            const sp = 600 + Math.random() * 500, an = (Math.random() * 0.35 + 0.05);
+            this.particles.push({ x: sx, y: sy, vx: dir * Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 120, t: 0, life: 1.1, r: 5 + Math.random() * 7, color: Math.random() < 0.5 ? '#ff7a2a' : '#ffd27a' });
+          });
+          this.later(0.45, () => foes().filter(e => (e.x - lim) * dir < 0).forEach(e => { this._damage(e, a.power, null, true); e.dot = { until: this.time + 3, dps: a.power * 0.15, c: 'rgba(255,120,40,.45)' }; }));
+          break;
+        }
       }
-      if (id === 'stit') {
-        s.coins -= a.cost;
-        s.abilityCd[id] = this.time + a.cooldown;
-        s.shieldUntil = this.time + a.duration;
-        this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: 380, txt: t('shield_faith'), color: '#9fd4ff', t: 0, life: 1.4, big: true });
-        return true;
-      }
-      return false;
+      say(a.name, a.color === '#0b0907' ? '#fff' : '#fff1c4', a.kind === 'meteors' || a.kind === 'element' || a.kind === 'stun' || a.kind === 'holy' ? tx : null);
+      if (team === 'player' && this.o.onSkill) this.o.onSkill(a);
+      return true;
     }
+    /* spustí akci se zpožděním (v čase bitvy) */
+    later(sec, fn) { this.timers.push({ at: this.time + sec, fn }); }
 
     /* Rozkaz pro armádu: 'utok' | 'formace' | 'ustup' */
     setFormation(team, mode, flagX) {
@@ -526,6 +639,12 @@
         const s = this.side[team];
         s.coins = Math.min(s.maxCoins, s.coins + s.income * dt);
       }
+      this._runQueue();
+      if (this.timers.length) {
+        const due = this.timers.filter(x => x.at <= this.time);
+        if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
+      }
+      this._updateSkillFx(dt);
       this._ai(dt);
       this._autoPlayer(dt);
       this._updateDefense(dt);
@@ -548,8 +667,9 @@
           u.dotTick = (u.dotTick || 0) - dt;
           if (u.dotTick <= 0) { u.dotTick = 0.5; this._damage(u, u.dot.dps * 0.5, null, true); if (u.dead) continue; }
         }
-        const slowK = u.slowUntil > this.time ? 0.5 : 1;
+        const slowK = (u.slowUntil > this.time ? 0.5 : 1) * ((this.side[u.team].hornUntil || 0) > this.time ? 1.3 : 1);
         if (u === this.hero) { this._updateHero(u, dt); continue; }
+        if (u.stunUntil > this.time) { u.moving = false; continue; }
         const foeTeam = u.team === 'player' ? 'enemy' : 'player';
         const reach = u.def.range * (C().rangeScale || 1) + 18;
         // najdi nejbližšího nepřítele před sebou
@@ -645,7 +765,11 @@
             const second = this.units.find(e => e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 70);
             if (second) this._damage(second, p.dmg * 0.6, null);
           }
-          if (p.target && !p.target.dead) this._damage(p.target, p.dmg, p.from, p.kind === 'fire');
+          if (p.target && !p.target.dead) {
+            this._damage(p.target, p.dmg, p.from, p.kind === 'fire' || p.burn);
+            if (p.burn && !p.target.dead) p.target.dot = { until: this.time + 3, dps: Math.max(6, p.dmg * 0.3), c: 'rgba(255,120,40,.45)' };
+            if (p.poison && !p.target.dead) p.target.dot = { until: this.time + 4, dps: Math.max(6, p.dmg * 0.35), c: 'rgba(120,220,80,.45)' };
+          }
           else if (p.castle) this._damageCastle(p.castle, p.dmg);
         }
       }
@@ -686,6 +810,93 @@
         vx: r(a.vx[0], a.vx[1]), vy: r(a.vy[0], a.vy[1]), s: r(a.size[0], a.size[1]),
         c: a.color[Math.floor(Math.random() * a.color.length)], rot: Math.random() * 6, ph: Math.random() * 6, petal: a.petal
       };
+    }
+
+    /* ohnivé zdi, vichřice, paprsky a ledová kopí ze speciálních útoků */
+    _updateSkillFx(dt) {
+      const t = this.time;
+      // jedovaté mraky
+      for (const c of this.clouds) {
+        c.tick -= dt;
+        if (c.tick <= 0) { c.tick = 0.5; for (const e of this.units) if (e.team !== (c.team || 'player') && !e.dead && Math.abs(e.x - c.x) < c.r) this._damage(e, c.dps * 0.5, null); }
+      }
+      this.clouds = this.clouds.filter(c => c.until > this.time);
+      for (const b of this.bolts) b.t += dt;
+      this.bolts = this.bolts.filter(b => b.t < 0.35);
+      for (const w of this.walls) {
+        w.tick -= dt;
+        if (w.tick <= 0) {
+          w.tick = 0.4;
+          for (const e of this.units) if (e.team !== w.team && !e.dead && Math.abs(e.x - w.x) < 46) { this._damage(e, w.dps * 0.4, null, true); e.dot = { until: t + 2, dps: w.dps * 0.25, c: 'rgba(255,120,40,.45)' }; }
+        }
+      }
+      this.walls = this.walls.filter(w => w.until > t);
+      for (const o of this.tornados) {
+        o.x += o.vx * dt; o.tick -= dt;
+        for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 60 && !e.def.boss) { e.x += o.vx * 0.55 * dt; e.slotX = null; }
+        if (o.tick <= 0) { o.tick = 0.3; for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 70) this._damage(e, o.dps * 0.3, null); }
+      }
+      this.tornados = this.tornados.filter(o => o.until > t && o.x > 0 && o.x < this.W);
+      for (const b of this.beams) b.t += dt;
+      this.beams = this.beams.filter(b => b.t < b.life);
+      for (const k of this.spikes) k.t += dt;
+      this.spikes = this.spikes.filter(k => k.t < k.life);
+      if (this.shake > 0) this.shake = Math.max(0, this.shake - dt);
+    }
+    /* klece s rukojmími u nepřátelské pevnosti; po vítězství se otevřou */
+    _drawCages(ctx, t) {
+      const cfg = C(), n = Math.min(3, Math.ceil(this.o.hostages / 2)), E = this.side.enemy;
+      const freed = this.over && E.castle.hp <= 0;
+      this._hpal = this._hpal || Art.unitPalette('player', 'zakladni', 'kralovstvi');
+      for (let i = 0; i < n; i++) {
+        const x = E.castle.front - 120 - i * 64, y = cfg.laneTop - 6;
+        const prisoner = GameData.units.pesak;
+        const run = freed ? Math.min(400, (this.time - (this._freeAt || (this._freeAt = this.time))) * 160) : 0;
+        Art.drawUnit(ctx, prisoner, this._hpal, { x: x - run, y: y - 4, facing: freed ? -1 : (Math.sin(t * 2 + i) > 0 ? 1 : -1), t, moving: freed, walk: t * 9, scaleMul: 0.62, noShadow: true });
+        if (!freed) {
+          ctx.save();
+          ctx.fillStyle = '#4a2e16'; ctx.fillRect(x - 26, y - 70, 52, 7); ctx.fillRect(x - 26, y - 2, 52, 7);
+          ctx.strokeStyle = '#2a1a0c'; ctx.lineWidth = 4;
+          for (let k = 0; k < 6; k++) { ctx.beginPath(); ctx.moveTo(x - 24 + k * 9.6, y - 66); ctx.lineTo(x - 24 + k * 9.6, y); ctx.stroke(); }
+          ctx.fillStyle = '#8a8a8a'; ctx.beginPath(); ctx.arc(x, y - 36, 4, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+    _drawSkillFx(ctx, t) {
+      const cfg = C();
+      for (const w of this.walls) {
+        const a = Math.min(1, (w.until - t) / 0.5);
+        for (let i = 0; i < 9; i++) {
+          const y = cfg.laneTop + i * (cfg.laneBottom - cfg.laneTop) / 8, fl = 110 + Math.sin(t * 9 + i * 1.7) * 30;
+          const g = ctx.createLinearGradient(0, y - fl, 0, y);
+          g.addColorStop(0, 'rgba(255,220,120,0)'); g.addColorStop(0.5, `rgba(255,140,40,${0.8 * a})`); g.addColorStop(1, `rgba(200,40,10,${0.9 * a})`);
+          ctx.beginPath(); ctx.moveTo(w.x - 34, y); ctx.quadraticCurveTo(w.x - 24, y - fl * 0.6, w.x + Math.sin(t * 7 + i) * 6, y - fl); ctx.quadraticCurveTo(w.x + 24, y - fl * 0.6, w.x + 34, y); ctx.closePath();
+          ctx.fillStyle = g; ctx.fill();
+        }
+      }
+      for (const o of this.tornados) {
+        ctx.save(); ctx.globalAlpha = 0.75;
+        for (let k = 0; k < 9; k++) {
+          const yy = o.y + 10 - k * 30, r = 16 + k * 9, ph = t * 12 + k;
+          ctx.beginPath(); ctx.ellipse(o.x + Math.sin(ph * 0.5) * k * 2, yy, r, 6 + k * 0.6, 0, 0, Math.PI * 2);
+          ctx.lineWidth = 4; ctx.strokeStyle = k % 2 ? 'rgba(200,220,235,.8)' : 'rgba(150,175,195,.8)'; ctx.stroke();
+        }
+        ctx.restore();
+      }
+      for (const b of this.beams) {
+        const a = Math.sin(Math.min(1, b.t / b.life) * Math.PI);
+        const g = ctx.createLinearGradient(b.x - 70, 0, b.x + 70, 0);
+        g.addColorStop(0, 'rgba(255,240,180,0)'); g.addColorStop(0.5, `rgba(255,248,210,${0.85 * a})`); g.addColorStop(1, 'rgba(255,240,180,0)');
+        ctx.fillStyle = g; ctx.fillRect(b.x - 70, 0, 140, cfg.laneBottom + 20);
+      }
+      for (const k of this.spikes) {
+        const grow = Math.min(1, k.t / 0.15), fade = Math.min(1, (k.life - k.t) / 0.3), h = k.h * grow;
+        ctx.save(); ctx.globalAlpha = fade;
+        ctx.beginPath(); ctx.moveTo(k.x - 9, k.y); ctx.lineTo(k.x, k.y - h); ctx.lineTo(k.x + 9, k.y); ctx.closePath();
+        const g = ctx.createLinearGradient(k.x, k.y - h, k.x, k.y); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#6ac0f0');
+        Art.fs(ctx, g, 1.8); ctx.restore();
+      }
     }
 
     _updateFx(dt) {
@@ -760,7 +971,8 @@
       else { tx = castle.front + (team === 'player' ? 30 : -30); ty = cfg.groundY - 120 - this.rand() * 80; }
       const dist = Math.hypot(tx - ox, ty - oy);
       const kind = from && from.def && from.def.projectile === 'fire' ? 'fire' : 'arrow';
-      this.projectiles.push({ team, kind, x0: ox, y0: oy, tx, ty, target, castle: target ? null : castle, dmg, from, t: 0, dur: Math.max(0.25, dist / speed), arc: kind === 'fire' ? Math.min(50, dist * 0.12) : Math.min(90, dist * 0.22), done: false });
+      const burn = (this.side[team].fireArrowsUntil || 0) > this.time;
+      this.projectiles.push({ burn, team, kind, x0: ox, y0: oy, tx, ty, target, castle: target ? null : castle, dmg, from, t: 0, dur: Math.max(0.25, dist / speed), arc: kind === 'fire' ? Math.min(50, dist * 0.12) : Math.min(90, dist * 0.22), done: false });
     }
 
     _damage(target, raw, from, fire) {
@@ -778,6 +990,8 @@
         }
       }
       if (s.shieldUntil > this.time) dmg *= 1 - GameData.abilities.stit.reduction;
+      if ((s.curseUntil || 0) > this.time) dmg *= 1.5;
+      if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
       target.hp -= dmg;
       target.hurt = 0.15;
       this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
@@ -904,14 +1118,6 @@
           if (sl.kind === 'kuse') this.projectiles[this.projectiles.length - 1].pierce = true;
         }
       });
-      // jedovaté mraky
-      for (const c of this.clouds) {
-        c.tick -= dt;
-        if (c.tick <= 0) { c.tick = 0.5; for (const e of this.units) if (e.team === 'enemy' && !e.dead && Math.abs(e.x - c.x) < c.r) this._damage(e, c.dps * 0.5, null); }
-      }
-      this.clouds = this.clouds.filter(c => c.until > this.time);
-      for (const b of this.bolts) b.t += dt;
-      this.bolts = this.bolts.filter(b => b.t < 0.35);
     }
     _catImpact(p) {
       const t = this.time, x = p.tx, y = p.ty, dmg = p.dmg;
@@ -922,7 +1128,9 @@
       if (p.el === 'ohen') {
         burst(20, '#ff9a3c'); near(95).forEach(e => { this._damage(e, dmg, null, true); e.dot = { until: t + 3, dps: dmg * 0.18, c: 'rgba(255,120,40,.45)' }; });
       } else if (p.el === 'led') {
-        burst(18, '#cfeeff'); near(95).forEach(e => { this._damage(e, dmg * 0.8, null); e.slowUntil = t + 2.5; });
+        burst(18, '#cfeeff'); near(p.slow ? 140 : 95).forEach(e => { this._damage(e, dmg * 0.8, null); e.slowUntil = t + (p.slow || 2.5); });
+      } else if (p.el === 'kamen') {
+        burst(18, '#a08a6a'); near(100).forEach(e => this._damage(e, dmg, null));
       } else if (p.el === 'blesk') {
         burst(12, '#fffbe0');
         let cur = near(110).sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
@@ -943,7 +1151,7 @@
         burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = Math.min(C().enemyFront - 20, e.x + 70); e.slotX = null; } });
       } else if (p.el === 'jed') {
         burst(10, '#9be07a'); near(90).forEach(e => this._damage(e, dmg * 0.5, null));
-        this.clouds.push({ x, y, r: 105, until: t + 4, dps: dmg * 0.3, tick: 0.2 });
+        this.clouds.push({ team: p.team, x, y, r: 105, until: t + (p.team === 'player' && !p.from ? 5 : 4), dps: dmg * 0.3, tick: 0.2 });
       }
     }
 
@@ -998,7 +1206,8 @@
       ctx.setTransform(sc, 0, 0, sc, -(this.cam.x - par) * sc, -viewTop * sc);
       ctx.drawImage(this.layers.far, 0, 0, this.W, this.H);
       Art.drawClouds(ctx, this.layers.clouds, (this._rt || 0), this.W);
-      ctx.setTransform(sc, 0, 0, sc, -this.cam.x * sc, -viewTop * sc);
+      const shk = this.shake > 0 ? (Math.random() - 0.5) * 14 * this.shake : 0;
+      ctx.setTransform(sc, 0, 0, sc, (-this.cam.x + shk) * sc, (-viewTop + shk * 0.6) * sc);
       ctx.drawImage(this.layers.near, 0, 0, this.W, this.H);
 
       const t = this.time;
@@ -1041,6 +1250,8 @@
         ctx.restore();
       }
 
+      this._drawSkillFx(ctx, t);
+      if (this.o.hostages) this._drawCages(ctx, t);
       // jednotky seřazené podle hloubky
       const list = this.units.slice().sort((a, b) => a.y - b.y);
       for (const u of list) {
@@ -1089,8 +1300,9 @@
         g.addColorStop(0, 'rgba(255,120,40,0)'); g.addColorStop(1, 'rgba(255,170,60,.85)');
         ctx.beginPath(); ctx.moveTo(x - 80, y - 110); ctx.lineTo(x - 6, y - 8); ctx.lineTo(x + 6, y + 4); ctx.closePath();
         ctx.lineWidth = 12; ctx.strokeStyle = g; ctx.stroke();
-        ctx.beginPath(); ctx.arc(x, y, 11, 0, Math.PI * 2);
-        const rg = ctx.createRadialGradient(x - 3, y - 3, 2, x, y, 12);
+        const mr = m.big ? 34 : 11;
+        ctx.beginPath(); ctx.arc(x, y, mr, 0, Math.PI * 2);
+        const rg = ctx.createRadialGradient(x - mr * 0.3, y - mr * 0.3, 2, x, y, mr + 1);
         rg.addColorStop(0, '#fff4c2'); rg.addColorStop(0.5, '#ffb347'); rg.addColorStop(1, '#e2531c');
         Art.fs(ctx, rg, 2);
       }
@@ -1184,10 +1396,12 @@
       else { frame = 'i'; st = {}; }
       const palKey = u.team + (u.pal.__k || (u.pal.__k = Math.random().toString(36).slice(2)));
       const e = this.sprites.get(u.drawDef || u.def, u.pal, palKey, frame, st, US());
-      if (!u.dead && (u.slowUntil > this.time || (u.dot && this.time < u.dot.until))) {
-        const icy = u.slowUntil > this.time;
+      const stunned = !u.dead && u.stunUntil > this.time;
+      if (!u.dead && (u.slowUntil > this.time || stunned || (u.dot && this.time < u.dot.until))) {
+        const icy = u.slowUntil > this.time || (stunned && u.frozen);
+        if (stunned && !u.frozen) for (let k = 0; k < 3; k++) { const an = this.time * 5 + k * 2.1; ctx.beginPath(); ctx.arc(u.x + Math.cos(an) * 14, u.y - 96 * US() + Math.sin(an) * 4, 3, 0, Math.PI * 2); ctx.fillStyle = '#ffe14a'; ctx.fill(); }
         ctx.beginPath(); ctx.ellipse(u.x, u.y - 2, 22 * US(), 7 * US(), 0, 0, Math.PI * 2);
-        ctx.fillStyle = icy ? 'rgba(127,211,255,.45)' : (u.dot.c || 'rgba(255,140,60,.45)'); ctx.fill();
+        ctx.fillStyle = icy ? 'rgba(127,211,255,.55)' : (u.dot && this.time < u.dot.until ? (u.dot.c || 'rgba(255,140,60,.45)') : 'rgba(255,225,74,.35)'); ctx.fill();
       }
       const f = u.face || u.dir;
       if (shield && !u.dead) {
