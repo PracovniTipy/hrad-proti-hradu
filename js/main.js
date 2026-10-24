@@ -1,0 +1,533 @@
+/* =========================================================================
+   APLIKACE – navigace mezi obrazovkami, spuštění bitev a odměny
+   ========================================================================= */
+(function () {
+  const $ = s => document.querySelector(s);
+  const { fmt, esc, stars, isUnitUnlocked } = Screens;
+
+  const App = {
+    save: Save.load(),
+    screenEl: $('#screen'),
+    current: 'hrad',
+    battle: null,
+    onResize: null,
+
+    persist() { Save.save(); this.refreshTop(); },
+
+    refreshTop() {
+      const s = this.save;
+      $('#pName').textContent = s.name;
+      $('#pTrophies').textContent = fmt(s.trophies);
+      $('#rGold').textContent = fmt(s.gold);
+      $('#rGems').textContent = fmt(s.gems);
+      Art.renderUnitIcon($('#avatarCv'), s.avatar, 'player', s.skins.unit[s.avatar], { headshot: true, noShadow: true });
+    },
+
+    go(name, opts = {}) {
+      const scroll = this.screenEl.scrollTop;
+      this.current = name;
+      this.onResize = null;
+      cancelAnimationFrame(this.previewRaf);
+      if (this._stopLive) { this._stopLive(); this._stopLive = null; }
+      if (name === 'skiny') name = 'obchod';
+      const navName = name === 'stavitel' ? 'hrad' : name;
+      document.querySelectorAll('#nav [data-go]').forEach(b => {
+        if (b.dataset.go === navName) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      });
+      Screens[name](this, opts);
+      applyIcons(this.screenEl);
+      // tutoriály při první návštěvě
+      const tut = this.save.tut || (this.save.tut = {});
+      if (this.save.lang && !Tutorial.active) {
+        if (name === 'hrad' && !tut.home) { tut.home = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.HOME), 600); }
+        if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
+      }
+      this.screenEl.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
+      this.screenEl.scrollTop = opts.keepScroll ? scroll : 0;
+      if (location.hash.slice(1) !== name) { try { history.replaceState(null, '', '#' + name); } catch (e) { /* nic */ } }
+    },
+
+    toast(msg) {
+      const t = $('#toast');
+      t.textContent = msg; t.hidden = false;
+      clearTimeout(this._tt);
+      this._tt = setTimeout(() => (t.hidden = true), 2200);
+    },
+
+    modal(html, onMount) {
+      const m = $('#modal'), c = $('#modalCard');
+      c.innerHTML = html;
+      applyIcons(c);
+      m.hidden = false;
+      const close = () => { m.hidden = true; c.innerHTML = ''; };
+      c.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+      if (onMount) onMount(c, close);
+      const first = c.querySelector('.btn:not([disabled])');
+      if (first) first.focus();
+      return close;
+    },
+
+    /* ---------------- KAMPAŇ ---------------- */
+    /* Přepnutí národa (při prvním výběru se ukáže prolog) */
+    setFaction(f, opts = {}) {
+      const s = this.save;
+      if (!GameData.factions[f] || GameData.factions[f].enemyOnly) return;
+      if (!GameData.campaignHelpers.factionUnlocked(s, f)) { this.toast(t('t_nation_locked')); return; }
+      const changed = s.faction !== f;
+      s.faction = f;
+      if (!GameData.factionUnits(f).includes(s.avatar)) s.avatar = GameData.factions[f].roles.tezka;
+      this.persist();
+      if (changed && !opts.silent) this.toast(t('t_playing', { name: GameData.factions[f].name }));
+      if (opts.go) this.go(opts.go, { keepScroll: true });
+    },
+
+    /* Příběhová scéna (jen poprvé, pokud force není true) */
+    playScene(id, onDone, force) {
+      const seen = this.save.seenScenes || (this.save.seenScenes = {});
+      if (!force && seen[id]) { if (onDone) onDone(); return; }
+      seen[id] = true; Save.save();
+      Story.play(id, onDone);
+    },
+
+    /* Malá scéna národa: bojiště, hrad a těžká jednotka */
+    _paintFactionScene(cv, f) {
+      const F = GameData.factions[f];
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = cv.clientWidth, h = cv.clientHeight;
+      cv.width = w * dpr; cv.height = h * dpr;
+      const ctx = cv.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const W = 900, Hh = 600;
+      const off = document.createElement('canvas'); off.width = W; off.height = Hh;
+      Art.drawBattleBackground(off.getContext('2d'), W, Hh, 9, F.theme);
+      const sc = Math.max(w / 560, h / 260);
+      ctx.drawImage(off, 0, 300, 560, 260, 0, 0, 560 * sc, 260 * sc);
+      ctx.save(); ctx.scale(sc * 0.62, sc * 0.62);
+      const img = Art.castleImage('player', this.save.skins.castle, GameData.calc.castleLevel(this.save), 2, F.castleStyle, Object.assign(Screens.castleCfg(this.save), { emblem: (this.save.castleCfg || {}).emblem || GameData.defaultEmblem[f] }));
+      Art.drawCastle(ctx, img, 300, h / (sc * 0.62) - 6, 1, 0, 1, F.color);
+      ctx.restore();
+      const units = F.units;
+      units.forEach((id, i) => {
+        ctx.save(); ctx.translate(w * (0.56 + i * 0.11), h - 10); const k = h / 120; ctx.scale(k, k);
+        Art.drawUnit(ctx, GameData.units[id], Art.unitPalette('player', this.save.skins.unit[id], f), { x: 0, y: 0, facing: 1, t: 0, ring: true });
+        ctx.restore();
+      });
+    },
+
+    openLevel(id) {
+      const H = GameData.campaignHelpers;
+      const lv = H.find(id);
+      if (!lv) return;
+      const ch = H.chapters(lv.act).find(c => c.id === lv.chapter);
+      const act = H.act(lv.act);
+      if (!H.isUnlocked(this.save, id)) { this.toast(t('t_prev_first')); return; }
+      // první úroveň aktu: nejdřív příběhová scéna
+      if (H.isFirstOfAct(id) && !(this.save.seenScenes || {})[act.scene]) { this.playScene(act.scene, () => this.openLevel(id)); return; }
+      if (lv.faction !== 'spojenectvi' && this.save.faction !== lv.faction) this.setFaction(lv.faction, { silent: true });
+      const EF = GameData.factions[lv.enemy];
+      lv.enemyUnits = lv.roles.map(r => GameData.unitForRole(lv.enemy, r));
+      if (lv.mix) lv.enemyUnits = lv.enemyUnits.concat(lv.mix.roles.map(r => GameData.unitForRole(lv.mix.faction, r)));
+      const cleared = !!this.save.campaign.cleared[id];
+      const gold = cleared ? Math.round(lv.reward.gold * 0.25) : lv.reward.gold;
+      const gems = cleared ? 0 : lv.reward.gems;
+      const allyF = lv.alliance ? GameData.factionOrder : [lv.faction];
+      this.modal(`
+        <div class="eyebrow">${t('act_n', { n: act.n })} · ${t('chapter', { n: ch.id })} · ${esc(ch.name)}</div>
+        <h2>${lv.label} ${esc(lv.name)}${lv.boss ? ' <span class="tag tag-demo">Boss</span>' : ''}</h2>
+        <p class="muted" style="margin:0">${esc(lv.story)}</p>
+        ${lv.alliance ? `<div class="ally-note">${GameData.factionOrder.map(f => `<span class="ally-chip" style="--c:${GameData.factions[f].color}">${esc(GameData.factions[f].name)}</span>`).join('')}<small>${t('alliance_note')}</small></div>` : ''}
+        <dl class="kv">
+          <dt>${t('difficulty')}</dt><dd><span class="stars">${stars(lv.diff)}</span> ×${lv.diff.toFixed(2).replace('.', ',')}</dd>
+          <dt>${t('reward')}</dt><dd>${ico('coin')} ${fmt(gold)}${gems ? ` · ${ico('gem')} ${gems}` : ''}${cleared ? ' ' + t('replay_tag') : ''}</dd>
+          <dt>${t('you_play')}</dt><dd>${allyF.map(f => esc(GameData.factions[f].name)).join(' + ')}</dd>
+          <dt>${t('enemy')}</dt><dd>${esc(EF.name)}${lv.mix ? ' + ' + esc(GameData.factions[lv.mix.faction].name) : ''}</dd>
+          <dt>${t('status')}</dt><dd>${cleared ? t('cleared') : t('not_cleared')}</dd>
+        </dl>
+        <div><div class="eyebrow" style="margin-bottom:6px">${t('enemy_units')}</div><div class="enemy-icons">${lv.enemyUnits.concat(lv.boss === 'demonkral' ? ['demonkral'] : []).map(u => `<canvas data-eu="${u}" title="${GameData.units[u].name}"></canvas>`).join('')}</div></div>
+        <div class="modal-actions">
+          <button class="btn btn-green btn-big" id="goFight">${t('to_battle')}</button>
+          <button class="btn" data-close>${t('back')}</button>
+        </div>`, (c, close) => {
+        c.querySelectorAll('canvas[data-eu]').forEach(cv => Art.renderUnitIcon(cv, cv.dataset.eu, 'enemy', GameData.units[cv.dataset.eu].faction === lv.enemy ? (lv.unitSkin || 'zakladni') : 'zakladni', { zoom: GameData.units[cv.dataset.eu].boss ? 0.55 : 1 }));
+        c.querySelector('#goFight').addEventListener('click', () => {
+          close();
+          const go = () => this.startBattle({
+            mode: 'campaign', title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
+            enemyFaction: lv.enemy, theme: lv.theme || EF.theme,
+            enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
+            alliance: !!lv.alliance, playFaction: lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
+            ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: GameData.battleConfig.worldW + 640 } } : {}),
+            level: lv
+          });
+          if (lv.boss === 'demonkral') this.playScene('finale', go); else go();
+        });
+      });
+    },
+
+    startTraining() {
+      const f = this.save.faction, F = GameData.factions[f];
+      this.startBattle({
+        mode: 'training', title: t('training'), difficulty: 0.8, enemyUnits: ['pech', 'strelec', 'tezka'].map(r => F.roles[r]),
+        enemyFaction: f, theme: F.theme,
+        enemyName: t('training'), enemyCastleSkin: 'kralovsky', enemyUnitSkin: 'zakladni', enemyCastleLevel: 2
+      });
+    },
+
+    /* ---------------- PVP ---------------- */
+    startPvp(oppId) {
+      const R = GameData.pvpRules, P = GameData.pvpHelpers;
+      const o = P.byId(oppId);
+      const hist = this.save.pvp.attacks[oppId] || [];
+      if (hist.length >= R.maxAttacks) return;
+      const i = hist.length;
+      this.startBattle({
+        mode: 'pvp', title: `${o.name} · ${i + 1}. boj`, difficulty: P.difficulty(o, i),
+        enemyUnits: GameData.factionUnits(o.faction), enemyName: o.name,
+        enemyFaction: o.faction, theme: GameData.factions[o.faction].theme,
+        enemyCastleSkin: o.castleSkin, enemyUnitSkin: o.unitSkin, enemyCastleLevel: o.castleLevel,
+        opp: o, attackIndex: i
+      });
+    },
+
+    /* ---------------- BITVA ---------------- */
+    startBattle(cfg) {
+      const save = this.save;
+      if (this._stopLive) { this._stopLive(); this._stopLive = null; }
+      cancelAnimationFrame(this.previewRaf);
+      $('#app').hidden = true;
+      const B = $('#battle');
+      B.hidden = false;
+      $('#foeName').textContent = cfg.enemyName || t('enemy');
+      $('#bBanner').innerHTML = cfg.mode === 'pvp'
+        ? `<span class="tag tag-demo">${t('bot')}</span>${esc(cfg.title)} · ${t('diff_' + cfg.attackIndex)}`
+        : esc(cfg.title);
+      $('#bPauseMenu').hidden = true;
+
+      // tlačítka jednotek – po národech, každý národ má svůj přepínač AUTO
+      const facs = cfg.alliance ? GameData.factionOrder.slice() : [cfg.playFaction && cfg.playFaction !== 'spojenectvi' ? cfg.playFaction : save.faction];
+      const groups = facs.map(f => ({ f, units: GameData.factionUnits(f).filter(id => isUnitUnlocked(save, GameData.units[id])) }));
+      const units = groups.flatMap(g => g.units);
+      let k = 0;
+      const autoPref = save.settings.auto || (save.settings.auto = {});
+      $('#bUnits').classList.toggle('ally', facs.length > 1);
+      document.querySelector('#battle .b-bar').classList.toggle('ally', facs.length > 1);
+      $('#bUnits').innerHTML = groups.map(g => {
+        const F = GameData.factions[g.f];
+        return `<div class="ugrp" style="--c:${F.color}" data-grp="${g.f}">
+          <div class="ugrp-h"><b>${esc(F.name)}</b>
+            <button class="auto-tg" data-auto="${g.f}" aria-pressed="false" aria-label="${t('auto_for', { name: esc(F.name) })}"><i></i><span>AUTO</span></button></div>
+          <div class="ugrp-b">${g.units.map(id => `
+            <button class="ubtn" data-spawn="${id}" aria-label="${esc(GameData.units[id].name)} · ${GameData.units[id].cost}">
+              <canvas></canvas><span class="key">${++k <= 9 ? k : ''}</span><i class="cd" style="height:0"></i>
+              <span class="cost">${ico('coin')}${GameData.units[id].cost}</span>
+            </button>`).join('')}</div>
+        </div>`;
+      }).join('');
+      $('#bAbil').innerHTML = Object.values(GameData.abilities).map((a, i) => `
+        <button class="abtn ${a.id === 'ohen' ? 'fire' : 'shield'}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name}: ${a.desc}">
+          ${ico(a.id === 'ohen' ? 'fire' : 'shield')}<i class="cd" style="height:0"></i>
+          <span class="cost">${ico('coin')}${a.cost}</span>
+        </button>`).join('');
+      applyIcons(B);
+
+      const hint = $('#bHint');
+      const portrait = window.innerHeight > window.innerWidth;
+      hint.textContent = t('hint_battle');
+      const banner = $('#bBanner');
+      hint.hidden = false; hint.style.opacity = 1; banner.hidden = false; banner.style.opacity = 1;
+      clearTimeout(this._ht);
+      this._ht = setTimeout(() => {
+        hint.style.opacity = 0; banner.style.opacity = 0;
+        setTimeout(() => { hint.hidden = true; banner.hidden = true; }, 600);
+      }, 5000);
+
+      const stats = GameData.calc.battleStats(save);
+      let lastHud = {};
+      $('#bBoss').hidden = true;
+      const battle = new Battle({
+        canvas: $('#bCanvas'), mini: $('#bMini'),
+        mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
+        world: cfg.world || null, enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
+        playerUnits: units, boss: cfg.boss || null,
+        playerFaction: save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
+        enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
+        speed: save.settings.speed || 1,
+        seed: (cfg.title || '').length * 31 + 7,
+        player: { stats, unitSkins: save.skins.unit, castleSkin: save.skins.castle, castleLevel: GameData.calc.castleLevel(save), castleCfg: Screens.castleCfg(save) },
+        onUpdateHud: b => this._hud(b, lastHud),
+        onEnd: res => this._battleEnd(cfg, res),
+        onFormation: mode => this._formUi(mode),
+        onHero: (u, died) => this._heroUi(u, died),
+        onAutoSpawn: () => { save.stats.unitsSent++; }
+      });
+      this.battle = battle;
+      if (!(save.tut || {}).battle) {
+        save.tut = save.tut || {}; save.tut.battle = true; Save.save();
+        battle.togglePause(true);
+        setTimeout(() => Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false)), 450);
+      }
+      this._formUi('utok');
+      this._heroUi(null);
+      $('#bSpeed').textContent = '×' + battle.speed;
+
+      // ikony jednotek do tlačítek
+      requestAnimationFrame(() => {
+        B.querySelectorAll('[data-spawn]').forEach(btn => Art.renderUnitIcon(btn.querySelector('canvas'), btn.dataset.spawn, 'player', save.skins.unit[btn.dataset.spawn], { zoom: 0.92, pad: 3 }));
+        battle.resize();
+      });
+      B.querySelectorAll('[data-spawn]').forEach(btn => btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if (battle.spawn('player', btn.dataset.spawn)) { save.stats.unitsSent++; }
+        else if (!battle.over) {
+          const chk = battle.canSpawn('player', btn.dataset.spawn);
+          if (chk.why === 'mince') this._flash(btn);
+        }
+      }));
+      B.querySelectorAll('[data-auto]').forEach(btn => {
+        const f = btn.dataset.auto;
+        const setUi = on => { btn.setAttribute('aria-pressed', on); btn.closest('.ugrp').classList.toggle('auto-on', on); };
+        if (autoPref[f]) { battle.setAuto(f, true); setUi(true); }
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault(); e.stopPropagation();
+          const on = !battle.auto[f];
+          battle.setAuto(f, on); setUi(on);
+          autoPref[f] = on; Save.save();
+          this.toast(t(on ? 't_auto_on' : 't_auto_off', { name: GameData.factions[f].name }));
+        });
+      });
+      B.querySelectorAll('[data-abil]').forEach(btn => btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if (!battle.useAbility('player', btn.dataset.abil)) this._flash(btn);
+      }));
+    },
+
+    _heroUi(u, died) {
+      const p = $('#bHero');
+      p.hidden = !u;
+      p.querySelectorAll('.on').forEach(b => b.classList.remove('on'));
+      if (u) $('#heroName').textContent = u.def.name;
+      if (died) this.toast(t('t_hero_fell'));
+    },
+
+    _formUi(mode) {
+      document.querySelectorAll('#bForm [data-form]').forEach(b => b.setAttribute('aria-pressed', b.dataset.form === mode));
+    },
+
+    _flash(btn) {
+      btn.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 220 });
+    },
+
+    _hud(b, last) {
+      const P = b.side.player, E = b.side.enemy;
+      const set = (k, v, fn) => { if (last[k] !== v) { last[k] = v; fn(v); } };
+      set('hpMe', Math.ceil(P.castle.hp), v => { $('#hpMe').style.width = (v / P.castle.maxHp * 100) + '%'; $('#hpMeNum').textContent = `${fmt(v)} / ${fmt(P.castle.maxHp)}`; });
+      set('hpFoe', Math.ceil(E.castle.hp), v => { $('#hpFoe').style.width = (v / E.castle.maxHp * 100) + '%'; $('#hpFoeNum').textContent = `${fmt(v)} / ${fmt(E.castle.maxHp)}`; });
+      const tl = Math.max(0, Math.ceil(b.timeLeft));
+      if (b.bossUnit) {
+        const u = b.bossUnit, alive = !u.dead;
+        set('bossOn', alive, v => { $('#bBoss').hidden = !v; if (v) $('#bossName').textContent = u.def.name; });
+        if (alive) set('bossHp', Math.round(u.hp / u.maxHp * 200), v => ($('#bossHp').style.width = (v / 2) + '%'));
+      }
+      if (b.hero) { const r = Math.max(0, b.hero.hp / b.hero.maxHp); set('heroHp', Math.round(r * 100), v => ($('#heroHp').style.width = v + '%')); }
+      set('time', tl, v => { const el = $('#bTimer'); el.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`; el.classList.toggle('low', v <= 30); });
+      const coins = Math.floor(P.coins);
+      set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', (v / P.maxCoins * 100) + '%'); });
+      set('max', P.maxCoins, v => ($('#bCoinMax').textContent = 'max ' + v));
+      document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
+        const def = GameData.units[btn.dataset.spawn];
+        const cdEnd = P.cooldowns[def.id] || 0;
+        const cd = Math.max(0, (cdEnd - b.time) / def.spawnCooldown);
+        const key = 'u' + def.id;
+        const val = (P.coins >= def.cost ? 1 : 0) + '|' + Math.round(cd * 40);
+        set(key, val, () => {
+          btn.classList.toggle('poor', P.coins < def.cost);
+          btn.querySelector('.cd').style.height = (cd * 100) + '%';
+        });
+      });
+      document.querySelectorAll('#bAbil [data-abil]').forEach(btn => {
+        const st = b.abilityState('player', btn.dataset.abil);
+        const val = (st.affordable ? 1 : 0) + '|' + Math.round(st.cdLeft / st.cdTotal * 40);
+        set('a' + btn.dataset.abil, val, () => {
+          btn.classList.toggle('poor', !st.affordable);
+          btn.querySelector('.cd').style.height = (st.cdLeft / st.cdTotal * 100) + '%';
+        });
+      });
+    },
+
+    _closeBattle() {
+      if (this.battle) { this.battle.destroy(); this.battle = null; }
+      $('#battle').hidden = true;
+      $('#app').hidden = false;
+    },
+
+    /* Vyhodnocení bitvy a odměny */
+    _battleEnd(cfg, res) {
+      const save = this.save, R = GameData.pvpRules;
+      if (!this.battle) return;
+      save.stats.kills += res.kills;
+      if (res.win) save.stats.wins++; else save.stats.losses++;
+      const rewards = [];
+      let note = '';
+      if (cfg.mode === 'campaign') {
+        const lv = cfg.level;
+        const first = !save.campaign.cleared[lv.id];
+        if (res.win) {
+          const gold = first ? lv.reward.gold : Math.round(lv.reward.gold * 0.25);
+          const gems = first ? lv.reward.gems : 0;
+          save.gold += gold; save.gems += gems;
+          rewards.push(`<span class="pill">${ico('coin')} +${fmt(gold)}</span>`);
+          if (gems) rewards.push(`<span class="pill">${ico('gem')} +${gems}</span>`);
+          if (first) {
+            save.campaign.cleared[lv.id] = true;
+            const unlockedUnit = GameData.unitOrder.map(id => GameData.units[id]).find(u => u.unlock && u.unlock.campaign === lv.id);
+            if (unlockedUnit) note = t('unit_unlocked', { name: `<b>${unlockedUnit.name}</b>` });
+            const H = GameData.campaignHelpers;
+            const ch = H.chapters(lv.act).find(c => c.id === lv.chapter);
+            if (lv.boss && ch.outro) note += (note ? '<br>' : '') + `<i class="outro">${esc(ch.outro)}</i>`;
+            const next = H.currentLevel(save);
+            if (next && next.act !== lv.act) {
+              const na = H.act(next.act);
+              this.storyAct = next.act;
+              note += (note ? '<br>' : '') + `<b>${t('act_done', { n: H.act(lv.act).n })}</b> ` + t('act_unlocked', { n: na.n, name: esc(na.faction === 'spojenectvi' ? t('alliance') : GameData.factions[na.faction].name) });
+            } else if (next) note += (note ? '<br>' : '') + t('level_unlocked', { name: `<b>${next.label} ${esc(next.name)}</b>` });
+            else { note += (note ? '<br>' : '') + `<b>${t('campaign_done')}</b>`; cfg.epilog = true; }
+          }
+        } else note = t('note_tip');
+      } else if (cfg.mode === 'pvp') {
+        const id = cfg.opp.id;
+        save.pvp.attacks[id] = (save.pvp.attacks[id] || []).concat([res.win ? 'win' : 'loss']);
+        const i = cfg.attackIndex;
+        if (res.win) {
+          save.trophies += R.trophyReward[i]; save.gold += R.goldReward[i]; save.stats.pvpWins++;
+          rewards.push(`<span class="pill">${ico('trophy')} +${R.trophyReward[i]}</span>`, `<span class="pill">${ico('coin')} +${R.goldReward[i]}</span>`);
+        } else {
+          save.trophies = Math.max(0, save.trophies - R.trophyLoss); save.stats.pvpLosses++;
+          rewards.push(`<span class="pill">${ico('trophy')} −${R.trophyLoss}</span>`);
+        }
+        const left = R.maxAttacks - save.pvp.attacks[id].length;
+        note = left > 0 ? t('pvp_left', { name: esc(cfg.opp.name), n: left }) : t('pvp_none', { name: esc(cfg.opp.name) });
+      } else {
+        if (res.win) { save.gold += 100; rewards.push(`<span class="pill">${ico('coin')} +100</span>`); }
+        note = t('note_training');
+      }
+      this.persist();
+      const reason = res.reason === 'cas' ? t('r_time') : (res.win ? t('r_enemy') : t('r_you'));
+      const back = cfg.mode === 'pvp' ? 'pvp' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      this.modal(`
+        <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
+        <p style="text-align:center;margin:0" class="muted">${reason}</p>
+        ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
+        <dl class="kv">
+          <dt>${t('battle_lbl')}</dt><dd>${esc(cfg.title)}</dd>
+          <dt>${t('duration')}</dt><dd>${Math.floor(res.time / 60)}:${String(Math.floor(res.time % 60)).padStart(2, '0')}</dd>
+          <dt>${t('kills')}</dt><dd>${res.kills}</dd>
+          <dt>${t('sent')}</dt><dd>${res.sent}</dd>
+          <dt>${t('your_castle')}</dt><dd>${Math.round(res.playerHp * 100)} %</dd>
+        </dl>
+        ${note ? `<div class="notice"><div>${note}</div></div>` : ''}
+        <div class="modal-actions">
+          <button class="btn btn-gold" id="resBack">${t('continue')}</button>
+        </div>`, (c, close) => {
+        c.querySelector('#resBack').addEventListener('click', () => {
+          close(); this._closeBattle(); this.go(back);
+          if (cfg.epilog) this.playScene('epilog', null, true);
+        });
+      });
+    },
+
+    /* Změna jazyka (ze startu nebo z profilu) */
+    setLang(l) {
+      this.save.lang = l;
+      I18N.set(l); I18N.localizeData(); I18N.apply(document);
+      this.persist();
+      if (!this.battle) this.go(this.current || 'hrad', { keepScroll: true });
+    },
+
+    init() {
+      // národ, který ještě není odemčený příběhem, nelze hrát
+      if (!GameData.campaignHelpers.factionUnlocked(this.save, this.save.faction)) { this.save.faction = 'kralovstvi'; this.save.avatar = 'rytir'; }
+      I18N.set(this.save.lang || (navigator.language || 'cs').slice(0, 2));
+      I18N.localizeData();
+      I18N.apply(document);
+      applyIcons(document);
+      this.refreshTop();
+      document.querySelectorAll('#nav [data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
+      $('#profileBtn').addEventListener('click', () => this.go('profil'));
+      $('#bPause').addEventListener('click', () => { if (!this.battle || this.battle.over) return; this.battle.togglePause(true); $('#bPauseMenu').hidden = false; });
+      $('#bResume').addEventListener('click', () => { $('#bPauseMenu').hidden = true; this.battle && this.battle.togglePause(false); });
+      $('#bQuit').addEventListener('click', () => {
+        $('#bPauseMenu').hidden = true;
+        const b = this.battle;
+        if (!b) return;
+        b.togglePause(false);
+        b.side.player.castle.hp = 0;   // vzdání = prohra
+      });
+      document.querySelectorAll('#bForm [data-form]').forEach(btn => btn.addEventListener('pointerdown', e => {
+        e.preventDefault(); e.stopPropagation();
+        if (this.battle && !this.battle.over) this.battle.setFormation('player', btn.dataset.form);
+      }));
+      // ovládání hrdiny – držení tlačítek
+      const ctrlSet = () => {
+        const b = this.battle; if (!b || !b.ctrl) return;
+        const on = k => document.querySelector(`#bHero [data-mv="${k}"]`).classList.contains('on') || this._keys[k];
+        b.ctrl.mx = (on('right') ? 1 : 0) - (on('left') ? 1 : 0);
+        b.ctrl.my = (on('down') ? 1 : 0) - (on('up') ? 1 : 0);
+        b.ctrl.attack = document.querySelector('#bHero [data-hact="attack"]').classList.contains('on') || !!this._keys.attack;
+        b.ctrl.block = document.querySelector('#bHero [data-hact="block"]').classList.contains('on') || !!this._keys.block;
+      };
+      this._keys = {};
+      this._ctrlSet = ctrlSet;
+      document.querySelectorAll('#bHero .pb, #bHero .hb').forEach(btn => {
+        const down = e => { e.preventDefault(); e.stopPropagation(); try { btn.setPointerCapture(e.pointerId); } catch (x) { /* nic */ } btn.classList.add('on'); ctrlSet(); };
+        const up = e => { btn.classList.remove('on'); ctrlSet(); };
+        btn.addEventListener('pointerdown', down);
+        btn.addEventListener('pointerup', up);
+        btn.addEventListener('pointercancel', up);
+        btn.addEventListener('lostpointercapture', up);
+        btn.addEventListener('contextmenu', e => e.preventDefault());
+      });
+      $('#heroExit').addEventListener('click', () => { if (this.battle) this.battle.releaseHero(); });
+      const keyMap = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', x: 'attack', X: 'attack', c: 'block', C: 'block' };
+      window.addEventListener('keydown', e => {
+        if (!this.battle || !this.battle.hero) return;
+        if (e.key === 'Escape') { this.battle.releaseHero(); return; }
+        const k = keyMap[e.key]; if (!k) return;
+        e.preventDefault(); this._keys[k] = true; ctrlSet();
+      });
+      window.addEventListener('keyup', e => { const k = keyMap[e.key]; if (k) { this._keys[k] = false; ctrlSet(); } });
+      $('#bSpeed').addEventListener('click', () => {
+        if (!this.battle) return;
+        const v = this.battle.speed === 1 ? 2 : 1;
+        this.battle.setSpeed(v); this.save.settings.speed = v; Save.save();
+        $('#bSpeed').textContent = '×' + v;
+      });
+      window.addEventListener('keydown', e => {
+        const b = this.battle;
+        if (!b || $('#battle').hidden) return;
+        if (e.code === 'Space') { e.preventDefault(); $('#bPause').click(); return; }
+        const n = parseInt(e.key, 10);
+        const btns = document.querySelectorAll('#bUnits [data-spawn]');
+        if (n >= 1 && n <= btns.length && !b.paused) { if (b.spawn('player', btns[n - 1].dataset.spawn)) this.save.stats.unitsSent++; }
+        if (e.key === 'q' || e.key === 'Q') b.useAbility('player', 'ohen');
+        if (e.key === 'w' || e.key === 'W') b.useAbility('player', 'stit');
+        const fk = { a: 'utok', s: 'formace', d: 'ustup' }[e.key.toLowerCase()];
+        if (fk) b.setFormation('player', fk);
+      });
+      let rt;
+      window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (this.onResize) this.onResize(); else if (this.current === 'hrad' && !this.battle) this.go('hrad', { keepScroll: true }); }, 150); });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && this.battle && !this.battle.over) { this.battle.togglePause(true); $('#bPauseMenu').hidden = false; }
+      });
+      const start = location.hash.slice(1);
+      if (!this.save.lang) {
+        this.go('hrad');
+        Tutorial.pickLanguage(l => this.setLang(l));
+      } else this.go(Screens[start] ? start : 'hrad');
+      // fonty se načítají asynchronně – po načtení překresli plátna s textem
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.battle) this.go(this.current, { keepScroll: true }); });
+    }
+  };
+
+  window.App = App;
+  App.init();
+})();

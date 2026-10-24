@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Hrad proti hradu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0d121c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@500;700;800;900&family=Cinzel:wght@700;900&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <button id="profileBtn" class="profile-chip" aria-label="Profil hráče">
+      <canvas id="avatarCv" class="avatar" width="44" height="44"></canvas>
+      <span><b id="pName">Velitel</b><small><span data-ico="trophy"></span><span id="pTrophies" class="num">0</span></small></span>
+    </button>
+    <div class="res">
+      <span class="pill" title="Zlato – na vylepšení hradu"><span data-ico="coin"></span><b id="rGold" class="num">0</b></span>
+      <span class="pill" title="Drahokamy – na skiny"><span data-ico="gem"></span><b id="rGems" class="num">0</b></span>
+    </div>
+  </header>
+  <main id="screen" tabindex="-1"></main>
+  <nav id="nav" aria-label="Hlavní nabídka">
+    <button data-go="hrad" style="--tint:#3d7fe0"><span class="nav-medal" data-ico="navHrad"></span><span class="nav-lbl" data-i18n="nav_hrad">Hrad</span></button>
+    <button data-go="pribeh" style="--tint:#c9a24a"><span class="nav-medal" data-ico="navPribeh"></span><span class="nav-lbl" data-i18n="nav_pribeh">Příběh</span></button>
+    <button data-go="pvp" style="--tint:#d6453c"><span class="nav-medal" data-ico="navPvp"></span><span class="nav-lbl" data-i18n="nav_pvp">Souboj</span></button>
+    <button data-go="zebricek" style="--tint:#e8b84a"><span class="nav-medal" data-ico="navZebricek"></span><span class="nav-lbl" data-i18n="nav_zebricek">Žebříček</span></button>
+    <button data-go="obchod" style="--tint:#43a047"><span class="nav-medal" data-ico="navObchod"></span><span class="nav-lbl" data-i18n="nav_obchod">Obchod</span></button>
+  </nav>
+</div>
+
+<section id="battle" hidden aria-label="Bitva">
+  <div class="b-hud">
+    <div class="hpbox me">
+      <div class="lbl" data-i18n="your_castle">Tvůj hrad</div>
+      <div class="hp"><i id="hpMe" style="width:100%"></i></div>
+      <div class="hpnum" id="hpMeNum">0 / 0</div>
+    </div>
+    <div class="b-center">
+      <button class="hud-btn" id="bSpeed" aria-label="Rychlost hry">×1</button>
+      <div id="bTimer">3:00</div>
+      <button class="hud-btn" id="bPause" aria-label="Pauza"><span data-ico="pause"></span></button>
+    </div>
+    <div class="hpbox foe">
+      <div class="lbl" id="foeName">Nepřátelský hrad</div>
+      <div class="hp"><i id="hpFoe" style="width:100%"></i></div>
+      <div class="hpnum" id="hpFoeNum">0 / 0</div>
+    </div>
+  </div>
+  <div class="b-stage" id="bStage">
+    <canvas id="bCanvas"></canvas>
+    <div class="b-form" id="bForm" role="group" aria-label="Rozkazy armádě">
+      <button class="fbtn" data-form="utok" aria-pressed="true"><span data-ico="swords"></span><span data-i18n="form_attack">Útok</span></button>
+      <button class="fbtn" data-form="formace" aria-pressed="false"><span data-ico="flag"></span><span data-i18n="form_hold">Formace</span></button>
+      <button class="fbtn" data-form="ustup" aria-pressed="false"><span data-ico="castle"></span><span data-i18n="form_retreat">Ústup</span></button>
+    </div>
+    <div class="b-hero" id="bHero" hidden>
+      <div class="hero-info"><b id="heroName">Hrdina</b><div class="hp"><i id="heroHp" style="width:100%"></i></div>
+        <button class="hb-exit" id="heroExit" data-i18n="release">Pustit</button></div>
+      <div class="hero-pad">
+        <button class="pb up" data-mv="up" aria-label="Nahoru">▲</button>
+        <button class="pb left" data-mv="left" aria-label="Doleva">◀</button>
+        <button class="pb right" data-mv="right" aria-label="Doprava">▶</button>
+        <button class="pb down" data-mv="down" aria-label="Dolů">▼</button>
+      </div>
+      <div class="hero-acts">
+        <button class="hb hb-blk" data-hact="block" aria-label="Bránit se"><span data-ico="shieldsm"></span><span data-i18n="block">Blok</span></button>
+        <button class="hb hb-atk" data-hact="attack" aria-label="Útok"><span data-ico="swords"></span><span data-i18n="atk">Útok</span></button>
+      </div>
+    </div>
+    <div class="b-boss" id="bBoss" hidden><b id="bossName"></b><div class="hp"><i id="bossHp" style="width:100%"></i></div></div>
+    <div class="b-top">
+      <div class="b-banner" id="bBanner"></div>
+      <div class="b-hint" id="bHint" hidden></div>
+    </div>
+  </div>
+  <canvas id="bMini" class="b-mini" aria-label="Minimapa bojiště"></canvas>
+  <div class="b-bar">
+    <div class="coins" id="bCoins"><div><span data-ico="coin"></span><b id="bCoinNum">0</b><small id="bCoinMax">max 600</small></div></div>
+    <div class="b-units" id="bUnits"></div>
+    <div class="b-abil" id="bAbil"></div>
+  </div>
+  <div id="bPauseMenu" class="overlay" hidden>
+    <div class="modal-card panel">
+      <h2 data-i18n="pause">Pauza</h2>
+      <p class="muted" data-i18n="pause_text"></p>
+      <div class="modal-actions">
+        <button class="btn btn-green" id="bResume" data-i18n="resume">Pokračovat</button>
+        <button class="btn btn-red" id="bQuit" data-i18n="surrender">Vzdát boj</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="modal" class="overlay" hidden><div class="modal-card panel" id="modalCard" role="dialog" aria-modal="true"></div></div>
+<div id="toast" hidden></div>
+
+<!-- Data (lze upravovat bez zásahu do logiky) -->
+<script src="js/i18n.js"></script>
+<script src="js/data/units.js"></script>
+<script src="js/data/skins.js"></script>
+<script src="js/data/narody.js"></script>
+<script src="js/data/demoni.js"></script>
+<script src="js/data/castle.js"></script>
+<script src="js/data/campaign.js"></script>
+<script src="js/data/pvp.js"></script>
+<script src="js/data/obchod.js"></script>
+<!-- Jádro -->
+<script src="js/i18n_obsah.js"></script>
+<script src="js/core/save.js"></script>
+<script src="js/core/art.js"></script>
+<script src="js/core/art_narody.js"></script>
+<script src="js/core/art_svet.js"></script>
+<script src="js/core/art_peklo.js"></script>
+<script src="js/core/battle.js"></script>
+<!-- Rozhraní -->
+<script src="js/ui/icons.js"></script>
+<script src="js/ui/screens.js"></script>
+<script src="js/ui/tutorial.js"></script>
+<script src="js/ui/scene.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Offline režim (PWA) – jen když hra běží z webu, ne ze souboru ani v náhledu
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && window.top === window.self) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>
