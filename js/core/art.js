@@ -117,7 +117,7 @@
     p.ornament = skin.ornament || null;
     p.glow = skin.glow || null;
     p.mount = skin.mount || null;
-    p.feat = skin.feat || null;
+    p.feat = team === 'enemy' ? null : (skin.feat || null);   // tvarové prvky skinů jen u hráče
     return p;
   }
   function castlePalette(team, skinId, cfg) {

@@ -541,6 +541,8 @@
     if (!fUnits.includes(unitSel)) unitSel = fUnits[3];
     App.skinUnit = unitSel;
     const deal = dealOfDay(save);
+    const sub = opts.sub || App.shopSub || 'postavy';
+    App.shopSub = sub;
     const rarClass = r => ({ 'Základní': 'r0', 'Vzácný': 'r1', 'Epický': 'r2', 'Legendární': 'r3' }[r] || 'r0');
     const rar = r => `<span class="rar" style="color:${GameData.rarityColors[r]}">${t('rar_' + ['Základní', 'Vzácný', 'Epický', 'Legendární'].indexOf(r))}</span>`;
     let body = '';
@@ -553,6 +555,10 @@
         <div class="chips" role="tablist">
           ${fUnits.map(id => `<button class="chip" role="tab" data-sel="${id}" aria-selected="${id === unitSel}"><canvas data-chip="${id}"></canvas>${GameData.units[id].name}</button>`).join('')}
         </div>
+        <div class="sub-tabs" role="tablist">
+          <button class="sub-tab" data-sub="postavy" aria-selected="${sub === 'postavy'}">${ico('helmet')} ${t('sub_chars')}</button>
+          <button class="sub-tab" data-sub="zbrane" aria-selected="${sub === 'zbrane'}">${ico('swords')} ${t('weapon_skins')}</button>
+        </div>` + (sub === 'postavy' ? `
         <section class="panel skin-preview"><canvas id="skinPrev" aria-label="Náhled jednotky"></canvas></section>
         <div class="skin-grid">
           ${GameData.unitSkins.filter(s => (!s.exclusive || save.skins.ownedUnit.includes(s.id)) && GameData.skinFits(s, unitSel))
@@ -575,7 +581,7 @@
           }).join('')}
         </div>
         <button class="btn" id="equipAll">${t('equip_all')}</button>
-        <div class="sec-head" style="margin-top:18px"><h2>${t('weapon_skins')}</h2><span class="muted">${esc(GameData.units[unitSel].name)}</span></div>
+` : `        
         <div class="skin-grid">
           ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel)).map(w => {
             const ownedW = (save.skins.ownedWeapon || ['w_zakladni']).includes(w.id) || w.id === 'w_zakladni';
@@ -591,7 +597,7 @@
                 : `<button class="btn btn-sm btn-gold" data-wbuy="${w.id}">${t('buy')} ${ico('gem')} ${w.price}</button>`}
             </article>`;
           }).join('')}
-        </div>`;
+        </div>`);
     } else if (tab === 'utoky') {
       const SK = GameData.skillsOf(save);
       const rarN = ['Základní', 'Vzácný', 'Epický', 'Legendární'];
@@ -676,8 +682,8 @@
     const el = App.screenEl;
     el.innerHTML = `
       <div class="scr">
-        <div class="sec-head"><h1>${t('nav_obchod')}</h1><span class="muted">${t('shop_note')}</span></div>
-        ${deal && tab === 'vojaci' ? `<section class="panel deal">
+        <div class="sec-head"><h1>${t('nav_obchod')}</h1></div>
+        ${false ? `<section class="panel deal">
           <canvas id="dealCv"></canvas>
           <div class="deal-body">
             <div class="eyebrow">${t('deal')}</div>
@@ -687,14 +693,16 @@
             <button class="btn btn-gold" data-buy="${deal.skin.id}" data-price="${deal.price}" ${save.gems < deal.price ? 'disabled' : ''}>Koupit pro ${esc(GameData.units[unitSel].name.toLowerCase())}e</button>
           </div>
         </section>` : ''}
-        <div class="tabs" role="tablist">
-          ${[['nabidky', t('tab_offers')], ['utoky', t('tab_skills')], ['zbrojnice', t('tab_armory')], ['vojaci', t('tab_units')], ['hrady', t('tab_castles')], ['dekorace', t('tab_decor')], ['drahokamy', t('tab_gems')]].map(([id, n]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${n}</button>`).join('')}
+        <div class="tabs shop-tabs" role="tablist">
+          ${[['nabidky', t('tab_offers'), 'crown'], ['vojaci', t('tab_units'), 'helmet'], ['zbrojnice', t('tab_armory'), 'shield'], ['utoky', t('tab_skills'), 'fire'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
         </div>
+        <p class="shop-hint muted">${t('shop_hint_' + tab)}</p>
         ${body}
       </div>`;
     el.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: b.dataset.tab, keepScroll: true })));
+    el.querySelectorAll('[data-sub]').forEach(b => b.addEventListener('click', () => App.go('obchod', { sub: b.dataset.sub, keepScroll: true })));
     if (Shop.tabs.includes(tab)) { Shop.bind(App, tab, el); return; }
-    if (deal && tab === 'vojaci') {
+    if (false) {
       const cv = el.querySelector('#dealCv');
       const draw = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -750,7 +758,7 @@
           save.skins.unit[unitSel] = sk.id; App.persist(); App.toast(t('t_bought', { name: sk.name })); App.go('obchod', { keepScroll: true });
         });
       }));
-      el.querySelector('#equipAll').addEventListener('click', () => {
+      if (el.querySelector('#equipAll')) el.querySelector('#equipAll').addEventListener('click', () => {
         const sk = save.skins.unit[unitSel];
         const skd = GameData.unitSkins.find(x => x.id === sk) || {};
         if (skd.exclusive || skd.only) { App.toast(t('only_for', { name: GameData.units[unitSel].name })); return; }
@@ -759,7 +767,7 @@
       });
       const pv = el.querySelector('#skinPrev');
       const anim = () => {
-        if (!pv.isConnected) return;
+        if (!pv || !pv.isConnected) return;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         const w = pv.clientWidth, h = pv.clientHeight;
         if (pv.width !== Math.round(w * dpr)) { pv.width = w * dpr; pv.height = h * dpr; }

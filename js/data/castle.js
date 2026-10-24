@@ -18,7 +18,7 @@ GameData.calc = {
     return Math.round(b.baseCost * Math.pow(b.growth, level) / 10) * 10;
   },
   castleHp: (l) => 2000 + l * 350,
-  income: (l) => 16 + l * 2.2,
+  income: (l) => (16 + l * 2.2) * 0.95,   // o 5 % pomalejší příjem mincí
   unitMult: (l) => 1 + l * 0.06,
   towerDmg: (l) => (l > 0 ? 8 + l * 5 : 0),
   maxCoins: (l) => 600 + l * 100,
@@ -56,13 +56,16 @@ GameData.calc = {
     };
   },
 
-  /* Statistiky nepřítele podle obtížnosti (1,0 = vyrovnaný soupeř) */
+  /* Statistiky nepřítele podle obtížnosti.
+     Nepřátelští vojáci jsou STEJNĚ silní jako základní vojáci hráče stejného druhu
+     (lučištník = lučištník). Obtížnost dělá jen příjem mincí nepřítele, velikost
+     jeho vln, životy hradu a věž – rozhoduje strategie. */
   enemyStats(diff) {
     return {
-      castleHp: Math.round(2000 * (0.7 + 0.3 * diff) / 50) * 50,
-      income: 16 * (0.72 + 0.28 * diff),
-      hpMult: diff,
-      dmgMult: 0.6 + 0.4 * diff,
+      castleHp: Math.round(2000 * (0.75 + 0.25 * diff) / 50) * 50,
+      income: 16 * 0.95 * (0.8 + 0.2 * diff),
+      hpMult: 1,
+      dmgMult: 1,
       towerDmg: diff >= 1.2 ? Math.round(6 + diff * 7) : 0,
       maxCoins: 900
     };
