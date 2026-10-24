@@ -293,6 +293,7 @@
     else if (WM && WM.cat === wcat && wcat === 'pole') drawSpear(ctx, L, pal, atk, moving, w);
     else if (WM && WM.cat === wcat && wcat === 'bow') drawBow(ctx, L, pal, atk);
     // výchozí zbraně národů: skutečné modely (katana, sekera, luk jumi, kopí jari)
+    else if (L.meleeModel) drawSwordArm(ctx, L, pal, atk, w, moving, L.meleeModel);
     else if (L.weapon === 'katana' || L.weapon === 'katana2') drawSwordArm(ctx, L, pal, atk, w, moving, 'katana');
     else if (L.weapon === 'axe') drawSwordArm(ctx, L, pal, atk, w, moving, 'sekera');
     else if (L.weapon === 'daneaxe') drawSwordArm(ctx, L, pal, atk, w, moving, 'dvojsekera');
