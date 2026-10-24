@@ -694,7 +694,7 @@
           </div>
         </section>` : ''}
         <div class="tabs shop-tabs" role="tablist">
-          ${[['nabidky', t('tab_offers'), 'crown'], ['vojaci', t('tab_units'), 'helmet'], ['zbrojnice', t('tab_armory'), 'shield'], ['utoky', t('tab_skills'), 'fire'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
+          ${[['nabidky', t('tab_offers'), 'crown'], ['vojaci', t('tab_units'), 'helmet'], ['zbrojnice', t('tab_armory'), 'shield'], ['utoky', t('tab_skills'), 'swords'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
         </div>
         <p class="shop-hint muted">${t('shop_hint_' + tab)}</p>
         ${['vojaci', 'zbrojnice', 'utoky', 'hrady'].includes(tab) ? `<div class="rar-legend">${['Základní', 'Vzácný', 'Epický', 'Legendární'].map((r, i) => `<span style="--rc:${GameData.rarityColors[r]}">${t('rar_' + i)}</span>`).join('<i>‹</i>')}<small>${t('rarity_legend')}</small></div>` : ''}

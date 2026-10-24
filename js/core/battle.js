@@ -22,7 +22,7 @@
       if (e) { this.map.delete(key); this.map.set(key, e); return e; }
       const s = (def.look.scale || 1) * scaleMul;
       const M = !!(pal.mount || def.look.mount);
-      const bx0 = (M ? -62 : -40) * s, by0 = (M ? -170 : -132) * s, bw = (M ? 172 : 130) * s, bh = (M ? 186 : 148) * s;
+      const bx0 = (M ? -62 : -48) * s, by0 = (M ? -170 : -140) * s, bw = (M ? 196 : 160) * s, bh = (M ? 190 : 158) * s;
       const cv = document.createElement('canvas');
       cv.width = Math.ceil(bw * this.r); cv.height = Math.ceil(bh * this.r);
       const c = cv.getContext('2d');

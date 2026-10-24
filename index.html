@@ -159,7 +159,7 @@
   // Offline režim (PWA) – jen když hra běží z webu, ne ze souboru ani v náhledu
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && window.top === window.self) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {}));
-    let reloaded = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || !navigator.serviceWorker.controller) return; reloaded = true; if (!(window.App && App.battle)) location.reload(); });
+    let reloaded = false; const hadCtl = !!navigator.serviceWorker.controller; navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || !hadCtl) return; reloaded = true; if (!(window.App && App.battle)) location.reload(); });
   }
 </script>
 </body>

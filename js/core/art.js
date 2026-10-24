@@ -292,6 +292,12 @@
     if (WM && WM.cat === wcat && wcat === 'melee') drawSwordArm(ctx, L, pal, atk, w, moving);
     else if (WM && WM.cat === wcat && wcat === 'pole') drawSpear(ctx, L, pal, atk, moving, w);
     else if (WM && WM.cat === wcat && wcat === 'bow') drawBow(ctx, L, pal, atk);
+    // výchozí zbraně národů: skutečné modely (katana, sekera, luk jumi, kopí jari)
+    else if (L.weapon === 'katana' || L.weapon === 'katana2') drawSwordArm(ctx, L, pal, atk, w, moving, 'katana');
+    else if (L.weapon === 'axe') drawSwordArm(ctx, L, pal, atk, w, moving, 'sekera');
+    else if (L.weapon === 'daneaxe') drawSwordArm(ctx, L, pal, atk, w, moving, 'dvojsekera');
+    else if (L.weapon === 'yumi') drawBow(ctx, L, pal, atk);
+    else if (L.weapon === 'yari') drawSpear(ctx, L, pal, atk, moving, w);
     else if (P.weapon && P.weapon[L.weapon]) P.weapon[L.weapon](ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'sword' || L.weapon === 'longsword') drawSwordArm(ctx, L, pal, atk, w, moving);
     else if (L.weapon === 'bow') drawBow(ctx, L, pal, atk);
@@ -514,7 +520,8 @@
   }
 
   function drawBow(ctx, L, pal, atk) {
-    const BM = pal.wmodel && pal.wmodel.cat === 'bow' ? pal.wmodel : null;
+    // každý luk se kreslí jako model: výchozí dlouhý luk, samurajové velmi dlouhý luk jumi
+    const BM = pal.wmodel && pal.wmodel.cat === 'bow' ? pal.wmodel : { id: L.weapon === 'yumi' ? 'yumi' : (L.bowModel || 'dlouhy'), cat: 'bow' };
     let pull = 0.15;
     if (atk >= 0) pull = atk < 0.6 ? ease(atk / 0.6) : 0;
     const cx = 3, cy = -47, r = 18;
@@ -523,20 +530,23 @@
     const px = tipTop[0] - pull * 15, py = cy;
     if (BM) {
       // model luku: nejdřív ramena, pak tětiva a paže
-      limb(ctx, -2, -50, px, py, 5, shade(pal.tunic, -0.2));
+      const gx = cx + r + 2, gy = cy;                       // úchop luku
+      const sx = gx - 12 - pull * 20, sy = gy;              // natažená tětiva
       const c = window.Art.weaponColors(pal, BM);
-      limb(ctx, 1, -50, cx + r - 1, cy, 5.2, pal.tunic);
-      const tips = window.Art.drawBowLimbs(ctx, BM.id, c, cx, cy, r);
-      ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(px, py); ctx.lineTo(tips[1][0], tips[1][1]);
-      ctx.lineWidth = 1.1; ctx.strokeStyle = c.string; ctx.stroke();
+      limb(ctx, -2, -50, sx, sy, 5, shade(pal.tunic, -0.2));
+      limb(ctx, 1, -50, gx - 1, gy, 5.2, pal.tunic);
+      const tips = window.Art.drawBowLimbs(ctx, BM.id, c, gx, gy);
+      ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(sx, sy); ctx.lineTo(tips[1][0], tips[1][1]);
+      ctx.lineWidth = 1.3; ctx.strokeStyle = c.string; ctx.stroke();
       if (atk < 0 || atk < 0.6) {
-        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + 27, py); ctx.lineWidth = 3.4; ctx.strokeStyle = OUT; ctx.stroke();
-        ctx.lineWidth = 1.6; ctx.strokeStyle = BM.arrow || '#d8c39a'; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(px + 27, py - 3); ctx.lineTo(px + 32, py); ctx.lineTo(px + 27, py + 3); ctx.closePath(); fs(ctx, BM.tip || '#c9ced6', 1.1);
+        const al = BM.id === 'yumi' ? 40 : 34;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + al, sy); ctx.lineWidth = 3.6; ctx.strokeStyle = OUT; ctx.stroke();
+        ctx.lineWidth = 1.8; ctx.strokeStyle = BM.arrow || '#d8c39a'; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(sx + al, sy - 3.4); ctx.lineTo(sx + al + 6, sy); ctx.lineTo(sx + al, sy + 3.4); ctx.closePath(); fs(ctx, BM.tip || '#c9ced6', 1.1);
+        ctx.beginPath(); ctx.moveTo(sx + 1, sy); ctx.lineTo(sx - 4, sy - 3.4); ctx.lineTo(sx + 5, sy); ctx.lineTo(sx - 4, sy + 3.4); ctx.closePath(); fs(ctx, '#f2f2f2', 0.9);
       }
-      fist(ctx, px, py, pal.leather, 1.57);
-      rr(ctx, cx + r - 2.5, cy - 4, 5, 8, 1.5); fs(ctx, pal.leatherDark, 1.2);
-      fist(ctx, cx + r, cy, pal.skin, 0);
+      fist(ctx, sx, sy, pal.leather, 1.57);
+      fist(ctx, gx, gy, pal.skin, 0);
       return;
     }
     // zadní (natahující) paže
@@ -571,7 +581,7 @@
     ctx.translate(-4 + tx, -44);
     ctx.rotate(ang);
     const PM = pal.wmodel && pal.wmodel.cat === 'pole' ? pal.wmodel : null;
-    limb(ctx, -18, 0, 46, 0, 2.6, (PM && PM.wood) || pal.wood);
+    limb(ctx, -20, 0, 46, 0, 3.6, (PM && PM.wood) || pal.wood);
     window.Art.drawPole(ctx, (PM && PM.id) || 'kopi', pal, PM);
     ctx.restore();
     // přední paže
