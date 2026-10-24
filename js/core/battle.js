@@ -207,8 +207,10 @@
       const dir = team === 'player' ? 1 : -1;
       const skin = team === 'player' ? (s.skins[unitId] || 'zakladni') : (this.o.enemyUnitSkin || 'zakladni');
       const fac = def.faction || s.faction;
-      const key = team + skin + fac;
-      if (!this.palCache[key]) this.palCache[key] = Art.unitPalette(team, skin, fac);
+      // výbava a skin hráče: bonusy a vzhled
+      const L = team === 'player' && this.o.player.loadout ? this.o.player.loadout(unitId) : null;
+      const key = team + skin + fac + (L ? L.lk.key : '');
+      if (!this.palCache[key]) this.palCache[key] = L ? GameData.gearHelpers.palette(team, skin, fac, L.lk) : Art.unitPalette(team, skin, fac);
       // pevnost s více branami: vojáci vycházejí postupně ze všech bran
       let sx = s.castle.front + dir * (8 + this.rand() * 10);
       const gates = s.castleImg.gates;
@@ -230,6 +232,12 @@
         walk: this.rand() * 6, moving: true, dead: 0, target: null,
         pal: this.palCache[key], hurt: 0, born: this.time
       };
+      if (L) {
+        const b = L.bonus;
+        u.hp *= 1 + (b.hp || 0); u.maxHp = u.hp; u.dmg *= 1 + (b.dmg || 0);
+        u.armorBonus = b.armor || 0; u.crit = b.crit || 0;
+        u.drawDef = GameData.gearHelpers.drawDef(def, L.lk);
+      }
       this.units.push(u);
       if (def.boss) {
         this.bossUnit = u;
@@ -655,7 +663,11 @@
 
     _damage(target, raw, from, fire) {
       const s = this.side[target.team];
-      let dmg = raw * (1 - target.def.armor);
+      let dmg = raw * (1 - Math.min(0.8, target.def.armor + (target.armorBonus || 0)));
+      if (from && from.crit && this.rand() < from.crit) {
+        dmg *= 1.8;
+        this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('crit'), color: '#ffb347', t: 0, life: 0.8 });
+      }
       if (target.blocking) {
         dmg *= 0.2;
         if (!target._blkTxt || this.time - target._blkTxt > 0.6) {
@@ -958,7 +970,7 @@
       else if (u.moving) { const q = Math.floor(((u.walk % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2) * 10); frame = 'w' + q; st = { moving: true, walk: q / 10 * Math.PI * 2 }; }
       else { frame = 'i'; st = {}; }
       const palKey = u.team + (u.pal.__k || (u.pal.__k = Math.random().toString(36).slice(2)));
-      const e = this.sprites.get(u.def, u.pal, palKey, frame, st, US());
+      const e = this.sprites.get(u.drawDef || u.def, u.pal, palKey, frame, st, US());
       const f = u.face || u.dir;
       if (shield && !u.dead) {
         const s = US() * (u.def.look.scale || 1);

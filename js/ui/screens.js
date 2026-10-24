@@ -179,9 +179,12 @@
       Art.drawCastle(ctx, img, img.w, 492 / cs, 1, t, 1, F.color);
       ctx.restore();
       // stráže a hlídka
-      const pal = id => Art.unitPalette('player', st.skins[id] || 'zakladni', st.faction);
+      const GHs = GameData.gearHelpers, sv = window.App && App.save;
+      const lkOf = id => (sv ? GHs.look(sv, id) : null);
+      const pal = id => sv ? GHs.palette('player', st.skins[id] || 'zakladni', st.faction, lkOf(id)) : Art.unitPalette('player', st.skins[id] || 'zakladni', st.faction);
+      const dd = id => sv ? GHs.drawDef(GameData.units[id], lkOf(id)) : GameData.units[id];
       const U = GameData.units;
-      const guard = (id, x, y, f) => Art.drawUnit(ctx, U[id], pal(id), { x, y, facing: f, t, ring: false, scaleMul: 1.45, walk: 0 });
+      const guard = (id, x, y, f) => Art.drawUnit(ctx, dd(id), pal(id), { x, y, facing: f, t, ring: false, scaleMul: 1.45, walk: 0 });
       guard(F.roles.tezka, 700 + 210, 508, -1);
       guard(F.roles.kopi, 700 - 236, 506, 1);
       // hlídka chodí po cestě sem a tam
@@ -189,8 +192,8 @@
       const ph = (t % period) / period;
       const pos = ph < 0.5 ? ph * 2 : 2 - ph * 2;
       const px = 700 - span / 2 + pos * span;
-      Art.drawUnit(ctx, U[F.roles.pech], pal(F.roles.pech), { x: px, y: 530, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7, t, ring: false, scaleMul: 1.45 });
-      Art.drawUnit(ctx, U[F.roles.strelec], pal(F.roles.strelec), { x: px - (ph < 0.5 ? 46 : -46), y: 524, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7 + 1.5, t, ring: false, scaleMul: 1.45 });
+      Art.drawUnit(ctx, dd(F.roles.pech), pal(F.roles.pech), { x: px, y: 530, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7, t, ring: false, scaleMul: 1.45 });
+      Art.drawUnit(ctx, dd(F.roles.strelec), pal(F.roles.strelec), { x: px - (ph < 0.5 ? 46 : -46), y: 524, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7 + 1.5, t, ring: false, scaleMul: 1.45 });
       // částice
       const amb = (window.ArtThemes.ambient || {})[theme];
       if (amb) {
@@ -407,7 +410,7 @@
   function screenObchod(App, opts = {}) {
     const save = App.save;
     const F = GameData.factions[save.faction];
-    const tab = opts.tab || App.shopTab || 'vojaci';
+    const tab = opts.tab || App.shopTab || 'nabidky';
     App.shopTab = tab;
     const fUnits = GameData.factionUnits(save.faction);
     let unitSel = opts.unit || App.skinUnit;
@@ -417,7 +420,9 @@
     const rarClass = r => ({ 'Základní': 'r0', 'Vzácný': 'r1', 'Epický': 'r2', 'Legendární': 'r3' }[r] || 'r0');
     const rar = r => `<span class="rar" style="color:${GameData.rarityColors[r]}">${t('rar_' + ['Základní', 'Vzácný', 'Epický', 'Legendární'].indexOf(r))}</span>`;
     let body = '';
-    if (tab === 'vojaci') {
+    if (Shop.tabs.includes(tab)) {
+      body = Shop.body(App, tab, opts);
+    } else if (tab === 'vojaci') {
       body = `
         <div class="chips" role="tablist">
           ${fUnits.map(id => `<button class="chip" role="tab" data-sel="${id}" aria-selected="${id === unitSel}"><canvas data-chip="${id}"></canvas>${GameData.units[id].name}</button>`).join('')}
@@ -431,8 +436,10 @@
             return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''}">
               <canvas data-skinunit="${s.id}"></canvas>
               <h3>${s.name}</h3>${rar(s.rarity)}<p>${s.desc}</p>
+              ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
               ${eq ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : owned ? `<button class="btn btn-sm btn-blue" data-equip="${s.id}">${t('use')}</button>`
+                : s.czk ? `<button class="btn btn-sm btn-green" data-skinczk="${s.id}">${s.czk} Kč</button>`
                 : `<button class="btn btn-sm btn-gold" data-buy="${s.id}" data-price="${price}" ${save.gems < price ? 'disabled' : ''}>${t('buy')} ${ico('gem')} ${price}</button>`}
             </article>`;
           }).join('')}
@@ -480,17 +487,17 @@
             <button class="btn btn-sm btn-gold" data-ex="${x.id}" ${save.gold < x.gold ? 'disabled' : ''}>${ico('coin')} ${fmt(x.gold)}</button>
           </article>`).join('')}
         </div>
-        <div class="sec-head"><h2>${t('packs')}</h2><span class="tag tag-demo">${t('unavailable')}</span></div>
-        <div class="notice"><div>${t('packs_note')}</div></div>
+        <div class="sec-head"><h2>${t('packs')}</h2></div>
         <div class="skin-grid">
-          ${G.realMoney.map(x => `<article class="panel skin r3"><div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${esc(x.name)}</h3><button class="btn btn-sm" disabled>${esc(x.price)}</button></article>`).join('')}
-        </div>`;
+          ${GameData.gemPacks.map(x => `<article class="panel skin r3">${x.badge ? `<span class="offer-badge">${x.badge}</span>` : ''}<div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${t('gems_n', { n: x.gems })}</h3><button class="btn btn-sm btn-green" data-gempack="${x.id}">${x.czk} Kč</button></article>`).join('')}
+        </div>
+        ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}`;
     }
     const el = App.screenEl;
     el.innerHTML = `
       <div class="scr">
         <div class="sec-head"><h1>${t('nav_obchod')}</h1><span class="muted">${t('shop_note')}</span></div>
-        ${deal ? `<section class="panel deal">
+        ${deal && tab === 'vojaci' ? `<section class="panel deal">
           <canvas id="dealCv"></canvas>
           <div class="deal-body">
             <div class="eyebrow">${t('deal')}</div>
@@ -501,12 +508,13 @@
           </div>
         </section>` : ''}
         <div class="tabs" role="tablist">
-          ${[['vojaci', t('tab_units')], ['hrady', t('tab_castles')], ['dekorace', t('tab_decor')], ['drahokamy', t('tab_gems')]].map(([id, n]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${n}</button>`).join('')}
+          ${[['nabidky', t('tab_offers')], ['zbrojnice', t('tab_armory')], ['vojaci', t('tab_units')], ['hrady', t('tab_castles')], ['dekorace', t('tab_decor')], ['drahokamy', t('tab_gems')]].map(([id, n]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${n}</button>`).join('')}
         </div>
         ${body}
       </div>`;
     el.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: b.dataset.tab, keepScroll: true })));
-    if (deal) {
+    if (Shop.tabs.includes(tab)) { Shop.bind(App, tab, el); return; }
+    if (deal && tab === 'vojaci') {
       const cv = el.querySelector('#dealCv');
       const draw = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -535,6 +543,13 @@
       el.querySelectorAll('canvas[data-skinunit]').forEach(c => Art.renderUnitIcon(c, unitSel, 'player', c.dataset.skinunit));
       el.querySelectorAll('[data-sel]').forEach(b => b.addEventListener('click', () => App.go('obchod', { unit: b.dataset.sel, keepScroll: true })));
       el.querySelectorAll('[data-equip]').forEach(b => b.addEventListener('click', () => { save.skins.unit[unitSel] = b.dataset.equip; App.persist(); App.go('obchod', { keepScroll: true }); }));
+      el.querySelectorAll('[data-skinczk]').forEach(b => b.addEventListener('click', () => {
+        const sk = GameData.unitSkins.find(x => x.id === b.dataset.skinczk);
+        Platby.buy(App, { id: 'skin_' + sk.id, name: sk.name, czk: sk.czk }, () => {
+          if (!save.skins.ownedUnit.includes(sk.id)) save.skins.ownedUnit.push(sk.id);
+          save.skins.unit[unitSel] = sk.id; App.persist(); App.toast(t('t_bought', { name: sk.name })); App.go('obchod', { keepScroll: true });
+        });
+      }));
       el.querySelector('#equipAll').addEventListener('click', () => {
         const sk = save.skins.unit[unitSel];
         Object.keys(GameData.units).forEach(u => (save.skins.unit[u] = sk));
@@ -601,6 +616,12 @@
         save.lastDaily = todayKey(); save.gems += G.daily.gems; save.gold += G.daily.gold;
         App.persist(); App.toast(`+${G.daily.gems} 💎  +${G.daily.gold}`); App.go('obchod', { keepScroll: true });
       });
+      el.querySelectorAll('[data-gempack]').forEach(b => b.addEventListener('click', () => {
+        const x = GameData.gemPacks.find(o => o.id === b.dataset.gempack);
+        Platby.buy(App, { id: 'gems_' + x.id, name: t('gems_n', { n: x.gems }), czk: x.czk }, () => {
+          const got = Shop.grant(App, { gems: x.gems }); App.go('obchod', { keepScroll: true }); Shop.rewardsModal(App, t('gems_n', { n: x.gems }), got);
+        });
+      }));
       el.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => {
         const x = G.exchange.find(o => o.id === b.dataset.ex);
         if (save.gold < x.gold) return;

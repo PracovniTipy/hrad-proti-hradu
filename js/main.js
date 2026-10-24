@@ -253,7 +253,8 @@
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
         seed: (cfg.title || '').length * 31 + 7,
-        player: { stats, unitSkins: save.skins.unit, castleSkin: save.skins.castle, castleLevel: GameData.calc.castleLevel(save), castleCfg: Screens.castleCfg(save) },
+        player: { stats, unitSkins: save.skins.unit, castleSkin: save.skins.castle, castleLevel: GameData.calc.castleLevel(save), castleCfg: Screens.castleCfg(save),
+          loadout: id => ({ bonus: GameData.gearHelpers.bonus(save, id), lk: GameData.gearHelpers.look(save, id) }) },
         onUpdateHud: b => this._hud(b, lastHud),
         onEnd: res => this._battleEnd(cfg, res),
         onFormation: mode => this._formUi(mode),
@@ -272,7 +273,10 @@
 
       // ikony jednotek do tlačítek
       requestAnimationFrame(() => {
-        B.querySelectorAll('[data-spawn]').forEach(btn => Art.renderUnitIcon(btn.querySelector('canvas'), btn.dataset.spawn, 'player', save.skins.unit[btn.dataset.spawn], { zoom: 0.92, pad: 3 }));
+        B.querySelectorAll('[data-spawn]').forEach(btn => {
+          const id = btn.dataset.spawn, def = GameData.units[id], GHp = GameData.gearHelpers, lk = GHp.look(save, id);
+          Art.renderUnitIcon(btn.querySelector('canvas'), id, 'player', save.skins.unit[id], { zoom: 0.92, pad: 3, def: GHp.drawDef(def, lk), pal: GHp.palette('player', save.skins.unit[id], def.faction, lk) });
+        });
         battle.resize();
       });
       B.querySelectorAll('[data-spawn]').forEach(btn => btn.addEventListener('pointerdown', e => {

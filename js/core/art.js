@@ -902,13 +902,13 @@
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
-    const def = GameData.units[unitId];
+    const def = opts.def || GameData.units[unitId];
     let s = (opts.zoom || 1) * Math.min(cw / 70, ch / 92);
     ctx.save();
     if (opts.headshot) { s = ch / 27; ctx.translate(cw / 2 - 2 * s, ch / 2 + 64 * s); }
     else ctx.translate(cw / 2 - 2 * s, ch - (opts.pad || 6) * s);
     ctx.scale(s, s);
-    drawUnit(ctx, def, unitPalette(team, skinId, faction), { x: 0, y: 0, facing: 1, walk: opts.walk || 0, moving: !!opts.moving, atk: opts.atk == null ? -1 : opts.atk, t: opts.t || 0, noShadow: !!opts.noShadow });
+    drawUnit(ctx, def, opts.pal || unitPalette(team, skinId, faction), { x: 0, y: 0, facing: 1, walk: opts.walk || 0, moving: !!opts.moving, atk: opts.atk == null ? -1 : opts.atk, t: opts.t || 0, noShadow: !!opts.noShadow });
     ctx.restore();
   }
 

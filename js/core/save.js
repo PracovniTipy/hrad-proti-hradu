@@ -36,7 +36,10 @@
         unit: equipped,
         castle: 'kralovsky'
       },
-      settings: { speed: 1, auto: {} }
+      settings: { speed: 1, auto: {} },
+      gear: { owned: [], eq: {} },
+      purchases: {},
+      chests: {}
     };
   }
 

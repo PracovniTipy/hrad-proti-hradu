@@ -296,3 +296,82 @@ h1, h2, h3 { text-shadow: 0 2px 0 rgba(0,0,0,.55); }
 #nav button:active .nav-medal { transform: scale(.94); }
 @media (min-width: 700px) { #nav .nav-medal { width: 62px; height: 56px; } }
 @media (max-height: 430px) and (orientation: landscape) { #nav button { min-height: 48px; } #nav .nav-medal { width: 44px; height: 40px; } }
+
+/* =====================================================================
+   OBCHOD: balíčky, truhly, zbrojnice, odměny
+   ===================================================================== */
+.tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; padding-bottom: 2px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs .tab { flex: none; }
+.offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+.offer { padding: 14px 12px 12px; display: grid; gap: 6px; justify-items: center; text-align: center; overflow: visible; }
+.offer h3 { font-size: 16px; }
+.offer p { margin: 0; font-size: 13px; color: var(--muted); }
+.offer .btn { width: 100%; font-size: 18px; }
+.offer.sold { opacity: .6; }
+.offer-art { height: 74px; display: grid; place-items: center; filter: drop-shadow(0 6px 8px rgba(0,0,0,.55)); }
+.offer-art svg { width: 86px; height: 72px; }
+.art-big svg { width: 64px; height: 64px; }
+.art-stack { display: flex; }
+.art-stack .ico { width: 40px; height: 40px; margin: 0 -8px; }
+.art-stack .ico:nth-child(2) { transform: translateY(-10px) scale(1.15); z-index: 1; }
+.offer-give { display: flex; gap: 10px; justify-content: center; font-family: var(--font-display); font-weight: 900; color: #ffe9a8; }
+.offer-give .ico { width: 20px; height: 20px; }
+.offer-badge {
+  position: absolute; top: -8px; right: -6px; z-index: 2; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 900;
+  font-family: var(--font-display); color: #fff; background: radial-gradient(120% 120% at 50% 0%, #ff8a7a, #c8362c 55%, #7a1410); box-shadow: 0 0 0 2px #ffd77a, 0 4px 8px rgba(0,0,0,.5);
+  transform: rotate(6deg);
+}
+.skin { position: relative; overflow: visible; }
+.gear-bonus { margin: 0; color: #8fe07a; font-weight: 800; font-size: 13px; }
+.link-btn { background: none; border: 0; padding: 0; color: #9fd0ff; text-decoration: underline; font-size: 13px; font-weight: 700; justify-self: start; }
+/* truhly */
+.chest-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.chest-card { display: grid; grid-template-columns: 96px 1fr; grid-template-rows: auto auto; gap: 8px 12px; padding: 14px; align-items: center; overflow: hidden; }
+.chest-card .btn { grid-column: 1 / -1; font-size: 19px; }
+.chest-card.tydenni { box-shadow: 0 0 0 1px #05070b, 0 0 26px rgba(192,124,255,.28), 0 10px 24px rgba(0,0,0,.45); }
+.chest-body { display: grid; gap: 4px; }
+.chest-body h3 { font-size: 18px; }
+.chest-body p { margin: 0; font-size: 13px; }
+.chest-art svg { width: 96px; height: 80px; display: block; filter: drop-shadow(0 6px 8px rgba(0,0,0,.6)); }
+.chest-card .chest-art svg { animation: chestBob 2.6s ease-in-out infinite; }
+@keyframes chestBob { 50% { transform: translateY(-4px) rotate(-1.5deg); } }
+/* otevření truhly */
+.chest-open { position: relative; display: grid; place-items: center; height: 130px; }
+.chest-open .chest-art { position: relative; z-index: 1; animation: chestShake .7s ease-in-out; }
+.chest-open .chest-art svg { width: 130px; height: 108px; }
+.chest-open .lid { transform-origin: 14px 46px; animation: lidOpen .6s .6s ease-out forwards; }
+@keyframes chestShake { 0%, 100% { transform: none; } 20% { transform: rotate(-6deg); } 40% { transform: rotate(6deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(3deg); } }
+@keyframes lidOpen { to { transform: rotate(-28deg) translate(-4px, -6px); } }
+.chest-rays { position: absolute; width: 220px; height: 220px; border-radius: 50%; background: conic-gradient(from 0deg, rgba(255,215,122,.0), rgba(255,215,122,.35), rgba(255,215,122,0) 12%, rgba(255,215,122,.35) 25%, rgba(255,215,122,0) 37%, rgba(255,215,122,.35) 50%, rgba(255,215,122,0) 62%, rgba(255,215,122,.35) 75%, rgba(255,215,122,0) 87%); filter: blur(4px); opacity: 0; animation: rays 6s .9s linear infinite, fadeIn .4s .9s forwards; }
+@keyframes rays { to { transform: rotate(360deg); } }
+@keyframes fadeIn { to { opacity: 1; } }
+.rw-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.rw { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border-radius: 12px; text-align: center; background: rgba(0,0,0,.3); box-shadow: inset 0 0 0 1px rgba(232,184,74,.35); animation: rwIn .4s ease-out both; }
+.rw:nth-child(2) { animation-delay: .1s; } .rw:nth-child(3) { animation-delay: .2s; } .rw:nth-child(4) { animation-delay: .3s; }
+@keyframes rwIn { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.rw-ico .ico, .rw-ico svg { width: 40px; height: 40px; }
+.rw b { font-family: var(--font-display); color: #ffe9a8; font-size: 16px; }
+.rw small { color: var(--muted); font-size: 12px; }
+.rw-gear { box-shadow: inset 0 0 0 2px var(--rc), 0 0 16px color-mix(in srgb, var(--rc) 45%, transparent); }
+.rw-gear canvas { width: 70px; height: 84px; }
+.pay-price { font-family: var(--font-display); font-size: 34px; font-weight: 900; text-align: center; color: #ffe9a8; text-shadow: 0 2px 0 #000; }
+/* zbrojnice */
+.armory-top { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 14px; padding: 12px; align-items: center; }
+.armory-top canvas { width: 100%; height: 190px; border-radius: 12px; box-shadow: inset 0 0 0 2px rgba(232,184,74,.4); }
+.armory-info { display: grid; gap: 6px; }
+.armory-info h3 { font-size: 20px; }
+.gear-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.gear-card { padding: 10px; display: grid; gap: 6px; align-content: start; }
+.gear-card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--rc) 70%, transparent), inset 0 -40px 50px -30px color-mix(in srgb, var(--rc) 35%, transparent); }
+.gear-card canvas { width: 100%; height: 110px; border-radius: 10px; background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--rc) 35%, #1a2232), #0d121c 80%); }
+.gear-card h3 { font-size: 15px; }
+.gear-card p { margin: 0; font-size: 12px; }
+.gear-card.equipped { box-shadow: 0 0 0 2px #8fe07a, 0 0 18px rgba(143,224,122,.35); }
+.gear-card .btn { width: 100%; }
+@media (max-width: 520px) {
+  .offer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gear-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .armory-top { grid-template-columns: 130px 1fr; }
+  .armory-top canvas { height: 150px; }
+}

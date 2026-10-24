@@ -42,7 +42,12 @@ Na telefonu je nejlepší hrát **na šířku**, protože pak je vidět celé bo
 - **16 jazyků**: při prvním spuštění si hráč vybere jazyk (čeština, angličtina, čínština, hindština, španělština, francouzština, arabština, bengálština, portugalština, ruština, urdština, indonéština, němčina, japonština, turečtina, korejština). Rozhraní a tutoriály jsou přeložené do všech; příběhy a popisy jednotek jsou česky a anglicky (ostatní jazyky používají angličtinu). Arabština a urdština se zobrazují zprava doleva. Jazyk jde změnit v Profilu.
 - **Tutoriály**: při první návštěvě hlavní stránky, v první bitvě a v úpravě hradu. Zvýrazní ovládací prvek a vysvětlí ho; klepnutím kamkoli se přejde dál, po posledním kroku tutoriál skončí (jde i přeskočit). V Profilu je lze spustit znovu.
 - **Úprava hradu**: barva praporů a vlajek, znak (9 erbů), barva střech, vzhled hradu a dekorace (pochodně, prapory, erbovní štíty, zahrada, zlacení). Změny se projeví v náhledu i v bitvách.
-- **Obchod**: skiny vojáků a hradů, dekorace, nabídka dne se slevou, denní odměna a směnárna zlata za drahokamy. Nákupy za skutečné peníze nejsou zapojené (jen ukázka, tlačítka vypnutá).
+- **Obchod** má záložky Nabídky, Zbrojnice, Vojáci (skiny), Hrady, Dekorace a Drahokamy:
+  - *Balíčky za 29 Kč* (startovní, měšec zlata, hrst drahokamů, kovář, zbrojíř, lučištník, hraničáři, hradní…) a dražší balíček hrdiny a královský balíček. Některé jdou koupit jen jednou.
+  - *Denní truhla* (29 Kč, 1× denně) a *týdenní truhla* (99 Kč, 1× týdně) s náhodným zlatem, drahokamy a zbraněmi či brněním. Šance jsou ve hře zveřejněné; předmět, který už hráč má, se změní na zlato.
+  - *Zbrojnice*: 4 zbraně a 4 brnění pro každou roli (pěchota, střelci, kopiníci, těžká jednotka) – za zlato, drahokamy nebo Kč. Výbava přidává útok, životy, zbroj a kritické zásahy, platí pro danou roli u všech národů a vojáci ji mají vidět i na bojišti (zářící zbraně, rohatá nebo zlatá zbroj s korunou a pláštěm).
+  - *Skiny vojáků* přidávají malé bonusy; dva prémiové skiny jsou za Kč.
+  - **Platby za skutečné peníze nejsou zapojené.** Hra má připravené rozhraní `window.HraPlatby` (js/core/platby.js) pro Google Play Billing, App Store nebo platby herních portálů. Do té doby jde nákup jen vyzkoušet zdarma v jasně označeném testovacím režimu.
 - **Detailní grafika**: postavy mají oči, obočí, nos, uši, vlasy, ruce s prsty, boty s podrážkou a plastické stínování. Bojiště má hloubku (vzdálená krajina se posouvá pomaleji) a plující mraky; evropská krajina má stromy, ploty, kaluže, kytky, vesnici, mlýn a vzdálený hrad. Snímky postav se ukládají do mezipaměti, aby hra běžela plynule i se stovkou vojáků.
 - **Živá hlavní stránka**: animovaná scéna hradu v krajině národa se strážemi a hlídkou, rychlé dlaždice Příběh / Trénink / Souboj / Obchod.
 - **Tři národy**: na obrazovce Hrad (sekce Národ) nebo v Příběhu si vybereš, za koho hraješ. Každý národ má vlastní vojáky, hrad, bojiště, mapu, příběh a organizaci armády:
@@ -79,7 +84,7 @@ Na telefonu je nejlepší hrát **na šířku**, protože pak je vidět celé bo
 - **PvP obrazovka**: 5 soupeřů na sezónu a na každého **maximálně 3 útoky**. Obtížnost roste (×1,0 → ×1,3 → ×1,65) a stejně tak odměna (+30 / +45 / +70 trofejí). U každého soupeře je jasně vidět počet zbývajících útoků, obtížnost a odměna.
 - **Žebříček TOP 10** podle trofejí. Ostatní hráči jsou **označená ukázková data**, tvoje pozice je skutečná.
 - **Profil hráče**: jméno, portrét, statistiky a smazání postupu.
-- **Skiny**: 5 skinů vojáků (Týmová zbroj, Lesní hraničáři, Stínová legie, Zlatý paladin, Ledová stráž) a 4 skiny hradů. Kupují se za drahokamy a mění **jen vzhled**.
+- **Skiny**: 5 skinů vojáků (Týmová zbroj, Lesní hraničáři, Stínová legie, Zlatý paladin, Ledová stráž) a 4 skiny hradů. Kupují se za drahokamy (prémiové za Kč) a kromě vzhledu přidávají malý bonus.
 - **Ukládání postupu** do prohlížeče (localStorage).
 - **České rozhraní** a ovládání prsty (velká tlačítka, responzivní rozvržení na šířku i na výšku).
 

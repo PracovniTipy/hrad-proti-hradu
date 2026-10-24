@@ -1,6 +1,6 @@
 /* =========================================================================
-   SKINY – POUZE KOSMETIKA
-   Skin mění jen barvy a ozdoby. Na statistiky jednotek ani hradu nemá vliv.
+   SKINY VOJÁKŮ A HRADŮ
+   Skin mění barvy a ozdoby; bonusy skinů vojáků jsou v vybava.js.
    Nový skin přidáte novým záznamem do pole – nic dalšího se měnit nemusí.
      palette  – přepíše barvy z týmové palety (viz teamPalettes)
      ornament – volitelná ozdoba helmy: 'horns' | 'crown' | 'crystal'
