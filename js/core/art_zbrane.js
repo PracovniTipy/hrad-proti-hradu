@@ -64,7 +64,7 @@
 
   /* ------------ MODELY ZBRANÍ NA BLÍZKO (rukojeť v 0, čepel ve směru +y) ------------ */
   const MELEE = {
-    AXE_SIDE: -1,
+    AXE_SIDE: -1, HEAD_ROT: -1.7,
     // jednoruční meč: široká čepel s žlábkem
     mec(ctx, c) {
       glowOn(ctx, c);
@@ -433,12 +433,14 @@
 
   /* výchozí model podle zbraně jednotky (meče teď vypadají jako opravdové meče) */
   const DEFAULT = { sword: 'mec', longsword: 'dlouhy' };
+  /* sekery, kladiva a palcáty se drží hlavicí NAHORU (ne obráceně jako meč) */
+  const HEADED = { sekera: 1, kladivo: 1, palcat: 1 };
   /* zbraně se kreslí výrazně větší a širší, aby byly v bitvě jasně vidět */
-  function drawMelee(ctx, id, pal, M) { ctx.save(); ctx.scale(id === 'katana' || id === 'savle' ? -1.0 : 1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
+  function drawMelee(ctx, id, pal, M, icon) { ctx.save(); if (HEADED[id] && !icon) { ctx.rotate(MELEE.HEAD_ROT); ctx.translate(0, 4); } ctx.scale(id === 'katana' || id === 'savle' ? -1.0 : 1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
   function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(0.95, 1.05); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
 
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
-    MELEE_REF: MELEE, meleeModels: Object.keys(MELEE).filter(k => k !== 'AXE_SIDE'), poleModels: Object.keys(POLE) });
+    MELEE_REF: MELEE, meleeModels: Object.keys(MELEE).filter(k => k !== 'AXE_SIDE' && k !== 'HEAD_ROT'), poleModels: Object.keys(POLE) });
 })();
 
 /* =========================================================================
@@ -542,7 +544,7 @@
     if (cat === 'melee') {
       const s = Math.min(w, h) / 92;
       ctx.translate(w * 0.3, h * 0.76); ctx.scale(s, s); ctx.rotate(-Math.PI * 0.75);
-      A.drawMelee(ctx, id, pal, M);
+      A.drawMelee(ctx, id, pal, M, true);
     } else if (cat === 'pole') {
       const s = w / 130;
       ctx.translate(w * 0.14, h * 0.82); ctx.scale(s, s); ctx.rotate(-0.62);

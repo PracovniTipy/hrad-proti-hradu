@@ -196,12 +196,15 @@
             mode: 'campaign', title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
             enemyFaction: lv.enemy, theme: lv.theme || EF.theme,
             enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
-            alliance: !!lv.alliance, playFaction: lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
+            alliance: !!lv.alliance, playFaction: lv._pf || lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
             ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: GameData.battleConfig.worldW + 640 } } : {}),
             hostages: lv.hostages || 0,
             level: lv
           });
-          if (lv.scene && GameData.scenes[lv.scene]) this.playScene(lv.scene, go); else go();
+          // po dokončení příběhu samurajů si hráč v každém zápase vybere armádu
+          const pick = !lv.alliance && H.actDone(this.save, 'samurajove');
+          const go2 = pick ? () => this.pickArmy(pf => { lv._pf = pf; go(); }) : go;
+          if (lv.scene && GameData.scenes[lv.scene]) this.playScene(lv.scene, go2); else go2();
         });
       });
     },
@@ -312,8 +315,8 @@
       const battle = new Battle({
         canvas: $('#bCanvas'), mini: $('#bMini'),
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
-        world: cfg.world || null, enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
-        playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0,
+        world: facs.length > 1 ? Object.assign({}, cfg.world || {}, { playerFront: GameData.battleConfig.playerFront + 560 }) : (cfg.world || null), enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
+        playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0, allyFactions: facs.length > 1 ? facs : null,
         playerFaction: (cfg.playFaction && cfg.playFaction !== 'spojenectvi') ? cfg.playFaction : save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
@@ -430,6 +433,8 @@
       set('time', tl, v => { const el = $('#bTimer'); el.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`; el.classList.toggle('low', v <= 30); });
       const coins = Math.floor(P.coins);
       set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', ((v % 500) / 5) + '%'); });
+      const alive = b.units.filter(u => u.team === 'player' && !u.dead).length;
+      set('alive', alive, v => ($('#bAlive').textContent = v));
       const qn = (b.queue || []).length;
       set('max', qn, v => ($('#bCoinMax').textContent = v ? t('queue_n', { n: v }) : ''));
       document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
@@ -553,6 +558,8 @@
     },
 
     init() {
+      // skin s omezením (např. jezdecký) nasazený na jinou jednotku → vrátit základní
+      Object.keys(this.save.skins.unit || {}).forEach(u => { const sk = GameData.unitSkins.find(x => x.id === this.save.skins.unit[u]); if (sk && sk.only && !sk.only.includes(u)) this.save.skins.unit[u] = 'zakladni'; });
       // hra je jen na šířku – na telefonu zkusí celou obrazovku a zamknout orientaci
       const lockLand = () => {
         if (!matchMedia('(pointer: coarse)').matches) return;

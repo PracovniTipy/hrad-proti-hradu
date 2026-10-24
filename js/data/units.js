@@ -123,15 +123,15 @@ GameData.formationConfig = { rows: 4, colSpacing: 40 };
 
 /* Základní nastavení souboje */
 GameData.battleConfig = {
-  worldW: 5000,         // velký rozestup mezi hrady
+  worldW: 7000,         // velký rozestup mezi hrady
   worldH: 600,
   viewTop: 60,          // horní okraj viditelné scény (nebe nad ním se ořízne)
   groundY: 492,         // úroveň patky hradů
   laneTop: 474,         // rozsah "hloubky", kde chodí vojáci
   laneBottom: 540,
   playerFront: 470,     // čelo (brána) mého hradu – celý hrad je vidět i s Velkou pevností
-  enemyFront: 4530,     // čelo nepřátelského hradu (worldW - 470)
-  timeLimit: 420,       // sekund (7 minut – bojiště je dlouhé)
+  enemyFront: 6530,     // čelo nepřátelského hradu (worldW - 470)
+  timeLimit: 720,       // sekund (12 minut – nepřítel shromažďuje velkou armádu)
   startCoins: 120,
   killRewardRatio: 0.3, // podíl ceny jednotky, který dostaneš za zabití
   unitScale: 1.45,      // velikost postav na bojišti

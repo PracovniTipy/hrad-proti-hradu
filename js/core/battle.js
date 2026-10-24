@@ -81,11 +81,11 @@
           skins: opts.player.unitSkins
         },
         enemy: {
-          coins: cfg.startCoins, income: es.income, maxCoins: es.maxCoins,
+          coins: cfg.startCoins, income: es.income, baseIncome: es.income, maxCoins: Infinity,
           hpMult: es.hpMult, dmgMult: es.dmgMult,
           castle: { hp: es.castleHp * (opts.enemyCastleHpMult || 1), maxHp: es.castleHp * (opts.enemyCastleHpMult || 1), front: cfg.enemyFront, tower: es.towerDmg, towerTimer: 1.5 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
-          formation: 'formace', flagX: cfg.enemyFront - 200,
+          formation: 'formace', flagX: cfg.enemyFront - 420,
           castleImg: Art.castleImage('enemy', opts.enemyCastleSkin || 'kralovsky', opts.enemyCastleLevel || 3, opts.enemyCastleStyle ? 1.5 : 2, opts.enemyCastleStyle || (GameData.factions[opts.enemyFaction] || {}).castleStyle || 'evropa'),
           faction: opts.enemyFaction || 'kralovstvi',
           skins: null
@@ -108,6 +108,18 @@
         this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
       }
       this.palCache = {};
+      // SPOJENECTVÍ: hrady všech tří národů nad sebou, z každého vycházejí jeho vojáci
+      this.allyCastles = [];
+      if (opts.allyFactions && opts.allyFactions.length > 1) {
+        const pf = this.side.player.faction;
+        opts.allyFactions.filter(f => f !== pf).forEach((f, i) => {
+          const F = GameData.factions[f];
+          const img = Art.castleImage('player', 'kralovsky', opts.player.castleLevel || 3, 2, F.castleStyle || 'evropa', { emblem: GameData.defaultEmblem[f], banner: F.color, decor: {} });
+          this.allyCastles.push({ f, img, k: 0.82 - i * 0.08, dy: -(26 + i * 26), dx: -(300 + i * 270) });
+        });
+      }
+      // STŘED BOJIŠTĚ: kdo ho obsadí, má výhodu (+35 % mincí, +10 % útok)
+      this.cp = { x: cfg.worldW / 2, r: 200, v: 0, owner: null };
 
       // pozadí
       this.theme = opts.theme || 'evropa';
@@ -160,7 +172,7 @@
         if (Math.abs(dx) > 6) { drag.moved = true; clearTimeout(this._lp); }
         if (drag.moved) {
           this.cam.x = this._clampCam(drag.cam - dx);
-          this.cam.manualUntil = this.time + 4;
+          this.cam.manualUntil = this.time + 24;   // hráč má dost času prohlížet bojiště
         }
       };
       this._onUp = e => {
@@ -192,7 +204,7 @@
           const r = this.o.mini.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width * this.W;
           this.cam.x = this._clampCam(x - this.cam.viewW / 2);
-          this.cam.manualUntil = this.time + 5;
+          this.cam.manualUntil = this.time + 30;
         };
         this.o.mini.addEventListener('pointerdown', this._onMini);
         this.o.mini.addEventListener('pointermove', e => { if (e.buttons) this._onMini(e); });
@@ -283,6 +295,9 @@
       if (!this.palCache[key]) this.palCache[key] = L ? GameData.gearHelpers.palette(team, skin, fac, L.lk) : Art.unitPalette(team, skin, fac);
       // pevnost s více branami: vojáci vycházejí postupně ze všech bran
       let sx = s.castle.front + dir * (8 + this.rand() * 10);
+      let sy = null;
+      const ac = team === 'player' && this.allyCastles.find(a => a.f === fac);
+      if (ac) { sx = s.castle.front + ac.dx - 4; sy = cfg.laneTop - 4; }
       const gates = s.castleImg.gates;
       if (gates && gates.length) {
         s.gateTurn = ((s.gateTurn || 0) + 1) % gates.length;
@@ -295,7 +310,7 @@
       const u = {
         id: this.nextId++, team, def, dir,
         x: sx,
-        y: cfg.laneTop + this.rand() * (cfg.laneBottom - cfg.laneTop),
+        y: sy != null ? sy : cfg.laneTop + this.rand() * (cfg.laneBottom - cfg.laneTop),
         hp: def.hp * (def.boss ? 1 : s.hpMult), maxHp: def.hp * (def.boss ? 1 : s.hpMult),
         dmg: def.dmg * s.dmgMult,
         atkTimer: 0.2, atk: -1, atkDur: Math.min(0.55, def.attackInterval * 0.7), hitDone: false,
@@ -444,12 +459,13 @@
       const SELF = { heal: 1, buff: 1, shield: 1, repair: 1, gold: 1, summon: 1, firearrows: 1, curse: 0 };
       const col = a.color || '#ffd77a';
       if (team === 'player') {
+        const camFree = this.time >= this.cam.manualUntil;   // když si hráč sám posunul kameru, nechá se být
         if (a.kind in AREA && AREA[a.kind]) {
-          this.cam.x = this._clampCam(tx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 2.5;
+          if (camFree) { this.cam.x = this._clampCam(tx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 6; }
           const delay = a.kind === 'meteor' ? 1.1 : a.kind === 'meteors' ? 0.7 : a.kind === 'volley' ? 0.9 : a.kind === 'barrage' ? 0.8 : 0;
           this.later(delay, () => { this.blasts.push({ x: tx, y: midY, r: (a.radius || 160) * (a.kind === 'meteor' ? 1.4 : 1.15), color: col, t: 0, life: 1.0 }); this.shake = Math.max(this.shake, a.kind === 'meteor' ? 1 : 0.45); puff(tx, midY, col, 40, 160); });
         } else if (a.kind in SELF) {
-          const my = mine(); if (my.length) { const mx = my.reduce((q, u) => q + u.x, 0) / my.length; this.cam.x = this._clampCam(mx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 2.5; }
+          const my = mine(); if (my.length && camFree) { const mx = my.reduce((q, u) => q + u.x, 0) / my.length; this.cam.x = this._clampCam(mx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 6; }
           mine().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 46, color: col, t: 0, life: 0.9, small: true }));
         } else if (a.kind === 'curse' || a.kind === 'quake') {
           foes().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 50, color: col, t: 0, life: 1.0, small: true }));
@@ -663,9 +679,10 @@
 
       for (const team of ['player', 'enemy']) {
         const s = this.side[team];
-        s.coins = Math.min(s.maxCoins, s.coins + s.income * dt);
+        s.coins = Math.min(s.maxCoins, s.coins + s.income * dt * (this.cp.owner === team ? 1.35 : 1));
       }
       this._runQueue();
+      this._updateCapture(dt);
       if (this.timers.length) {
         const due = this.timers.filter(x => x.at <= this.time);
         if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
@@ -851,6 +868,33 @@
       };
     }
 
+    /* obsazování středu bojiště */
+    _updateCapture(dt) {
+      const cp = this.cp;
+      let p = 0, e = 0;
+      for (const u of this.units) if (!u.dead && Math.abs(u.x - cp.x) < cp.r) { if (u.team === 'player') p++; else e++; }
+      const d = Math.max(-4, Math.min(4, p - e));
+      if (d) cp.v = Math.max(-1, Math.min(1, cp.v + d * dt * 0.05));
+      const prev = cp.owner;
+      cp.owner = cp.v >= 1 ? 'player' : cp.v <= -1 ? 'enemy' : (cp.owner && Math.abs(cp.v) > 0.5 ? cp.owner : null);
+      if (cp.owner !== prev && cp.owner) this.texts.push({ x: cp.x, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.45, txt: cp.owner === 'player' ? t('cp_ours') : t('cp_theirs'), color: cp.owner === 'player' ? '#9fd0ff' : '#ff9e9e', t: 0, life: 2.4, big: true, huge: true });
+    }
+    _drawCapture(ctx, t) {
+      const cp = this.cp, cfg = C(), y = cfg.laneTop - 8;
+      // kamenný kruh na zemi a prapor
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(cp.x, (cfg.laneTop + cfg.laneBottom) / 2 + 8, cp.r, 40, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,233,168,.10)'; ctx.fill(); ctx.setLineDash([16, 10]); ctx.lineWidth = 4;
+      ctx.strokeStyle = cp.owner === 'player' ? 'rgba(80,150,255,.85)' : cp.owner === 'enemy' ? 'rgba(240,70,60,.85)' : 'rgba(255,233,168,.6)'; ctx.stroke(); ctx.setLineDash([]);
+      // ukazatel obsazení
+      const w = 160, bx = cp.x - w / 2, by = y - 190;
+      ctx.fillStyle = 'rgba(10,12,18,.8)'; ctx.fillRect(bx - 3, by - 3, w + 6, 16);
+      ctx.fillStyle = '#d6453c'; ctx.fillRect(bx, by, w / 2, 10); ctx.fillStyle = '#4b8df0'; ctx.fillRect(bx + w / 2, by, w / 2, 10);
+      ctx.fillStyle = '#fff'; ctx.fillRect(bx + w / 2 + cp.v * w / 2 - 2, by - 3, 4, 16);
+      ctx.restore();
+      this._drawFlag(ctx, cp.x, y, cp.owner === 'player' ? '#2f62b8' : cp.owner === 'enemy' ? '#a8262a' : '#d9c9a0', t, cp.owner === 'enemy' ? -1 : 1);
+    }
+
     /* ohnivé zdi, vichřice, paprsky a ledová kopí ze speciálních útoků */
     _updateSkillFx(dt) {
       const t = this.time;
@@ -1008,7 +1052,7 @@
       if (this.side.player.formation === 'formace' && (ex == null || ex > this.side.player.flagX + 500)) focus = this.side.player.flagX + 120;
       if (ex != null && fx != null) focus = (fx + Math.min(ex, fx + 300)) / 2;
       const want = this._clampCam(focus - this.cam.viewW * 0.55);
-      this.cam.x += (want - this.cam.x) * Math.min(1, dt * 2.2);
+      this.cam.x += (want - this.cam.x) * Math.min(1, dt * 0.45);   // pomalé, klidné sledování
     }
 
     _strike(u) {
@@ -1064,6 +1108,7 @@
       }
       if (s.shieldUntil > this.time) dmg *= 1 - GameData.abilities.stit.reduction;
       if ((s.curseUntil || 0) > this.time) dmg *= 1.5;
+      if (from && from.team && this.cp && this.cp.owner === from.team) dmg *= 1.1;
       if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
       if (from && from.inspired > this.time) dmg *= 1 + (from.inspiredBy || 0.15);
       if (from && from.def && from.def.charge && !from.charged) { from.charged = true; dmg *= from.def.charge; this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('charge'), color: '#ffd77a', t: 0, life: 0.9 }); }
@@ -1105,16 +1150,20 @@
         this.spawn('enemy', ai.next);
         ai.next = null;
       }
-      // vlny: shromáždit u praporu → zaútočit → po ztrátách znovu shromáždit
+      // NEPŘÍTEL ČEKÁ A SHROMAŽĎUJE VELKOU ARMÁDU: vyrazí po 1,5 / 2 / 3 minutách
+      // (náhodně), takže z toho je velká bitva. Mezitím brání svou polovinu.
       const mine = this.units.filter(u => u.team === 'enemy' && !u.dead).length;
-      const threat = this.units.some(u => u.team === 'player' && !u.dead && u.x > s.flagX - 260);
+      const threat = this.units.some(u => u.team === 'player' && !u.dead && u.x > s.flagX - 320);
+      const WAITS = [90, 120, 180];
+      if (ai.attackAt == null) ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)];
       if (s.formation === 'formace') {
-        if (!ai.gatherStart) ai.gatherStart = this.time;
-        if (mine >= ai.wave || threat || (this.time - ai.gatherStart > 26 && mine >= 2)) { s.formation = 'utok'; ai.gatherStart = 0; }
-      } else if (s.formation === 'utok' && mine <= 1 && !threat) {
+        if (this.time >= ai.attackAt || threat) s.formation = 'utok';
+      } else if (s.formation === 'utok' && mine <= 2 && !threat) {
         s.formation = 'formace';
-        ai.wave = Math.min(12, ai.wave + 1);
+        ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * 0.75;
       }
+      // čím déle bitva trvá, tím rychleji nepřítel získává mince (je to těžší a těžší)
+      s.income = s.baseIncome * (1 + this.time / 300);
       // na vyšší obtížnost používá i ohnivý déšť
       if (this.o.difficulty >= 1.25 && s.coins > 420) {
         const near = this.units.filter(u => u.team === 'player' && !u.dead && u.x > C().enemyFront - 500).length;
@@ -1287,6 +1336,11 @@
 
       const t = this.time;
       const P = this.side.player, E = this.side.enemy;
+      for (const ac of this.allyCastles.slice().reverse()) {
+        ctx.save(); ctx.translate(P.castle.front + ac.dx, cfg.groundY + ac.dy); ctx.scale(ac.k, ac.k);
+        Art.drawCastle(ctx, ac.img, 0, 0, 1, t, 1, GameData.factions[ac.f].color);
+        ctx.restore();
+      }
       Art.drawCastle(ctx, P.castleImg, P.castle.front, cfg.groundY, 1, t, P.castle.hp / P.castle.maxHp, '#2f62b8');
       Art.drawCastle(ctx, E.castleImg, E.castle.front, cfg.groundY, -1, t, E.castle.hp / E.castle.maxHp, '#a8262a');
       this._castleFire(ctx, P, 1, t);
@@ -1325,6 +1379,7 @@
         ctx.restore();
       }
 
+      this._drawCapture(ctx, t);
       this._drawSkillFx(ctx, t);
       if (this.o.hostages) this._drawCages(ctx, t);
       // jednotky seřazené podle hloubky
@@ -1473,6 +1528,8 @@
         const fx = (this.squad.mode === 'ustup' ? pf.castle.front + 70 : this.squad.flagX) * sx;
         c.fillStyle = '#7dff9a'; c.fillRect(fx - 1.5, 2, 3, h - 4);
       }
+      c.fillStyle = this.cp.owner === 'player' ? '#4b8df0' : this.cp.owner === 'enemy' ? '#d6453c' : '#ffe9a8';
+      c.beginPath(); c.arc(this.cp.x * sx, h * 0.25, 5, 0, Math.PI * 2); c.fill();
       c.lineWidth = 2; c.strokeStyle = '#ffd77a';
       c.strokeRect(this.cam.x * sx + 1, 2, this.cam.viewW * sx - 2, h - 4);
     }

@@ -702,3 +702,7 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .army-card small { font-family: var(--font-body); color: #d9c9a0; font-size: 12px; text-align: center; }
 .army-card:disabled { filter: grayscale(.9) brightness(.6); cursor: not-allowed; }
 .army-card:not(:disabled):hover { transform: translateY(-2px); }
+
+.alive-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 6px; border-radius: 18px;
+  font-family: var(--font-display); color: #ffe9a8; font-size: 18px; background: rgba(10,13,20,.85); border: 2px solid #e8b84a; box-shadow: 0 0 0 1px #05070b; }
+.alive-badge svg { width: 24px; height: 24px; }
