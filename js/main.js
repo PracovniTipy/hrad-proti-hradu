@@ -206,9 +206,31 @@
       });
     },
 
+    /* Mimo příběh se hra vždy zeptá, za jakou armádu chceš bojovat */
+    pickArmy(onPick) {
+      const save = this.save, H = GameData.campaignHelpers;
+      this.modal(`
+        <div class="eyebrow">${t('pick_army_eyebrow')}</div>
+        <h2>${t('pick_army')}</h2>
+        <div class="army-grid">${GameData.factionOrder.map(f => {
+          const F = GameData.factions[f], un = H.factionUnlocked(save, f);
+          return `<button class="army-card" data-army="${f}" ${un ? '' : 'disabled'} style="--c:${F.color}">
+            <canvas data-armycv="${f}"></canvas>
+            <b>${esc(F.name)}</b><small>${un ? esc(F.people || '') : t('locked_story')}</small>
+          </button>`;
+        }).join('')}</div>
+        <div class="modal-actions"><button class="btn" data-close>${t('back')}</button></div>`, (c, close) => {
+        c.querySelectorAll('canvas[data-armycv]').forEach(cv => Art.renderUnitIcon(cv, GameData.factions[cv.dataset.armycv].roles.tezka, 'player', save.skins.unit[GameData.factions[cv.dataset.armycv].roles.tezka], { zoom: 0.9 }));
+        c.querySelectorAll('[data-army]').forEach(b => b.addEventListener('click', () => { if (b.disabled) return; close(); onPick(b.dataset.army); }));
+      });
+    },
+
     startTraining() {
+      this.pickArmy(pf => this._startTraining(pf));
+    },
+    _startTraining(pf) {
       const f = this.save.faction, F = GameData.factions[f];
-      this.startBattle({
+      this.startBattle({ playFaction: pf,
         mode: 'training', title: t('training'), difficulty: 0.8, enemyUnits: ['pech', 'strelec', 'tezka'].map(r => F.roles[r]),
         enemyFaction: f, theme: F.theme,
         enemyName: t('training'), enemyCastleSkin: 'kralovsky', enemyUnitSkin: 'zakladni', enemyCastleLevel: 2
@@ -222,13 +244,13 @@
       const hist = this.save.pvp.attacks[oppId] || [];
       if (hist.length >= R.maxAttacks) return;
       const i = hist.length;
-      this.startBattle({
+      this.pickArmy(pf => this.startBattle({ playFaction: pf,
         mode: 'pvp', title: `${o.name} · ${i + 1}. boj`, difficulty: P.difficulty(o, i),
         enemyUnits: GameData.factionUnits(o.faction), enemyName: o.name,
         enemyFaction: o.faction, theme: GameData.factions[o.faction].theme,
         enemyCastleSkin: o.castleSkin, enemyUnitSkin: o.unitSkin, enemyCastleLevel: o.castleLevel,
         opp: o, attackIndex: i
-      });
+      }));
     },
 
     /* ---------------- BITVA ---------------- */
@@ -292,7 +314,7 @@
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
         world: cfg.world || null, enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
         playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0,
-        playerFaction: save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
+        playerFaction: (cfg.playFaction && cfg.playFaction !== 'spojenectvi') ? cfg.playFaction : save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
         seed: (cfg.title || '').length * 31 + 7,

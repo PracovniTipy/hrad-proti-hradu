@@ -421,4 +421,10 @@
   Object.assign(I18N.D, {
     rarity_legend: ['čím vzácnější, tím silnější bonus', 'the rarer, the stronger the bonus', '越稀有，加成越强', 'जितना दुर्लभ, उतना मज़बूत बोनस', 'cuanto más raro, mejor bonificación', 'plus c’est rare, plus le bonus est fort', 'كلما كان أندر كانت المكافأة أقوى', 'যত বিরল, তত শক্তিশালী বোনাস', 'quanto mais raro, maior o bônus', 'чем реже, тем сильнее бонус', 'جتنا نایاب، اتنا مضبوط بونس', 'makin langka, makin kuat bonusnya', 'je seltener, desto stärker der Bonus', 'レアなほどボーナスが強い', 'ne kadar nadir, o kadar güçlü bonus', '희귀할수록 보너스가 강합니다']
   });
+
+  Object.assign(I18N.D, {
+    pick_army: ['Za jakou armádu chceš bojovat?', 'Which army do you want to fight for?', '你想为哪支军队而战？', 'आप किस सेना के लिए लड़ना चाहते हैं?', '¿Con qué ejército quieres luchar?', 'Pour quelle armée veux-tu combattre ?', 'مع أي جيش تريد القتال؟', 'কোন সেনার হয়ে লড়বে?', 'Por qual exército quer lutar?', 'За какую армию будешь сражаться?', 'کس فوج کی طرف سے لڑنا چاہتے ہو؟', 'Mau bertarung dengan pasukan mana?', 'Für welche Armee willst du kämpfen?', 'どの軍で戦う？', 'Hangi ordu için savaşmak istersin?', '어느 군대로 싸우겠습니까?'],
+    pick_army_eyebrow: ['Volba armády', 'Choose army', '选择军队', 'सेना चुनें', 'Elegir ejército', 'Choix de l’armée', 'اختيار الجيش', 'সেনা বাছাই', 'Escolher exército', 'Выбор армии', 'فوج منتخب کریں', 'Pilih pasukan', 'Armee wählen', '軍を選ぶ', 'Ordu seçimi', '군대 선택'],
+    locked_story: ['Odemkne se v příběhu', 'Unlocks in the story', '在故事中解锁', 'कहानी में खुलेगा', 'Se desbloquea en la historia', 'Se débloque dans l’histoire', 'يُفتح في القصة', 'গল্পে খুলবে', 'Desbloqueia na história', 'Откроется в сюжете', 'کہانی میں کھلے گا', 'Terbuka di cerita', 'Wird in der Story freigeschaltet', 'ストーリーで解放', 'Hikâyede açılır', '스토리에서 해금']
+  });
 })();
