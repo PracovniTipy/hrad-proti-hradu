@@ -158,17 +158,35 @@
       const ctx = cv.getContext('2d');
       // výřez světa: od nebe po trávu pod cestou
       // trochu z větší dálky, aby byl vidět celý hrad i se špičkami věží
-      const bottom = 560;
+      let bottom = 560;
       let top = 30;
       let sc = h / (bottom - top);
       if (w / sc > 1400) { sc = w / 1400; top = bottom - h / sc; }
+      // úzká obrazovka (telefon na výšku): celý hrad se musí vejít na šířku,
+      // nad krajinou pokračuje obloha
+      if (w / sc < 540) { sc = w / 540; bottom = 600; top = bottom - h / sc; }
       const viewW = w / sc;
       const camX = Math.max(0, Math.min(1400 - viewW, 700 - viewW / 2 + Math.sin(t * 0.08) * Math.min(60, (1400 - viewW) / 2)));
       const k = sc * dpr;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.fillStyle = '#0d121c'; ctx.fillRect(0, 0, cv.width, cv.height);
+      if (!L.skyTop) { const sx = L.far.getContext('2d').getImageData(4, 2, 1, 1).data; L.skyTop = `rgb(${sx[0]},${sx[1]},${sx[2]})`; }
+      ctx.fillStyle = top < 0 ? L.skyTop : '#0d121c'; ctx.fillRect(0, 0, cv.width, cv.height);
       ctx.setTransform(k, 0, 0, k, -(camX * 0.55) * k, -top * k);
+      if (top < 0) {
+        // vysoká obloha nad krajinou: přechod do sytější modři a další mraky
+        const sg = ctx.createLinearGradient(0, top, 0, 60);
+        sg.addColorStop(0, '#1e4f9c'); sg.addColorStop(1, L.skyTop);
+        ctx.fillStyle = sg; ctx.fillRect(-200, top - 10, 1900, 80 - top);
+      }
       ctx.drawImage(L.far, 0, 0, 1400, 600);
+      if (top < 0) {
+        const fade = ctx.createLinearGradient(0, -2, 0, 150);
+        fade.addColorStop(0, L.skyTop); fade.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.save(); ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = fade; ctx.globalAlpha = 1; ctx.fillRect(-200, -2, 1900, 152);
+        ctx.restore();
+        ctx.save(); ctx.translate(0, Math.max(top + 30, -260)); Art.drawClouds(ctx, L.clouds, t * 0.7 + 40, 1400); ctx.restore();
+      }
       Art.drawClouds(ctx, L.clouds, t, 1400);
       ctx.setTransform(k, 0, 0, k, -camX * k, -top * k);
       ctx.drawImage(L.near, 0, 0, 1400, 600);
@@ -231,7 +249,11 @@
     Art.drawEmblem(ctx, id, w / 2, h * (bg ? 0.46 : 0.5), Math.min(w, h) * (bg ? 0.27 : 0.38), color);
   }
 
-  function screenHrad(App) {
+  /* HRAD = jen živá scéna přes celou obrazovku (první, co hráč po spuštění uvidí).
+     SPRÁVA = pokračování příběhu, sága, vylepšení hradu a organizace armády. */
+  function screenSprava(App, opts = {}) { return screenHrad(App, Object.assign({}, opts, { sprava: true })); }
+  function screenHrad(App, opts = {}) {
+    const sprava = !!opts.sprava;
     const save = App.save;
     const F = GameData.factions[save.faction];
     const lvl = GameData.calc.castleLevel(save);
@@ -241,8 +263,8 @@
     const R = GameData.pvpRules;
     const attacksLeft = (save.pvp.opponents || []).reduce((a, id) => a + Math.max(0, R.maxAttacks - (save.pvp.attacks[id] || []).length), 0);
     const el = App.screenEl;
-    el.innerHTML = `
-      <div class="scr">
+    el.innerHTML = sprava ? '' : `
+      <div class="scr scr-home">
         <section class="hero-live">
           <canvas id="homeCv" aria-label="Tvůj hrad v krajině"></canvas>
           <div class="hero-badge">
@@ -255,7 +277,16 @@
           </div>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
         </section>
-
+      </div>`;
+    if (!sprava) {
+      el.classList.add('home-mode');
+      App._stopLive = liveScene(el.querySelector('#homeCv'), () => sceneState(save));
+      emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
+      return;
+    }
+    el.innerHTML = `
+      <div class="scr">
+        <div class="sec-head"><h1>${t('nav_sprava')}</h1><span class="muted">${t('castle_level', { n: lvl })}</span></div>
         <div class="act-grid">
           ${cur ? `<button class="act act-main" data-act="story">
               <span class="act-ico">${ico('swords')}</span>
@@ -306,8 +337,6 @@
         <div class="sec-head"><h2>${t('organization')}</h2><span class="muted">${esc(F.name)} · ${t('army_power', { n: Math.round((st.unitMult - 1) * 100) })}</span></div>
         ${orgHtml(F, save, st)}
       </div>`;
-    App._stopLive = liveScene(el.querySelector('#homeCv'), () => sceneState(save));
-    emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
     el.querySelectorAll('canvas[data-actcv]').forEach(c => { const a = GameData.campaignHelpers.act(c.dataset.actcv); paintActCard(c, a, !GameData.campaignHelpers.actUnlocked(save, a.id)); });
     el.querySelectorAll('[data-saga]').forEach(b => b.addEventListener('click', () => {
       if (!GameData.campaignHelpers.actUnlocked(save, b.dataset.saga)) { App.toast(t('t_nation_locked')); return; }
@@ -323,7 +352,7 @@
       save.buildings[bd.id] = l + 1;
       App.persist();
       App.toast(t('t_upgraded', { name: bd.name, n: l + 1 }));
-      App.go('hrad', { keepScroll: true });
+      App.go('sprava', { keepScroll: true });
     }));
     const story = el.querySelector('[data-act="story"]');
     if (story) story.addEventListener('click', () => App.openLevel(cur.id));
@@ -886,5 +915,5 @@
     });
   }
 
-  window.Screens = { hrad: screenHrad, pribeh: screenPribeh, pvp: screenPvp, zebricek: screenZebricek, skiny: screenObchod, obchod: screenObchod, stavitel: screenStavitel, castleCfg, profil: screenProfil, isUnitUnlocked, stars, fmt, esc };
+  window.Screens = { hrad: screenHrad, sprava: screenSprava, pribeh: screenPribeh, pvp: screenPvp, zebricek: screenZebricek, skiny: screenObchod, obchod: screenObchod, stavitel: screenStavitel, castleCfg, profil: screenProfil, isUnitUnlocked, stars, fmt, esc };
 })();

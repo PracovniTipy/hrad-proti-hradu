@@ -302,4 +302,8 @@
     weapons: ['Zbraně', 'Weapons', '武器', 'हथियार', 'Armas', 'Armes', 'الأسلحة', 'অস্ত্র', 'Armas', 'Оружие', 'ہتھیار', 'Senjata', 'Waffen', '武器', 'Silahlar', '무기'],
     armors: ['Brnění', 'Armor', '护甲', 'कवच', 'Armaduras', 'Armures', 'الدروع', 'বর্ম', 'Armaduras', 'Броня', 'زرہ', 'Zirah', 'Rüstungen', '防具', 'Zırhlar', '방어구']
   });
+
+  Object.assign(I18N.D, {
+    nav_sprava: ['Vylepšení', 'Upgrades', '升级', 'उन्नयन', 'Mejoras', 'Améliorations', 'الترقيات', 'আপগ্রেড', 'Melhorias', 'Улучшения', 'اپ گریڈ', 'Peningkatan', 'Ausbau', '強化', 'Geliştirme', '강화']
+  });
 })();

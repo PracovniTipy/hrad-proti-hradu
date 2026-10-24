@@ -115,8 +115,8 @@
   /* Kroky tutoriálů */
   Tutorial.HOME = [
     { sel: '.hero-live', key: 'tut_home_1' },
-    { sel: '.act-main', key: 'tut_home_2' },
-    { sel: '.saga-strip', key: 'tut_home_3' },
+    { sel: '#nav [data-go="pribeh"]', key: 'tut_home_2' },
+    { sel: '#nav [data-go="sprava"]', key: 'tut_home_3' },
     { sel: '#nav [data-go="obchod"]', key: 'tut_home_4' }
   ];
   Tutorial.BATTLE = [

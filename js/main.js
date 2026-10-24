@@ -34,6 +34,7 @@
       document.querySelectorAll('#nav [data-go]').forEach(b => {
         if (b.dataset.go === navName) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
       });
+      this.screenEl.classList.remove('home-mode');
       Screens[name](this, opts);
       applyIcons(this.screenEl);
       // tutoriály při první návštěvě
@@ -526,7 +527,7 @@
       if (!this.save.lang) {
         this.go('hrad');
         Tutorial.pickLanguage(l => this.setLang(l));
-      } else this.go(Screens[start] ? start : 'hrad');
+      } else this.go('hrad');   // po spuštění vždy hrad
       // fonty se načítají asynchronně – po načtení překresli plátna s textem
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.battle) this.go(this.current, { keepScroll: true }); });
     }

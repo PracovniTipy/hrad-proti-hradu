@@ -32,11 +32,16 @@
   </header>
   <main id="screen" tabindex="-1"></main>
   <nav id="nav" aria-label="Hlavní nabídka">
-    <button data-go="hrad" style="--tint:#3d7fe0"><span class="nav-medal" data-ico="navHrad"></span><span class="nav-lbl" data-i18n="nav_hrad">Hrad</span></button>
-    <button data-go="pribeh" style="--tint:#c9a24a"><span class="nav-medal" data-ico="navPribeh"></span><span class="nav-lbl" data-i18n="nav_pribeh">Příběh</span></button>
-    <button data-go="pvp" style="--tint:#d6453c"><span class="nav-medal" data-ico="navPvp"></span><span class="nav-lbl" data-i18n="nav_pvp">Souboj</span></button>
-    <button data-go="zebricek" style="--tint:#e8b84a"><span class="nav-medal" data-ico="navZebricek"></span><span class="nav-lbl" data-i18n="nav_zebricek">Žebříček</span></button>
-    <button data-go="obchod" style="--tint:#43a047"><span class="nav-medal" data-ico="navObchod"></span><span class="nav-lbl" data-i18n="nav_obchod">Obchod</span></button>
+    <div class="nav-group nav-left">
+      <button data-go="hrad" style="--tint:#3d7fe0"><span class="nav-medal" data-ico="navHrad"></span><span class="nav-lbl" data-i18n="nav_hrad">Hrad</span></button>
+      <button data-go="sprava" style="--tint:#c9a24a"><span class="nav-medal" data-ico="navSprava"></span><span class="nav-lbl" data-i18n="nav_sprava">Vylepšení</span></button>
+      <button data-go="obchod" style="--tint:#43a047"><span class="nav-medal" data-ico="navObchod"></span><span class="nav-lbl" data-i18n="nav_obchod">Obchod</span></button>
+      <button data-go="zebricek" style="--tint:#e8b84a"><span class="nav-medal" data-ico="navZebricek"></span><span class="nav-lbl" data-i18n="nav_zebricek">Žebříček</span></button>
+    </div>
+    <div class="nav-group nav-right">
+      <button class="nav-big" data-go="pvp" style="--tint:#d6453c"><span class="nav-medal" data-ico="navPvp"></span><span class="nav-lbl" data-i18n="nav_pvp">Souboj</span></button>
+      <button class="nav-big" data-go="pribeh" style="--tint:#c9a24a"><span class="nav-medal" data-ico="navPribeh"></span><span class="nav-lbl" data-i18n="nav_pribeh">Příběh</span></button>
+    </div>
   </nav>
 </div>
 
