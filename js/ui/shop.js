@@ -102,7 +102,10 @@
     const def = GameData.units[uid];
     const fake = { gear: { eq: { [role]: { [g.slot]: g.id } } }, skins: save.skins };
     const lk = GH().look(fake, uid);
-    Art.renderUnitIcon(cv, uid, 'player', save.skins.unit[uid], { def: GH().drawDef(def, lk), pal: GH().palette('player', save.skins.unit[uid], def.faction, lk), zoom: 0.95 });
+    const pal = GH().palette('player', save.skins.unit[uid], def.faction, lk);
+    // zbraň samotná, zbroj na dřevěné figuríně – bez postavy
+    if (g.slot === 'weapon') Art.renderWeaponIcon(cv, uid, pal);
+    else Art.renderArmorIcon(cv, uid, GH().drawDef(def, lk), pal);
   }
 
   /* ---------- záložka NABÍDKY ---------- */
@@ -210,15 +213,7 @@
       <div class="chips" role="tablist">
         ${ROLES.map(r => { const id = GameData.unitForRole(shopNation(save), r); return `<button class="chip" role="tab" data-role="${r}" aria-selected="${r === role}"><canvas data-chip="${id}"></canvas>${roleName(r)}</button>`; }).join('')}
       </div>
-      <section class="panel armory-top">
-        <canvas id="armoryPrev"></canvas>
-        <div class="armory-info">
-          <div class="eyebrow">${roleName(role)}</div>
-          <h3>${esc(GameData.units[uid].name)}</h3>
-          <p class="gear-bonus">${bonusText(b) || t('no_bonus')}</p>
-          <p class="muted" style="margin:0;font-size:13px">${t('armory_note')}</p>
-        </div>
-      </section>
+      <div class="armory-line"><b>${esc(GameData.units[uid].name)}</b> <span class="gear-bonus">${bonusText(b) || t('no_bonus')}</span></div>
       <div class="sec-head"><h2>${t('weapons')}</h2></div>
       <div class="gear-grid">${list('weapon')}</div>
       <div class="sec-head"><h2>${t('armors')}</h2></div>
@@ -244,6 +239,7 @@
     }));
     // animovaný náhled vojáka ve výbavě
     const pv = el.querySelector('#armoryPrev');
+    if (!pv) return;
     const def = GameData.units[uid];
     const lk = GH().look(save, uid);
     const ddef = GH().drawDef(def, lk), pal = GH().palette('player', save.skins.unit[uid], def.faction, lk);

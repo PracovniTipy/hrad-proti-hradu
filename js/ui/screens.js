@@ -735,8 +735,7 @@
       el.querySelectorAll('canvas[data-wskin]').forEach(c => {
         const p = Art.unitPalette('player', save.skins.unit[unitSel], nation);
         p.wmodel = GameData.weaponSkinById(c.dataset.wskin).model;
-        const cat = Art.weaponCat(GameData.units[unitSel].look.weapon);
-        Art.renderUnitIcon(c, unitSel, 'player', save.skins.unit[unitSel], { pal: p, atk: cat === 'bow' ? 0.35 : -1, zoom: cat === 'pole' ? 0.62 : cat === 'bow' ? 0.85 : 0.72, offsetX: cat === 'pole' ? 0.2 : cat === 'bow' ? 0.04 : 0.12 });
+        Art.renderWeaponIcon(c, unitSel, p);
       });
       const wset = id => { save.skins.weapon[unitSel] = id; App.persist(); App.go('obchod', { keepScroll: true }); };
       el.querySelectorAll('[data-wequip]').forEach(b => b.addEventListener('click', () => wset(b.dataset.wequip)));

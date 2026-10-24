@@ -500,3 +500,75 @@
     ctx.beginPath(); ctx.moveTo(-9, -36); ctx.lineTo(10, -36); ctx.lineWidth = 3; ctx.strokeStyle = pal.sash || pal.trim; ctx.stroke();
   };
 })();
+
+/* =========================================================================
+   OBCHOD: obrázek samotné zbraně (bez postavy) a zbroj na dřevěné figuríně
+   ========================================================================= */
+(function () {
+  const A = window.Art, TAU = Math.PI * 2;
+  const DEF = { sword: 'mec', longsword: 'dlouhy', katana: 'katana', katana2: 'katana', axe: 'sekera', daneaxe: 'dvojsekera', flamesword: 'plamen',
+    spear: 'kopi', yari: 'kopi', trident: 'trojzubec', bow: 'dlouhy', yumi: 'yumi' };
+  function prep(cv) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = cv.clientWidth || cv.width, h = cv.clientHeight || cv.height;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+  /* unitId = komu zbraň patří (podle toho druh zbraně), pal.wmodel = konkrétní model */
+  function renderWeaponIcon(cv, unitId, pal) {
+    const { ctx, w, h } = prep(cv);
+    const def = GameData.units[unitId], L = def.look;
+    const cat = A.weaponCat(L.weapon) || (L.weapon === 'staff' ? 'staff' : 'melee');
+    const M = pal.wmodel && (pal.wmodel.cat === cat) ? pal.wmodel : null;
+    const id = (M && M.id) || (cat === 'melee' ? (L.meleeModel || DEF[L.weapon] || 'mec') : DEF[L.weapon]) || 'kopi';
+    // jemná záře za zbraní
+    const g = ctx.createRadialGradient(w / 2, h / 2, 4, w / 2, h / 2, Math.max(w, h) * 0.6);
+    g.addColorStop(0, (M && M.glow) || pal.glow ? 'rgba(255,240,200,.18)' : 'rgba(255,255,255,.07)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    if (cat === 'melee') {
+      const s = Math.min(w, h) / 92;
+      ctx.translate(w * 0.3, h * 0.76); ctx.scale(s, s); ctx.rotate(-Math.PI * 0.75);
+      A.drawMelee(ctx, id, pal, M);
+    } else if (cat === 'pole') {
+      const s = w / 130;
+      ctx.translate(w * 0.14, h * 0.82); ctx.scale(s, s); ctx.rotate(-0.62);
+      A.limb(ctx, -10, 0, 46, 0, 3.6, (M && M.wood) || pal.wood);
+      A.drawPole(ctx, id, pal, M);
+    } else if (cat === 'bow') {
+      const c = A.weaponColors(pal, M);
+      const tall = id === 'yumi' ? 128 : 108, s = h / tall;
+      ctx.translate(w * 0.48, h * (id === 'yumi' ? 0.66 : 0.52)); ctx.scale(s, s);
+      const tips = A.drawBowLimbs(ctx, id, c, 0, 0);
+      ctx.beginPath(); ctx.moveTo(tips[0][0], tips[0][1]); ctx.lineTo(tips[1][0], tips[1][1]); ctx.lineWidth = 1.3; ctx.strokeStyle = c.string; ctx.stroke();
+      // šíp přes luk
+      ctx.beginPath(); ctx.moveTo(-26, 0); ctx.lineTo(16, 0); ctx.lineWidth = 3.6; ctx.strokeStyle = A.OUT; ctx.stroke(); ctx.lineWidth = 1.8; ctx.strokeStyle = (M && M.arrow) || '#d8c39a'; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(16, -3.4); ctx.lineTo(23, 0); ctx.lineTo(16, 3.4); ctx.closePath(); A.fs(ctx, (M && M.tip) || '#c9ced6', 1.1);
+    } else { // hůl mága
+      const s = h / 100, mc = L.magic || '#7fc8ff';
+      ctx.translate(w / 2, h * 0.9); ctx.scale(s, s); ctx.rotate(0.25);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -78); ctx.lineCap = 'round'; ctx.lineWidth = 6; ctx.strokeStyle = A.OUT; ctx.stroke(); ctx.lineWidth = 3.4; ctx.strokeStyle = L.staffWood || '#7a4c2a'; ctx.stroke();
+      ctx.save(); ctx.shadowColor = (M && M.glow) || pal.glow || mc; ctx.shadowBlur = 16;
+      const og = ctx.createRadialGradient(-2, -86, 1, 0, -84, 8); og.addColorStop(0, '#fff'); og.addColorStop(0.5, (pal.glow || mc)); og.addColorStop(1, A.shade(mc, -0.4));
+      ctx.beginPath(); ctx.arc(0, -84, 8, 0, TAU); ctx.fillStyle = og; ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.moveTo(-7, -78); ctx.quadraticCurveTo(-8, -92, 0, -94); ctx.quadraticCurveTo(8, -92, 7, -78); ctx.lineWidth = 2.4; ctx.strokeStyle = pal.trim || '#e8b84a'; ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* zbroj na dřevěné figuríně: postava bez obličeje a bez zbraně */
+  function renderArmorIcon(cv, unitId, def, pal) {
+    const { ctx, w, h } = prep(cv);
+    const wood = '#b08a5a';
+    const p = Object.assign({}, pal, { skin: wood, eyes: wood, iris: wood, hair: '#8a6a40', lace: pal.lace });
+    const s = Math.min(w / 78, h / 104);
+    // podstavec
+    ctx.save(); ctx.translate(w / 2, h - 6);
+    ctx.beginPath(); ctx.ellipse(0, 0, 26 * s, 5 * s, 0, 0, TAU); A.fs(ctx, '#5a3a1e', 1.6);
+    ctx.restore();
+    ctx.save(); ctx.translate(w / 2 - 2 * s, h - 8); ctx.scale(s, s);
+    A.drawUnit(ctx, Object.assign({}, def, { look: Object.assign({}, def.look, { mount: null, sashimono: false }) }), Object.assign(p, { mount: null }), { x: 0, y: 0, facing: 1, t: 0.3, noShadow: true, noWeapon: true, mannequin: true });
+    ctx.restore();
+  }
+  Object.assign(A, { renderWeaponIcon, renderArmorIcon });
+})();

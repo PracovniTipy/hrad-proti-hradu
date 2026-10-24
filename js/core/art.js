@@ -289,7 +289,8 @@
     // Zbraň a paže (skin zbraně mění barvy čepele, dřeva a záři)
     const palMain = pal;
     const WM = pal.wmodel, wcat = window.Art.weaponCat ? window.Art.weaponCat(L.weapon) : null;
-    if (WM && WM.cat === wcat && wcat === 'melee') drawSwordArm(ctx, L, pal, atk, w, moving);
+    if (st.noWeapon) { /* figurína v obchodě: bez zbraně */ }
+    else if (WM && WM.cat === wcat && wcat === 'melee') drawSwordArm(ctx, L, pal, atk, w, moving);
     else if (WM && WM.cat === wcat && wcat === 'pole') drawSpear(ctx, L, pal, atk, moving, w);
     else if (WM && WM.cat === wcat && wcat === 'bow') drawBow(ctx, L, pal, atk);
     // výchozí zbraně národů: skutečné modely (katana, sekera, luk jumi, kopí jari)
@@ -308,7 +309,8 @@
     // Štít (před tělem) – při bloku zvednutý před obličej
     ctx.save();
     if (st.block) ctx.translate(5, -9);
-    if (P.shield && P.shield[L.shield]) P.shield[L.shield](ctx, L, pal, atk);
+    if (st.noWeapon) { /* bez štítu */ }
+    else if (P.shield && P.shield[L.shield]) P.shield[L.shield](ctx, L, pal, atk);
     else if (L.shield === 'round') {
       const sx = atk >= 0 && atk < 0.6 ? -1.5 : 0;
       ctx.beginPath(); ctx.arc(8 + sx, -41, 11, 0, TAU); fs(ctx, pal.tunic, 2);
@@ -441,7 +443,7 @@
       }
     } else {
       // obličej
-      face(ctx, pal, L);
+      if (st.mannequin) { ctx.beginPath(); ctx.arc(1.5, -63, 9, 0, TAU); fs(ctx, pal.skin, 1.6); } else face(ctx, pal, L);
       const PH = window.ArtParts || {};
       if (L.beard && PH.beard) PH.beard(ctx, L, pal);
       if (PH.helmet && PH.helmet[L.helmet]) PH.helmet[L.helmet](ctx, L, pal, st);
