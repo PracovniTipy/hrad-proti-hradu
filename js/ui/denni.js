@@ -27,13 +27,25 @@
     { gems: 80 }, { gold: 2000, gems: 50 }, { skin: 'verny' }
   ];
 
+  /* Po 14. dni pokračují odměny každý den donekonečna (týdenní cyklus,
+     každý týden o 15 % víc, každý 30. den bonus drahokamů) */
+  const LOYAL = [{ gold: 800 }, { gems: 40 }, { gold: 1200 }, { randomGear: { minTier: 0 } }, { gems: 60 }, { gold: 1800 }, { randomGear: { minTier: 1 }, gems: 80 }];
+  function reward(n) {
+    if (n <= 14) return DAYS[n - 1];
+    const i = (n - 15) % 7, week = Math.floor((n - 15) / 7), k = Math.min(3, 1 + week * 0.15);
+    const r = Object.assign({}, LOYAL[i]);
+    if (r.gold) r.gold = Math.round(r.gold * k / 10) * 10;
+    if (r.gems) r.gems = Math.round(r.gems * k);
+    if (n % 30 === 0) r.gems = (r.gems || 0) + 300;
+    return r;
+  }
+
   const Denni = {
-    DAYS,
+    DAYS, reward,
     state(save) {
       const L = save.login || (save.login = { last: '', streak: 0, lastClaim: '' });
       // vynechaný den → řada začíná znovu
       if (L.lastClaim && L.lastClaim !== today() && L.lastClaim !== yesterday()) { L.streak = 0; }
-      if (L.streak >= 14 && L.lastClaim !== today()) L.streak = 0; // po 14. dni nové kolo
       return { streak: L.streak, claimedToday: L.lastClaim === today(), day: L.lastClaim === today() ? L.streak : L.streak + 1 };
     },
     available(save) { return !this.state(save).claimedToday; },
@@ -54,11 +66,18 @@
           ${done ? '<i class="dd-check">✓</i>' : ''}
         </div>`;
       };
+      const loyal = st.day > 14;
+      let grid;
+      if (!loyal) grid = DAYS.map(cell).join('');
+      else {
+        const start = st.day - ((st.day - 15) % 7);
+        grid = [0, 1, 2, 3, 4, 5, 6].map(k => cell(reward(start + k), start + k - 1)).join('');
+      }
       App.modal(`
         <div class="eyebrow">${t('daily_free')}</div>
         <h2>${t('daily_title')}</h2>
-        <p class="muted" style="margin:0">${t('daily_rule')}</p>
-        <div class="dd-grid">${DAYS.map(cell).join('')}</div>
+        <p class="muted" style="margin:0">${loyal ? t('daily_rule2') : t('daily_rule')}</p>
+        <div class="dd-grid">${grid}</div>
         <div class="dd-streak">${t('streak_n', { n: st.streak })}</div>
         <div class="modal-actions">
           ${st.claimedToday ? `<button class="btn" disabled>${t('daily_tomorrow')}</button>` : `<button class="btn btn-gold btn-big" id="ddClaim">${t('claim')}</button>`}
@@ -76,7 +95,7 @@
       const st = this.state(save);
       if (st.claimedToday) return;
       const day = st.streak + 1;
-      const r = DAYS[day - 1];
+      const r = reward(day);
       save.login.streak = day;
       save.login.lastClaim = today();
       if (r.skin) {

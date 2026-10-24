@@ -558,3 +558,30 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
   background: linear-gradient(180deg, #ffffff 0%, #e8ecf1 30%, #8d96a3 50%, #d5dbe2 64%, #ffffff 80%, #9aa3b0 100%);
   -webkit-background-clip: text; background-clip: text;
 }
+
+/* ===== Oddíl: výběr vojáků tažením prstu ===== */
+.fbtn-sel[aria-pressed="true"] { color: #062a12 !important; text-shadow: none !important; background: var(--tex-noise) padding-box, linear-gradient(180deg, #c8ffd4, #4fd27a 55%, #1f8a44) padding-box, var(--gold-rim) border-box !important; box-shadow: 0 0 0 1px #05070b, 0 0 16px rgba(120,255,150,.6) !important; }
+.b-squad { position: absolute; left: 8px; top: 58px; z-index: 2; display: flex; gap: 6px; align-items: center; padding: 4px 6px 4px 10px; border-radius: 22px 8px 22px 8px;
+  background: linear-gradient(180deg, rgba(14,40,22,.92), rgba(8,22,12,.92)); border: 2px solid #4fd27a; box-shadow: 0 0 0 1px #05070b, 0 4px 12px rgba(0,0,0,.5); }
+.b-squad[hidden] { display: none; }
+.b-squad .sq-name { font-family: var(--font-display); color: #c8ffd4; font-size: 13px; white-space: nowrap; }
+.b-squad .sq-name i { font-style: normal; color: #fff; background: #1f8a44; border-radius: 10px; padding: 0 7px; margin-left: 2px; }
+.b-squad .fbtn { min-height: 36px; padding: 2px 8px; }
+.b-squad .fbtn[aria-pressed="true"] { color: #062a12; background: var(--tex-noise) padding-box, linear-gradient(180deg, #c8ffd4, #4fd27a 55%, #1f8a44) padding-box, var(--gold-rim) border-box; }
+.b-squad .sq-x { font-size: 16px; color: #ffb4a8; }
+.b-selhint { position: absolute; right: 12px; top: 10px; z-index: 2; pointer-events: none; max-width: 34vw; text-align: center;
+  font-family: var(--font-body); color: #eafff0; font-size: 13px; padding: 6px 14px; border-radius: 12px; background: rgba(8,30,14,.85); border: 1px solid #4fd27a; animation: selPulse 1.4s ease-in-out infinite; }
+.b-selhint[hidden] { display: none; }
+@keyframes selPulse { 50% { box-shadow: 0 0 14px rgba(120,255,150,.55); } }
+@media (max-height: 430px) and (orientation: landscape) { .b-squad { top: 50px; } .b-squad .fbtn { min-height: 32px; } }
+
+/* ===== Hra je jen na šířku: na výšku se zobrazí výzva k otočení ===== */
+#rotate { display: none; }
+@media (orientation: portrait) and (pointer: coarse) {
+  #rotate { display: flex; position: fixed; inset: 0; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+    background: radial-gradient(120% 80% at 50% 30%, #2a2016, #0b0907 70%); color: #ffe9a8; font-family: var(--font-display); font-size: 22px; text-align: center; padding: 24px; }
+  #rotate .rot-phone { width: 70px; height: 120px; border-radius: 14px; border: 5px solid #e8b84a; box-shadow: 0 0 0 2px #05070b, 0 0 24px rgba(232,184,74,.4); position: relative; animation: rotPhone 2.2s ease-in-out infinite; }
+  #rotate .rot-phone i { position: absolute; left: 50%; bottom: 7px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #e8b84a; }
+  #app { visibility: hidden; }
+}
+@keyframes rotPhone { 0%, 20% { transform: rotate(0); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }

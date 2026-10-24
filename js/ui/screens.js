@@ -75,7 +75,7 @@
     ctx.restore();
   }
 
-  /* Obrázek aktu ságy: krajina, hrad a hrdinové (u Aktu IV Démonický král) */
+  /* Obrázek aktu ságy: krajina, hrad a hrdinové (u Aktu IV Pekelný generál) */
   function paintActCard(cv, act, locked) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = cv.clientWidth, h = cv.clientHeight;

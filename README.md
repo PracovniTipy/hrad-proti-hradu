@@ -58,12 +58,12 @@ Na telefonu je nejlepší hrát **na šířku**, protože pak je vidět celé bo
   - *Akt I – Lví koruna* (hraješ za rytíře): vikingští nájezdníci, Stínová legie zrádného vévody Morvana, obležené hlavní město a první démoni.
   - *Akt II – Klan Kazehana* (hraješ za samuraje): klan Akabane, hory Kurama, regent Kurogane s maskou démona óni.
   - *Akt III – Bouřný fjord* (hraješ za vikingy): jarl Hrafn Krutý, Ledová pustina a Ragnarök proti Mrazivé koruně.
-  - *Akt IV – Spojenectví* (všechny tři národy): Brána pekel a Ohnivá hora. Finále na Trůnu Démonického krále.
-  - Mezi akty jsou **příběhové scény** s portréty postav (král Aldrik, daimjó Rjú, jarlka Sigrun, Démonický král Azgaroth). Po bossovi každé kapitoly se zobrazí, jak příběh pokračuje. Scény jde přehrát znovu v Příběhu.
+  - *Akt IV – Spojenectví* (všechny tři národy): Brána pekel a Ohnivá hora. Finále na Trůnu Pekelného generála.
+  - Mezi akty jsou **příběhové scény** s portréty postav (král Aldrik, daimjó Rjú, jarlka Sigrun, Pekelný generál Azgaroth). Po bossovi každé kapitoly se zobrazí, jak příběh pokračuje. Scény jde přehrát znovu v Příběhu.
   - Národ se odemkne pro Hrad, Trénink a Souboj, až k němu v příběhu dojdeš.
 - **Démoni**: běs, ohnivý chrlič (metá ohnivé koule), rohatý strážce s trojzubcem, zatracený rytíř s plamenným mečem. Mají obsidiánovou pevnost, pekelné bojiště s lávou a sopkou a vlastní mapu.
 - **Bitvy spojenectví (Akt IV)**: posíláš vojáky **všech tří národů najednou**. Tlačítka jsou rozdělená po národech a **každý národ má vlastní přepínač AUTO**. Když je zapnutý, hra za tebe vysílá vojáky toho národa (vybírá je podle toho, co posílá nepřítel). Zapnuté národy se v utrácení mincí střídají. AUTO funguje i v běžných bitvách a hra si ho pamatuje.
-- **Démonický král (boss)**: ve finále vstoupí po 18 sekundách na bojiště, má vlastní ukazatel životů a jeho meč zasáhne až pět vojáků. Když padne, jeho pevnost přijde o 30 % životů.
+- **Pekelný generál (boss)**: ve finále vstoupí po 18 sekundách na bojiště, má vlastní ukazatel životů a jeho meč zasáhne až pět vojáků. Když padne, jeho pevnost přijde o 30 % životů.
 - **Organizace armády**: každý národ má strom velení. Království: král → maršál (ty) → rytíři → seržanti → pěšáci a kopiníci, lučištníci. Samurajové: šógun → daimjó (ty) → karó → samurajové → ašigaru-gašira → ašigaru. Vikingové: thing → jarl (ty) → hirð (berserkové, štítonoši) → karlové (válečníci, lovci) → thrallové. U jednotek jsou vidět jejich statistiky.
 - **Ovládání hrdiny**: klepni na kteréhokoli svého vojáka a převezmeš nad ním kontrolu. Objeví se panel se šipkami (pohyb dopředu, dozadu a do hloubky bojiště) a tlačítky **Útok** (držením útočíš opakovaně) a **Blok** (zvedneš štít a dostáváš jen 20 % zranění, ale nemůžeš útočit ani se hýbat). Hrdina má o 25 % silnější útok a mečem zasáhne až tři nepřátele najednou. Lučištník střílí tam, kam se dívá. Když hrdina padne, můžeš si vybrat dalšího.
 - **Formace (rozkazy armádě)**:
@@ -117,7 +117,7 @@ js/data/narody.js          – národy, samurajské a vikingské jednotky, organ
 js/data/skins.js           – týmové barvy, skiny vojáků a hradů
 js/data/castle.js          – budovy, ceny vylepšení, výpočty statistik
 js/data/campaign.js        – sága ve 4 aktech, kapitoly, úrovně, postavy a příběhové scény
-js/data/demoni.js          – démoni a Démonický král
+js/data/demoni.js          – démoni a Pekelný generál
 js/data/pvp.js             – pravidla PvP a ukázkoví hráči
 js/core/save.js            – profil hráče a ukládání
 js/core/art.js             – vektorová grafika (postavy, hrady, pozadí, mapa)

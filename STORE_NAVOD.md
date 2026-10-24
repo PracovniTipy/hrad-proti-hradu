@@ -27,6 +27,9 @@ Hra je napsaná v HTML5 (HTML + CSS + JavaScript bez serveru). Do obchodů se pr
    ```
    npm run android
    ```
+   **Jen na šířku:** v `android/app/src/main/AndroidManifest.xml` přidej k `<activity>`
+   atribut `android:screenOrientation="sensorLandscape"`. (Na iOS v Xcode → General →
+   Device Orientation nech zaškrtnuté jen *Landscape Left* a *Landscape Right*.)
 3. V Android Studiu: **Build → Generate Signed App Bundle** → vytvoř si klíč (soubor `.jks`)
    a **dobře si ho schovej** – bez něj už aplikaci nikdy neaktualizuješ.
    Výsledkem je soubor `.aab`.

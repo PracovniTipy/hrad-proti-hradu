@@ -129,17 +129,45 @@
     /* ---------------- vstup a kamera ---------------- */
     _bindInput() {
       let drag = null;
-      this._onDown = e => { drag = { x: e.clientX, cam: this.cam.x, moved: false }; };
+      const toWorld = (cx, cy) => {
+        const r = this.canvas.getBoundingClientRect();
+        return [this.cam.x + (cx - r.left) / this.cam.scale, (this.H - this.cam.viewH) + (cy - r.top) / this.cam.scale];
+      };
+      this._toWorld = toWorld;
+      this._onDown = e => {
+        drag = { x: e.clientX, y: e.clientY, cam: this.cam.x, moved: false, sel: !!this.selectMode };
+        if (drag.sel) { const w = toWorld(e.clientX, e.clientY); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] }; }
+        // podržení prstu = začátek výběru oddílu
+        clearTimeout(this._lp);
+        if (!drag.sel && !this.hero) this._lp = setTimeout(() => {
+          if (!drag || drag.moved || this.over) return;
+          drag.sel = true;
+          const w = toWorld(drag.x, drag.y); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] };
+          if (navigator.vibrate) try { navigator.vibrate(15); } catch (_) {}
+        }, 380);
+      };
       this._onMove = e => {
         if (!drag) return;
+        if (drag.sel) {
+          const w = toWorld(e.clientX, e.clientY);
+          this.selRect.x1 = w[0]; this.selRect.y1 = w[1];
+          if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 8) drag.moved = true;
+          return;
+        }
         const dx = (e.clientX - drag.x) / this.cam.scale;
-        if (Math.abs(dx) > 6) drag.moved = true;
+        if (Math.abs(dx) > 6) { drag.moved = true; clearTimeout(this._lp); }
         if (drag.moved) {
           this.cam.x = this._clampCam(drag.cam - dx);
           this.cam.manualUntil = this.time + 4;
         }
       };
       this._onUp = e => {
+        clearTimeout(this._lp);
+        if (drag && drag.sel) {
+          if (this.selRect) this._selectSquad(this.selRect);
+          this.selRect = null; drag = null;
+          return;
+        }
         // krátké klepnutí: na vlastního vojáka = převzít ovládání, jinak přesun praporu
         if (drag && !drag.moved && e.target === this.canvas && !this.over) {
           const r = this.canvas.getBoundingClientRect();
@@ -147,7 +175,10 @@
           const wy = (this.H - this.cam.viewH) + (e.clientY - r.top) / this.cam.scale;
           const u = this.unitAt(wx, wy);
           if (u) this.takeControl(u);
-          else if (!this.hero) this.setFormation('player', 'formace', wx);
+          else if (!this.hero) {
+            if (this.squad && this.active === 'squad') this.setSquad('formace', wx);
+            else this.setFormation('player', 'formace', wx);
+          }
         }
         drag = null;
       };
@@ -297,6 +328,7 @@
     setFormation(team, mode, flagX) {
       const s = this.side[team], cfg = C();
       s.formation = mode;
+      if (team === 'player') this.active = 'main';
       if (flagX != null) {
         const lo = team === 'player' ? cfg.playerFront + 90 : cfg.playerFront + 400;
         const hi = team === 'player' ? cfg.enemyFront - 400 : cfg.enemyFront - 90;
@@ -304,6 +336,44 @@
       }
       if (team === 'player' && this.o.onFormation) this.o.onFormation(mode);
     }
+
+    /* ---------------- ODDÍL (výběr tažením prstu) ----------------
+       Hráč tažením označí vojáky. Ti dostanou vlastní rozkaz (oddíl),
+       ostatní dál plní hlavní rozkaz armády. */
+    setSelectMode(v) { this.selectMode = v == null ? !this.selectMode : v; if (this.o.onSelectMode) this.o.onSelectMode(this.selectMode); }
+    _selectSquad(r) {
+      const x0 = Math.min(r.x0, r.x1) - 14, x1 = Math.max(r.x0, r.x1) + 14;
+      const y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);
+      const wide = (x1 - x0) < 40;   // jen klepnutí → vezme vojáky v okolí
+      const pick = this.units.filter(u => u.team === 'player' && !u.dead && !u.controlled &&
+        (wide ? Math.abs(u.x - r.x0) < 90 : (u.x >= x0 && u.x <= x1 && u.y - 90 * US() <= y1 + 10 && u.y >= y0 - 10)));
+      this.setSelectMode(false);
+      if (!pick.length) return;
+      for (const u of this.units) if (u.team === 'player') u.squad = false;
+      pick.forEach(u => { u.squad = true; u.slotX = null; });
+      const cx = pick.reduce((a, u) => a + u.x, 0) / pick.length;
+      this.squad = { mode: 'formace', flagX: 0 };
+      this.active = 'squad';
+      this.setSquad('formace', cx);
+      this.texts.push({ x: cx, y: Math.min(...pick.map(u => u.y)) - 110 * US(), txt: t('squad_n', { n: pick.length }), color: '#9dffb0', t: 0, life: 1.4, big: true });
+    }
+    setSquad(mode, flagX) {
+      if (!this.squad) return;
+      const cfg = C();
+      this.squad.mode = mode;
+      if (flagX != null) this.squad.flagX = Math.max(cfg.playerFront + 90, Math.min(cfg.enemyFront - 400, flagX));
+      this.active = 'squad';
+      this._assignSlots('player');
+      if (this.o.onSquad) this.o.onSquad(this.squadCount(), mode);
+    }
+    disbandSquad() {
+      for (const u of this.units) u.squad = false;
+      this.squad = null; this.active = 'main';
+      this._assignSlots('player');
+      if (this.o.onSquad) this.o.onSquad(0, null);
+    }
+    squadCount() { return this.units.filter(u => u.squad && !u.dead).length; }
+    modeOf(u) { return u.squad && this.squad ? this.squad.mode : this.side[u.team].formation; }
 
     /* ---------------- OVLÁDANÝ HRDINA ---------------- */
     unitAt(wx, wy) {
@@ -384,10 +454,20 @@
 
     /* Spočítá místo každého vojáka v šiku */
     _assignSlots(team) {
+      if (team === 'player' && this.squad) {
+        const all = this.units.filter(u => u.team === team && !u.dead && !u.controlled);
+        this._assignList(team, all.filter(u => !u.squad), this.side[team].formation, this.side[team].flagX);
+        this._assignList(team, all.filter(u => u.squad), this.squad.mode, this.squad.flagX);
+        return;
+      }
+      const s = this.side[team];
+      this._assignList(team, this.units.filter(u => u.team === team && !u.dead && !u.controlled), s.formation, s.flagX);
+    }
+    _assignList(team, units, mode, flagX) {
       const s = this.side[team], cfg = C(), FC = GameData.formationConfig, R = GameData.formationRank;
       const dir = team === 'player' ? 1 : -1;
-      const anchor = s.formation === 'ustup' ? s.castle.front + dir * 70 : s.flagX;
-      const list = this.units.filter(u => u.team === team && !u.dead && !u.controlled)
+      const anchor = mode === 'ustup' ? s.castle.front + dir * 70 : flagX;
+      const list = units
         .sort((a, b) => (R[a.def.roleKey] ?? 1) - (R[b.def.roleKey] ?? 1) || a.id - b.id);
       const rows = FC.rows, lane = cfg.laneBottom - cfg.laneTop - 10;
       let col = 0, row = 0, prevRank = null;
@@ -408,6 +488,7 @@
 
     destroy() {
       cancelAnimationFrame(this.raf);
+      clearTimeout(this._lp);
       if (this._baseCfg) { GameData.battleConfig = this._baseCfg; this._baseCfg = null; }
       this.destroyed = true;
       this.over = true;
@@ -454,7 +535,8 @@
       this._slotTimer = (this._slotTimer || 0) - dt;
       if (this._slotTimer <= 0) {
         this._slotTimer = 0.25;
-        for (const team of ['player', 'enemy']) if (this.side[team].formation !== 'utok') this._assignSlots(team);
+        if (this.squad && !this.squadCount()) this.disbandSquad();
+        for (const team of ['player', 'enemy']) if (this.side[team].formation !== 'utok' || (team === 'player' && this.squad && this.squad.mode !== 'utok')) this._assignSlots(team);
       }
 
       // jednotky
@@ -496,7 +578,7 @@
         } else {
           u.target = null; u.castleTarget = false;
           const sp = u.def.speed * (C().speedScale || 1) * slowK;
-          const mode = this.side[u.team].formation;
+          const mode = this.modeOf(u);
           if (mode !== 'utok' && u.slotX != null) {
             // pochod na své místo v šiku
             const dx = u.slotX - u.x, dy = u.slotY - u.y;
@@ -942,6 +1024,21 @@
         if (team === 'enemy' && !this.o.showEnemyFlag) continue;
         this._drawFlag(ctx, sd.flagX, cfg.laneTop - 6, team === 'player' ? '#2f62b8' : '#a8262a', t, team === 'player' ? 1 : -1);
       }
+      if (this.squad && this.squad.mode === 'formace') this._drawFlag(ctx, this.squad.flagX, cfg.laneTop - 6, '#2f9a4a', t, 1);
+      // značky vojáků v oddílu
+      for (const u of this.units) {
+        if (!u.squad || u.dead || !this.squad) continue;
+        ctx.beginPath(); ctx.ellipse(u.x, u.y, 22 * US(), 6 * US(), 0, 0, Math.PI * 2);
+        ctx.lineWidth = 2.5; ctx.strokeStyle = 'rgba(120,255,150,.85)'; ctx.stroke();
+      }
+      // obdélník výběru
+      if (this.selRect) {
+        const r = this.selRect, x = Math.min(r.x0, r.x1), y = Math.min(r.y0, r.y1), w = Math.abs(r.x1 - r.x0), h = Math.abs(r.y1 - r.y0);
+        ctx.save();
+        ctx.fillStyle = 'rgba(120,255,150,.14)'; ctx.fillRect(x, y, w, h);
+        ctx.setLineDash([10, 6]); ctx.lineDashOffset = -t * 30; ctx.lineWidth = 3; ctx.strokeStyle = '#9dffb0'; ctx.strokeRect(x, y, w, h);
+        ctx.restore();
+      }
 
       // jednotky seřazené podle hloubky
       const list = this.units.slice().sort((a, b) => a.y - b.y);
@@ -1068,6 +1165,10 @@
       if (pf.formation !== 'utok') {
         const fx = (pf.formation === 'ustup' ? pf.castle.front + 70 : pf.flagX) * sx;
         c.fillStyle = '#ffd77a'; c.fillRect(fx - 1.5, 2, 3, h - 4);
+      }
+      if (this.squad && this.squad.mode !== 'utok') {
+        const fx = (this.squad.mode === 'ustup' ? pf.castle.front + 70 : this.squad.flagX) * sx;
+        c.fillStyle = '#7dff9a'; c.fillRect(fx - 1.5, 2, 3, h - 4);
       }
       c.lineWidth = 2; c.strokeStyle = '#ffd77a';
       c.strokeRect(this.cam.x * sx + 1, 2, this.cam.viewW * sx - 2, h - 4);

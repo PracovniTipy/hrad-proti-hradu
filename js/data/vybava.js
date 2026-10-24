@@ -161,6 +161,6 @@ GameData.avatars = [
   { id: 'chrlic', unit: 'chrlic', name: 'Okřídlený chrlič', bg: ['#ffcf6a', '#5a1410'] },
   { id: 'rohac', unit: 'rohac', name: 'Rohatý strážce', bg: ['#e15a4f', '#2a0606'] },
   { id: 'zatracenec', unit: 'zatracenec', name: 'Zatracený rytíř', bg: ['#ff6a3a', '#120404'] },
-  { id: 'demonkral', unit: 'demonkral', name: 'Démonický král', bg: ['#ff3a2a', '#1a0202'] },
+  { id: 'demonkral', unit: 'demonkral', name: 'Pekelný generál', bg: ['#ff3a2a', '#1a0202'] },
   { id: 'smaragd', unit: 'samuraj', skin: 'smaragd', name: 'Smaragdový duch', bg: ['#7ee0a8', '#0e3a24'] }
 ];

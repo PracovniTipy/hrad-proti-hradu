@@ -43,8 +43,8 @@ Object.assign(GameData.units, {
   },
   demonkral: {
     id: 'demonkral', faction: 'demoni', roleKey: 'tezka', boss: true,
-    name: 'Démonický král', role: 'Vládce podsvětí',
-    desc: 'Azgaroth, Démonický král. Obrovský, jeho plamenný meč zasáhne až pět nepřátel najednou.',
+    name: 'Pekelný generál', role: 'Generál pekelných legií',
+    desc: 'Azgaroth, Pekelný generál. Obrovský, jeho plamenný meč zasáhne až pět nepřátel najednou.',
     cost: 0, hp: 5200, dmg: 70, attackInterval: 1.5, range: 58, speed: 30, armor: 0.3, spawnCooldown: 0, ranged: false,
     cleave: 5,
     look: { helmet: 'demonking', weapon: 'flamesword', shield: null, armor: 'demon', wings: 'big', tail: true, cape: true, capeColor: '#2a0606', scale: 1.85 },
@@ -53,7 +53,7 @@ Object.assign(GameData.units, {
 });
 
 GameData.factions.demoni = {
-  id: 'demoni', name: 'Démoni', people: 'Legie Démonického krále',
+  id: 'demoni', name: 'Démoni', people: 'Legie Pekelného generála',
   desc: 'Běsi, ohniví chrliči a zatracení rytíři z Ohnivé hory.',
   strengths: 'Rychlí běsi, ohnivé koule, odolní pekelní rytíři.',
   theme: 'peklo', castleStyle: 'peklo', mapTheme: 'peklo',
@@ -64,6 +64,6 @@ GameData.factions.demoni = {
     player: { skin: '#b83a2c', hair: '#1a0d0d', eyes: '#ffd23f', tunic: '#2a1414', tunicDark: '#180909', trim: '#ff8a2a', metal: '#3a3438', metalDark: '#17141a', leather: '#3a1f18', leatherDark: '#200f0b', legs: '#7e2018', boots: '#1d0f0c', horn: '#e8dcc0', wing: '#5a1410', fire: '#ffb347', cape: '#3a0d0d', plume: '#ff5a2a' },
     enemy: { skin: '#b83a2c', hair: '#1a0d0d', eyes: '#ffd23f', tunic: '#2a1414', tunicDark: '#180909', trim: '#ff8a2a', metal: '#3a3438', metalDark: '#17141a', leather: '#3a1f18', leatherDark: '#200f0b', legs: '#7e2018', boots: '#1d0f0c', horn: '#e8dcc0', wing: '#5a1410', fire: '#ffb347', cape: '#3a0d0d', plume: '#ff5a2a' }
   },
-  prologue: 'Před tisíci lety zapečetily tři národy Démonického krále Azgarotha pod Ohnivou horou. Pečeť slábne.',
+  prologue: 'Před tisíci lety zapečetily tři národy Pekelného generála Azgarotha pod Ohnivou horou. Pečeť slábne.',
   organization: []
 };

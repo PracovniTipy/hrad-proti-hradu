@@ -298,6 +298,8 @@
         onUpdateHud: b => this._hud(b, lastHud),
         onEnd: res => this._battleEnd(cfg, res),
         onFormation: mode => this._formUi(mode),
+        onSquad: (n, mode) => this._squadUi(n, mode),
+        onSelectMode: on => { $('#bSelect').setAttribute('aria-pressed', on); $('#bSelHint').hidden = !on; },
         onHero: (u, died) => this._heroUi(u, died),
         onAutoSpawn: () => { save.stats.unitsSent++; }
       });
@@ -308,6 +310,8 @@
         setTimeout(() => Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false)), 450);
       }
       this._formUi('utok');
+      this._squadUi(0, null);
+      $('#bSelect').setAttribute('aria-pressed', false); $('#bSelHint').hidden = true;
       this._heroUi(null);
       $('#bSpeed').textContent = '×' + battle.speed;
 
@@ -351,6 +355,13 @@
       p.querySelectorAll('.on').forEach(b => b.classList.remove('on'));
       if (u) $('#heroName').textContent = u.def.name;
       if (died) this.toast(t('t_hero_fell'));
+    },
+
+    _squadUi(n, mode) {
+      const p = $('#bSquad');
+      p.hidden = !n;
+      $('#sqCount').textContent = n;
+      p.querySelectorAll('[data-sq]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sq === mode));
     },
 
     _formUi(mode) {
@@ -488,6 +499,18 @@
     },
 
     init() {
+      // hra je jen na šířku – na telefonu zkusí celou obrazovku a zamknout orientaci
+      const lockLand = () => {
+        if (!matchMedia('(pointer: coarse)').matches) return;
+        const de = document.documentElement;
+        const lock = () => { try { const p = screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {}); } catch (_) {} };
+        try {
+          if (!document.fullscreenElement && de.requestFullscreen) de.requestFullscreen({ navigationUI: 'hide' }).then(lock).catch(lock);
+          else lock();
+        } catch (_) { lock(); }
+      };
+      lockLand();
+      document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
       // národ, který ještě není odemčený příběhem, nelze hrát
       if (!GameData.campaignHelpers.factionUnlocked(this.save, this.save.faction)) { this.save.faction = 'kralovstvi'; this.save.avatar = 'rytir'; }
       I18N.set(this.save.lang || (navigator.language || 'cs').slice(0, 2));
@@ -507,6 +530,15 @@
         b.togglePause(false);
         b.side.player.castle.hp = 0;   // vzdání = prohra
       });
+      $('#bSelect').addEventListener('pointerdown', e => {
+        e.preventDefault(); e.stopPropagation();
+        if (this.battle && !this.battle.over) this.battle.setSelectMode();
+      });
+      document.querySelectorAll('#bSquad [data-sq]').forEach(btn => btn.addEventListener('pointerdown', e => {
+        e.preventDefault(); e.stopPropagation();
+        if (this.battle && !this.battle.over) this.battle.setSquad(btn.dataset.sq);
+      }));
+      $('#sqDisband').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (this.battle) this.battle.disbandSquad(); });
       document.querySelectorAll('#bForm [data-form]').forEach(btn => btn.addEventListener('pointerdown', e => {
         e.preventDefault(); e.stopPropagation();
         if (this.battle && !this.battle.over) this.battle.setFormation('player', btn.dataset.form);

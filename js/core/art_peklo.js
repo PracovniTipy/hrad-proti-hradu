@@ -1,7 +1,7 @@
 /* =========================================================================
    GRAFIKA DÉMONŮ A PEKLA
    - díly postav: rohy, drápy, trojzubec, plamenný meč, ohnivá koule,
-     netopýří křídla, ocas, černá pekelná zbroj, koruna Démonického krále
+     netopýří křídla, ocas, černá pekelná zbroj, koruna Pekelného generála
    - hrad 'peklo' (obsidiánová pevnost), bojiště 'peklo', mapa 'peklo'
    ========================================================================= */
 (function () {

@@ -49,7 +49,7 @@ GameData.campaigns = {
     {
       id: 2, name: 'Temné hory', label: { top: 43, left: 3 },
       intro: 'V horách se probouzí Stínová legie zrádného vévody Morvana.',
-      outro: 'Morvan padl. V jeho tvrzi jsi našel dopisy zapečetěné rohatou korunou – znakem Démonického krále. Legie táhne na hlavní město!',
+      outro: 'Morvan padl. V jeho tvrzi jsi našel dopisy zapečetěné rohatou korunou – znakem Pekelného generála. Legie táhne na hlavní město!',
       levels: [
         { id: '2-1', name: 'Průsmyk vran', diff: 0.95, enemy: 'kralovstvi', roles: R5, reward: { gold: 650, gems: 20 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [18, 58], story: 'Úzký průsmyk hlídají kopiníci Stínové legie.' },
         { id: '2-2', name: 'Opuštěný důl', diff: 1.02, enemy: 'kralovstvi', roles: R5, reward: { gold: 700, gems: 20 }, castleSkin: 'temna', unitSkin: 'stinovy', pos: [42, 54], story: 'V dole se kuje černá ocel. Zastav výrobu zbraní.' },
@@ -168,14 +168,14 @@ GameData.campaigns = {
     },
     {
       id: 2, name: 'Ohnivá hora', label: { top: 1.2, left: 3 },
-      intro: 'Poslední výstup k trůnu Démonického krále.',
+      intro: 'Poslední výstup k trůnu Pekelného generála.',
       outro: 'Azgaroth padl. Ohnivá hora utichla.',
       levels: [
         { id: 'd2-1', name: 'Sirné prameny', diff: 2.1, enemy: 'demoni', roles: R4, alliance: true, reward: { gold: 4300, gems: 50 }, castleSkin: 'temna', pos: [60, 50], story: 'Jedovatý dým a vroucí prameny. Chrliči útočí ze skal.' },
         { id: 'd2-2', name: 'Řetězový most', diff: 2.16, enemy: 'demoni', roles: R4, alliance: true, reward: { gold: 4400, gems: 50 }, castleSkin: 'temna', pos: [32, 44], story: 'Most visí na řetězech nad propastí plnou ohně.' },
         { id: 'd2-3', name: 'Síň zatracených', diff: 2.22, enemy: 'demoni', roles: R3, alliance: true, reward: { gold: 4500, gems: 55 }, castleSkin: 'temna', pos: [18, 32], story: 'Zatracení rytíři kdysi sloužili Lví koruně. Dnes slouží peklu.' },
         { id: 'd2-4', name: 'Kráter', diff: 2.28, enemy: 'demoni', roles: R4, alliance: true, reward: { gold: 4600, gems: 55 }, castleSkin: 'temna', pos: [40, 25], story: 'Okraj kráteru. Pod tebou bublá láva, před tebou celá Azgarothova legie.' },
-        { id: 'd2-5', name: 'Trůn Démonického krále', diff: 2.3, enemy: 'demoni', roles: R4, alliance: true, reward: { gold: 8000, gems: 200 }, castleSkin: 'temna', pos: [50, 15], boss: 'demonkral', megaCastle: true, story: 'Závěrečná bitva. Obří pekelná pevnost má tři brány a démoni vycházejí ze všech najednou. Azgaroth sám vstoupí na bojiště. Až padne, jeho pevnost se otřese.' }
+        { id: 'd2-5', name: 'Trůn Pekelného generála', diff: 2.3, enemy: 'demoni', roles: R4, alliance: true, reward: { gold: 8000, gems: 200 }, castleSkin: 'temna', pos: [50, 15], boss: 'demonkral', megaCastle: true, story: 'Závěrečná bitva. Obří pekelná pevnost má tři brány a démoni vycházejí ze všech najednou. Azgaroth sám vstoupí na bojiště. Až padne, jeho pevnost se otřese.' }
       ]
     }
   ]
@@ -198,7 +198,7 @@ GameData.scenes = {
   prolog: {
     title: 'Prolog', theme: 'peklo',
     pages: [
-      { who: 'vypravec', text: 'Před tisíci lety sestoupil z Ohnivé hory Azgaroth, Démonický král. Rytíři, samurajové a vikingové ho tehdy společně porazili a zapečetili třemi pečetěmi.' },
+      { who: 'vypravec', text: 'Před tisíci lety sestoupil z Ohnivé hory Azgaroth, Pekelný generál. Rytíři, samurajové a vikingové ho tehdy společně porazili a zapečetili třemi pečetěmi.' },
       { who: 'vypravec', text: 'Národy pak na spojenectví zapomněly. Pečeti slábnou a Azgarothův šepot znovu rozeštvává vládce.' },
       { who: 'aldrik', text: 'Maršále! Na hranicích hoří vesnice a v horách se probouzí Stínová legie. Ubraň království, než bude pozdě.' }
     ]
@@ -206,7 +206,7 @@ GameData.scenes = {
   akt2: {
     title: 'Akt II · Klan Kazehana', theme: 'japonsko',
     pages: [
-      { who: 'aldrik', text: 'Temný lord Morvan nesloužil sám sobě. Na jeho pečeti je znak Démonického krále. Druhou pečeť střeží klan Kazehana na východě.' },
+      { who: 'aldrik', text: 'Temný lord Morvan nesloužil sám sobě. Na jeho pečeti je znak Pekelného generála. Druhou pečeť střeží klan Kazehana na východě.' },
       { who: 'vypravec', text: 'Maršál se plaví přes moře do Země vycházejícího slunce. Tam ho přivítá mladý daimjó Rjú – jeho země je ale rozdělená válkou.' },
       { who: 'rju', text: 'Pomůžeme vám, rytíři, až sjednotíme provincie. Regent Kurogane se zavřel v hlavním městě a od té doby mluví hlasem, který není jeho.' }
     ]
@@ -228,10 +228,10 @@ GameData.scenes = {
     ]
   },
   finale: {
-    title: 'Trůn Démonického krále', theme: 'peklo',
+    title: 'Trůn Pekelného generála', theme: 'peklo',
     pages: [
       { who: 'azgaroth', text: 'Tři národy… stejně jako před tisíci lety. Tentokrát vás spálím všechny.' },
-      { who: 'rju', text: 'Až Démonický král padne, jeho pevnost se otřese. Pak udeřte všichni najednou!' }
+      { who: 'rju', text: 'Až Pekelný generál padne, jeho pevnost se otřese. Pak udeřte všichni najednou!' }
     ]
   },
   epilog: {
@@ -239,7 +239,9 @@ GameData.scenes = {
     pages: [
       { who: 'vypravec', text: 'Azgaroth padl a Ohnivá hora utichla. Tři národy obnovily pečeť – tentokrát jedinou, společnou, kterou nerozbije žádný svár.' },
       { who: 'sigrun', text: 'Skaldové o téhle bitvě budou zpívat tisíc let.' },
-      { who: 'aldrik', text: 'Spojenectví vydrží, dokud si budeme pamatovat tento den. Děkuji, maršále.' }
+      { who: 'aldrik', text: 'Spojenectví vydrží, dokud si budeme pamatovat tento den. Děkuji, maršále.' },
+      { who: 'azgaroth', text: 'Hlupáci… Já byl jen jeden z generálů pekla. Mí bratři už drží vaše země – a vaše lidi.' },
+      { who: 'vypravec', text: 'Démoni ovládli kraj za krajem a odvlekli zajatce. Spojené národy se vydávají osvobodit zemi území po území, porazit pekelné generály a zachránit rukojmí. Pokračování brzy…' }
     ]
   }
 };
