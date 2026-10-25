@@ -111,7 +111,7 @@
     catapult: v => sample('siegeshot', v),
     boom: v => sample('siegehit', v * 0.9),
     castle: v => sample(Math.random() < 0.3 ? 'collapse' : 'siegehit', v * 0.6, 0.85 + Math.random() * 0.1),
-    cry: v => sample('cry', v),
+    cry: () => {},   // mluvené pokřiky vypnuté, dokud nebudou skutečné nahrávky
     horse: v => sample('horse', v * 0.7),
     spear: v => sample('spear', v * 0.7),
     spawn: v => sample('swing', v * 0.45)
