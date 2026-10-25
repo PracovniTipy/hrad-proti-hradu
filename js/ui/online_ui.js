@@ -46,6 +46,7 @@
     onl_coop_locked: ['Tuhle úroveň ještě nemáš ve svém příběhu odemčenou – dostáváš zlato, postup se ti započítá, až se k ní dostaneš.', 'You have not unlocked this level in your own story yet – you get gold, progress counts once you reach it.'],
     onl_waiting: ['Čekám na hostitele…', 'Waiting for the host…'],
     onl_rules: ['Online: vítězství 1 v 1 = +30 trofejí, 2 v 2 = +20. Prohra ubere 15 / 10. Každý bojuje se svým hradem – vylepšeními, obránci na hradbách, vroucím olejem i výbavou.', 'Online: a 1 v 1 win = +30 trophies, 2 v 2 = +20. A loss costs 15 / 10. Everyone fights with their own castle – upgrades, wall defenders, boiling oil and gear.'],
+    credits_cries: ['Válečné pokřiky:', 'War cries:'],
     retreat_hint: ['Ústup: vojáci se schovají za hradby. Tam na ně nedosáhnou speciální útoky ani nepřátelé.', 'Retreat: troops hide behind the walls. Special attacks and enemies cannot reach them there.'],
     onl_btn: ['Online s přáteli', 'Online with friends'],
     onl_btn_d: ['1 v 1, 2 v 2 nebo příběh ve dvou', '1 v 1, 2 v 2 or story co-op']
