@@ -2,7 +2,7 @@
   "name": "hrad-proti-hradu",
   "version": "1.0.0",
   "private": true,
-  "description": "Hrad proti hradu – mobilní strategická hra (HTML5 + Capacitor)",
+  "description": "Castle WARS – mobilní strategická hra (HTML5 + Capacitor)",
   "scripts": {
     "www": "python3 tools/build_www.py",
     "android": "npm run www && npx cap sync android && npx cap open android",

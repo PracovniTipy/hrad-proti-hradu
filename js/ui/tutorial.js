@@ -83,7 +83,7 @@
       ov.innerHTML = `
         <div class="lang-card">
           <canvas class="lang-crest"></canvas>
-          <h1>Hrad proti hradu</h1>
+          <h1>Castle WARS</h1>
           <p class="lang-title">${I18N.D.choose_lang.filter((_, k) => [0, 1, 2, 4, 6, 9].includes(k)).join(' · ')}</p>
           <div class="lang-grid">
             ${I18N.LANGS.map(l => `<button class="lang-btn ${l.id === guess ? 'guess' : ''}" data-lang="${l.id}" lang="${l.id}"><b>${l.name}</b><small>${l.en}</small></button>`).join('')}

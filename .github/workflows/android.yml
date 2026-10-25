@@ -1,6 +1,6 @@
 # Po každém nahrání hry sestaví aplikaci pro Android (APK) a zveřejní ji
 # v Releases. Stáhnout jde vždy z:
-#   https://github.com/PracovniTipy/hrad-proti-hradu/releases/latest/download/HradProtiHradu.apk
+#   https://github.com/PracovniTipy/hrad-proti-hradu/releases/latest/download/CastleWARS.apk
 name: Android aplikace
 
 on:
@@ -65,18 +65,20 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease bundleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../CastleWARS.apk
           cp app/build/outputs/apk/release/app-release.apk ../HradProtiHradu.apk
-          cp app/build/outputs/bundle/release/app-release.aab ../HradProtiHradu.aab
+          cp app/build/outputs/bundle/release/app-release.aab ../CastleWARS.aab
 
       - name: Zveřejnit ke stažení
         uses: softprops/action-gh-release@v2
         with:
           tag_name: android-${{ github.run_number }}
-          name: Hrad proti hradu – Android ${{ github.run_number }}
+          name: Castle WARS – Android ${{ github.run_number }}
           body: |
-            Aplikace pro Android. Na telefonu stáhni **HradProtiHradu.apk** a otevři ho.
+            Aplikace pro Android. Na telefonu stáhni **CastleWARS.apk** a otevři ho.
             (Soubor .aab je pro nahrání do Google Play.)
           files: |
+            CastleWARS.apk
             HradProtiHradu.apk
-            HradProtiHradu.aab
+            CastleWARS.aab
           make_latest: true

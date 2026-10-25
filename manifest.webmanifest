@@ -1,6 +1,6 @@
 {
-  "name": "Hrad proti hradu",
-  "short_name": "Hrad",
+  "name": "Castle WARS",
+  "short_name": "Castle WARS",
   "description": "Strategická hra: hrad proti hradu, rytíři, samurajové, vikingové a Démonický král.",
   "lang": "cs",
   "start_url": "./index.html",
