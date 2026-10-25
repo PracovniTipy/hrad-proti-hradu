@@ -36,22 +36,31 @@
   };
 
   /* ---------- udělení odměny a okno s odměnami ---------- */
-  function randomGear(slot, minTier, odds) {
+  /* Náhodná výbava – vždy jen věc, kterou hráč ještě NEMÁ.
+     Když už má úplně všechno, vrátí null a hráč dostane 2 500 zlata. */
+  function randomGear(slot, minTier, odds, owned) {
+    owned = owned || (window.App && App.save.gear && App.save.gear.owned) || [];
     let tier = minTier || 0;
     if (odds) { let r = Math.random(), acc = 0; for (let i = 0; i < odds.length; i++) { acc += odds[i]; if (r <= acc) { tier = i; break; } } }
-    const pool = GameData.gear.filter(g => g.tier === tier && (!slot || g.slot === slot));
-    return pool[Math.floor(Math.random() * pool.length)];
+    const free = g => !owned.includes(g.id);
+    const pick = arr => arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
+    return pick(GameData.gear.filter(g => free(g) && g.tier === tier && (!slot || g.slot === slot)))
+      || pick(GameData.gear.filter(g => free(g) && g.tier >= (minTier || 0) && (!slot || g.slot === slot)))
+      || pick(GameData.gear.filter(g => free(g) && (!slot || g.slot === slot)))
+      || pick(GameData.gear.filter(free));
   }
+  const FULL_COMP = 2500;
   function grant(App, give) {
     const save = ensure(App.save);
     const got = [];
     if (give.gold) { save.gold += give.gold; got.push({ kind: 'gold', n: give.gold }); }
     if (give.gems) { save.gems += give.gems; got.push({ kind: 'gems', n: give.gems }); }
     const gearIds = (give.gear || []).slice();
-    if (give.randomGear) gearIds.push(randomGear(give.randomGear.slot, give.randomGear.minTier, give.randomGear.odds).id);
+    if (give.randomGear) { const rg = randomGear(give.randomGear.slot, give.randomGear.minTier, give.randomGear.odds, save.gear.owned); gearIds.push(rg ? rg.id : null); }
     gearIds.forEach(id => {
-      const g = GameData.gearById(id);
-      if (save.gear.owned.includes(id)) { const comp = 300 * (g.tier + 1); save.gold += comp; got.push({ kind: 'dup', gear: g, n: comp }); }
+      const g = id && GameData.gearById(id);
+      // věc, kterou už hráč má (nebo má úplně všechno) → 2 500 zlata místo ní
+      if (!g || save.gear.owned.includes(id)) { save.gold += FULL_COMP; got.push(g ? { kind: 'dup', gear: g, n: FULL_COMP } : { kind: 'gold', n: FULL_COMP }); }
       else { save.gear.owned.push(id); got.push({ kind: 'gear', gear: g }); }
     });
     (give.skins || []).forEach(id => { if (!save.skins.ownedUnit.includes(id)) save.skins.ownedUnit.push(id); got.push({ kind: 'skin', id }); });
@@ -119,10 +128,10 @@
         <div class="chest-body">
           <div class="eyebrow">${ch.period === 'day' ? t('chest_daily') : t('chest_weekly')}</div>
           <h3>${esc(ch.name)}</h3>
-          <p class="muted">${ico('coin')} ${fmt(ch.gold[0])}–${fmt(ch.gold[1])} · ${ico('gem')} ${ch.gems[0]}–${ch.gems[1]}<br>${ch.gearChance >= 1 ? t('chest_gear_sure', { n: ch.gearCount || 1 }) : t('chest_gear_chance', { n: Math.round(ch.gearChance * 100) })}</p>
+          <p class="muted">${ico('coin')} ${fmt(ch.gold[0])}–${fmt(ch.gold[1])}<br>${ch.gearChance >= 1 ? t('chest_gear_sure', { n: ch.gearCount || 1 }) : t('chest_gear_chance', { n: Math.round(ch.gearChance * 100) })}</p>
           <button class="link-btn" data-odds="${ch.id}">${t('odds')}</button>
         </div>
-        <button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ch.czk} Kč`}</button>
+        <button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ico('gem')} ${fmt(ch.gemsPrice)}`}</button>
       </article>`;
     };
     const offers = GameData.offers.map(o => {
@@ -161,22 +170,24 @@
       const ch = GameData.chests[b.dataset.chest];
       const key = ch.period === 'day' ? dayKey() : weekKey();
       if (save.chests[ch.id] === key) return;
-      Platby.buy(App, { id: 'chest_' + ch.id, name: ch.name, czk: ch.czk }, () => {
+      if (save.gems < ch.gemsPrice) { App.toast(t('t_no_gems')); return; }
+      (() => {
+        save.gems -= ch.gemsPrice;
         save.chests[ch.id] = key;
         const r = (a, b2) => Math.round(a + Math.random() * (b2 - a));
-        const give = { gold: Math.round(r(ch.gold[0], ch.gold[1]) / 10) * 10, gems: r(ch.gems[0], ch.gems[1]), gear: [] };
-        for (let i = 0; i < (ch.gearCount || 1); i++) if (Math.random() < ch.gearChance) give.gear.push(randomGear(null, 0, ch.tierOdds).id);
+        const give = { gold: Math.round(r(ch.gold[0], ch.gold[1]) / 10) * 10, gear: [] };
+        const taken = save.gear.owned.slice();
+        for (let i = 0; i < (ch.gearCount || 1); i++) if (Math.random() < ch.gearChance) { const g = randomGear(null, 0, ch.tierOdds, taken); give.gear.push(g ? g.id : null); if (g) taken.push(g.id); }
         const got = grant(App, give);
         App.go('obchod', { keepScroll: true });
         rewardsModal(App, ch.name, got, ch.id);
-      });
+      })();
     }));
     el.querySelectorAll('[data-odds]').forEach(b => b.addEventListener('click', () => {
       const ch = GameData.chests[b.dataset.odds];
       App.modal(`<h2>${esc(ch.name)} · ${t('odds')}</h2>
         <dl class="kv">
           <dt>${t('gold')}</dt><dd>${fmt(ch.gold[0])}–${fmt(ch.gold[1])}</dd>
-          <dt>${t('gems')}</dt><dd>${ch.gems[0]}–${ch.gems[1]}</dd>
           <dt>${t('gear_word')}</dt><dd>${ch.gearChance >= 1 ? t('chest_gear_sure', { n: ch.gearCount || 1 }) : `${Math.round(ch.gearChance * 100)} %`}</dd>
           ${ch.tierOdds.map((p, i) => p ? `<dt style="color:${GH().rarityColor[i]}">${t('rar_' + i)}</dt><dd>${Math.round(p * 1000) / 10} %</dd>` : '').join('')}
         </dl>

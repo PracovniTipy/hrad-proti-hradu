@@ -81,10 +81,27 @@ window.HraConfig = (function () {
     },
     save() {
       // testovací režim: neomezené zlato a drahokamy
-      if (this.data && this.data.tester) { this.data.gold = Math.max(this.data.gold, 9999999); this.data.gems = Math.max(this.data.gems, 9999999); }
+      if (this.data && this.data.tester && HraConfig.dev) { this.data.gold = Math.max(this.data.gold, 9999999); this.data.gems = Math.max(this.data.gems, 9999999); }
       try { localStorage.setItem(KEY, JSON.stringify(this.data)); } catch (e) { /* prohlížeč ukládání nepovolil */ }
+      if (window.Ucet) Ucet.queue();
       clearTimeout(this._bt);
       this._bt = setTimeout(() => { try { localStorage.setItem(KEY + '-zaloha', JSON.stringify(this.data)); } catch (e) { /* nic */ } }, 3000);
+    },
+    /* Nahradí postup jiným (z účtu nebo ze zálohy). Původní postup se nikdy
+       nezahodí – uloží se jako samostatná záloha v prohlížeči. */
+    replace(obj, tag) {
+      try { localStorage.setItem(KEY + '-pred-' + (tag || 'nahradou') + '-' + Date.now(), JSON.stringify(this.data)); } catch (e) { /* nic */ }
+      this.data = merge(defaults(), obj);
+      try { localStorage.setItem(KEY, JSON.stringify(this.data)); localStorage.setItem(KEY + '-zaloha', JSON.stringify(this.data)); } catch (e) { /* nic */ }
+      return this.data;
+    },
+    /* Kolik toho hráč má odehráno – podle toho se porovnávají dva postupy */
+    score(d) {
+      if (!d) return 0;
+      const cl = Object.keys((d.campaign && d.campaign.cleared) || {}).length;
+      const bl = Object.values(d.buildings || {}).reduce((a, b) => a + (b || 0), 0);
+      const st = d.stats || {};
+      return cl * 1000 + bl * 300 + (d.trophies || 0) + ((st.wins || 0) + (st.pvpWins || 0)) * 50 + ((d.gear && d.gear.owned) || []).length * 200;
     },
     reset() {
       this.data = defaults();

@@ -65,6 +65,7 @@
       this.nextId = 1;
       this.kills = 0;
       this.sent = 0;
+      this.st = { dmg: {}, kills: {}, sent: {}, skills: 0, cp: false };   // statistiky pro vyhodnocení a úkoly
       this.rand = Math.random;
 
       const ps = opts.player.stats;
@@ -73,7 +74,7 @@
         player: {
           coins: ps.startCoins || cfg.startCoins, income: ps.income, maxCoins: Infinity,
           hpMult: ps.unitMult, dmgMult: ps.unitMult,
-          castle: { hp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), maxHp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), front: cfg.playerFront, tower: ps.towerDmg, towerTimer: 1 },
+          castle: { hp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), maxHp: ps.castleHp * (opts.player.castleCfg && opts.player.castleCfg.big ? 1.25 : 1), front: cfg.playerFront, tower: ps.towerDmg, towerTimer: 1, oil: ps.oilDmg || 0, oilTimer: 2 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
           formation: 'utok', flagX: cfg.playerFront + 380,
           castleImg: Art.castleImage('player', opts.player.castleSkin, opts.player.castleLevel, 2, (GameData.factions[opts.playerFaction] || {}).castleStyle || 'evropa', opts.player.castleCfg || null),
@@ -330,7 +331,7 @@
         this.texts.push({ x: u.x - 60, y: 360, txt: t('boss_enters', { name: def.name }), color: '#ff7a4a', t: 0, life: 2.6, big: true });
         for (let i = 0; i < 3; i++) this._explode(u.x - 20 + i * 20, u.y - 20);
       }
-      if (team === 'player') this.sent++;
+      if (team === 'player') { this.sent++; this.st.sent[unitId] = (this.st.sent[unitId] || 0) + 1; if (window.Zvuk) Zvuk.play('spawn', 0.5); }
       this._dust(u.x, u.y);
       return true;
     }
@@ -366,6 +367,11 @@
       const puff = (x, y, col, n, up) => { for (let i = 0; i < n; i++) { const an = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 160; this.particles.push({ x: x + (Math.random() - 0.5) * 40, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - (up || 80), g: 260, t: 0, life: 0.7, r: 2 + Math.random() * 3.5, color: col }); } };
       s.coins -= a.cost;
       s.abilityCd[id] = this.time + a.cooldown;
+      if (team === 'player') this.st.skills++;
+      if (window.Zvuk && team === 'player') {
+        const snd = { heal: 'heal', buff: 'horn', summon: 'horn', repair: 'heal', gold: 'coin', breath: 'fire', wall: 'fire', meteors: 'fire', storm: 'bolt', stun: 'ice', quake: 'boom', curse: 'magic', holy: 'heal', shield: 'magic', volley: 'bow', barrage: 'catapult', tornado: 'magic', firearrows: 'fire' }[a.kind] || 'skill';
+        Zvuk.play('skill', 0.7); setTimeout(() => Zvuk.play(snd, 1), 120);
+      }
       const tx = frontX();
       switch (a.kind) {
         case 'meteors':
@@ -436,7 +442,7 @@
           for (let i = 0; i < 5; i++) this.later(i * 0.3, () => {
             const g = f[i] && !f[i].dead ? f[i] : null, x = g ? g.x : tx + dir * i * 50, y = g ? g.y : midY;
             const dist = Math.abs(x - ox);
-            this.projectiles.push({ team, kind: 'cat', el: 'kamen', x0: ox, y0: oy, tx: x, ty: y, target: null, castle: null, dmg: a.power, from: null, t: 0, dur: Math.max(0.7, dist / 520), arc: Math.min(240, dist * 0.35), done: false });
+            if (window.Zvuk) Zvuk.at('catapult', ox, this, 0.7); this.projectiles.push({ team, kind: 'cat', el: 'kamen', x0: ox, y0: oy, tx: x, ty: y, target: null, castle: null, dmg: a.power, from: null, t: 0, dur: Math.max(0.7, dist / 520), arc: Math.min(240, dist * 0.35), done: false });
           });
           break;
         }
@@ -810,6 +816,25 @@
         }
       }
 
+      // vroucí olej z hradeb: zasáhne všechny nepřátele těsně u brány
+      { const pc = this.side.player.castle;
+        if (pc.oil && pc.hp > 0) {
+          pc.oilTimer -= dt;
+          if (pc.oilTimer <= 0) {
+            const near = this.units.filter(e => e.team !== 'player' && !e.dead && e.x - pc.front < 300 && e.x > pc.front - 40);
+            if (near.length) {
+              pc.oilTimer = 7;
+              const wy = cfg.groundY - 210;
+              for (let i = 0; i < 70; i++) this.particles.push({ x: pc.front + 10 + Math.random() * 60, y: wy + Math.random() * 20, vx: 60 + Math.random() * 120, vy: 20 + Math.random() * 60, g: 900, t: 0, life: 0.55 + Math.random() * 0.3, r: 2.5 + Math.random() * 3, color: i % 3 ? '#3a2408' : '#ffb347' });
+              this.later(0.45, () => {
+                for (let x = pc.front + 40; x < pc.front + 300; x += 70) this.vfx.burn(x, (cfg.laneTop + cfg.laneBottom) / 2, 80, 2.2);
+                this.units.filter(e => e.team !== 'player' && !e.dead && e.x - pc.front < 300 && e.x > pc.front - 40).forEach(e => { this._damage(e, pc.oil, null, true); e.dot = { until: this.time + 3, dps: pc.oil * 0.12, c: 'rgba(255,140,40,.45)' }; });
+                if (window.Zvuk) Zvuk.at('fire', pc.front + 150, this, 0.9);
+              });
+            } else pc.oilTimer = 0.5;
+          }
+        } }
+
       // projektily
       for (const p of this.projectiles) {
         p.t += dt / p.dur;
@@ -888,6 +913,8 @@
       if (d) cp.v = Math.max(-1, Math.min(1, cp.v + d * dt * 0.05));
       const prev = cp.owner;
       cp.owner = cp.v >= 1 ? 'player' : cp.v <= -1 ? 'enemy' : (cp.owner && Math.abs(cp.v) > 0.5 ? cp.owner : null);
+      if (cp.owner !== prev && cp.owner && window.Zvuk) Zvuk.play('horn', 0.8);
+      if (cp.owner === 'player') this.st.cp = true;
       if (cp.owner !== prev && cp.owner) this.texts.push({ x: cp.x, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.45, txt: cp.owner === 'player' ? t('cp_ours') : t('cp_theirs'), color: cp.owner === 'player' ? '#9fd0ff' : '#ff9e9e', t: 0, life: 2.4, big: true, huge: true });
     }
     _drawCapture(ctx, t) {
@@ -1101,6 +1128,7 @@
       const kind = from && from.def && (from.def.projectile === 'fire' || from.def.projectile === 'magic') ? from.def.projectile : 'arrow';
       const burn = (this.side[team].fireArrowsUntil || 0) > this.time;
       this.projectiles.push({ burn, team, kind, x0: ox, y0: oy, tx, ty, target, castle: target ? null : castle, dmg, from, t: 0, dur: Math.max(0.25, dist / speed), arc: kind === 'fire' ? Math.min(50, dist * 0.12) : Math.min(90, dist * 0.22), done: false });
+      if (window.Zvuk) Zvuk.at(kind === 'arrow' ? 'bow' : 'magic', ox, this, 0.5);
     }
 
     _damage(target, raw, from, fire) {
@@ -1123,13 +1151,16 @@
       if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
       if (from && from.inspired > this.time) dmg *= 1 + (from.inspiredBy || 0.15);
       if (from && from.def && from.def.charge && !from.charged) { from.charged = true; dmg *= from.def.charge; this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('charge'), color: '#ffd77a', t: 0, life: 0.9 }); }
+      if (from && from.team === 'player' && from.def) this.st.dmg[from.def.id] = (this.st.dmg[from.def.id] || 0) + Math.min(dmg, Math.max(0, target.hp));
       target.hp -= dmg;
       target.hurt = 0.15;
+      if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? 'sword' : 'hit', target.x, this, 0.55);
       this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
       this.texts.push({ x: target.x + (Math.random() - 0.5) * 10, y: target.y - 82 * US(), txt: Math.round(dmg), color: target.team === 'player' ? '#ff8a80' : '#ffffff', t: 0, life: 0.8 });
       if (target.hp <= 0 && !target.dead) {
         target.dead = 0.001;
         target.atk = -1;
+        if (window.Zvuk) Zvuk.at('death', target.x, this, 0.6);
         if (target === this.hero) this.releaseHero(true);
         if (target.def.boss) this._bossDown(target);
         const killer = target.team === 'player' ? 'enemy' : 'player';
@@ -1138,6 +1169,7 @@
         ks.coins = Math.min(ks.maxCoins, ks.coins + reward);
         if (killer === 'player') {
           this.kills++;
+          if (from && from.team === 'player' && from.def) this.st.kills[from.def.id] = (this.st.kills[from.def.id] || 0) + 1;
           this.texts.push({ x: target.x, y: target.y - 100 * US(), txt: '+' + reward, color: '#ffd54f', t: 0, life: 1.1, coin: true });
         }
       }
@@ -1146,6 +1178,7 @@
     _damageCastle(castle, dmg, from) {
       if (castle.hp <= 0) return;
       castle.hp = Math.max(0, castle.hp - dmg);
+      if (window.Zvuk) Zvuk.at('castle', castle.front, this, 0.6);
       const x = castle.front + (castle === this.side.player.castle ? -20 : 20);
       this._debris(x, C().groundY - 60 - Math.random() * 120);
     }
@@ -1245,7 +1278,7 @@
           for (const f of foes) { const n = foes.filter(g => Math.abs(g.x - f.x) < 110).length; if (n > bestN) { bestN = n; best = f; } }
           const tx = best.x + 20, ty = best.y - 4;
           const dist = Math.hypot(tx - ox, ty - oy);
-          this.projectiles.push({ team: 'player', kind: 'cat', el: sl.el, x0: ox, y0: oy - 40, tx, ty, target: null, castle: null, dmg: k.dmg(this.def.catLvl) * P.dmgMult, from: null, t: 0, dur: Math.max(0.7, dist / 480), arc: Math.min(220, dist * 0.35), done: false });
+          if (window.Zvuk) Zvuk.at('catapult', ox, this, 0.6); this.projectiles.push({ team: 'player', kind: 'cat', el: sl.el, x0: ox, y0: oy - 40, tx, ty, target: null, castle: null, dmg: k.dmg(this.def.catLvl) * P.dmgMult, from: null, t: 0, dur: Math.max(0.7, dist / 480), arc: Math.min(220, dist * 0.35), done: false });
         } else {
           foes.sort((a, b) => a.x - b.x);
           const dmg = k.dmg(this.def.vez);
@@ -1261,6 +1294,8 @@
       const burst = (n, col) => { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 180; this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 80, g: 300, t: 0, life: 0.6, r: 2 + Math.random() * 3, color: col }); } };
       const S = p.big ? 140 : 62;
       const V = this.vfx;
+      if (window.Zvuk) Zvuk.at({ ohen: 'fire', led: 'ice', blesk: 'bolt', jed: 'magic' }[p.el] || 'boom', x, this, p.big ? 1 : 0.7);
+      if (window.Zvuk && (p.el === 'ohen' || p.el === 'kamen' || p.el === 'voda')) Zvuk.at('boom', x, this, p.big ? 0.9 : 0.5);
       if (p.el === 'ohen') V.explosion(x, y, S, 'fire');
       else if (p.el === 'led') { V.explosion(x, y, S * 0.9, 'ice'); V.iceSpikes(x, y, S * 1.6, p.big ? 2.2 : 1.2); }
       else if (p.el === 'kamen') V.explosion(x, y, S, 'stone');
@@ -1311,7 +1346,8 @@
       const loser = win ? this.side.enemy.castle : this.side.player.castle;
       for (let i = 0; i < 8; i++) this._explode(loser.front + (win ? 1 : -1) * (40 + Math.random() * 200), C().groundY - Math.random() * 220);
       const pc = this.side.player.castle, ec = this.side.enemy.castle;
-      const res = { win, reason, time: this.time, kills: this.kills, sent: this.sent, playerHp: pc.hp / pc.maxHp, enemyHp: ec.hp / ec.maxHp };
+      if (window.Zvuk) setTimeout(() => Zvuk.play(win ? 'win' : 'lose'), 500);
+      const res = { win, reason, time: this.time, kills: this.kills, sent: this.sent, st: this.st, playerHp: pc.hp / pc.maxHp, enemyHp: ec.hp / ec.maxHp };
       setTimeout(() => this.o.onEnd && this.o.onEnd(res), 1400);
     }
 
@@ -1326,6 +1362,7 @@
       for (let i = 0; i < 4; i++) this.particles.push({ x, y, vx: (Math.random() - 0.5) * 140, vy: -40 - Math.random() * 120, g: 520, t: 0, life: 0.7, r: 2 + Math.random() * 2.5, color: '#8b8f96', rect: true });
     }
     _explode(x, y) {
+      if (window.Zvuk) Zvuk.at('boom', x, this, 0.8);
       for (let i = 0; i < 18; i++) {
         const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 200;
         this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60, g: 260, t: 0, life: 0.5 + Math.random() * 0.4, r: 2 + Math.random() * 3, color: i % 3 ? '#ff9a3c' : '#ffe08a' });

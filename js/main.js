@@ -120,6 +120,7 @@
       if (!s.avatarChosen && !GameData.factionUnits(f).includes(s.avatar)) s.avatar = GameData.factions[f].roles.tezka;
       this.persist();
       if (changed && !opts.silent) this.toast(t('t_playing', { name: GameData.factions[f].name }));
+      if (changed && window.Zvuk && !this.battle) Zvuk.music(f, 'menu');
       if (opts.go) this.go(opts.go, { keepScroll: true });
     },
 
@@ -270,6 +271,8 @@
         ? `<span class="tag tag-demo">${t('bot')}</span>${esc(cfg.title)} · ${t('diff_' + cfg.attackIndex)}`
         : esc(cfg.title);
       $('#bPauseMenu').hidden = true;
+      if (window.Zvuk) Zvuk.music(cfg.alliance ? 'kralovstvi' : (cfg.playFaction && cfg.playFaction !== 'spojenectvi' ? cfg.playFaction : save.faction), 'battle');
+      this._sndBtns();
 
       // tlačítka jednotek – po národech, každý národ má svůj přepínač AUTO
       const facs = cfg.alliance ? GameData.factionOrder.slice() : [cfg.playFaction && cfg.playFaction !== 'spojenectvi' ? cfg.playFaction : save.faction];
@@ -293,7 +296,7 @@
       }).join('');
       // 3 speciální útoky, které si hráč vybral v obchodě
       $('#bAbil').innerHTML = GameData.skillsOf(save).eq.map(id => GameData.abilities[id]).map(a => `
-        <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name} – ${GameData.skillInfo(a).zoneName}: ${GameData.skillInfo(a).range}. Síla: ${GameData.skillInfo(a).dmg}">
+        <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name} – ${GameData.skillInfo(a).zoneName}: ${GameData.skillInfo(a).range}. ${t('sk_pow')}: ${GameData.skillInfo(a).dmg}">
           ${GameData.skillIcon(a, 46)}<i class="cd"></i>${a.range && /volley|barrage|breath/.test(a.kind) ? `<span class="rng">${Math.round(a.range / 10)} m</span>` : ''}
           <span class="cost">${a.cost ? ico('coin') + a.cost : t('free')}</span>
         </button>`).join('');
@@ -303,12 +306,15 @@
       const portrait = window.innerHeight > window.innerWidth;
       hint.textContent = t('hint_battle');
       const banner = $('#bBanner');
-      hint.hidden = false; hint.style.opacity = 1; banner.hidden = false; banner.style.opacity = 1;
+      // nápověda jen v prvních třech bitvách, ať nezakrývá bojiště
+      save.hintCount = (save.hintCount || 0) + 1;
+      const showHint = save.hintCount <= 3;
+      hint.hidden = !showHint; hint.style.opacity = showHint ? 1 : 0; banner.hidden = false; banner.style.opacity = 1;
       clearTimeout(this._ht);
       this._ht = setTimeout(() => {
         hint.style.opacity = 0; banner.style.opacity = 0;
         setTimeout(() => { hint.hidden = true; banner.hidden = true; }, 600);
-      }, 5000);
+      }, 3500);
 
       const stats = GameData.calc.battleStats(save);
       let lastHud = {};
@@ -395,7 +401,7 @@
         if (battle.useAbility('player', btn.dataset.abil)) return;
         this._flash(btn);
         const st = battle.abilityState('player', btn.dataset.abil), a = GameData.abilities[btn.dataset.abil];
-        if (!st.inRange && st.cdLeft <= 0) battle.texts.push({ x: battle.cam.x + battle.cam.viewW / 2, y: (battle.H - battle.cam.viewH) + battle.cam.viewH * 0.42, txt: 'Mimo dosah – nepřítel musí být do ' + Math.round(a.range / 10) + ' m od hradu', color: '#ffd27a', t: 0, life: 2, big: true });
+        if (!st.inRange && st.cdLeft <= 0) battle.texts.push({ x: battle.cam.x + battle.cam.viewW / 2, y: (battle.H - battle.cam.viewH) + battle.cam.viewH * 0.42, txt: t('sk_out', { n: Math.round(a.range / 10) }), color: '#ffd27a', t: 0, life: 2, big: true });
       }));
     },
 
@@ -471,8 +477,17 @@
       });
     },
 
+    /* přepínače zvuku a hudby v pauze */
+    _sndBtns() {
+      const box = $('#bSnd'); if (!box || !window.Zvuk) return;
+      const st = Zvuk.settings();
+      box.innerHTML = `<button class="btn btn-sm" data-snd="sfx">${st.sfx ? '🔊' : '🔇'} ${t('snd_sfx')}</button><button class="btn btn-sm" data-snd="music">${st.music ? '🎵' : '🔇'} ${t('snd_music')}</button>`;
+      box.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); this._sndBtns(); }));
+    },
+
     _closeBattle() {
       if (this.battle) { this.battle.destroy(); this.battle = null; }
+      if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');
       $('#battle').hidden = true;
       $('#app').hidden = false;
     },
@@ -484,11 +499,19 @@
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
       const rewards = [];
-      let note = '';
+      let note = '', stars = 0;
       if (cfg.mode === 'campaign') {
         const lv = cfg.level;
         const first = !save.campaign.cleared[lv.id];
         if (res.win) {
+          // hvězdy podle toho, kolik zůstalo z tvého hradu: 80 % a víc = 3, 50 % a víc = 2, jinak 1
+          stars = res.playerHp >= 0.8 ? 3 : res.playerHp >= 0.5 ? 2 : 1;
+          save.campaign.stars = save.campaign.stars || {};
+          const prevStars = save.campaign.stars[lv.id] || (first ? 0 : 1);
+          if (stars > prevStars) {
+            save.campaign.stars[lv.id] = stars;
+            if (stars === 3) { save.gems += 15; rewards.push(`<span class="pill">${ico('gem')} +15 · ★★★</span>`); }
+          }
           const gold = first ? lv.reward.gold : Math.round(lv.reward.gold * 0.25);
           const gems = first ? lv.reward.gems : 0;
           save.gold += gold; save.gems += gems;
@@ -529,11 +552,24 @@
         if (res.win) { save.gold += 100; rewards.push(`<span class="pill">${ico('coin')} +100</span>`); }
         note = t('note_training');
       }
+      const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
+      if (qDone) note += (note ? '<br>' : '') + `${ico('crown')} ${t('quests_ready', { n: qDone })}`;
       this.persist();
+      // nejlepší jednotka bitvy (MVP) a přehled podle druhu vojáka
+      const ST = res.st || { dmg: {}, kills: {}, sent: {} };
+      const ids = Object.keys(Object.assign({}, ST.sent, ST.dmg)).filter(id => GameData.units[id]);
+      ids.sort((a, b) => (ST.dmg[b] || 0) - (ST.dmg[a] || 0));
+      const mvp = ids[0] && (ST.dmg[ids[0]] || 0) > 0 ? ids[0] : null;
+      const statsHtml = ids.length ? `<div class="bstats">
+          ${mvp ? `<div class="mvp"><canvas data-mvp="${mvp}"></canvas><div><small>${t('mvp')}</small><b>${esc(GameData.units[mvp].name)}</b><span>${fmt(ST.dmg[mvp] || 0)} ${t('dmg_word')} · ${ST.kills[mvp] || 0} ${t('kills_word')}</span></div></div>` : ''}
+          <table class="bst"><tr><th></th><th>${t('sent')}</th><th>${t('dmg_word')}</th><th>${t('kills_word')}</th></tr>
+          ${ids.slice(0, 7).map(id => `<tr><td>${esc(GameData.units[id].name)}</td><td>${ST.sent[id] || 0}</td><td>${fmt(ST.dmg[id] || 0)}</td><td>${ST.kills[id] || 0}</td></tr>`).join('')}</table>
+        </div>` : '';
       const reason = res.reason === 'cas' ? t('r_time') : (res.win ? t('r_enemy') : t('r_you'));
       const back = cfg.mode === 'pvp' ? 'pvp' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       this.modal(`
         <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
+        ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
         <p style="text-align:center;margin:0" class="muted">${reason}</p>
         ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
         <dl class="kv">
@@ -543,10 +579,13 @@
           <dt>${t('sent')}</dt><dd>${res.sent}</dd>
           <dt>${t('your_castle')}</dt><dd>${Math.round(res.playerHp * 100)} %</dd>
         </dl>
+        ${statsHtml}
         ${note ? `<div class="notice"><div>${note}</div></div>` : ''}
         <div class="modal-actions">
           <button class="btn btn-gold" id="resBack">${t('continue')}</button>
         </div>`, (c, close) => {
+        const mc = c.querySelector('canvas[data-mvp]');
+        if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
         c.querySelector('#resBack').addEventListener('click', () => {
           close(); this._closeBattle(); this.go(back);
           if (cfg.afterScene) this.playScene(cfg.afterScene, null, true);

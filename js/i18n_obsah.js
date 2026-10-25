@@ -170,8 +170,39 @@
 
   window.I18N_EN.abilities = {
     ohen: { name: 'Fire Rain', desc: 'Fireballs fall on the nearest group of enemies.' },
-    stit: { name: 'Shield of Faith', desc: 'Your soldiers take half damage for 6 seconds.' }
+    stit: { name: 'Shield of Faith', desc: 'Your soldiers take half damage for 6 seconds.' },
+    salva: { name: 'Arrow Volley', desc: 'Archers on the walls fire 24 arrows at enemies close to the castle.' },
+    led: { name: 'Ice Storm', desc: 'Ice hits a group of enemies and slows them by half for 4 s.' },
+    blesk: { name: 'Chain Lightning', desc: 'Lightning strikes an enemy and jumps to 4 more.' },
+    jed: { name: 'Poison Cloud', desc: 'A poison cloud hurts every enemy standing in it for 5 s.' },
+    vlna: { name: 'Tidal Wave', desc: 'A wave hurts enemies and throws them far back.' },
+    bourka: { name: 'Storm of the Gods', desc: '6 lightning bolts strike the strongest enemies within 3 s.' },
+    leceni: { name: 'Healing Light', desc: 'All your soldiers heal 40% of their health.' },
+    roh: { name: 'War Horn', desc: 'For 8 s your soldiers deal +40% damage and move 30% faster.' },
+    kletba: { name: 'Curse of Weakness', desc: 'For 8 s all enemies take 50% more damage.' },
+    mraz: { name: 'Eternal Frost', desc: 'Enemies in the area freeze for 3 s and cannot move.' },
+    zeme: { name: 'Earthquake', desc: 'The ground shakes: hurts every enemy on the field and stuns them for 1.5 s.' },
+    meteor: { name: 'Giant Meteor', desc: 'A huge flaming boulder falls from the sky and crushes everything around.' },
+    posily: { name: 'Village Reinforcements', desc: '3 free infantrymen run out of the gate.' },
+    hrdina: { name: 'Hero Arrives', desc: 'Your heavy unit arrives for free at full strength.' },
+    oprava: { name: 'Masons', desc: 'Masons repair 20% of your castle’s health.' },
+    zlato: { name: 'Golden Rain', desc: 'The treasurer brings 300 coins to the battle.' },
+    ohnivesipy: { name: 'Fire Arrows', desc: 'For 10 s your archers set enemies on fire.' },
+    palba: { name: 'Catapult Barrage', desc: 'Catapults on the walls fire 5 stone balls at the nearest enemies.' },
+    zed: { name: 'Wall of Fire', desc: 'A wall of fire blazes in front of your soldiers for 6 s. Whoever crosses it burns.' },
+    vir: { name: 'Whirlwind', desc: 'A whirlwind bursts from the gate, races forward, hurts and throws enemies back.' },
+    svetlo: { name: 'Holy Light', desc: 'A beam from the sky hurts enemies in the area and heals your soldiers.' },
+    drak: { name: 'Dragon’s Breath', desc: 'A dragon on the walls breathes fire right in front of the castle: burns every enemy that came close.' },
+    jedsipy: { name: 'Poison Volley', desc: 'Archers on the walls fire 24 poisoned arrows; every hit poisons the enemy for 4 s.' },
+    ledkopi: { name: 'Ice Spears', desc: 'Ice spears burst from the ground: hurt enemies and stop them for 2 s.' }
   };
+  Object.assign(window.I18N_EN.units, {
+    g_popel: { name: 'Skarnath', role: 'General of the infernal legions', desc: 'General of ash. Where he walks, only ash remains.' },
+    g_mor: { name: 'Vargul', role: 'General of the infernal legions', desc: 'General of plague. His breath poisons whole armies.' },
+    g_krev: { name: 'Belzar', role: 'General of the infernal legions', desc: 'General of blood. The strongest of Malakor’s generals.' },
+    g_mraz: { name: 'Hrimgar', role: 'General of the infernal legions', desc: 'General of frost. His sword freezes blood in the veins.' },
+    demonvladce: { name: 'Malakor', role: 'Ruler of all demons', desc: 'The Demon King, lord of all demons. Huge and nearly indestructible.' }
+  });
 
   /* Přepne obsah hry (jména, popisy, příběhy) mezi češtinou a angličtinou */
   I18N.localizeData = function () {
@@ -196,11 +227,12 @@
       apply(ch, ['name', 'intro', 'outro'], ch.en || EN.chapters[f + ':' + ch.id]);
       ch.levels.forEach(l => apply(l, ['name', 'story'], l.en || EN.levels[l.id]));
     }));
+    EN.buildings.olej = EN.buildings.olej || { name: 'Boiling Oil', desc: 'Close-range defence: boiling oil is poured from the walls onto enemies right at the gate (within 30 m). Hurts and burns them.' };
     GameData.buildings.forEach(b => apply(b, ['name', 'desc'], EN.buildings[b.id]));
     const GEN = { 'weapon:0': ['Tempered Steel', 'Better tempered blade and point.'], 'weapon:1': ['Rune Weapon', 'Runes on the blade glow blue.'], 'weapon:2': ['Dragonfire', 'Forged in dragon fire. Burns orange.'], 'weapon:3': ['Starsteel', 'Legendary weapon from a fallen star. Shines gold.'],
       'armor:0': ['Mail Vest', 'Sturdy chainmail under the tunic.'], 'armor:1': ['Steel Armor', 'Polished steel with blue trim.'], 'armor:2': ['Shadow Armor', 'Black steel with spiked pauldrons, a torn cloak and a horned helm.'], 'armor:3': ['King’s Armor', 'Gilded plate, ruby pauldrons, a crimson ermine cloak, a golden lion on the chest and a white-gold plume.'] };
     (GameData.gear || []).forEach(g => { const e = GEN[g.slot + ':' + g.tier]; apply(g, ['name', 'desc'], e && { name: e[0], desc: e[1] }); });
-    const OEN = { pevnost: ['Great Fortress', 'Big castle: up to 10 defenders on the walls, +25% castle health, plus 10,000 gold and 500 gems.'], start: ['Starter Pack', 'Best start: 6,000 gold, 400 gems, rune weapon and steel armor for infantry and the Forest Rangers skin.'], mesec: ['Bag of Gold', '8,000 gold for castle upgrades.'], hrst: ['Handful of Gems', '450 gems for skins, attacks and gear.'], kovar: ['Smith’s Pack', 'A random epic or legendary weapon, 3,000 gold and 100 gems.'], zbrojir: ['Armorer’s Pack', 'Shadow armor for the heavy unit, steel armor for infantry and 3,000 gold.'], lucist: ['Archer’s Pack', 'Dragon bow and steel armor for archers and 250 gems.'], valecny: ['War Pack', '6,000 gold and 300 gems for the campaign.'], hraniceri: ['Rangers’ Pack', 'Three skins: Forest Rangers, Midnight Watch and Shadow Legion + 150 gems.'], hradni: ['Castle Pack', 'Torches and great banners for your castle and 5,000 gold.'], kopinik: ['Spearmen’s Pack', 'Shadow armor and dragon spear for spearmen and 2,000 gold.'], hrdina: ['Hero’s Pack', 'Legendary Star Steel and Shadow Armor for the heavy unit, 8,000 gold and 500 gems.'], kral: ['Royal Pack', 'King’s armor and Star Steel for the heavy unit, legendary infantry armor and bow, 25,000 gold and 2,000 gems.'] };
+    const OEN = { pevnost: ['Great Fortress', 'Big castle: up to 10 defenders on the walls, +25% castle health, plus 10,000 gold and 500 gems.'], start: ['Starter Pack', 'Best start: 6,000 gold, 400 gems, rune weapon and steel armor for infantry and the Forest Rangers skin.'], mesec: ['Bag of Gold', '8,000 gold for castle upgrades.'], hrst: ['Handful of Gems', '450 gems for skins, attacks and gear.'], kovar: ['Smith’s Pack', 'An epic or legendary weapon you do not own yet (2,500 gold if you own them all), plus 3,000 gold and 100 gems.'], zbrojir: ['Armorer’s Pack', 'Shadow armor for the heavy unit, steel armor for infantry and 3,000 gold.'], lucist: ['Archer’s Pack', 'Dragon bow and steel armor for archers and 250 gems.'], valecny: ['War Pack', '6,000 gold and 300 gems for the campaign.'], hraniceri: ['Rangers’ Pack', 'Three skins: Forest Rangers, Midnight Watch and Shadow Legion + 150 gems.'], hradni: ['Castle Pack', 'Torches and great banners for your castle and 5,000 gold.'], kopinik: ['Spearmen’s Pack', 'Shadow armor and dragon spear for spearmen and 2,000 gold.'], hrdina: ['Hero’s Pack', 'Legendary Star Steel and Shadow Armor for the heavy unit, 8,000 gold and 500 gems.'], kral: ['Royal Pack', 'King’s armor and Star Steel for the heavy unit, legendary infantry armor and bow, 25,000 gold and 2,000 gems.'] };
     (GameData.offers || []).forEach(o => apply(o, ['name', 'desc'], OEN[o.id] && { name: OEN[o.id][0], desc: OEN[o.id][1] }));
     if (GameData.chests) { apply(GameData.chests.denni, ['name'], { name: 'Daily Chest' }); apply(GameData.chests.tydenni, ['name'], { name: 'Weekly Chest' }); }
     (GameData.saga || []).forEach(a => apply(a, ['name'], { name: EN.saga[a.id] }));
@@ -216,6 +248,7 @@
     GameData.castleCustom.decorations.forEach(d => apply(d, ['name', 'desc'], EN.decor[d.id]));
     GameData.castleCustom.emblems.forEach(e => apply(e, ['name'], EN.emblems[e.id]));
     Object.values(GameData.abilities).forEach(a => apply(a, ['name', 'desc'], EN.abilities[a.id]));
+    (GameData.skills || []).forEach(a => apply(a, ['name', 'desc'], EN.abilities[a.id]));
   };
 
   // Doplňkové krátké texty (všechny jazyky)
@@ -281,7 +314,7 @@
     dup_comp: ['už máš → +{n} zlata', 'already owned → +{n} gold', '已拥有 → +{n} 金币', 'पहले से है → +{n} सोना', 'ya lo tienes → +{n} oro', 'déjà possédé → +{n} or', 'تملكه → +{n} ذهب', 'আগেই আছে → +{n} সোনা', 'já possui → +{n} ouro', 'уже есть → +{n} золота', 'پہلے سے ہے → +{n} سونا', 'sudah punya → +{n} emas', 'schon vorhanden → +{n} Gold', '所持済み → +{n} ゴールド', 'zaten var → +{n} altın', '보유 중 → +{n} 골드'],
     great: ['Skvělé!', 'Great!', '太好了！', 'बढ़िया!', '¡Genial!', 'Super !', 'رائع!', 'দারুণ!', 'Ótimo!', 'Отлично!', 'زبردست!', 'Hebat!', 'Super!', 'やった！', 'Harika!', '좋아요!'],
     chests: ['Truhly', 'Chests', '宝箱', 'संदूक', 'Cofres', 'Coffres', 'الصناديق', 'সিন্দুক', 'Baús', 'Сундуки', 'صندوق', 'Peti', 'Truhen', '宝箱', 'Sandıklar', '상자'],
-    chests_sub: ['Náhodný obsah, šance jsou zveřejněné', 'Random contents, odds are published', '随机内容，概率已公开', 'यादृच्छिक सामग्री, संभावनाएँ प्रकाशित', 'Contenido aleatorio, probabilidades públicas', 'Contenu aléatoire, chances publiées', 'محتوى عشوائي، الاحتمالات منشورة', 'এলোমেলো উপাদান, সম্ভাবনা প্রকাশিত', 'Conteúdo aleatório, chances publicadas', 'Случайное содержимое, шансы опубликованы', 'بے ترتیب مواد، امکانات شائع', 'Isi acak, peluang dipublikasikan', 'Zufälliger Inhalt, Chancen veröffentlicht', '中身はランダム、確率を公開', 'Rastgele içerik, olasılıklar açık', '무작위 내용, 확률 공개'],
+    chests_sub: ['Za drahokamy · náhodný obsah, šance jsou zveřejněné', 'For gems · random contents, odds are published', '随机内容，概率已公开', 'यादृच्छिक सामग्री, संभावनाएँ प्रकाशित', 'Contenido aleatorio, probabilidades públicas', 'Contenu aléatoire, chances publiées', 'محتوى عشوائي، الاحتمالات منشورة', 'এলোমেলো উপাদান, সম্ভাবনা প্রকাশিত', 'Conteúdo aleatório, chances publicadas', 'Случайное содержимое, шансы опубликованы', 'بے ترتیب مواد، امکانات شائع', 'Isi acak, peluang dipublikasikan', 'Zufälliger Inhalt, Chancen veröffentlicht', '中身はランダム、確率を公開', 'Rastgele içerik, olasılıklar açık', '무작위 내용, 확률 공개'],
     chest_daily: ['1× denně', 'Once a day', '每日一次', 'दिन में एक बार', '1 vez al día', '1× par jour', 'مرة يوميًا', 'দিনে একবার', '1× por dia', '1 раз в день', 'دن میں ایک بار', '1× sehari', '1× täglich', '1日1回', 'Günde 1 kez', '하루 1회'],
     chest_weekly: ['1× týdně', 'Once a week', '每周一次', 'सप्ताह में एक बार', '1 vez por semana', '1× par semaine', 'مرة أسبوعيًا', 'সপ্তাহে একবার', '1× por semana', '1 раз в неделю', 'ہفتے میں ایک بار', '1× seminggu', '1× wöchentlich', '週1回', 'Haftada 1 kez', '주 1회'],
     chest_gear_sure: ['Vždy {n}× zbraň nebo brnění', 'Always {n}× weapon or armor', '必得 {n} 件武器或护甲', 'हमेशा {n}× हथियार या कवच', 'Siempre {n}× arma o armadura', 'Toujours {n}× arme ou armure', 'دائمًا {n}× سلاح أو درع', 'সবসময় {n}× অস্ত্র বা বর্ম', 'Sempre {n}× arma ou armadura', 'Всегда {n}× оружие или броня', 'ہمیشہ {n}× ہتھیار یا زرہ', 'Selalu {n}× senjata atau zirah', 'Immer {n}× Waffe oder Rüstung', '必ず武器か防具 {n} 個', 'Her zaman {n}× silah veya zırh', '무기/방어구 {n}개 확정'],
@@ -440,5 +473,72 @@
     nat_pick_locked: ['Samurajové a Vikingové se odemknou po dokončení příběhu samurajů (Akt II).', 'Samurai and Vikings unlock after you finish the Samurai story (Act II).'],
     nat_playing: ['Hraješ', 'Playing'],
     nat_choose: ['Vybrat', 'Choose'],
+    sk_pow: ['Síla', 'Power'], sk_rng: ['Dosah', 'Range'], sk_cost: ['{n} v boji', '{n} in battle'], sk_cd: ['obnova {n} s', 'cooldown {n} s'],
+    sk_out: ['Mimo dosah – nepřítel musí být do {n} m od hradu', 'Out of range – the enemy must be within {n} m of the castle'],
+    quests: ['Úkoly', 'Quests'], quests_ready: ['Splnil jsi {n} denní úkol(y) – vyzvedni si odměnu na hlavní stránce.', 'You completed {n} daily quest(s) – claim the reward on the main screen.'],
+    mvp: ['Nejlepší jednotka bitvy', 'Best unit of the battle'], dmg_word: ['zranění', 'damage'], kills_word: ['zabití', 'kills'],
+    stars_note: ['3 hvězdy: hradu zůstalo aspoň 80 % životů (+15 drahokamů poprvé). 2 hvězdy: aspoň 50 %.', '3 stars: your castle kept at least 80% health (+15 gems the first time). 2 stars: at least 50%.'],
+    eff_oil: ['{n} zranění u brány každých 7 s', '{n} damage at the gate every 7 s'], eff_oil0: ['Zatím bez oleje', 'No oil yet'],
+    u_overview: ['Přehled jednotek', 'Unit overview'], u_range: ['Dosah', 'Range'], u_speed: ['Rychlost', 'Speed'], u_melee: ['na blízko', 'melee'],
+    u_fast: ['rychlý', 'fast'], u_slow: ['pomalý', 'slow'], u_mid: ['střední', 'medium'], u_strong: ['Silný proti', 'Strong vs'], u_weak: ['Pozor na', 'Weak vs'],
+    u_splash: ['zasáhne více nepřátel najednou', 'hits several enemies at once'], u_aura: ['posiluje vojáky kolem sebe', 'boosts soldiers around him'], u_charge: ['první úder v náporu je silnější', 'first strike of a charge is stronger'],
+    snd_sfx: ['Zvuky', 'Sounds'], snd_music: ['Hudba', 'Music'], snd_on: ['zapnuto', 'on'], snd_off: ['vypnuto', 'off'],
+    acc_title: ['Účet hráče', 'Player account'],
+    acc_why: ['Zaregistruj se a tvůj postup se bude ukládat i na server. Když vymažeš data nebo změníš telefon, přihlásíš se a hraješ dál.', 'Register and your progress is also saved on the server. If you clear data or change phones, just log in and keep playing.'],
+    acc_register: ['Registrovat', 'Register'],
+    acc_login: ['Přihlásit se', 'Log in'],
+    acc_logout: ['Odhlásit', 'Log out'],
+    acc_sync: ['Uložit teď', 'Save now'],
+    acc_synced: ['Postup je uložený na serveru.', 'Progress saved to the server.'],
+    acc_saved_at: ['Naposledy uloženo na server:', 'Last saved to server:'],
+    acc_save_err: ['Postup se teď nepodařilo uložit na server (bez internetu?). Zkusí se to znovu.', 'Could not save to the server right now (offline?). It will retry.'],
+    acc_username: ['Uživatelské jméno', 'Username'],
+    acc_username_ph: ['3–20 znaků', '3–20 characters'],
+    acc_email: ['E-mail', 'E-mail'],
+    acc_password: ['Heslo', 'Password'],
+    acc_pass_ph: ['aspoň 6 znaků', 'at least 6 characters'],
+    acc_login_id: ['Uživatelské jméno nebo e-mail', 'Username or e-mail'],
+    acc_reg_note: ['E-mail slouží jen k přihlášení k tvému účtu. Nikomu ho neposíláme.', 'Your e-mail is only used to log in to your account. We never share it.'],
+    acc_have: ['Už máš účet? Přihlas se', 'Already have an account? Log in'],
+    acc_new: ['Nemáš účet? Zaregistruj se', 'No account? Register'],
+    acc_welcome: ['Vítej, {name}! Postup se teď ukládá i na server.', 'Welcome, {name}! Progress is now saved to the server too.'],
+    acc_logged_out: ['Odhlášeno. Postup zůstává i v tomto zařízení.', 'Logged out. Progress stays on this device too.'],
+    acc_loaded: ['Postup načten.', 'Progress loaded.'],
+    acc_levels: ['{n} úrovní', '{n} levels'],
+    acc_which: ['Který postup chceš hrát?', 'Which progress do you want to play?'],
+    acc_which_note: ['Na účtu je uložený jiný postup než v tomto zařízení. Ten druhý se nesmaže – zůstane jako záloha.', 'Your account has different progress than this device. The other one is not deleted – it is kept as a backup.'],
+    acc_from_account: ['Z účtu', 'From account'],
+    acc_from_device: ['Z tohoto zařízení', 'From this device'],
+    acc_change_pass: ['Změnit heslo', 'Change password'],
+    acc_pass_old: ['Současné heslo', 'Current password'],
+    acc_pass_new: ['Nové heslo', 'New password'],
+    acc_save: ['Uložit', 'Save'],
+    acc_e_user: ['Uživatelské jméno musí mít 3–20 znaků (písmena, čísla, mezera, _ . -).', 'Username must have 3–20 characters (letters, numbers, space, _ . -).'],
+    acc_e_email: ['Zadej platný e-mail.', 'Enter a valid e-mail.'],
+    acc_e_pass: ['Heslo musí mít aspoň 6 znaků.', 'Password must have at least 6 characters.'],
+    acc_e_user_taken: ['Toto uživatelské jméno už někdo má.', 'This username is already taken.'],
+    acc_e_email_taken: ['Na tento e-mail už účet existuje. Přihlas se.', 'An account with this e-mail already exists. Log in.'],
+    acc_e_login: ['Špatné jméno, e-mail nebo heslo.', 'Wrong username, e-mail or password.'],
+    acc_e_locked: ['Příliš mnoho pokusů. Zkus to znovu za 15 minut.', 'Too many attempts. Try again in 15 minutes.'],
+    acc_e_session: ['Přihlášení vypršelo. Přihlas se znovu.', 'Your session expired. Please log in again.'],
+    acc_e_net: ['Nepodařilo se spojit se serverem. Zkontroluj internet.', 'Could not reach the server. Check your connection.'],
+    acc_nudge: ['Ulož si postup', 'Save progress'],
+    bk_title: ['Záloha postupu kódem', 'Backup code'],
+    bk_note: ['Funguje i bez účtu: zkopíruj si kód a později ho vlož na jiném zařízení.', 'Works without an account: copy the code and paste it later on another device.'],
+    bk_export: ['Zkopírovat kód', 'Copy code'],
+    bk_import: ['Obnovit z kódu', 'Restore from code'],
+    bk_export_note: ['Tento kód obsahuje celý tvůj postup. Ulož si ho třeba do poznámek.', 'This code contains all your progress. Keep it e.g. in your notes.'],
+    bk_import_note: ['Vlož kód zálohy. Současný postup se nesmaže – uloží se jako záloha v tomto zařízení.', 'Paste the backup code. Your current progress is not deleted – it is kept as a backup on this device.'],
+    bk_copy: ['Kopírovat', 'Copy'],
+    bk_copied: ['Kód zkopírován.', 'Code copied.'],
+    bk_restore: ['Obnovit', 'Restore'],
+    bk_bad: ['Tento kód není platný.', 'This code is not valid.'],
+    lb_bots: ['Soupeři (počítač)', 'Opponents (AI)'],
+    lb_loading: ['Načítám žebříček…', 'Loading leaderboard…'],
+    lb_empty: ['Zatím tu nikdo není. Buď první!', 'Nobody here yet. Be the first!'],
+    lb_world_note: ['Skuteční hráči s účtem, seřazení podle trofejí.', 'Real players with an account, ranked by trophies.'],
+    lb_world_reg: ['Do světového žebříčku se dostaneš, když si založíš účet.', 'Create an account to appear in the world leaderboard.'],
+    t_no_gems: ['Nemáš dost drahokamů.', 'Not enough gems.'],
+    pay_soon: ['Nákupy za skutečné peníze budou dostupné v aplikaci z Google Play a App Store.', 'Real-money purchases will be available in the Google Play and App Store app.'],
   });
 })();

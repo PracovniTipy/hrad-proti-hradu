@@ -21,12 +21,13 @@
         <div class="eyebrow">${t('pay_title')}</div>
         <h2>${product.name}</h2>
         <div class="pay-price">${this.price(product.czk)}</div>
-        <div class="notice"><div>${t('pay_demo')}</div></div>
+        <div class="notice"><div>${HraConfig.dev ? t('pay_demo') : t('pay_soon')}</div></div>
         <div class="modal-actions">
-          <button class="btn btn-green" id="payTest">${t('pay_test')}</button>
+          ${HraConfig.dev ? `<button class="btn btn-green" id="payTest">${t('pay_test')}</button>` : ''}
           <button class="btn" data-close>${t('back')}</button>
         </div>`, (c, close) => {
-        c.querySelector('#payTest').addEventListener('click', () => { close(); onOk(); });
+        const pt = c.querySelector('#payTest');
+        if (pt) pt.addEventListener('click', () => { close(); onOk(); });
       });
     }
   };

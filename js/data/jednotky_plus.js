@@ -89,3 +89,4 @@ const UEN = {
   jarl: ['Jarl', 'Commander', 'Leader of warriors in a wolf pelt. Soldiers around him get +15% attack.']
 };
 Object.keys(UEN).forEach(id => { const e = UEN[id]; GameData.units[id].en = { name: e[0], role: e[1], desc: e[2] }; });
+

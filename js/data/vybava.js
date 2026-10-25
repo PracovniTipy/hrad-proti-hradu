@@ -69,7 +69,7 @@ GameData.offers = [
     give: { gold: 6000, gems: 400, gear: ['weapon_pech_1', 'armor_pech_1'], skins: ['lesni'] }, art: 'chest' },
   { id: 'mesec', name: 'Měšec zlata', desc: '8 000 zlata na vylepšení hradu.', czk: 29, give: { gold: 8000 }, art: 'gold' },
   { id: 'hrst', name: 'Hrst drahokamů', desc: '450 drahokamů na skiny, útoky a výbavu.', czk: 29, give: { gems: 450 }, art: 'gems' },
-  { id: 'kovar', name: 'Balíček kováře', desc: 'Náhodná epická nebo legendární zbraň, 3 000 zlata a 100 drahokamů.', czk: 29, give: { gold: 3000, gems: 100, randomGear: { slot: 'weapon', minTier: 2 } }, art: 'weapon' },
+  { id: 'kovar', name: 'Balíček kováře', desc: 'Epická nebo legendární zbraň, kterou ještě nemáš (když máš všechny, dostaneš 2 500 zlata), k tomu 3 000 zlata a 100 drahokamů.', czk: 29, give: { gold: 3000, gems: 100, randomGear: { slot: 'weapon', minTier: 2 } }, art: 'weapon' },
   { id: 'zbrojir', name: 'Balíček zbrojíře', desc: 'Stínová zbroj pro těžkou jednotku, ocelová pro pěchotu a 3 000 zlata.', czk: 29, limit: 1, give: { gold: 3000, gear: ['armor_tezka_2', 'armor_pech_1'] }, art: 'armor' },
   { id: 'lucist', name: 'Balíček lučištníka', desc: 'Dračí luk a ocelová zbroj pro střelce a 250 drahokamů.', czk: 29, limit: 1, give: { gems: 250, gear: ['weapon_strelec_2', 'armor_strelec_1'] }, art: 'weapon' },
   { id: 'valecny', name: 'Válečný balíček', desc: '6 000 zlata a 300 drahokamů na další tažení.', czk: 29, give: { gold: 6000, gems: 300 }, art: 'chest' },
@@ -81,12 +81,12 @@ GameData.offers = [
   { id: 'kral', name: 'Královský balíček', desc: 'Zbroj krále a Hvězdná ocel pro těžkou jednotku, legendární zbroj pěchoty a luk, 25 000 zlata a 2 000 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 25000, gems: 2000, gear: ['armor_tezka_3', 'weapon_tezka_3', 'armor_pech_3', 'weapon_strelec_3'] }, art: 'crown' }
 ];
 
-/* ---- Truhly za skutečné peníze (obsah je náhodný, šance jsou zveřejněné) ---- */
+/* ---- Truhly za drahokamy (herní měna, ne přímo skutečné peníze; šance jsou zveřejněné) ---- */
 GameData.chests = {
-  denni: { id: 'denni', name: 'Denní truhla', czk: 29, period: 'day', desc: 'Jednou denně.',
-    gold: [2000, 4000], gems: [100, 250], gearChance: 0.7, tierOdds: [0.3, 0.45, 0.2, 0.05] },
-  tydenni: { id: 'tydenni', name: 'Týdenní truhla', czk: 99, period: 'week', desc: 'Jednou týdně. Vždy obsahuje zbraň nebo brnění.',
-    gold: [12000, 20000], gems: [600, 1000], gearChance: 1, gearCount: 3, tierOdds: [0, 0.4, 0.4, 0.2] }
+  denni: { id: 'denni', name: 'Denní truhla', gemsPrice: 120, period: 'day', desc: 'Jednou denně.',
+    gold: [2500, 4500], gems: [0, 0], gearChance: 0.7, tierOdds: [0.3, 0.45, 0.2, 0.05] },
+  tydenni: { id: 'tydenni', name: 'Týdenní truhla', gemsPrice: 600, period: 'week', desc: 'Jednou týdně. Vždy obsahuje 3 zbraně nebo brnění.',
+    gold: [14000, 22000], gems: [0, 0], gearChance: 1, gearCount: 3, tierOdds: [0, 0.4, 0.4, 0.2] }
 };
 
 /* ---- Drahokamy za skutečné peníze ---- */

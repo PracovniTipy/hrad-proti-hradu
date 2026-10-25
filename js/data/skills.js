@@ -56,38 +56,42 @@ GameData.skills = [
 /* Jasný popis síly a dosahu útoku (obchod i bitva).
    1 jednotka světa = 10 cm, bojiště má 700 m. */
 GameData.skillInfo = k => {
+  const cs = !window.I18N || I18N.lang === 'cs', L = (c, e) => cs ? c : e;
   const m = v => Math.round(v / 10) + ' m', W = (GameData.battleConfig || {}).worldW || 7000;
-  const P = k.power, R = k.radius;
+  const P = k.power, R = k.radius, dmgW = L('zranění', 'damage');
   const I = { zone: 'cil', zoneName: '', range: '', dmg: '', from: 0, to: 0 };
-  const castle = (txt) => { I.zone = 'hrad'; I.zoneName = 'Obrana hradu – na blízko'; I.range = txt || ('do ' + m(k.range) + ' před hradem'); I.from = 0; I.to = k.range / W; };
-  const target = (w) => { I.zone = 'cil'; I.zoneName = 'Kdekoli na bojišti'; I.range = 'nejbližší nepřátelé, oblast ' + m(w) + ' široká'; I.spot = w / W; };
+  const castle = (txt) => { I.zone = 'hrad'; I.zoneName = L('Obrana hradu – na blízko', 'Castle defence – close range'); I.range = txt || L('do ' + m(k.range) + ' před hradem', 'up to ' + m(k.range) + ' in front of the castle'); I.from = 0; I.to = k.range / W; };
+  const target = (w) => { I.zone = 'cil'; I.zoneName = L('Kdekoli na bojišti', 'Anywhere on the field'); I.range = L('nejbližší nepřátelé, oblast ' + m(w) + ' široká', 'nearest enemies, area ' + m(w) + ' wide'); I.spot = w / W; };
+  const field = (txt) => { I.zone = 'pole'; I.zoneName = L('Celé bojiště', 'Whole battlefield'); I.range = txt; I.from = 0; I.to = 1; };
+  const own = (zn, txt) => { I.zone = 'vlastni'; I.zoneName = zn; I.range = txt; };
+  const allMine = L('všichni tvoji vojáci', 'all your soldiers'), mineZ = L('Tvoji vojáci', 'Your soldiers');
   switch (k.kind) {
-    case 'meteors': target(R * 1.6); I.dmg = '7 koulí × ' + Math.round(P / 2.6) + ' zranění + hoření'; break;
-    case 'meteor': target(R * 2); I.dmg = P + ' zranění každému v oblasti'; break;
+    case 'meteors': target(R * 1.6); I.dmg = L('7 koulí', '7 balls') + ' × ' + Math.round(P / 2.6) + ' ' + dmgW + L(' + hoření', ' + burning'); break;
+    case 'meteor': target(R * 2); I.dmg = P + ' ' + dmgW + L(' každému v oblasti', ' to everyone in the area'); break;
     case 'element':
-      if (k.el === 'led') { target(280); I.dmg = Math.round(P * 0.8) + ' zranění + zpomalení ' + k.slow + ' s'; }
-      else if (k.el === 'blesk') { target(340); I.dmg = P + ' zranění, pak 4 další × ' + Math.round(P * 0.75); I.range = 'nejbližší nepřítel + 4 další v okolí'; }
-      else if (k.el === 'jed') { target(210); I.dmg = Math.round(P * 0.5) + ' zranění + jed ' + Math.round(P * 0.3) + '/s po 5 s'; }
-      else if (k.el === 'voda') { target(230); I.dmg = Math.round(P * 0.7) + ' zranění + odhození o 7 m'; }
-      else { target(190); I.dmg = P + ' zranění + hoření'; }
+      if (k.el === 'led') { target(280); I.dmg = Math.round(P * 0.8) + ' ' + dmgW + L(' + zpomalení ', ' + slow ') + k.slow + ' s'; }
+      else if (k.el === 'blesk') { target(340); I.dmg = P + ' ' + dmgW + L(', pak 4 další × ', ', then 4 more × ') + Math.round(P * 0.75); I.range = L('nejbližší nepřítel + 4 další v okolí', 'nearest enemy + 4 more nearby'); }
+      else if (k.el === 'jed') { target(210); I.dmg = Math.round(P * 0.5) + ' ' + dmgW + L(' + jed ', ' + poison ') + Math.round(P * 0.3) + L('/s po 5 s', '/s for 5 s'); }
+      else if (k.el === 'voda') { target(230); I.dmg = Math.round(P * 0.7) + ' ' + dmgW + L(' + odhození o 7 m', ' + knockback 7 m'); }
+      else { target(190); I.dmg = P + ' ' + dmgW + L(' + hoření', ' + burning'); }
       break;
-    case 'volley': castle(); I.dmg = '24 šípů × ' + P + ' zranění' + (k.poison ? ' + jed 4 s' : ''); break;
-    case 'barrage': castle(); I.dmg = '5 koulí × ' + P + ' zranění'; break;
-    case 'breath': castle(); I.dmg = P + ' zranění každému + hoření 3 s'; break;
-    case 'tornado': castle('jede od brány ' + m(k.range) + ' dopředu'); I.zoneName = 'Od hradu dopředu'; I.dmg = P + ' zranění/s + odhazuje nepřátele'; break;
-    case 'storm': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = '6 blesků do nejsilnějších nepřátel'; I.from = 0; I.to = 1; I.dmg = '6 × ' + P + ' zranění'; break;
-    case 'quake': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = 'všichni nepřátelé na zemi'; I.from = 0; I.to = 1; I.dmg = P + ' zranění + omráčení ' + String(k.duration).replace('.', ',') + ' s'; break;
-    case 'curse': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = 'všichni nepřátelé'; I.from = 0; I.to = 1; I.dmg = '+' + Math.round(P * 100) + ' % zranění na ' + k.duration + ' s'; break;
-    case 'stun': target(R * 2); I.dmg = P + ' zranění + zastavení ' + k.duration + ' s'; break;
-    case 'holy': target(R * 2); I.dmg = P + ' zranění, tvoje vojáky léčí 30 %'; break;
-    case 'wall': I.zone = 'cil'; I.zoneName = 'Před tvými vojáky'; I.range = 'zeď 9 m široká na ' + k.duration + ' s'; I.spot = 92 / W; I.dmg = Math.round(P) + ' zranění/s + hoření'; break;
-    case 'heal': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '+' + Math.round(P * 100) + ' % životů'; break;
-    case 'buff': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '+' + Math.round(P * 100) + ' % útok, +30 % rychlost na ' + k.duration + ' s'; break;
-    case 'shield': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '−' + Math.round(P * 100) + ' % zranění na ' + k.duration + ' s'; break;
-    case 'firearrows': I.zone = 'vlastni'; I.zoneName = 'Tvoji střelci'; I.range = 'všichni tvoji střelci'; I.dmg = 'šípy zapalují na ' + k.duration + ' s'; break;
-    case 'summon': I.zone = 'brana'; I.zoneName = 'U tvé brány'; I.range = 'vyběhnou z brány'; I.dmg = k.count + '× ' + (k.role === 'tezka' ? 'těžká jednotka' : 'pěšák') + ' zdarma'; break;
-    case 'repair': I.zone = 'brana'; I.zoneName = 'Tvůj hrad'; I.range = 'hradby'; I.dmg = '+' + Math.round(P * 100) + ' % životů hradu'; break;
-    case 'gold': I.zone = 'brana'; I.zoneName = 'Pokladna'; I.range = '—'; I.dmg = '+' + P + ' mincí'; break;
+    case 'volley': castle(); I.dmg = L('24 šípů', '24 arrows') + ' × ' + P + ' ' + dmgW + (k.poison ? L(' + jed 4 s', ' + poison 4 s') : ''); break;
+    case 'barrage': castle(); I.dmg = L('5 koulí', '5 balls') + ' × ' + P + ' ' + dmgW; break;
+    case 'breath': castle(); I.dmg = P + ' ' + dmgW + L(' každému + hoření 3 s', ' to each + burning 3 s'); break;
+    case 'tornado': castle(L('jede od brány ' + m(k.range) + ' dopředu', 'travels ' + m(k.range) + ' forward from the gate')); I.zoneName = L('Od hradu dopředu', 'Forward from the castle'); I.dmg = P + ' ' + dmgW + L('/s + odhazuje nepřátele', '/s + throws enemies back'); break;
+    case 'storm': field(L('6 blesků do nejsilnějších nepřátel', '6 bolts at the strongest enemies')); I.dmg = '6 × ' + P + ' ' + dmgW; break;
+    case 'quake': field(L('všichni nepřátelé na zemi', 'all enemies on the ground')); I.dmg = P + ' ' + dmgW + L(' + omráčení ', ' + stun ') + String(k.duration).replace('.', cs ? ',' : '.') + ' s'; break;
+    case 'curse': field(L('všichni nepřátelé', 'all enemies')); I.dmg = '+' + Math.round(P * 100) + L(' % zranění na ', '% damage taken for ') + k.duration + ' s'; break;
+    case 'stun': target(R * 2); I.dmg = P + ' ' + dmgW + L(' + zastavení ', ' + stop ') + k.duration + ' s'; break;
+    case 'holy': target(R * 2); I.dmg = P + ' ' + dmgW + L(', tvoje vojáky léčí 30 %', ', heals your soldiers 30%'); break;
+    case 'wall': I.zone = 'cil'; I.zoneName = L('Před tvými vojáky', 'In front of your soldiers'); I.range = L('zeď 9 m široká na ', 'wall 9 m wide for ') + k.duration + ' s'; I.spot = 92 / W; I.dmg = Math.round(P) + ' ' + dmgW + L('/s + hoření', '/s + burning'); break;
+    case 'heal': own(mineZ, allMine); I.dmg = '+' + Math.round(P * 100) + L(' % životů', '% health'); break;
+    case 'buff': own(mineZ, allMine); I.dmg = '+' + Math.round(P * 100) + L(' % útok, +30 % rychlost na ', '% attack, +30% speed for ') + k.duration + ' s'; break;
+    case 'shield': own(mineZ, allMine); I.dmg = '−' + Math.round(P * 100) + L(' % zranění na ', '% damage taken for ') + k.duration + ' s'; break;
+    case 'firearrows': own(L('Tvoji střelci', 'Your archers'), L('všichni tvoji střelci', 'all your archers')); I.dmg = L('šípy zapalují na ', 'arrows set enemies on fire for ') + k.duration + ' s'; break;
+    case 'summon': I.zone = 'brana'; I.zoneName = L('U tvé brány', 'At your gate'); I.range = L('vyběhnou z brány', 'run out of the gate'); I.dmg = k.count + '× ' + (k.role === 'tezka' ? L('těžká jednotka', 'heavy unit') : L('pěšák', 'infantryman')) + L(' zdarma', ' for free'); break;
+    case 'repair': I.zone = 'brana'; I.zoneName = L('Tvůj hrad', 'Your castle'); I.range = L('hradby', 'walls'); I.dmg = '+' + Math.round(P * 100) + L(' % životů hradu', '% castle health'); break;
+    case 'gold': I.zone = 'brana'; I.zoneName = L('Pokladna', 'Treasury'); I.range = '—'; I.dmg = '+' + P + L(' mincí', ' coins'); break;
   }
   return I;
 };

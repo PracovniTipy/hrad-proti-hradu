@@ -5,7 +5,7 @@
 (function () {
   const fmt = n => Math.round(n).toLocaleString('cs-CZ');
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const BLD_ICONS = { hradby: 'wall', pokladnice: 'chest', kasarna: 'barracks', vez: 'tower', zbrojnice: 'armory' };
+  const BLD_ICONS = { hradby: 'wall', pokladnice: 'chest', kasarna: 'barracks', vez: 'tower', zbrojnice: 'armory', olej: 'fire' };
 
   function isUnitUnlocked(save, u) {
     if (!u.unlock) return true;
@@ -126,6 +126,29 @@
     return `<div class="org">${F.organization.map(n => `
       <div class="org-row">${node(n)}</div>
       ${n.children ? `<div class="org-row org-kids">${n.children.map(node).join('')}</div>` : ''}`).join('')}</div>`;
+  }
+
+  /* Přehled jednotek národa: síla, dosah, rychlost a na koho jsou dobré */
+  function unitsHtml(fac, save, st) {
+    const ids = GameData.factionUnits(fac);
+    const U = ids.map(id => GameData.units[id]);
+    const maxHp = Math.max(...U.map(u => u.hp)), maxDps = Math.max(...U.map(u => u.dmg / (u.attackInterval || 1))), maxRng = Math.max(...U.map(u => u.range)), maxSp = Math.max(...U.map(u => u.speed));
+    const roleNm = r => t('role_' + r);
+    const bar = (lbl, v, max, txt) => `<div class="us-row"><span>${lbl}</span><i><b style="width:${Math.max(6, v / max * 100)}%"></b></i><em>${txt}</em></div>`;
+    return `<div class="unit-grid">${U.map(u => {
+      const locked = !isUnitUnlocked(save, u);
+      const strong = Object.keys(u.bonusVs || {}).filter(k => ['pech', 'strelec', 'kopi', 'jizda', 'tezka', 'mag', 'velitel'].includes(k)).map(k => `${roleNm(k)} ×${String(u.bonusVs[k]).replace('.', ',')}`);
+      const weak = U.filter(o => o.bonusVs && o.bonusVs[u.roleKey]).map(o => roleNm(o.roleKey));
+      const dps = u.dmg * st.unitMult / (u.attackInterval || 1);
+      return `<article class="panel ucard ${locked ? 'locked' : ''}">
+        <div class="uc-top"><canvas data-ucard="${u.id}"></canvas><div><b>${esc(u.name)}</b><small>${esc(u.role || '')} · ${ico('coin')} ${u.cost}</small>${locked ? `<small class="lk">${ico('lock')} ${esc((u.unlock && u.unlock.text) || t('locked'))}</small>` : ''}</div></div>
+        ${bar(t('hp'), u.hp, maxHp, Math.round(u.hp * st.unitMult))}
+        ${bar(t('atk'), u.dmg / (u.attackInterval || 1), maxDps, Math.round(u.dmg * st.unitMult) + ' (' + dps.toFixed(0) + '/s)')}
+        ${bar(t('u_range'), u.range, maxRng, u.ranged ? Math.round(u.range / 10) + ' m' : t('u_melee'))}
+        ${bar(t('u_speed'), u.speed, maxSp, u.speed > maxSp * 0.8 ? t('u_fast') : u.speed < maxSp * 0.55 ? t('u_slow') : t('u_mid'))}
+        <p class="uc-vs">${strong.length ? `<span class="good">▲ ${t('u_strong')}: ${strong.join(', ')}</span>` : ''}${weak.length ? `<span class="bad">▼ ${t('u_weak')}: ${[...new Set(weak)].join(', ')}</span>` : ''}${u.splash ? `<span class="good">✦ ${t('u_splash')}</span>` : ''}${u.aura ? `<span class="good">✦ ${t('u_aura')}</span>` : ''}${u.charge ? `<span class="good">✦ ${t('u_charge')}</span>` : ''}</p>
+      </article>`;
+    }).join('')}</div>`;
   }
 
   /* Nastavení hradu hráče (znak, barvy, zapnuté a koupené dekorace) */
@@ -352,6 +375,12 @@
         <section class="hero-live">
           <canvas id="homeCv" aria-label="Tvůj hrad v krajině"></canvas>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
+          ${Ucet.logged() ? '' : `<button class="acc-nudge" data-acc="register">${ico('shield')} ${t('acc_nudge')}</button>`}
+          <button class="daily-btn quest-btn" id="questBtn" aria-label="${t('quests')}">
+            <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M28 10h64a8 8 0 0 1 8 8v70a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V18a8 8 0 0 1 8-8z" fill="#e9d6a8" stroke="#1a0e06" stroke-width="4"/><path d="M34 32h40M34 50h40M34 68h28" stroke="#6b4508" stroke-width="6" stroke-linecap="round"/><path d="M80 28l5 5 9-11M80 46l5 5 9-11" fill="none" stroke="#2f8a3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="88" cy="68" r="8" fill="none" stroke="#6b4508" stroke-width="5"/></svg></span>
+            <span class="daily-lbl">${t('quests')}</span>
+            ${Ukoly.ready(save) ? '<i class="daily-dot">!</i>' : ''}
+          </button>
           <button class="daily-btn" id="dailyBtn" aria-label="${t('daily_title')}">
             <span class="daily-chest">${Icons.navObchod ? '' : ''}<svg viewBox="0 0 120 100"><path d="M14 46h92v40a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#8a5a32" stroke="#1a0e06" stroke-width="4"/><path d="M14 46c0-20 20-30 46-30s46 10 46 30z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M14 46h92" stroke="#ffd77a" stroke-width="7"/><path d="M30 18v74M90 18v74" stroke="#ffd77a" stroke-width="7"/><rect x="49" y="39" width="22" height="24" rx="3" fill="#ffd77a" stroke="#1a0e06" stroke-width="3"/></svg></span>
             <span class="daily-lbl">${t('daily_short')}</span>
@@ -364,6 +393,8 @@
       App._stopLive = liveScene(el.querySelector('#homeCv'), () => sceneState(save));
       if (el.querySelector('#crestCv')) emblemCanvas(el.querySelector('#crestCv'), cfg.emblem, '#f2c94c', cfg.banner || F.color);
       el.querySelector('#dailyBtn').addEventListener('click', () => Denni.open(App));
+      UcetUI.bind(App, el);
+      el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
       return;
     }
     el.innerHTML = `
@@ -397,9 +428,13 @@
 
         ${defenseHtml(save)}
 
+        <div class="sec-head"><h2>${t('u_overview')}</h2><span class="muted">${esc(F.name)}</span></div>
+        ${unitsHtml(save.faction, save, st)}
+
         <div class="sec-head"><h2>${t('organization')}</h2><span class="muted">${esc(F.name)} · ${t('army_power', { n: Math.round((st.unitMult - 1) * 100) })}</span></div>
         ${orgHtml(F, save, st)}
       </div>`;
+    el.querySelectorAll('canvas[data-ucard]').forEach(cv => Art.renderUnitIcon(cv, cv.dataset.ucard, 'player', save.skins.unit[cv.dataset.ucard], { zoom: 0.95 }));
     el.querySelectorAll('canvas[data-natcv]').forEach(cv => Art.renderUnitIcon(cv, GameData.factions[cv.dataset.natcv].roles.tezka, 'player', save.skins.unit[GameData.factions[cv.dataset.natcv].roles.tezka], { zoom: 0.9 }));
     el.querySelectorAll('[data-setnat]').forEach(b => b.addEventListener('click', () => {
       if (b.getAttribute('aria-disabled')) { App.toast(t('nat_pick_locked')); return; }
@@ -578,11 +613,11 @@
             <div class="sk-top">${GameData.skillIcon(k, 58)}<div><h3>${esc(k.name)}</h3>${rar(rarN[k.rarity])}</div></div>
             <p>${esc(k.desc)}</p>
             ${(() => { const I = GameData.skillInfo(k); return `<div class="sk-info z-${I.zone}">
-              <div class="sk-row"><span class="sk-k">Síla</span><span class="sk-v pow">${esc(I.dmg)}</span></div>
-              <div class="sk-row"><span class="sk-k">Dosah</span><span class="sk-v"><b class="sk-zone">${esc(I.zoneName)}</b> ${esc(I.range)}</span></div>
+              <div class="sk-row"><span class="sk-k">${t('sk_pow')}</span><span class="sk-v pow">${esc(I.dmg)}</span></div>
+              <div class="sk-row"><span class="sk-k">${t('sk_rng')}</span><span class="sk-v"><b class="sk-zone">${esc(I.zoneName)}</b> ${esc(I.range)}</span></div>
               ${GameData.skillRangeBar(k)}
             </div>`; })()}
-            <p class="sk-stats">${ico('coin')} ${k.cost || t('free')} v boji · ⏱ obnova ${k.cooldown} s</p>
+            <p class="sk-stats">${ico('coin')} ${t('sk_cost', { n: k.cost || t('free') })} · ⏱ ${t('sk_cd', { n: k.cooldown })}</p>
             ${on ? `<button class="btn btn-sm" data-skoff="${k.id}">✓ ${t('skill_on')}</button>`
               : own ? `<button class="btn btn-sm btn-blue" data-skon="${k.id}">${t('skill_take')}</button>`
               : k.price.czk ? `<button class="btn btn-sm btn-green" data-skczk="${k.id}">${k.price.czk} Kč</button>`
@@ -895,6 +930,7 @@
               const cls = ['node', l.boss ? 'boss' : '', typeof l.boss === 'string' ? 'final' : '', cleared ? 'cleared' : '', isCur ? 'current' : '', unlocked ? '' : 'lockednode'].join(' ');
               return `<button class="${cls}" style="left:${l.pos[0]}%;top:${l.pos[1]}%" data-lv="${l.id}" aria-label="${l.label} ${esc(l.name)}${cleared ? ' ✓' : ''}">
                 ${cleared || isCur ? ico('crown') : ''}${unlocked ? l.label : ico('lock')}
+                ${cleared ? `<span class="nstars">${[1, 2, 3].map(i => `<i class="${i <= ((save.campaign.stars || {})[l.id] || 1) ? 'on' : ''}">★</i>`).join('')}</span>` : ''}
               </button>`;
             }).join('')}
           </section>
@@ -1031,18 +1067,32 @@
     const el = App.screenEl;
     el.innerHTML = `
       <div class="scr" style="max-width:720px">
-        <div class="sec-head"><h1>${t('nav_zebricek')}</h1><span class="tag tag-demo">${t('demo_data')}</span></div>
+        <div class="sec-head"><h1>${t('nav_zebricek')}</h1>${App.lbTab === 'bots' ? `<span class="tag tag-demo">${t('demo_data')}</span>` : ''}</div>
         <div class="tabs" role="tablist">
-          <button class="tab" role="tab" aria-selected="true">TOP 10</button>
-          <button class="tab" role="tab" disabled >${t('friends_online')}</button>
-          <button class="tab" role="tab" disabled >${t('world_online')}</button>
+          <button class="tab" role="tab" data-lbt="world" aria-selected="${App.lbTab !== 'bots'}">${t('world_online')}</button>
+          <button class="tab" role="tab" data-lbt="bots" aria-selected="${App.lbTab === 'bots'}">${t('lb_bots')}</button>
         </div>
-        <section class="panel lb">
-          ${list.slice(0, 10).map(row).join('')}
-          ${myRank > 10 ? `<div class="lb-gap">• • •</div>${row(me, myRank - 1)}` : ''}
+        <section class="panel lb" id="lbBox">
+          ${App.lbTab === 'bots' ? list.slice(0, 10).map(row).join('') + (myRank > 10 ? `<div class="lb-gap">• • •</div>${row(me, myRank - 1)}` : '') : `<div class="lb-load muted">${t('lb_loading')}</div>`}
         </section>
-        <div class="notice"><div>${t('lb_notice')}</div></div>
+        <div class="notice"><div>${App.lbTab === 'bots' ? t('lb_notice') : Ucet.logged() ? t('lb_world_note') : t('lb_world_reg')}</div></div>
+        ${App.lbTab !== 'bots' && !Ucet.logged() ? `<button class="btn btn-green" data-acc="register">${t('acc_register')}</button>` : ''}
       </div>`;
+    el.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => { App.lbTab = b.dataset.lbt; App.go('zebricek'); }));
+    UcetUI.bind(App, el);
+    if (App.lbTab !== 'bots') {
+      const box = el.querySelector('#lbBox');
+      Ucet.leaderboard().then(rows => {
+        if (App.current !== 'zebricek') return;
+        const mine = Ucet.logged() ? Ucet.s.username : null;
+        const wl = (rows || []).map(r => ({ name: r.username, trophies: r.trophies, faction: GameData.factions[r.faction] ? r.faction : 'kralovstvi', me: r.username === mine }));
+        box.innerHTML = wl.length ? wl.map((p, i) => `<div class="lb-row ${p.me ? 'me' : ''}"><div class="rank ${i < 3 ? 'r' + (i + 1) : ''}">${i + 1}</div>
+            <canvas data-av="${GameData.factions[p.faction].roles.tezka}" data-skin="zakladni" data-team="${p.me ? 'player' : 'enemy'}"></canvas>
+            <div class="lb-name"><b>${esc(p.name)}${p.me ? ' ' + t('you_suffix') : ''}</b><small>${esc(GameData.factions[p.faction].name)}</small></div>
+            <div class="lb-tro">${ico('trophy')}${fmt(p.trophies)}</div></div>`).join('') : `<div class="lb-load muted">${t('lb_empty')}</div>`;
+        box.querySelectorAll('canvas[data-av]').forEach(c => Art.renderUnitIcon(c, c.dataset.av, c.dataset.team, c.dataset.skin, { headshot: true, noShadow: true }));
+      }).catch(() => { box.innerHTML = `<div class="lb-load muted">${t('acc_e_net')}</div>`; });
+    }
     el.querySelectorAll('canvas[data-av]').forEach(c => Art.renderUnitIcon(c, c.dataset.av, c.dataset.team, c.dataset.skin, { headshot: true, noShadow: true }));
   }
 
@@ -1077,11 +1127,17 @@
           <div class="panel stat"><small>${t('sent')}</small><b>${fmt(s.unitsSent)}</b></div>
           <div class="panel stat"><small>${t('tab_decor')}</small><b>${save.skins.ownedUnit.length + save.skins.ownedCastle.length}</b></div>
         </div>
+        ${UcetUI.profileHtml()}
+        ${UcetUI.backupHtml()}
         <section class="panel" style="padding:12px 14px;display:grid;gap:10px">
           <b>${t('settings')}</b>
           <div class="field"><label for="langSel">${t('language')}</label>
             <select id="langSel" class="sel">${I18N.LANGS.map(l => `<option value="${l.id}" ${l.id === I18N.lang ? 'selected' : ''}>${l.name}${l.id !== 'en' && l.id !== 'cs' ? ' · ' + l.en : ''}</option>`).join('')}</select></div>
           <p class="muted" style="margin:0;font-size:13px">${t('lang_note')}</p>
+          <div class="modal-actions snd-row">
+            <button class="btn" data-snd="sfx">${Zvuk.settings().sfx ? '🔊' : '🔇'} ${t('snd_sfx')}: ${Zvuk.settings().sfx ? t('snd_on') : t('snd_off')}</button>
+            <button class="btn" data-snd="music">${Zvuk.settings().music ? '🎵' : '🔇'} ${t('snd_music')}: ${Zvuk.settings().music ? t('snd_on') : t('snd_off')}</button>
+          </div>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -1100,12 +1156,14 @@
       el.querySelectorAll('[data-avatar]').forEach(x => x.setAttribute('aria-pressed', x === b));
       drawAv();
     }));
+    UcetUI.bind(App, el); UcetUI.bindBackup(App, el);
+    el.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); App.go('profil', { keepScroll: true }); }));
     el.querySelector('#langSel').addEventListener('change', e => App.setLang(e.target.value));
     el.querySelector('#tutAgain').addEventListener('click', () => { save.tut = {}; App.persist(); App.go('hrad'); });
     el.querySelector('#resetBtn').addEventListener('click', () => {
       el.querySelector('#resetBox').innerHTML = `<div style="display:grid;gap:8px"><b style="color:#ff8a80">${t('reset_q')}</b>
         <div class="modal-actions"><button class="btn btn-red" id="resetYes">${t('yes_delete')}</button><button class="btn" id="resetNo">${t('no')}</button></div></div>`;
-      el.querySelector('#resetYes').addEventListener('click', () => { const lang = App.save.lang; App.save = Save.reset(); App.save.lang = lang; App.persist(); App.refreshTop(); App.toast(t('done')); App.go('hrad'); });
+      el.querySelector('#resetYes').addEventListener('click', async () => { if (Ucet.logged()) { await Ucet.upload(); await Ucet.logout(); } const lang = App.save.lang; App.save = Save.reset(); App.save.lang = lang; App.persist(); App.refreshTop(); App.toast(t('done')); App.go('hrad'); });
       el.querySelector('#resetNo').addEventListener('click', () => App.go('profil'));
     });
   }
