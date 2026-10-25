@@ -3,6 +3,10 @@
   "appName": "Hrad proti hradu",
   "webDir": "www",
   "backgroundColor": "#0d121c",
+  "server": {
+    "url": "https://pracovnitipy.github.io/hrad-proti-hradu/index.html",
+    "allowNavigation": ["pracovnitipy.github.io", "smjplqxwqyraphfeqsyk.supabase.co"]
+  },
   "android": { "allowMixedContent": false },
   "ios": { "contentInset": "never" }
 }
