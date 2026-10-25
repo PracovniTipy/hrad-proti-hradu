@@ -482,6 +482,7 @@
     u_overview: ['Přehled jednotek', 'Unit overview'], u_range: ['Dosah', 'Range'], u_speed: ['Rychlost', 'Speed'], u_melee: ['na blízko', 'melee'],
     u_fast: ['rychlý', 'fast'], u_slow: ['pomalý', 'slow'], u_mid: ['střední', 'medium'], u_strong: ['Silný proti', 'Strong vs'], u_weak: ['Pozor na', 'Weak vs'],
     u_splash: ['zasáhne více nepřátel najednou', 'hits several enemies at once'], u_aura: ['posiluje vojáky kolem sebe', 'boosts soldiers around him'], u_charge: ['první úder v náporu je silnější', 'first strike of a charge is stronger'],
+    app_version: ['Verze hry', 'Game version'],
     snd_sfx: ['Zvuky', 'Sounds'], snd_music: ['Hudba', 'Music'], snd_on: ['zapnuto', 'on'], snd_off: ['vypnuto', 'off'],
     acc_title: ['Účet hráče', 'Player account'],
     acc_why2: ['Postup se ukládá automaticky – v telefonu i na server. Nastav si jméno, e-mail a heslo, a budeš moct pokračovat i na jiném zařízení.', 'Progress saves automatically – on this device and on the server. Set a name, e-mail and password to continue on another device too.'],
