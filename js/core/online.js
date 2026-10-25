@@ -278,7 +278,7 @@
         const lead = preps[team[0]], st = lead.stats;
         const big = lead.castle.cfg && lead.castle.cfg.big ? 1.25 : 1;
         const mult = team.reduce((a, pid) => a + preps[pid].stats.unitMult, 0) / team.length;
-        return { hp: R(st.castleHp * big * (team.length > 1 ? 1.5 : 1)), tower: st.towerDmg || 0, oil: 0, income: st.income, mult, coins: st.startCoins || cfg.startCoins, extra: team.length > 1 };
+        return { hp: R(st.castleHp * big * (team.length > 1 ? 1.5 : 1)), tower: st.towerDmg || 0, oil: st.oilDmg || 0, income: st.income, mult, coins: st.startCoins || cfg.startCoins, extra: team.length > 1 };
       };
       const go = { mode: r.mode, code: r.code, host: this.pid, seed: 1 + Math.floor(Math.random() * 9999), teams: { A, B }, preps, sides: { A: side(A) } };
       if (r.mode === 'coop') {
@@ -321,7 +321,8 @@
           net, mode: 'online', difficulty: 1, speed: 1, theme: go.theme, seed: go.seed,
           playerFaction: lead.fac, playerUnits: mine.units,
           netSides: { player: go.sides[myTeam], enemy: go.sides[other] },
-          player: { stats: lead.stats, castleSkin: lead.castle.skin, castleLevel: lead.castle.level, castleCfg: lead.castle.cfg, defense: null },
+          player: { stats: lead.stats, castleSkin: lead.castle.skin, castleLevel: lead.castle.level, castleCfg: lead.castle.cfg, defense: lead.def || null },
+          enemyDefense: foe ? foe.def || null : null,
           enemyFaction: foe ? foe.fac : 'kralovstvi', enemyCastleSkin: foe ? foe.castle.skin : 'kralovsky', enemyCastleLevel: foe ? foe.castle.level : 3, enemyCastleCfg: foe ? foe.castle.cfg : null,
           enemyStats: { castleHp: 1, income: 0, hpMult: go.sides[other].mult, dmgMult: go.sides[other].mult, towerDmg: 0, maxCoins: Infinity },
           enemyUnits: [], boss: null, hostages: 0, world: null, enemyCastleStyle: null, enemyCastleHpMult: 1, allyFactions: null

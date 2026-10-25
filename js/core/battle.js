@@ -101,14 +101,21 @@
       this.autoState = {};
       this.bossPlan = opts.boss ? { id: opts.boss, at: 18, spawned: false } : null;
       // obrana hradu hráče (lučištníci, kušiníci, katapulty na hradbách)
-      this.def = opts.player.defense || null;
-      this.defShot = []; this.defTimer = [];
+      // obrana na hradbách – u obou stran (soupeř online má taky svůj hrad i obránce)
+      this.defs = { player: opts.player.defense || null, enemy: opts.enemyDefense || null };
+      this.def = this.defs.player;
+      this.dshot = { player: [], enemy: [] }; this.dtimer = { player: [], enemy: [] };
+      this.defShot = this.dshot.player; this.defTimer = this.dtimer.player;
       this.clouds = []; this.bolts = [];
       this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0; this.blasts = []; this.flash = null; this.vfx = new VFX();
-      if (this.def && this.def.slots.length) {
-        this.side.player.castle.tower = 0;   // věž nahrazují obránci na hradbách
-        this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
+      for (const team of ['player', 'enemy']) {
+        const d = this.defs[team];
+        if (d && d.slots && d.slots.length) {
+          this.side[team].castle.tower = 0;   // věž nahrazují obránci na hradbách
+          d.slots.forEach((_, i) => (this.dtimer[team][i] = 0.6 + i * 0.35));
+        }
       }
+      if (opts.enemyOil) { this.side.enemy.castle.oil = opts.enemyOil; this.side.enemy.castle.oilTimer = 2; }
       this.palCache = {};
       // SPOJENECTVÍ: hrady všech tří národů nad sebou, z každého vycházejí jeho vojáci
       this.allyCastles = [];
@@ -124,7 +131,8 @@
       if (opts.netSides) for (const team of ['player', 'enemy']) {
         const n = opts.netSides[team], s = this.side[team];
         if (!n) continue;
-        s.castle.hp = s.castle.maxHp = n.hp; s.castle.tower = n.tower || 0; s.castle.oil = n.oil || 0;
+        const hasDef = this.defs[team] && this.defs[team].slots && this.defs[team].slots.length;
+        s.castle.hp = s.castle.maxHp = n.hp; s.castle.tower = hasDef ? 0 : (n.tower || 0); s.castle.oil = n.oil || 0; s.castle.oilTimer = 2;
         s.income = s.baseIncome = n.income; s.hpMult = s.dmgMult = n.mult; s.coins = n.coins;
         if (n.extra) s.extra = { coins: n.coins, cooldowns: {}, abilityCd: {} };
       }
@@ -877,24 +885,24 @@
         }
       }
 
-      // vroucí olej z hradeb: zasáhne všechny nepřátele těsně u brány
-      { const pc = this.side.player.castle;
-        if (pc.oil && pc.hp > 0) {
-          pc.oilTimer -= dt;
-          if (pc.oilTimer <= 0) {
-            const near = this.units.filter(e => e.team !== 'player' && !e.dead && e.x - pc.front < 300 && e.x > pc.front - 40);
-            if (near.length) {
-              pc.oilTimer = 7;
-              const wy = cfg.groundY - 210;
-              for (let i = 0; i < 70; i++) this.particles.push({ x: pc.front + 10 + Math.random() * 60, y: wy + Math.random() * 20, vx: 60 + Math.random() * 120, vy: 20 + Math.random() * 60, g: 900, t: 0, life: 0.55 + Math.random() * 0.3, r: 2.5 + Math.random() * 3, color: i % 3 ? '#3a2408' : '#ffb347' });
-              this.later(0.45, () => {
-                for (let x = pc.front + 40; x < pc.front + 300; x += 70) this.vfx.burn(x, (cfg.laneTop + cfg.laneBottom) / 2, 80, 2.2);
-                this.units.filter(e => e.team !== 'player' && !e.dead && e.x - pc.front < 300 && e.x > pc.front - 40).forEach(e => { this._damage(e, pc.oil, null, true); e.dot = { until: this.time + 3, dps: pc.oil * 0.12, c: 'rgba(255,140,40,.45)' }; });
-                if (window.Zvuk) Zvuk.at('fire', pc.front + 150, this, 0.9);
-              });
-            } else pc.oilTimer = 0.5;
-          }
-        } }
+      // vroucí olej z hradeb: zasáhne všechny nepřátele těsně u brány (obě strany)
+      for (const team of ['player', 'enemy']) {
+        const pc = this.side[team].castle, dir = team === 'player' ? 1 : -1;
+        if (!pc.oil || pc.hp <= 0) continue;
+        pc.oilTimer -= dt;
+        if (pc.oilTimer > 0) continue;
+        const inZone = e => e.team !== team && !e.dead && (e.x - pc.front) * dir < 300 && (e.x - pc.front) * dir > -40;
+        if (this.units.some(inZone)) {
+          pc.oilTimer = 7;
+          const wy = cfg.groundY - 210;
+          for (let i = 0; i < 70; i++) this.particles.push({ x: pc.front + dir * (10 + Math.random() * 60), y: wy + Math.random() * 20, vx: dir * (60 + Math.random() * 120), vy: 20 + Math.random() * 60, g: 900, t: 0, life: 0.55 + Math.random() * 0.3, r: 2.5 + Math.random() * 3, color: i % 3 ? '#3a2408' : '#ffb347' });
+          this.later(0.45, () => {
+            for (let k = 40; k < 300; k += 70) this.vfx.burn(pc.front + dir * k, (cfg.laneTop + cfg.laneBottom) / 2, 80, 2.2);
+            this.units.filter(inZone).forEach(e => { this._damage(e, pc.oil, null, true); e.dot = { until: this.time + 3, dps: pc.oil * 0.12, c: 'rgba(255,140,40,.45)' }; });
+            if (window.Zvuk) Zvuk.at('fire', pc.front + dir * 150, this, 0.9);
+          });
+        } else pc.oilTimer = 0.5;
+      }
 
       // projektily
       for (const p of this.projectiles) {
@@ -1331,30 +1339,36 @@
     }
     /* ---------------- OBRANA HRADU ---------------- */
     _updateDefense(dt) {
-      if (!this.def || !this.def.slots.length) return;
-      const P = this.side.player, cfg = C(), K = GameData.defense.kinds;
+      for (const team of ['player', 'enemy']) this._updateDefenseOf(team, dt);
+    }
+    _updateDefenseOf(team, dt) {
+      const D = this.defs[team];
+      if (!D || !D.slots || !D.slots.length) return;
+      const P = this.side[team], cfg = C(), K = GameData.defense.kinds, dir = team === 'player' ? 1 : -1;
       if (P.castle.hp <= 0) return;
-      const pos = Art.defenseSpots(P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1, this.def.slots);
-      this.def.slots.forEach((sl, i) => {
-        this.defTimer[i] -= dt;
-        if (this.defTimer[i] > 0) return;
+      const timer = this.dtimer[team], shot = this.dshot[team];
+      const pos = Art.defenseSpots(P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, dir, D.slots);
+      D.slots.forEach((sl, i) => {
+        timer[i] = (timer[i] || 0) - dt;
+        if (timer[i] > 0) return;
         const k = K[sl.kind];
-        const foes = this.units.filter(e => e.team === 'enemy' && !e.dead && e.x - P.castle.front < k.range);
-        if (!foes.length) { this.defTimer[i] = 0.3; return; }
-        this.defTimer[i] = k.interval;
-        this.defShot[i] = this.time;
+        const foes = this.units.filter(e => e.team !== team && !e.dead && (e.x - P.castle.front) * dir < k.range);
+        if (!foes.length) { timer[i] = 0.3; return; }
+        timer[i] = k.interval;
+        shot[i] = this.time;
+        if (!pos[i]) return;
         const [ox, oy] = pos[i];
         if (sl.kind === 'katapult') {
           // cíl: místo, kde je nejvíc nepřátel
           let best = foes[0], bestN = 0;
           for (const f of foes) { const n = foes.filter(g => Math.abs(g.x - f.x) < 110).length; if (n > bestN) { bestN = n; best = f; } }
-          const tx = best.x + 20, ty = best.y - 4;
+          const tx = best.x + dir * 20, ty = best.y - 4;
           const dist = Math.hypot(tx - ox, ty - oy);
-          if (window.Zvuk) Zvuk.at('catapult', ox, this, 0.6); this.projectiles.push({ team: 'player', kind: 'cat', el: sl.el, x0: ox, y0: oy - 40, tx, ty, target: null, castle: null, dmg: k.dmg(this.def.catLvl) * P.dmgMult, from: null, t: 0, dur: Math.max(0.7, dist / 480), arc: Math.min(220, dist * 0.35), done: false });
+          if (window.Zvuk) Zvuk.at('catapult', ox, this, 0.6); this.projectiles.push({ team, kind: 'cat', el: sl.el, x0: ox, y0: oy - 40, tx, ty, target: null, castle: null, dmg: k.dmg(D.catLvl) * P.dmgMult, from: null, t: 0, dur: Math.max(0.7, dist / 480), arc: Math.min(220, dist * 0.35), done: false });
         } else {
-          foes.sort((a, b) => a.x - b.x);
-          const dmg = k.dmg(this.def.vez);
-          this._shoot('player', ox + 14, oy - 46, foes[0], dmg, sl.kind === 'kuse' ? 760 : 620, null);
+          foes.sort((a, b) => (a.x - b.x) * dir);
+          const dmg = k.dmg(D.vez);
+          this._shoot(team, ox + dir * 14, oy - 46, foes[0], dmg, sl.kind === 'kuse' ? 760 : 620, null);
           if (sl.kind === 'kuse') this.projectiles[this.projectiles.length - 1].pierce = true;
         }
       });
@@ -1396,7 +1410,7 @@
           cur = this.units.filter(e => e.team !== p.team && !e.dead && !hit.includes(e) && Math.abs(e.x - from.x) < 170).sort((a, b) => Math.abs(a.x - from.x) - Math.abs(b.x - from.x))[0];
         }
       } else if (p.el === 'voda') {
-        burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = Math.min(C().enemyFront - 20, e.x + 70); e.slotX = null; } });
+        burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = p.team === 'player' ? Math.min(C().enemyFront - 20, e.x + 70) : Math.max(C().playerFront + 20, e.x - 70); e.slotX = null; } });
       } else if (p.el === 'jed') {
         burst(10, '#9be07a'); near(90).forEach(e => this._damage(e, dmg * 0.5, null));
         this.clouds.push({ team: p.team, x, y, r: 105, until: t + (p.team === 'player' && !p.from ? 5 : 4), dps: dmg * 0.3, tick: 0.2 });
@@ -1473,6 +1487,8 @@
       this._castleFire(ctx, P, 1, t);
       this._castleFire(ctx, E, -1, t);
       if (this.def && this.def.slots.length) Art.drawDefense(ctx, P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1, t, this.def, P.faction, 'player', { shot: this.defShot });
+      const ED = this.defs.enemy;
+      if (ED && ED.slots && ED.slots.length) Art.drawDefense(ctx, E.castleImg, (GameData.factions[E.faction] || {}).castleStyle || 'evropa', E.castle.front, cfg.groundY, -1, t, ED, E.faction, 'enemy', { shot: this.dshot.enemy });
       // jedovaté mraky
       for (const c of this.clouds) {
         const a = Math.min(1, (c.until - t) / 0.6);
