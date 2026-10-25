@@ -1,0 +1,64 @@
+# Aplikace Castle WARS pro Windows, macOS a Linux (Electron).
+# Ke stažení: https://github.com/PracovniTipy/hrad-proti-hradu/releases/latest
+name: Aplikace pro počítač
+
+on:
+  push:
+    branches: [main]
+    paths: ['desktop/**', '.github/workflows/desktop.yml', 'icons/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            flag: --win
+          - os: macos-latest
+            flag: --mac
+          - os: ubuntu-latest
+            flag: --linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Hra do aplikace
+        shell: bash
+        run: |
+          python tools/build_www.py
+          rm -rf desktop/hra && cp -r www desktop/hra
+          rm -f desktop/hra/sw.js
+          cp icons/icon-512.png desktop/icon.png
+      - name: Sestavit
+        shell: bash
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          cd desktop
+          npm install --no-audit --no-fund
+          npx electron-builder ${{ matrix.flag }} --publish never
+      - name: Zveřejnit ke stažení
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-${{ github.run_number }}
+          name: Castle WARS – počítač ${{ github.run_number }}
+          body: |
+            **Windows:** stáhni CastleWARS-Windows.exe a spusť (Windows se může zeptat – klikni „Další informace“ → „Přesto spustit“).
+            **Mac:** stáhni CastleWARS-Mac.zip, rozbal, aplikaci přetáhni do Aplikací a poprvé ji otevři pravým tlačítkem → Otevřít.
+            **Linux:** CastleWARS-Linux.AppImage (nastav jako spustitelný).
+          files: |
+            desktop/dist/CastleWARS-Windows.exe
+            desktop/dist/CastleWARS-Mac.zip
+            desktop/dist/CastleWARS-Linux.AppImage
+          fail_on_unmatched_files: false
+          make_latest: false

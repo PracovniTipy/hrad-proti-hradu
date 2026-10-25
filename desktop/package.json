@@ -1,0 +1,62 @@
+{
+  "name": "castle-wars",
+  "productName": "Castle WARS",
+  "version": "1.0.0",
+  "description": "Castle WARS – strategická bitva hradů",
+  "author": "BattleCastle",
+  "main": "main.js",
+  "private": true,
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "cz.hradprotihradu.hra",
+    "productName": "Castle WARS",
+    "files": [
+      "main.js",
+      "icon.png",
+      "hra/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.png",
+      "artifactName": "CastleWARS-Windows.exe"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "icon": "icon.png",
+      "category": "public.app-category.strategy-games",
+      "identity": "-",
+      "artifactName": "CastleWARS-Mac.zip"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.png",
+      "category": "Game",
+      "artifactName": "CastleWARS-Linux.AppImage"
+    },
+    "publish": null
+  }
+}

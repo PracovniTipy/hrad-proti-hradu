@@ -4,3 +4,6 @@ android/
 ios/
 *.apk
 *.aab
+desktop/node_modules/
+desktop/dist/
+desktop/hra/
