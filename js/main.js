@@ -433,14 +433,14 @@
       const set = (k, v, fn) => { if (last[k] !== v) { last[k] = v; fn(v); } };
       set('hpMe', Math.ceil(P.castle.hp), v => { $('#hpMe').style.width = $('#hpMeT').style.width = (v / P.castle.maxHp * 100) + '%'; $('#hpMeNum').textContent = `${fmt(v)} / ${fmt(P.castle.maxHp)}`; });
       set('hpFoe', Math.ceil(E.castle.hp), v => { $('#hpFoe').style.width = $('#hpFoeT').style.width = (v / E.castle.maxHp * 100) + '%'; $('#hpFoeNum').textContent = `${fmt(v)} / ${fmt(E.castle.maxHp)}`; });
-      const tl = Math.max(0, Math.ceil(b.timeLeft));
+      const tl = Math.floor(b.time);   // ukazuje, jak dlouho bitva trvá (bez časového limitu)
       if (b.bossUnit) {
         const u = b.bossUnit, alive = !u.dead;
         set('bossOn', alive, v => { $('#bBoss').hidden = !v; if (v) $('#bossName').textContent = u.def.name; });
         if (alive) set('bossHp', Math.round(u.hp / u.maxHp * 200), v => ($('#bossHp').style.width = (v / 2) + '%'));
       }
       if (b.hero) { const r = Math.max(0, b.hero.hp / b.hero.maxHp); set('heroHp', Math.round(r * 100), v => ($('#heroHp').style.width = v + '%')); }
-      set('time', tl, v => { const el = $('#bTimer'); el.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`; el.classList.toggle('low', v <= 30); });
+      set('time', tl, v => { const el = $('#bTimer'); el.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`; el.classList.remove('low'); });
       const coins = Math.floor(P.coins);
       set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', ((v % 500) / 5) + '%'); });
       const alive = b.units.filter(u => u.team === 'player' && !u.dead).length;

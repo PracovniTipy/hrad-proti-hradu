@@ -131,7 +131,7 @@ GameData.battleConfig = {
   laneBottom: 540,
   playerFront: 470,     // čelo (brána) mého hradu – celý hrad je vidět i s Velkou pevností
   enemyFront: 6530,     // čelo nepřátelského hradu (worldW - 470)
-  timeLimit: 720,       // sekund (12 minut – nepřítel shromažďuje velkou armádu)
+  timeLimit: Infinity,  // bitva nemá časový limit – končí pádem jednoho z hradů
   startCoins: 120,
   killRewardRatio: 0.3, // podíl ceny jednotky, který dostaneš za zabití
   unitScale: 1.45,      // velikost postav na bojišti

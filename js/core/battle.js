@@ -1207,7 +1207,8 @@
         ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * 0.75;
       }
       // čím déle bitva trvá, tím rychleji nepřítel získává mince (je to těžší a těžší)
-      s.income = s.baseIncome * (1 + this.time / 300);
+      // příjem nepřítele roste s časem, ale nejvýš na 2,5× (bitva teď nemá časový limit)
+      s.income = s.baseIncome * Math.min(2.5, 1 + this.time / 300);
       // na vyšší obtížnost používá i ohnivý déšť
       if (this.o.difficulty >= 1.25 && s.coins > 420) {
         const near = this.units.filter(u => u.team === 'player' && !u.dead && u.x > C().enemyFront - 500).length;

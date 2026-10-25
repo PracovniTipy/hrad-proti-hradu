@@ -67,7 +67,8 @@ GameData.calc = {
   enemyStats(diff) {
     return {
       castleHp: Math.round(2000 * (0.75 + 0.25 * diff) / 50) * 50,
-      income: 16 * 0.95 * (0.8 + 0.2 * diff),
+      // o něco lehčí začátek: nepřítel má o 10 % menší příjem (u lehkých úrovní až o 18 %)
+      income: 16 * 0.95 * (0.8 + 0.2 * diff) * (diff < 1 ? 0.82 : diff < 1.5 ? 0.88 : 0.92),
       hpMult: 1,
       dmgMult: 1,
       towerDmg: diff >= 1.2 ? Math.round(6 + diff * 7) : 0,
