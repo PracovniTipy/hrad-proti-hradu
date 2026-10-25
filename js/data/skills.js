@@ -28,7 +28,7 @@ window.GameData = window.GameData || {};
 GameData.skills = [
   { id: 'ohen', kind: 'meteors', name: 'Ohnivý déšť', desc: 'Na nejbližší skupinu nepřátel dopadne 7 ohnivých koulí.', cost: 150, cooldown: 14, power: 120, radius: 130, icon: 'fire', color: '#e2531c', price: { gold: 0 }, rarity: 0 },
   { id: 'stit', kind: 'shield', name: 'Štít víry', desc: 'Tvoji vojáci dostávají 6 s o polovinu menší zranění.', cost: 200, cooldown: 24, duration: 6, power: 0.5, icon: 'shield', color: '#2f6fc0', price: { gold: 0 }, rarity: 0 },
-  { id: 'salva', kind: 'volley', name: 'Šípová salva', desc: 'Z hradeb vyletí 24 šípů a dopadnou na nejbližší nepřátele.', cost: 120, cooldown: 12, power: 34, radius: 160, icon: 'arrows', color: '#8a5a32', price: { gold: 1800 }, rarity: 0 },
+  { id: 'salva', kind: 'volley', name: 'Šípová salva', desc: 'Lučištníci na hradbách vystřelí 24 šípů na nepřátele blízko hradu.', cost: 120, cooldown: 12, power: 34, radius: 160, range: 1600, icon: 'arrows', color: '#8a5a32', price: { gold: 1800 }, rarity: 0 },
   { id: 'led', kind: 'element', el: 'led', name: 'Ledová bouře', desc: 'Led zasáhne skupinu nepřátel a na 4 s je zpomalí na polovinu.', cost: 160, cooldown: 15, power: 90, radius: 140, slow: 4, icon: 'ice', color: '#4aa8e8', price: { gold: 2600 }, rarity: 1 },
   { id: 'blesk', kind: 'element', el: 'blesk', name: 'Řetězový blesk', desc: 'Blesk zasáhne nepřítele a přeskočí na další 4.', cost: 170, cooldown: 15, power: 150, icon: 'bolt', color: '#e8c21a', price: { gems: 120 }, rarity: 1 },
   { id: 'jed', kind: 'element', el: 'jed', name: 'Jedovatý mrak', desc: 'Jedovatý mrak na 5 s zraňuje každého nepřítele, který v něm stojí.', cost: 150, cooldown: 16, power: 110, icon: 'poison', color: '#5ab83a', price: { gold: 2400 }, rarity: 1 },
@@ -45,14 +45,61 @@ GameData.skills = [
   { id: 'oprava', kind: 'repair', name: 'Zedníci', desc: 'Zedníci opraví 20 % životů tvého hradu.', cost: 200, cooldown: 40, power: 0.2, icon: 'hammer', color: '#7a7a7a', price: { gold: 4000 }, rarity: 1 },
   { id: 'zlato', kind: 'gold', name: 'Zlatý déšť', desc: 'Pokladník přinese 300 mincí do boje.', cost: 0, cooldown: 45, power: 300, icon: 'coins', color: '#e0a83a', price: { gems: 150 }, rarity: 2 },
   { id: 'ohnivesipy', kind: 'firearrows', name: 'Ohnivé šípy', desc: 'Na 10 s zapalují tvoji střelci nepřátele.', cost: 150, cooldown: 22, duration: 10, icon: 'firearrow', color: '#ff7a2a', price: { gold: 3200 }, rarity: 1 },
-  { id: 'palba', kind: 'barrage', name: 'Palba katapultů', desc: '5 kamenných koulí dopadne na přední řadu nepřátel.', cost: 240, cooldown: 26, power: 95, icon: 'catapult', color: '#6a4a2a', price: { gold: 4500 }, rarity: 2 },
+  { id: 'palba', kind: 'barrage', name: 'Palba katapultů', desc: 'Katapulty na hradbách vystřelí 5 kamenných koulí na nejbližší nepřátele.', cost: 240, cooldown: 26, power: 95, range: 2000, icon: 'catapult', color: '#6a4a2a', price: { gold: 4500 }, rarity: 2 },
   { id: 'zed', kind: 'wall', name: 'Ohnivá zeď', desc: 'Před tvými vojáky vyšlehne na 6 s ohnivá zeď. Kdo jí projde, hoří.', cost: 200, cooldown: 24, duration: 6, power: 60, icon: 'flames', color: '#ff5a1a', price: { gems: 170 }, rarity: 2 },
-  { id: 'vir', kind: 'tornado', name: 'Vichřice', desc: 'Vichřice se žene po bojišti, zraňuje a odhazuje nepřátele.', cost: 230, cooldown: 26, power: 50, duration: 4, icon: 'tornado', color: '#8ab0c8', price: { gems: 190 }, rarity: 2 },
+  { id: 'vir', kind: 'tornado', name: 'Vichřice', desc: 'Vichřice vyrazí z brány, žene se dopředu, zraňuje a odhazuje nepřátele.', cost: 230, cooldown: 26, power: 50, duration: 4, range: 1400, icon: 'tornado', color: '#8ab0c8', price: { gems: 190 }, rarity: 2 },
   { id: 'svetlo', kind: 'holy', name: 'Svaté světlo', desc: 'Paprsek z nebe zraní nepřátele v oblasti a vyléčí tvoje vojáky.', cost: 240, cooldown: 26, power: 140, radius: 170, icon: 'sun', color: '#ffd84a', price: { gems: 240 }, rarity: 3 },
-  { id: 'drak', kind: 'breath', name: 'Dračí dech', desc: 'Drak z hradeb vychrlí oheň: zasáhne všechny nepřátele do půlky bojiště.', cost: 360, cooldown: 40, power: 160, icon: 'dragon', color: '#b0201a', price: { czk: 59 }, rarity: 3 },
-  { id: 'jedsipy', kind: 'volley', poison: true, name: 'Jedovatá salva', desc: '24 otrávených šípů: každý zásah otráví nepřítele na 4 s.', cost: 170, cooldown: 16, power: 26, radius: 170, icon: 'poisonarrow', color: '#4a9a2a', price: { gems: 140 }, rarity: 2 },
+  { id: 'drak', kind: 'breath', name: 'Dračí dech', desc: 'Drak na hradbách chrlí oheň těsně před hrad: spálí všechny nepřátele, kteří se přiblížili, a zapálí je.', cost: 360, cooldown: 40, power: 260, range: 1000, icon: 'dragon', color: '#b0201a', price: { czk: 59 }, rarity: 3 },
+  { id: 'jedsipy', kind: 'volley', poison: true, name: 'Jedovatá salva', desc: 'Lučištníci na hradbách vystřelí 24 otrávených šípů, každý zásah otráví nepřítele na 4 s.', cost: 170, cooldown: 16, power: 26, radius: 170, range: 1600, icon: 'poisonarrow', color: '#4a9a2a', price: { gems: 140 }, rarity: 2 },
   { id: 'ledkopi', kind: 'stun', name: 'Ledová kopí', desc: 'Ze země vyrostou ledová kopí: zraní a na 2 s zastaví nepřátele.', cost: 200, cooldown: 20, power: 120, radius: 130, duration: 2, icon: 'icespike', color: '#6ac0f0', price: { gold: 5000 }, rarity: 2 }
 ];
+/* Jasný popis síly a dosahu útoku (obchod i bitva).
+   1 jednotka světa = 10 cm, bojiště má 700 m. */
+GameData.skillInfo = k => {
+  const m = v => Math.round(v / 10) + ' m', W = (GameData.battleConfig || {}).worldW || 7000;
+  const P = k.power, R = k.radius;
+  const I = { zone: 'cil', zoneName: '', range: '', dmg: '', from: 0, to: 0 };
+  const castle = (txt) => { I.zone = 'hrad'; I.zoneName = 'Obrana hradu – na blízko'; I.range = txt || ('do ' + m(k.range) + ' před hradem'); I.from = 0; I.to = k.range / W; };
+  const target = (w) => { I.zone = 'cil'; I.zoneName = 'Kdekoli na bojišti'; I.range = 'nejbližší nepřátelé, oblast ' + m(w) + ' široká'; I.spot = w / W; };
+  switch (k.kind) {
+    case 'meteors': target(R * 1.6); I.dmg = '7 koulí × ' + Math.round(P / 2.6) + ' zranění + hoření'; break;
+    case 'meteor': target(R * 2); I.dmg = P + ' zranění každému v oblasti'; break;
+    case 'element':
+      if (k.el === 'led') { target(280); I.dmg = Math.round(P * 0.8) + ' zranění + zpomalení ' + k.slow + ' s'; }
+      else if (k.el === 'blesk') { target(340); I.dmg = P + ' zranění, pak 4 další × ' + Math.round(P * 0.75); I.range = 'nejbližší nepřítel + 4 další v okolí'; }
+      else if (k.el === 'jed') { target(210); I.dmg = Math.round(P * 0.5) + ' zranění + jed ' + Math.round(P * 0.3) + '/s po 5 s'; }
+      else if (k.el === 'voda') { target(230); I.dmg = Math.round(P * 0.7) + ' zranění + odhození o 7 m'; }
+      else { target(190); I.dmg = P + ' zranění + hoření'; }
+      break;
+    case 'volley': castle(); I.dmg = '24 šípů × ' + P + ' zranění' + (k.poison ? ' + jed 4 s' : ''); break;
+    case 'barrage': castle(); I.dmg = '5 koulí × ' + P + ' zranění'; break;
+    case 'breath': castle(); I.dmg = P + ' zranění každému + hoření 3 s'; break;
+    case 'tornado': castle('jede od brány ' + m(k.range) + ' dopředu'); I.zoneName = 'Od hradu dopředu'; I.dmg = P + ' zranění/s + odhazuje nepřátele'; break;
+    case 'storm': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = '6 blesků do nejsilnějších nepřátel'; I.from = 0; I.to = 1; I.dmg = '6 × ' + P + ' zranění'; break;
+    case 'quake': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = 'všichni nepřátelé na zemi'; I.from = 0; I.to = 1; I.dmg = P + ' zranění + omráčení ' + String(k.duration).replace('.', ',') + ' s'; break;
+    case 'curse': I.zone = 'pole'; I.zoneName = 'Celé bojiště'; I.range = 'všichni nepřátelé'; I.from = 0; I.to = 1; I.dmg = '+' + Math.round(P * 100) + ' % zranění na ' + k.duration + ' s'; break;
+    case 'stun': target(R * 2); I.dmg = P + ' zranění + zastavení ' + k.duration + ' s'; break;
+    case 'holy': target(R * 2); I.dmg = P + ' zranění, tvoje vojáky léčí 30 %'; break;
+    case 'wall': I.zone = 'cil'; I.zoneName = 'Před tvými vojáky'; I.range = 'zeď 9 m široká na ' + k.duration + ' s'; I.spot = 92 / W; I.dmg = Math.round(P) + ' zranění/s + hoření'; break;
+    case 'heal': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '+' + Math.round(P * 100) + ' % životů'; break;
+    case 'buff': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '+' + Math.round(P * 100) + ' % útok, +30 % rychlost na ' + k.duration + ' s'; break;
+    case 'shield': I.zone = 'vlastni'; I.zoneName = 'Tvoji vojáci'; I.range = 'všichni tvoji vojáci'; I.dmg = '−' + Math.round(P * 100) + ' % zranění na ' + k.duration + ' s'; break;
+    case 'firearrows': I.zone = 'vlastni'; I.zoneName = 'Tvoji střelci'; I.range = 'všichni tvoji střelci'; I.dmg = 'šípy zapalují na ' + k.duration + ' s'; break;
+    case 'summon': I.zone = 'brana'; I.zoneName = 'U tvé brány'; I.range = 'vyběhnou z brány'; I.dmg = k.count + '× ' + (k.role === 'tezka' ? 'těžká jednotka' : 'pěšák') + ' zdarma'; break;
+    case 'repair': I.zone = 'brana'; I.zoneName = 'Tvůj hrad'; I.range = 'hradby'; I.dmg = '+' + Math.round(P * 100) + ' % životů hradu'; break;
+    case 'gold': I.zone = 'brana'; I.zoneName = 'Pokladna'; I.range = '—'; I.dmg = '+' + P + ' mincí'; break;
+  }
+  return I;
+};
+/* Mapka dosahu: tvůj hrad vlevo, nepřátelský vpravo, zvýrazněná zasažená část */
+GameData.skillRangeBar = k => {
+  const I = GameData.skillInfo(k);
+  let zone = '';
+  if (I.zone === 'hrad' || I.zone === 'pole') zone = `<i class="rz ${I.zone}" style="left:${(I.from * 100).toFixed(1)}%;width:${Math.max(3, (I.to - I.from) * 100).toFixed(1)}%"></i>`;
+  else if (I.zone === 'cil') zone = `<i class="rz cil" style="width:${Math.max(4, I.spot * 100 * 3).toFixed(1)}%"></i>`;
+  else zone = `<i class="rz vlastni"></i>`;
+  return `<div class="rbar z-${I.zone}"><b class="rc me"></b><span class="rf">${zone}</span><b class="rc foe"></b></div>`;
+};
 GameData.skillById = id => GameData.skills.find(s => s.id === id);
 /* zpětná kompatibilita: staré GameData.abilities */
 GameData.abilities = {};

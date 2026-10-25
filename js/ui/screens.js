@@ -601,7 +601,12 @@
           return `<article class="panel sk-card ${rarClass(rarN[k.rarity])} ${on ? 'equipped' : ''}" style="--ac:${k.color}">
             <div class="sk-top">${GameData.skillIcon(k, 58)}<div><h3>${esc(k.name)}</h3>${rar(rarN[k.rarity])}</div></div>
             <p>${esc(k.desc)}</p>
-            <p class="sk-stats">${ico('coin')} ${k.cost || t('free')} · ⏱ ${k.cooldown} s</p>
+            ${(() => { const I = GameData.skillInfo(k); return `<div class="sk-info z-${I.zone}">
+              <div class="sk-row"><span class="sk-k">Síla</span><span class="sk-v pow">${esc(I.dmg)}</span></div>
+              <div class="sk-row"><span class="sk-k">Dosah</span><span class="sk-v"><b class="sk-zone">${esc(I.zoneName)}</b> ${esc(I.range)}</span></div>
+              ${GameData.skillRangeBar(k)}
+            </div>`; })()}
+            <p class="sk-stats">${ico('coin')} ${k.cost || t('free')} v boji · ⏱ obnova ${k.cooldown} s</p>
             ${on ? `<button class="btn btn-sm" data-skoff="${k.id}">✓ ${t('skill_on')}</button>`
               : own ? `<button class="btn btn-sm btn-blue" data-skon="${k.id}">${t('skill_take')}</button>`
               : k.price.czk ? `<button class="btn btn-sm btn-green" data-skczk="${k.id}">${k.price.czk} Kč</button>`

@@ -337,7 +337,13 @@
     abilityState(team, id) {
       const s = this.side[team], a = GameData.abilities[id];
       const cdLeft = Math.max(0, (s.abilityCd[id] || 0) - this.time);
-      return { cdLeft, cdTotal: a.cooldown, affordable: s.coins >= a.cost, ready: cdLeft <= 0 && s.coins >= a.cost && !this.over };
+      // útoky z hradeb (šípy, katapulty, dračí dech) dosáhnou jen kousek před hrad
+      let inRange = true;
+      if (a.range && (a.kind === 'volley' || a.kind === 'barrage' || a.kind === 'breath')) {
+        const front = s.castle.front, foe = team === 'player' ? 'enemy' : 'player';
+        inRange = this.units.some(u => u.team === foe && !u.dead && Math.abs(u.x - front) <= a.range);
+      }
+      return { cdLeft, cdTotal: a.cooldown, affordable: s.coins >= a.cost, inRange, ready: cdLeft <= 0 && s.coins >= a.cost && inRange && !this.over };
     }
     useAbility(team, id) {
       const st = this.abilityState(team, id);
@@ -374,7 +380,8 @@
         case 'shield': s.shieldUntil = this.time + a.duration; break;
         case 'element': this._catImpact({ team, tx, ty: midY, dmg: a.power * (team === 'player' ? s.dmgMult : 1), el: a.el, slow: a.slow, big: true }); break;
         case 'volley': {
-          const pool = near(tx, a.radius).concat(foes()).slice(0, 12);
+          const inR = foes().filter(e => Math.abs(e.x - s.castle.front) <= a.range).sort((p, q) => Math.abs(p.x - s.castle.front) - Math.abs(q.x - s.castle.front));
+          const pool = inR.slice(0, 12);
           const ox = s.castle.front - dir * 40, oy = cfg.groundY - 260;
           for (let i = 0; i < 24; i++) {
             const tgt = pool.length ? pool[i % pool.length] : null;
@@ -424,7 +431,7 @@
         case 'gold': s.coins += a.power; for (let i = 0; i < 4; i++) this.vfx.explosion(s.castle.front - dir * (60 + i * 50), cfg.groundY - 150, 50, 'gold'); this.vfx.rise(s.castle.front - dir * 100, cfg.groundY - 60, 'gold', 30); break;
         case 'firearrows': s.fireArrowsUntil = this.time + a.duration; mine().filter(u => u.def.ranged).forEach(u => this.vfx.explosion(u.x, u.y - 50, 46, 'fire')); break;
         case 'barrage': {
-          const f = foes().sort((p, q) => dir === 1 ? p.x - q.x : q.x - p.x).slice(0, 5);
+          const f = foes().filter(e => Math.abs(e.x - s.castle.front) <= a.range).sort((p, q) => dir === 1 ? p.x - q.x : q.x - p.x).slice(0, 5);
           const ox = s.castle.front - dir * 120, oy = cfg.groundY - 220;
           for (let i = 0; i < 5; i++) this.later(i * 0.3, () => {
             const g = f[i] && !f[i].dead ? f[i] : null, x = g ? g.x : tx + dir * i * 50, y = g ? g.y : midY;
@@ -434,7 +441,7 @@
           break;
         }
         case 'wall': this.walls.push({ team, x: tx - dir * 30, until: this.time + a.duration, dps: a.power, tick: 0 }); for (let k = 0; k < 4; k++) this.vfx.burn(tx - dir * 30, cfg.laneTop + k * (cfg.laneBottom - cfg.laneTop) / 3, 70, a.duration); this.vfx.explosion(tx - dir * 30, midY, 110, 'fire'); break;
-        case 'tornado': this.tornados.push({ team, x: s.castle.front + dir * 120, y: midY, vx: dir * 320, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
+        case 'tornado': this.tornados.push({ team, x: s.castle.front + dir * 120, y: midY, vx: dir * ((a.range || 1400) - 120) / a.duration, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
         case 'holy':
           this.vfx.pillar(tx, midY, a.radius * 0.8, 'rgba(255,248,210,.85)', 1.4); this.vfx.explosion(tx, midY, 150, 'holy');
           near(tx, a.radius).forEach(e => this._damage(e, a.power, null));
@@ -442,7 +449,7 @@
           puff(tx, midY, '#fff6c4', 24, 120);
           break;
         case 'breath': {
-          const lim = (this.side.player.castle.front + this.side.enemy.castle.front) / 2;
+          const lim = s.castle.front + dir * (a.range || 1000);   // dračí dech je obrana hradu na blízko
           const sx = s.castle.front - dir * 30, sy = cfg.groundY - 300;
           this.vfx.breath(sx, sy, lim, dir);
           this.later(0.45, () => { for (let x = s.castle.front + dir * 200; (x - lim) * dir < 0; x += dir * 260) this.vfx.burn(x, midY, 200, 3); });

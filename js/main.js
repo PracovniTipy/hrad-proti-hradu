@@ -292,8 +292,8 @@
       }).join('');
       // 3 speciální útoky, které si hráč vybral v obchodě
       $('#bAbil').innerHTML = GameData.skillsOf(save).eq.map(id => GameData.abilities[id]).map(a => `
-        <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name}: ${a.desc}">
-          ${GameData.skillIcon(a, 46)}<i class="cd"></i>
+        <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name} – ${GameData.skillInfo(a).zoneName}: ${GameData.skillInfo(a).range}. Síla: ${GameData.skillInfo(a).dmg}">
+          ${GameData.skillIcon(a, 46)}<i class="cd"></i>${a.range && /volley|barrage|breath/.test(a.kind) ? `<span class="rng">${Math.round(a.range / 10)} m</span>` : ''}
           <span class="cost">${a.cost ? ico('coin') + a.cost : t('free')}</span>
         </button>`).join('');
       applyIcons(B);
@@ -391,7 +391,10 @@
       });
       B.querySelectorAll('[data-abil]').forEach(btn => btn.addEventListener('pointerdown', e => {
         e.preventDefault();
-        if (!battle.useAbility('player', btn.dataset.abil)) this._flash(btn);
+        if (battle.useAbility('player', btn.dataset.abil)) return;
+        this._flash(btn);
+        const st = battle.abilityState('player', btn.dataset.abil), a = GameData.abilities[btn.dataset.abil];
+        if (!st.inRange && st.cdLeft <= 0) battle.texts.push({ x: battle.cam.x + battle.cam.viewW / 2, y: (battle.H - battle.cam.viewH) + battle.cam.viewH * 0.42, txt: 'Mimo dosah – nepřítel musí být do ' + Math.round(a.range / 10) + ' m od hradu', color: '#ffd27a', t: 0, life: 2, big: true });
       }));
     },
 
@@ -458,9 +461,10 @@
       });
       document.querySelectorAll('#bAbil [data-abil]').forEach(btn => {
         const st = b.abilityState('player', btn.dataset.abil);
-        const val = (st.affordable ? 1 : 0) + '|' + Math.round(st.cdLeft / st.cdTotal * 40);
+        const val = (st.affordable ? 1 : 0) + '|' + (st.inRange ? 1 : 0) + '|' + Math.round(st.cdLeft / st.cdTotal * 40);
         set('a' + btn.dataset.abil, val, () => {
           btn.classList.toggle('poor', !st.affordable);
+          btn.classList.toggle('far', !st.inRange);
           btn.querySelector('.cd').style.setProperty('--cd', (st.cdLeft / st.cdTotal).toFixed(3));
         });
       });
