@@ -33,6 +33,7 @@
       cancelAnimationFrame(this.previewRaf);
       if (this._stopLive) { this._stopLive(); this._stopLive = null; }
       if (name === 'skiny') name = 'obchod';
+      if (name !== 'online' && window.Online && Online.room && !this.battle) Online.leave();
       const navName = name === 'stavitel' ? 'hrad' : name;
       document.querySelectorAll('#nav [data-go]').forEach(b => {
         if (b.dataset.go === navName) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
@@ -269,7 +270,9 @@
       $('#foeName').textContent = cfg.enemyName || t('enemy');
       $('#bBanner').innerHTML = cfg.mode === 'pvp'
         ? `<span class="tag tag-demo">${t('bot')}</span>${esc(cfg.title)} · ${t('diff_' + cfg.attackIndex)}`
-        : esc(cfg.title);
+        : cfg.mode === 'online' ? `<span class="tag tag-online">ONLINE</span>${esc(cfg.title || '')}` : esc(cfg.title);
+      B.classList.toggle('net', !!cfg.net);
+      $('#bWait').hidden = true;
       $('#bPauseMenu').hidden = true;
       if (window.Zvuk) Zvuk.music(cfg.alliance ? 'kralovstvi' : (cfg.playFaction && cfg.playFaction !== 'spojenectvi' ? cfg.playFaction : save.faction), 'battle');
       this._sndBtns();
@@ -295,7 +298,7 @@
         </div>`;
       }).join('');
       // 3 speciální útoky, které si hráč vybral v obchodě
-      $('#bAbil').innerHTML = GameData.skillsOf(save).eq.map(id => GameData.abilities[id]).map(a => `
+      $('#bAbil').innerHTML = (cfg.abil || GameData.skillsOf(save).eq).filter(id => GameData.abilities[id]).map(id => GameData.abilities[id]).map(a => `
         <button class="abtn skill" style="--ac:${a.color}" data-abil="${a.id}" aria-label="${a.name}, cena ${a.cost}" title="${a.name} – ${GameData.skillInfo(a).zoneName}: ${GameData.skillInfo(a).range}. ${t('sk_pow')}: ${GameData.skillInfo(a).dmg}">
           ${GameData.skillIcon(a, 46)}<i class="cd"></i>${a.range && /volley|barrage|breath/.test(a.kind) ? `<span class="rng">${Math.round(a.range / 10)} m</span>` : ''}
           <span class="cost">${a.cost ? ico('coin') + a.cost : t('free')}</span>
@@ -319,7 +322,7 @@
       const stats = GameData.calc.battleStats(save);
       let lastHud = {};
       $('#bBoss').hidden = true;
-      const battle = new Battle({
+      const bopts = {
         canvas: $('#bCanvas'), mini: $('#bMini'),
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
         world: facs.length > 1 ? Object.assign({}, cfg.world || {}, { playerFront: GameData.battleConfig.playerFront + 560 }) : (cfg.world || null), enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
@@ -339,9 +342,16 @@
         onSelectMode: on => { $('#bSelect').setAttribute('aria-pressed', on); $('#bSelHint').hidden = !on; },
         onHero: (u, died) => this._heroUi(u, died),
         onAutoSpawn: () => { save.stats.unitsSent++; }
-      });
+      };
+      // online: nastavení od hostitele (strany, hrady, síla) přepíše místní
+      if (cfg.battleOpts) {
+        const pl = Object.assign({}, bopts.player, cfg.battleOpts.player || {});
+        Object.assign(bopts, cfg.battleOpts, { player: pl });
+      }
+      const battle = new Battle(bopts);
+      if (cfg.net) cfg.net.attach(battle);
       this.battle = battle;
-      if (!(save.tut || {}).battle) {
+      if (!(save.tut || {}).battle && !cfg.net) {
         save.tut = save.tut || {}; save.tut.battle = true; Save.save();
         battle.togglePause(true);
         setTimeout(() => Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false)), 450);
@@ -500,7 +510,12 @@
       if (res.win) save.stats.wins++; else save.stats.losses++;
       const rewards = [];
       let note = '', stars = 0;
-      if (cfg.mode === 'campaign') {
+      const coopLocked = cfg.coop && !GameData.campaignHelpers.isUnlocked(save, cfg.level.id);
+      if (cfg.coop && res.reason === 'spojeni') note = t('onl_conn_lost');
+      else if (coopLocked) {
+        if (res.win) { const g = Math.round(cfg.level.reward.gold * 0.5); save.gold += g; rewards.push(`<span class="pill">${ico('coin')} +${fmt(g)}</span>`); }
+        note = t('onl_coop_locked');
+      } else if (cfg.mode === 'campaign' || cfg.coop) {
         const lv = cfg.level;
         const first = !save.campaign.cleared[lv.id];
         if (res.win) {
@@ -548,6 +563,19 @@
         }
         const left = R.maxAttacks - save.pvp.attacks[id].length;
         note = left > 0 ? t('pvp_left', { name: esc(cfg.opp.name), n: left }) : t('pvp_none', { name: esc(cfg.opp.name) });
+      } else if (cfg.mode === 'online') {
+        const duo = cfg.online === '2v2';
+        if (res.reason === 'spojeni') note = t('onl_conn_lost');
+        else if (res.win) {
+          const tr = duo ? 20 : 30, g = duo ? 250 : 300;
+          save.trophies += tr; save.gold += g; save.stats.pvpWins++;
+          rewards.push(`<span class="pill">${ico('trophy')} +${tr}</span>`, `<span class="pill">${ico('coin')} +${g}</span>`);
+          if (res.reason === 'odpojeni') note = t('onl_foe_left');
+        } else {
+          const tl = duo ? 10 : 15;
+          save.trophies = Math.max(0, save.trophies - tl); save.gold += 50; save.stats.pvpLosses++;
+          rewards.push(`<span class="pill">${ico('trophy')} −${tl}</span>`, `<span class="pill">${ico('coin')} +50</span>`);
+        }
       } else {
         if (res.win) { save.gold += 100; rewards.push(`<span class="pill">${ico('coin')} +100</span>`); }
         note = t('note_training');
@@ -565,8 +593,8 @@
           <table class="bst"><tr><th></th><th>${t('sent')}</th><th>${t('dmg_word')}</th><th>${t('kills_word')}</th></tr>
           ${ids.slice(0, 7).map(id => `<tr><td>${esc(GameData.units[id].name)}</td><td>${ST.sent[id] || 0}</td><td>${fmt(ST.dmg[id] || 0)}</td><td>${ST.kills[id] || 0}</td></tr>`).join('')}</table>
         </div>` : '';
-      const reason = res.reason === 'cas' ? t('r_time') : (res.win ? t('r_enemy') : t('r_you'));
-      const back = cfg.mode === 'pvp' ? 'pvp' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      const reason = res.reason === 'cas' ? t('r_time') : res.reason === 'spojeni' ? t('onl_conn_lost') : res.reason === 'odpojeni' ? t('onl_foe_left') : res.reason === 'vzdal' ? t('onl_you_quit') : (res.win ? t('r_enemy') : t('r_you'));
+      const back = cfg.net ? 'online' : cfg.mode === 'pvp' ? 'pvp' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       this.modal(`
         <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
         ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
@@ -587,8 +615,8 @@
         const mc = c.querySelector('canvas[data-mvp]');
         if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
         c.querySelector('#resBack').addEventListener('click', () => {
-          close(); this._closeBattle(); this.go(back);
-          if (cfg.afterScene) this.playScene(cfg.afterScene, null, true);
+          close(); this._closeBattle(); if (cfg.net && window.Online) Online.afterBattle(); this.go(back);
+          if (cfg.afterScene && !cfg.net) this.playScene(cfg.afterScene, null, true);
         });
       });
     },
@@ -652,6 +680,11 @@
         const b = this.battle;
         if (!b) return;
         b.togglePause(false);
+        if (b.net && b.net.role === 'client') {
+          // klient se vzdá: hostitel to dostane, místně je to prohra
+          if (!b.net.ended) { b.net.cmd({ k: 'q' }); b.net.ended = true; b.side.player.castle.hp = 0; b._end(false, 'vzdal'); }
+          return;
+        }
         b.side.player.castle.hp = 0;   // vzdání = prohra
       });
       $('#bSelect').addEventListener('pointerdown', e => {
@@ -719,6 +752,12 @@
       document.addEventListener('visibilitychange', () => {
         if (document.hidden && this.battle && !this.battle.over) { this.battle.togglePause(true); $('#bPauseMenu').hidden = false; }
       });
+      if (window.Online) {
+        Online.on('lobby', () => { if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
+        Online.on('error', k => { this.toast(t(k)); if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
+        Online.on('start', bc => { $('#modal').hidden = true; this.startBattle(bc); });
+        Online.on('wait', on => { const w = $('#bWait'); if (w && w.hidden === !!on) w.hidden = !on; });
+      }
       const start = location.hash.slice(1);
       // výběr jazyka: při prvním spuštění a jednou po přejmenování na Castle WARS (postup zůstává)
       if (!this.save.lang || !this.save.langAsked2) {

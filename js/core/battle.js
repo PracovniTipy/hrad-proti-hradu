@@ -69,7 +69,8 @@
       this.rand = Math.random;
 
       const ps = opts.player.stats;
-      const es = GameData.calc.enemyStats(opts.difficulty);
+      const es = opts.enemyStats || GameData.calc.enemyStats(opts.difficulty);
+      this.net = opts.net || null;   // online: { role: 'host'|'client', ... } (viz online.js)
       this.side = {
         player: {
           coins: ps.startCoins || cfg.startCoins, income: ps.income, maxCoins: Infinity,
@@ -87,7 +88,7 @@
           castle: { hp: es.castleHp * (opts.enemyCastleHpMult || 1), maxHp: es.castleHp * (opts.enemyCastleHpMult || 1), front: cfg.enemyFront, tower: es.towerDmg, towerTimer: 1.5 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
           formation: 'formace', flagX: cfg.enemyFront - 420,
-          castleImg: Art.castleImage('enemy', opts.enemyCastleSkin || 'kralovsky', opts.enemyCastleLevel || 3, opts.enemyCastleStyle ? 1.5 : 2, opts.enemyCastleStyle || (GameData.factions[opts.enemyFaction] || {}).castleStyle || 'evropa'),
+          castleImg: Art.castleImage('enemy', opts.enemyCastleSkin || 'kralovsky', opts.enemyCastleLevel || 3, opts.enemyCastleStyle ? 1.5 : 2, opts.enemyCastleStyle || (GameData.factions[opts.enemyFaction] || {}).castleStyle || 'evropa', opts.enemyCastleCfg || undefined),
           faction: opts.enemyFaction || 'kralovstvi',
           skins: null
         }
@@ -118,6 +119,14 @@
           const img = Art.castleImage('player', 'kralovsky', opts.player.castleLevel || 3, 2, F.castleStyle || 'evropa', { emblem: GameData.defaultEmblem[f], banner: F.color, decor: {} });
           this.allyCastles.push({ f, img, k: 0.82 - i * 0.08, dy: -(26 + i * 26), dx: -(300 + i * 270) });
         });
+      }
+      // ONLINE: přesné hodnoty hradů a ekonomiky stran od hostitele
+      if (opts.netSides) for (const team of ['player', 'enemy']) {
+        const n = opts.netSides[team], s = this.side[team];
+        if (!n) continue;
+        s.castle.hp = s.castle.maxHp = n.hp; s.castle.tower = n.tower || 0; s.castle.oil = n.oil || 0;
+        s.income = s.baseIncome = n.income; s.hpMult = s.dmgMult = n.mult; s.coins = n.coins;
+        if (n.extra) s.extra = { coins: n.coins, cooldowns: {}, abilityCd: {} };
       }
       // STŘED BOJIŠTĚ: kdo ho obsadí, má výhodu (+35 % mincí, +10 % útok)
       this.cp = { x: cfg.worldW / 2, r: 200, v: 0, owner: null };
@@ -154,7 +163,7 @@
         if (drag.sel) { const w = toWorld(e.clientX, e.clientY); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] }; }
         // podržení prstu = začátek výběru oddílu
         clearTimeout(this._lp);
-        if (!drag.sel && !this.hero) this._lp = setTimeout(() => {
+        if (!drag.sel && !this.hero && !this.net) this._lp = setTimeout(() => {
           if (!drag || drag.moved || this.over) return;
           drag.sel = true;
           const w = toWorld(drag.x, drag.y); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] };
@@ -189,7 +198,7 @@
           const wx = this.cam.x + (e.clientX - r.left) / this.cam.scale;
           const wy = (this.H - this.cam.viewH) + (e.clientY - r.top) / this.cam.scale;
           const u = this.unitAt(wx, wy);
-          if (u) this.takeControl(u);
+          if (u && !this.net) this.takeControl(u);
           else if (!this.hero) {
             if (this.squad && this.active === 'squad') this.setSquad('formace', wx);
             else this.setFormation('player', 'formace', wx);
@@ -281,7 +290,19 @@
       }
     }
     spawn(team, unitId, free) {
-      const chk = free ? { ok: !this.over } : this.canSpawn(team, unitId);
+      const F = this._force;
+      if (this.net && this.net.role === 'client' && !F) {
+        // klient vojáky jen objednává u hostitele; objeví se, až je hostitel pošle
+        if (team !== 'player' || free) return false;
+        const chk = this.canSpawn(team, unitId);
+        if (!chk.ok) return false;
+        const s = this.side.player, def = GameData.units[unitId];
+        s.coins -= def.cost; s.cooldowns[unitId] = this.time + def.spawnCooldown;
+        this.net.pend(def.cost);
+        this.net.cmd({ k: 'sp', u: unitId });
+        return true;
+      }
+      const chk = (free || F) ? { ok: !this.over } : this.canSpawn(team, unitId);
       if (!chk.ok) return false;
       const s = this.side[team], def = GameData.units[unitId], cfg = C();
       if (!free) {
@@ -289,10 +310,12 @@
         s.cooldowns[unitId] = this.time + def.spawnCooldown;
       }
       const dir = team === 'player' ? 1 : -1;
-      const skin = team === 'player' ? (s.skins[unitId] || 'zakladni') : (this.o.enemyUnitSkin || 'zakladni');
+      // online: vlastní vzhled a výbavu mají jen moji vojáci
+      const mine = this.net ? (F ? F.mine : !this._owner) : true;
+      const skin = team === 'player' && mine ? ((s.skins || {})[unitId] || 'zakladni') : (this.o.enemyUnitSkin || 'zakladni');
       const fac = def.faction || s.faction;
       // výbava a skin hráče: bonusy a vzhled
-      const L = team === 'player' && this.o.player.loadout ? this.o.player.loadout(unitId) : null;
+      const L = team === 'player' && mine && this.o.player.loadout ? this.o.player.loadout(unitId) : null;
       const key = team + skin + fac + (L ? L.lk.key : '');
       if (!this.palCache[key]) this.palCache[key] = L ? GameData.gearHelpers.palette(team, skin, fac, L.lk) : Art.unitPalette(team, skin, fac);
       // pevnost s více branami: vojáci vycházejí postupně ze všech bran
@@ -309,8 +332,9 @@
         sx += (this.rand() - 0.5) * 20;
         for (let i = 0; i < 5; i++) this.particles.push({ x: sx + (this.rand() - 0.5) * 40, y: C().laneTop + this.rand() * 40, vx: (this.rand() - 0.5) * 40, vy: -40 - this.rand() * 50, g: 0, t: 0, life: 0.7, r: 3 + this.rand() * 3, color: this.rand() < 0.5 ? '#ff7a2a' : '#ffd27a' });
       }
+      if (F) { sx = F.x; sy = F.y; }
       const u = {
-        id: this.nextId++, team, def, dir,
+        id: F ? F.id : this.nextId++, team, def, dir,
         x: sx,
         y: sy != null ? sy : cfg.laneTop + this.rand() * (cfg.laneBottom - cfg.laneTop),
         hp: def.hp * (def.boss ? 1 : s.hpMult), maxHp: def.hp * (def.boss ? 1 : s.hpMult),
@@ -325,14 +349,20 @@
         u.armorBonus = b.armor || 0; u.crit = b.crit || 0;
         u.drawDef = GameData.gearHelpers.drawDef(def, L.lk);
       }
+      // hostitel: bonusy výbavy vzdáleného hráče (vzhled vidí jen on sám)
+      const OB = this._owner && this._owner.bonus && this._owner.bonus[unitId];
+      if (OB && !F) { u.hp *= 1 + (OB.hp || 0); u.maxHp = u.hp; u.dmg *= 1 + (OB.dmg || 0); u.armorBonus = OB.armor || 0; u.crit = OB.crit || 0; }
+      if (F && F.hp) { u.maxHp = F.mh || F.hp; u.hp = F.hp; }
+      u.owner = F ? F.o : (this._owner ? this._owner.pid : (this.net && team === 'player' ? this.net.me : null));
       this.units.push(u);
+      if (this.net && this.net.role === 'host') this.net.onSpawn(u);
       if (def.boss) {
         this.bossUnit = u;
         this.texts.push({ x: u.x - 60, y: 360, txt: t('boss_enters', { name: def.name }), color: '#ff7a4a', t: 0, life: 2.6, big: true });
         for (let i = 0; i < 3; i++) this._explode(u.x - 20 + i * 20, u.y - 20);
       }
       if (window.Zvuk && GameData.units[unitId] && GameData.units[unitId].roleKey === 'jizda') Zvuk.at('horse', this.side[team].castle.front, this, 0.6);
-      if (team === 'player') { this.sent++; this.st.sent[unitId] = (this.st.sent[unitId] || 0) + 1; if (window.Zvuk) Zvuk.play('spawn', 0.5); }
+      if (team === 'player' && mine) { this.sent++; this.st.sent[unitId] = (this.st.sent[unitId] || 0) + 1; if (window.Zvuk) Zvuk.play('spawn', 0.5); }
       this._dust(u.x, u.y);
       return true;
     }
@@ -348,7 +378,18 @@
       return { cdLeft, cdTotal: a.cooldown, affordable: s.coins >= a.cost, inRange, ready: cdLeft <= 0 && s.coins >= a.cost && inRange && !this.over };
     }
     useAbility(team, id) {
-      const st = this.abilityState(team, id);
+      const forced = this._forceAb;
+      if (this.net && this.net.role === 'client' && !forced) {
+        if (team !== 'player') return false;
+        const st0 = this.abilityState(team, id);
+        if (!st0.ready) return false;
+        const s0 = this.side.player, a0 = GameData.abilities[id];
+        s0.coins -= a0.cost; s0.abilityCd[id] = this.time + a0.cooldown;
+        this.net.pend(a0.cost);
+        this.net.cmd({ k: 'ab', a: id });
+        return true;
+      }
+      const st = forced ? { ready: !this.over } : this.abilityState(team, id);
       if (!st.ready) return false;
       const s = this.side[team], a = GameData.abilities[id];
       const foeTeam = team === 'player' ? 'enemy' : 'player', dir = team === 'player' ? 1 : -1, cfg = C();
@@ -366,10 +407,11 @@
       const near = (x, r) => foes().filter(e => Math.hypot(e.x - x, (e.y - midY) * 0.7) < r);
       const ring = (x, y, col, r) => this.particles.push({ x, y, vx: 0, vy: 0, g: 0, t: 0, life: 0.5, r: r || 14, ring: true, color: col });
       const puff = (x, y, col, n, up) => { for (let i = 0; i < n; i++) { const an = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 160; this.particles.push({ x: x + (Math.random() - 0.5) * 40, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - (up || 80), g: 260, t: 0, life: 0.7, r: 2 + Math.random() * 3.5, color: col }); } };
-      s.coins -= a.cost;
-      s.abilityCd[id] = this.time + a.cooldown;
-      if (team === 'player') this.st.skills++;
-      if (window.Zvuk && team === 'player') {
+      if (!forced) { s.coins -= a.cost; s.abilityCd[id] = this.time + a.cooldown; }
+      const own = team === 'player' && !this._owner && !(forced && !forced.mine);   // můj vlastní útok (ne spoluhráče)
+      if (own) this.st.skills++;
+      if (this.net && this.net.role === 'host') this.net.onAbility(team, id, this._owner);
+      if (window.Zvuk && (own || team === 'player')) {
         const snd = { heal: 'heal', buff: 'horn', summon: 'horn', repair: 'heal', gold: 'coin', breath: 'fire', wall: 'fire', meteors: 'fire', storm: 'bolt', stun: 'ice', quake: 'boom', curse: 'magic', holy: 'heal', shield: 'magic', volley: 'bow', barrage: 'catapult', tornado: 'magic', firearrows: 'fire' }[a.kind] || 'skill';
         Zvuk.play('skill', 0.7); setTimeout(() => Zvuk.play(snd, 1), 120);
       }
@@ -469,7 +511,7 @@
       const AREA = { meteors: 1, meteor: 1, element: 1, volley: 1, storm: 1, stun: 1, holy: 1, barrage: 1, wall: 1, tornado: 0, breath: 0, quake: 0 };
       const SELF = { heal: 1, buff: 1, shield: 1, repair: 1, gold: 1, summon: 1, firearrows: 1, curse: 0 };
       const col = a.color || '#ffd77a';
-      if (team === 'player') {
+      if (own) {
         const camFree = this.time >= this.cam.manualUntil;   // když si hráč sám posunul kameru, nechá se být
         if (a.kind in AREA && AREA[a.kind]) {
           if (camFree) { this.cam.x = this._clampCam(tx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 6; }
@@ -484,7 +526,7 @@
         this.flash = { color: col, t: 0, life: 0.45 };
       }
       this.later(0.05, () => this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.5, txt: a.name, color: '#fff1c4', t: 0, life: 1.8, big: true, huge: true }));
-      if (team === 'player' && this.o.onSkill) this.o.onSkill(a);
+      if (own && this.o.onSkill) this.o.onSkill(a);
       return true;
     }
     /* spustí akci se zpožděním (v čase bitvy) */
@@ -493,6 +535,7 @@
     /* Rozkaz pro armádu: 'utok' | 'formace' | 'ustup' */
     setFormation(team, mode, flagX) {
       const s = this.side[team], cfg = C();
+      if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
       if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) { Zvuk.play('cry', 1); setTimeout(() => Zvuk.play('cry', 0.8), 300); setTimeout(() => Zvuk.play('cry', 0.6), 650); }
       s.formation = mode;
       if (team === 'player') this.active = 'main';
@@ -650,8 +693,8 @@
       }
     }
 
-    togglePause(v) { this.paused = v == null ? !this.paused : v; this._last = performance.now(); }
-    setSpeed(v) { this.speed = v; }
+    togglePause(v) { if (this.net) { this.paused = false; return; } this.paused = v == null ? !this.paused : v; this._last = performance.now(); }
+    setSpeed(v) { this.speed = this.net ? 1 : v; }
 
     destroy() {
       cancelAnimationFrame(this.raf);
@@ -659,6 +702,7 @@
       if (this._baseCfg) { GameData.battleConfig = this._baseCfg; this._baseCfg = null; }
       this.destroyed = true;
       this.over = true;
+      if (this.net && this.net.close) this.net.close();
       if (window.Zvuk) Zvuk.battleEnd();
       this.canvas.removeEventListener('pointerdown', this._onDown);
       window.removeEventListener('pointermove', this._onMove);
@@ -691,8 +735,11 @@
 
       for (const team of ['player', 'enemy']) {
         const s = this.side[team];
-        s.coins = Math.min(s.maxCoins, s.coins + s.income * dt * (this.cp.owner === team ? 1.35 : 1));
+        const inc = s.income * dt * (this.cp.owner === team ? 1.35 : 1);
+        s.coins = Math.min(s.maxCoins, s.coins + inc);
+        if (s.extra) s.extra.coins += inc;
       }
+      if (this.net) this.net.tick(dt);
       this._runQueue();
       this._updateCapture(dt);
       // řev bitvy podle počtu bojujících vojáků na obrazovce + válečné pokřiky při střetu
@@ -721,10 +768,10 @@
         this._auraT = 0.4;
         for (const c of this.units) if (!c.dead && c.def.aura) for (const u of this.units) if (u.team === c.team && !u.dead && Math.abs(u.x - c.x) < 200) { u.inspired = this.time + 0.6; u.inspiredBy = c.def.aura; }
       }
-      this._ai(dt);
+      if (!this.net || (this.net.role === 'host' && this.net.ai)) this._ai(dt);
       this._autoPlayer(dt);
       this._updateDefense(dt);
-      if (this.bossPlan && !this.bossPlan.spawned && this.time >= this.bossPlan.at) {
+      if (this.bossPlan && !this.bossPlan.spawned && this.time >= this.bossPlan.at && !(this.net && this.net.role === 'client')) {
         this.bossPlan.spawned = true;
         this.spawn('enemy', this.bossPlan.id, true);
       }
@@ -898,7 +945,8 @@
       this._updateFx(dt);
       this._camera(dt);
 
-      // konec hry
+      // konec hry (online rozhoduje jen hostitel)
+      if (this.net && this.net.role === 'client') return;
       const pc = this.side.player.castle, ec = this.side.enemy.castle;
       if (ec.hp <= 0) this._end(true, 'hrad');
       else if (pc.hp <= 0) this._end(false, 'hrad');
@@ -1165,7 +1213,15 @@
       if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
       if (from && from.inspired > this.time) dmg *= 1 + (from.inspiredBy || 0.15);
       if (from && from.def && from.def.charge && !from.charged) { from.charged = true; dmg *= from.def.charge; this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('charge'), color: '#ffd77a', t: 0, life: 0.9 }); }
-      if (from && from.team === 'player' && from.def) this.st.dmg[from.def.id] = (this.st.dmg[from.def.id] || 0) + Math.min(dmg, Math.max(0, target.hp));
+      if (from && from.team === 'player' && from.def && (!this.net || from.owner === this.net.me)) this.st.dmg[from.def.id] = (this.st.dmg[from.def.id] || 0) + Math.min(dmg, Math.max(0, target.hp));
+      if (from) target.lastHit = from;
+      if (this.net && this.net.role === 'client') {
+        // klient jen předvídá zranění; o smrti rozhoduje hostitel
+        target.hp = Math.max(1, target.hp - dmg); target.hurt = 0.15;
+        this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
+        if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? 'sword' : 'hit', target.x, this, 0.6);
+        return;
+      }
       target.hp -= dmg;
       target.hurt = 0.15;
       if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? (/kopi|jari|stitonos|rohac/.test(from.def.roleKey + from.def.id) && Math.random() < 0.4 ? 'spear' : 'sword') : 'hit', target.x, this, 0.6);
@@ -1181,9 +1237,10 @@
         const reward = Math.round(target.def.cost * C().killRewardRatio);
         const ks = this.side[killer];
         ks.coins = Math.min(ks.maxCoins, ks.coins + reward);
+        if (ks.extra) ks.extra.coins += reward;
         if (killer === 'player') {
           this.kills++;
-          if (from && from.team === 'player' && from.def) this.st.kills[from.def.id] = (this.st.kills[from.def.id] || 0) + 1;
+          if (from && from.team === 'player' && from.def && (!this.net || from.owner === this.net.me)) this.st.kills[from.def.id] = (this.st.kills[from.def.id] || 0) + 1;
           this.texts.push({ x: target.x, y: target.y - 100 * US(), txt: '+' + reward, color: '#ffd54f', t: 0, life: 1.1, coin: true });
         }
       }
@@ -1191,7 +1248,7 @@
 
     _damageCastle(castle, dmg, from) {
       if (castle.hp <= 0) return;
-      castle.hp = Math.max(0, castle.hp - dmg);
+      castle.hp = Math.max(this.net && this.net.role === 'client' ? 1 : 0, castle.hp - dmg);
       if (window.Zvuk) Zvuk.at('castle', castle.front, this, 0.6);
       const x = castle.front + (castle === this.side.player.castle ? -20 : 20);
       this._debris(x, C().groundY - 60 - Math.random() * 120);
@@ -1362,6 +1419,7 @@
       for (let i = 0; i < 8; i++) this._explode(loser.front + (win ? 1 : -1) * (40 + Math.random() * 200), C().groundY - Math.random() * 220);
       const pc = this.side.player.castle, ec = this.side.enemy.castle;
       if (window.Zvuk) { Zvuk.battleEnd(); setTimeout(() => Zvuk.play(win ? 'win' : 'lose'), 500); }
+      if (this.net && this.net.role === 'host') { if (this.net.forfeit) reason = 'odpojeni'; this.net.onEnd(win, reason); }
       const res = { win, reason, time: this.time, kills: this.kills, sent: this.sent, st: this.st, playerHp: pc.hp / pc.maxHp, enemyHp: ec.hp / ec.maxHp };
       setTimeout(() => this.o.onEnd && this.o.onEnd(res), 1400);
     }
