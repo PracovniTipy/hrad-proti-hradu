@@ -1,0 +1,25 @@
+name: Stažení zvuků
+on:
+  push:
+    paths: ['tools/zvuky_elevenlabs.txt']
+permissions:
+  contents: write
+jobs:
+  stahni:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stáhnout nahrávky
+        run: |
+          mkdir -p zvuky/zdroj
+          grep -v '^#' tools/zvuky_elevenlabs.txt | while read id name; do
+            [ -z "$id" ] && continue
+            curl -sfL -o "zvuky/zdroj/$name.mp3" "https://eleven-public-cdn.elevenlabs.io/payloadcms/$id.mp3" && echo "ok $name $(stat -c %s zvuky/zdroj/$name.mp3)"
+          done
+      - name: Uložit do repozitáře
+        run: |
+          git config user.name "PracovniTipy"
+          git config user.email "dudypetr1@seznam.cz"
+          git add zvuky/zdroj
+          git commit -m "Zdrojové nahrávky pokřiků (ElevenLabs Sound Effects)" || echo nic
+          git push
