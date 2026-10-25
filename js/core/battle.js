@@ -224,7 +224,8 @@
       this.canvas.style.height = ch + 'px';
       const cfg = C();
       // nízké bojiště (telefon na šířku): ořízni víc nebe, ať jsou vojáci větší
-      const viewH = ch < 330 ? 390 : this.H - cfg.viewTop;
+      // telefon na šířku: ukaž jen spodní pás světa (zem + hradby), vojáci jsou pak velcí
+      const viewH = ch < 200 ? 250 : ch < 300 ? 290 : ch < 420 ? 360 : this.H - cfg.viewTop;
       let scale = ch / viewH;
       // celé bojiště se vejde na šířku? pak ho roztáhni na šířku
       if (this.W * scale < cw) scale = cw / this.W;

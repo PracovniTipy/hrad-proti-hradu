@@ -706,3 +706,54 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .alive-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 6px; border-radius: 18px;
   font-family: var(--font-display); color: #ffe9a8; font-size: 18px; background: rgba(10,13,20,.85); border: 2px solid #e8b84a; box-shadow: 0 0 0 1px #05070b; }
 .alive-badge svg { width: 24px; height: 24px; }
+
+/* ===== Telefon na šířku: bojiště co největší, ovládání tenké ===== */
+@media (max-height: 520px) and (orientation: landscape) {
+  .b-hud { padding: 2px 10px 3px; gap: 10px; }
+  .hpbox .lbl { font-size: 12px; gap: 4px; line-height: 1.1; }
+  .hp-crest { width: 16px; height: 16px; box-shadow: 0 0 0 1px #b07a1c; }
+  .hp-crest svg { width: 12px; height: 12px; }
+  .hp { height: 11px; margin: 2px 0 0; border-width: 1px; }
+  .hp i::before { display: none; }
+  .hpnum { display: none; }
+  .b-center { gap: 4px; }
+  .hud-btn { width: 30px; height: 30px; font-size: 12px; }
+  .hud-btn svg { width: 15px; height: 15px; }
+  .timer-medal { padding: 1px 8px 1px 4px; }
+  .timer-medal > span, .timer-medal svg { width: 16px; height: 16px; }
+  #bTimer { font-size: 16px; min-width: 46px; }
+  .b-mini { height: 14px !important; border-top-width: 1px; }
+  .b-bar { padding: 3px 8px; gap: 6px; }
+  .coins { width: 50px; height: 50px; }
+  .coins::before { inset: 4px; }
+  .coins b { font-size: 14px; }
+  .coins small, .coins .ico { display: none; }
+  .ugrp, .b-units.ally .ugrp { grid-template-columns: auto 1fr; grid-template-rows: auto; align-items: center; gap: 5px; padding: 3px 4px; }
+  .ugrp-h, .b-units.ally .ugrp-h { flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .ugrp-h b { font-size: 10px; max-width: 60px; }
+  .auto-tg { height: 18px; font-size: 9px; padding: 1px 6px 1px 2px; gap: 3px; }
+  .auto-tg i { width: 12px; height: 12px; }
+  .ubtn, .b-units.ally .ubtn { width: 46px; height: 52px; border-radius: 9px; }
+  .ubtn canvas, .b-units.ally .ubtn canvas { height: 38px; }
+  .ubtn .cost, .b-units.ally .ubtn .cost { height: 14px; font-size: 11px; bottom: 2px; left: 2px; right: 2px; }
+  .ubtn .cost .ico, .ubtn .cost svg { width: 10px; height: 10px; }
+  .ubtn .key { display: none; }
+  .ubtn .qn { font-size: 11px; min-width: 20px; top: -4px; right: -4px; }
+  .abtn, .abtn.skill, .b-bar.ally .abtn.skill { width: 48px !important; height: 48px !important; }
+  .abtn.skill .skill-ico, .b-bar.ally .abtn.skill .skill-ico { width: 30px; height: 30px; top: 3px; }
+  .abtn .cost, .b-bar.ally .abtn.skill .cost { height: 15px !important; font-size: 10px !important; bottom: -5px !important; }
+  .b-abil { gap: 6px; }
+  .b-form { left: 6px; top: 6px; gap: 4px; }
+  .b-form .fbtn { min-height: 30px; padding: 2px 7px; font-size: 11px; gap: 4px; border-radius: 14px 6px 14px 6px; }
+  .b-form .fbtn svg { width: 16px; height: 16px; }
+  .alive-badge { font-size: 13px; padding: 2px 8px 2px 4px; gap: 4px; }
+  .alive-badge svg { width: 16px; height: 16px; }
+  .b-top { top: 42px; }
+  .b-banner, .b-hint { font-size: 12px; padding: 4px 10px; }
+  .b-squad { top: 42px; }
+}
+/* hodně nízký displej: rozkazy jen jako ikony */
+@media (max-height: 400px) and (orientation: landscape) {
+  .b-form .fbtn > span:not([data-ico]) { display: none; }
+  .b-form .fbtn { padding: 2px 6px; min-width: 34px; justify-content: center; }
+}
