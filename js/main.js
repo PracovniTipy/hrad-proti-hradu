@@ -720,9 +720,10 @@
         if (document.hidden && this.battle && !this.battle.over) { this.battle.togglePause(true); $('#bPauseMenu').hidden = false; }
       });
       const start = location.hash.slice(1);
-      if (!this.save.lang) {
+      // výběr jazyka: při prvním spuštění a jednou po přejmenování na Castle WARS (postup zůstává)
+      if (!this.save.lang || !this.save.langAsked2) {
         this.go('hrad');
-        Tutorial.pickLanguage(l => this.setLang(l));
+        Tutorial.pickLanguage(l => { this.save.langAsked2 = 1; this.setLang(l); });
       } else {
         this.go('hrad');   // po spuštění vždy hrad
         // denní odměna zdarma: hráč, který už má tutoriál za sebou, ji uvidí hned
