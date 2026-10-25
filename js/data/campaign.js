@@ -388,7 +388,9 @@ GameData.campaignHelpers = {
   /* národ je hratelný (Hrad, Souboj, Trénink) až po odemčení jeho aktu */
   factionUnlocked(save, f) {
     if (f === 'kralovstvi') return true;
-    return GameData.saga.some(s => s.faction === f) && this.actUnlocked(save, f);
+    // samurajové i vikingové se pro volné hraní odemknou až po dokončení příběhu samurajů
+    if (!GameData.saga.some(s => s.faction === f)) return false;
+    return this.actDone(save, 'samurajove') && this.actUnlocked(save, f);
   },
   progress(save, a) {
     const all = this.allLevels(a);

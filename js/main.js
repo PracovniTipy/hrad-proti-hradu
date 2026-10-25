@@ -19,9 +19,10 @@
       $('#pName').textContent = s.name;
       $('#pTrophies').textContent = fmt(s.trophies);
       $('#pLevel').textContent = t('castle_level', { n: GameData.calc.castleLevel(s) });
-      if (s.tester) { s.gold = Math.max(s.gold, 9999999); s.gems = Math.max(s.gems, 9999999); }
-      $('#rGold').textContent = s.tester ? '∞' : fmt(s.gold);
-      $('#rGems').textContent = s.tester ? '∞' : fmt(s.gems);
+      const tst = s.tester && HraConfig.dev;
+      if (tst) { s.gold = Math.max(s.gold, 9999999); s.gems = Math.max(s.gems, 9999999); }
+      $('#rGold').textContent = tst ? '∞' : fmt(s.gold);
+      $('#rGems').textContent = tst ? '∞' : fmt(s.gems);
       App.paintAvatar($('#avatarCv'), s.avatar);
     },
 
@@ -164,7 +165,7 @@
       if (!H.isUnlocked(this.save, id)) { this.toast(t('t_prev_first')); return; }
       // první úroveň aktu: nejdřív příběhová scéna
       if (H.isFirstOfAct(id) && !(this.save.seenScenes || {})[act.scene]) { this.playScene(act.scene, () => this.openLevel(id)); return; }
-      if (lv.faction !== 'spojenectvi' && this.save.faction !== lv.faction) this.setFaction(lv.faction, { silent: true });
+      if (lv.faction !== 'spojenectvi' && this.save.faction !== lv.faction && GameData.campaignHelpers.factionUnlocked(this.save, lv.faction)) this.setFaction(lv.faction, { silent: true });
       const EF = GameData.factions[lv.enemy];
       lv.enemyUnits = lv.roles.map(r => GameData.unitForRole(lv.enemy, r));
       if (lv.mix) lv.enemyUnits = lv.enemyUnits.concat(lv.mix.roles.map(r => GameData.unitForRole(lv.mix.faction, r)));
@@ -576,6 +577,12 @@
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // trofeje se počítají od nuly – kdo ještě nehrál souboj, nemá mít darované trofeje
+      const stt = this.save.stats || {};
+      if (!this.save.mig_tro0) {
+        if (this.save.trophies === 1200 && !(stt.pvpWins || 0) && !(stt.pvpLosses || 0)) { this.save.trophies = 0; this.save.pvp.opponents = []; }
+        this.save.mig_tro0 = 1; Save.save();
+      }
       // národ, který ještě není odemčený příběhem, nelze hrát
       if (!GameData.campaignHelpers.factionUnlocked(this.save, this.save.faction)) { this.save.faction = 'kralovstvi'; this.save.avatar = 'rytir'; }
       I18N.set(this.save.lang || (navigator.language || 'cs').slice(0, 2));
@@ -590,7 +597,7 @@
       let taps = [];
       $('#rGold').parentElement.addEventListener('click', () => {
         const now = Date.now(); taps = taps.filter(x => now - x < 2500); taps.push(now);
-        if (taps.length >= 7) {
+        if (taps.length >= 7 && HraConfig.dev) {
           taps = []; this.save.tester = !this.save.tester;
           if (!this.save.tester) { this.save.gold = 50000; this.save.gems = 5000; }
           this.persist(); this.toast(this.save.tester ? t('tester_on') : t('tester_off'));

@@ -369,35 +369,14 @@
     el.innerHTML = `
       <div class="scr">
         <div class="sec-head"><h1>${t('nav_sprava')}</h1><span class="muted">${t('castle_level', { n: lvl })}</span></div>
-        <div class="act-grid">
-          ${cur ? `<button class="act act-main" data-act="story">
-              <span class="act-ico">${ico('swords')}</span>
-              <span><b>${t('continue_story')}</b><small>${cur.label} · ${esc(cur.name)}</small></span>
-            </button>` : `<button class="act act-main" data-go="pribeh"><span class="act-ico">${ico('map')}</span><span><b>${t('story_done')}</b><small>${t('replay_levels')}</small></span></button>`}
-          <button class="act" data-act="training"><span class="act-ico">${ico('helmet')}</span><span><b>${t('training')}</b><small>${t('quick_battle')}</small></span></button>
-          <button class="act" data-go="pvp"><span class="act-ico">${ico('trophy')}</span><span><b>${t('nav_pvp')}</b><small>${attacksLeft ? t('attacks_left', { n: attacksLeft }) : t('attacks_none')}</small></span></button>
-          <button class="act" data-go="obchod"><span class="act-ico">${ico('shop')}</span><span><b>${t('nav_obchod')}</b><small>${t('shop_sub')}</small></span></button>
-        </div>
-
-        <div class="sec-head"><h2>${t('saga_title')}</h2><span class="muted">${t('saga_sub')}</span></div>
-        <div class="saga-strip">
-          ${GameData.saga.map((x, i) => {
-            const H = GameData.campaignHelpers;
-            const un = H.actUnlocked(save, x.id), done = H.actDone(save, x.id), here = H.currentAct(save) === x.id && !done;
-            const p = H.progress(save, x.id);
-            const nm = x.huge ? x.name : x.faction === 'spojenectvi' ? t('saga_finale') : GameData.factions[x.faction].name;
-            const state = done ? `${ico('crown')} ${t('saga_done')}` : here ? t('saga_now') : un ? t('completed_of', { a: p.done, b: p.total }) : `${ico('lock')} ${t('saga_locked')}`;
-            return `${i ? '<div class="saga-arrow" aria-hidden="true">➜</div>' : ''}
-            <button class="saga-act ${done ? 'done' : ''} ${here ? 'here' : ''} ${un ? '' : 'locked'}" data-saga="${x.id}" ${un ? '' : 'aria-disabled="true"'}>
-              <canvas data-actcv="${x.id}"></canvas>
-              <span class="saga-num">${t('act_n', { n: x.n })}</span>
-              <span class="saga-nm">${esc(nm)}</span>
-              <span class="saga-st">${state}</span>
-              <span class="saga-bar"><i style="width:${p.done / p.total * 100}%"></i></span>
-            </button>`;
-          }).join('')}
-        </div>
-
+        <section class="panel nat-pick">
+          <div><div class="eyebrow">${t('nat_pick_eyebrow')}</div><p class="muted" style="margin:2px 0 0;font-size:13px">${GameData.campaignHelpers.actDone(save, 'samurajove') ? t('nat_pick_open') : t('nat_pick_locked')}</p></div>
+          <div class="nat-cards">${GameData.factionOrder.map(f => {
+            const FF = GameData.factions[f], un = GameData.campaignHelpers.factionUnlocked(save, f), on = save.faction === f;
+            return `<button class="nat-card ${on ? 'on' : ''}" data-setnat="${f}" ${un ? '' : 'aria-disabled="true"'} style="--c:${FF.color}">
+              <canvas data-natcv="${f}"></canvas><b>${esc(FF.name)}</b><small>${on ? '✓ ' + t('nat_playing') : un ? t('nat_choose') : ico('lock') + ' ' + t('locked_story')}</small></button>`;
+          }).join('')}</div>
+        </section>
         <div class="sec-head"><h2>${t('upgrades')}</h2><span class="muted">${t('upgrades_sub')}</span></div>
         <div class="grid-cards">
           ${GameData.buildings.map(b => {
@@ -421,10 +400,10 @@
         <div class="sec-head"><h2>${t('organization')}</h2><span class="muted">${esc(F.name)} · ${t('army_power', { n: Math.round((st.unitMult - 1) * 100) })}</span></div>
         ${orgHtml(F, save, st)}
       </div>`;
-    el.querySelectorAll('canvas[data-actcv]').forEach(c => { const a = GameData.campaignHelpers.act(c.dataset.actcv); paintActCard(c, a, !GameData.campaignHelpers.actUnlocked(save, a.id)); });
-    el.querySelectorAll('[data-saga]').forEach(b => b.addEventListener('click', () => {
-      if (!GameData.campaignHelpers.actUnlocked(save, b.dataset.saga)) { App.toast(t('t_nation_locked')); return; }
-      App.go('pribeh', { act: b.dataset.saga });
+    el.querySelectorAll('canvas[data-natcv]').forEach(cv => Art.renderUnitIcon(cv, GameData.factions[cv.dataset.natcv].roles.tezka, 'player', save.skins.unit[GameData.factions[cv.dataset.natcv].roles.tezka], { zoom: 0.9 }));
+    el.querySelectorAll('[data-setnat]').forEach(b => b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled')) { App.toast(t('nat_pick_locked')); return; }
+      App.setFaction(b.dataset.setnat, { go: 'sprava' });
     }));
     el.querySelectorAll('canvas[data-orgunit]').forEach(c => Art.renderUnitIcon(c, c.dataset.orgunit, 'player', save.skins.unit[c.dataset.orgunit]));
     el.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => {
@@ -439,9 +418,6 @@
       App.go('sprava', { keepScroll: true });
     }));
     bindDefense(App, el);
-    const story = el.querySelector('[data-act="story"]');
-    if (story) story.addEventListener('click', () => App.openLevel(cur.id));
-    el.querySelector('[data-act="training"]').addEventListener('click', () => App.startTraining());
   }
 
   /* --------------------------------------------------------------- ÚPRAVA HRADU */
@@ -986,6 +962,7 @@
     el.innerHTML = `
       <div class="scr">
         <div class="sec-head"><h1>${t('pvp_title')}</h1><span class="tag tag-demo">${t('demo_data')}</span></div>
+        <button class="act train-row" data-act="training"><span class="act-ico">${ico('helmet')}</span><span><b>${t('training')}</b><small>${t('quick_battle')}</small></span><span class="go">›</span></button>
         <div class="notice"><div>${t('pvp_notice')}</div></div>
         <div class="muted" style="font-size:14px">${t('pvp_rules', { n: R.maxAttacks, l: R.trophyLoss })}</div>
         <div class="opp-list">
@@ -1027,6 +1004,7 @@
       </div>`;
     el.querySelectorAll('canvas[data-castle]').forEach(c => Art.renderCastleIcon(c, 'enemy', c.dataset.castle, +c.dataset.lvl, c.dataset.style));
     el.querySelectorAll('[data-attack]').forEach(b => b.addEventListener('click', () => App.startPvp(b.dataset.attack)));
+    el.querySelector('[data-act="training"]').addEventListener('click', () => App.startTraining());
     el.querySelector('#newSeason').addEventListener('click', () => {
       save.pvp.season++;
       save.pvp.attacks = {};

@@ -3,6 +3,13 @@
    Prototyp ukládá postup do localStorage tohoto prohlížeče.
    V online verzi se tento objekt bude načítat ze serveru (viz README).
    ========================================================================= */
+/* Nastavení vydání: v ostré verzi nejde nic získat zdarma.
+   Vývojářský režim (tester, zkušební nákupy) jen s ?dev=1 v adrese. */
+window.HraConfig = (function () {
+  let dev = false;
+  try { if (/[?&]dev=1/.test(location.search)) sessionStorage.setItem('hrad-dev', '1'); dev = sessionStorage.getItem('hrad-dev') === '1'; } catch (e) { /* nic */ }
+  return { dev, release: !dev };
+})();
 (function () {
   const KEY = 'hrad-proti-hradu-save-v1';
 
@@ -25,7 +32,7 @@
       tut: {},
       gold: 1500,
       gems: 150,
-      trophies: 1200,
+      trophies: 0,
       stats: { wins: 0, losses: 0, pvpWins: 0, pvpLosses: 0, unitsSent: 0, kills: 0 },
       buildings,
       campaign: { cleared: {} },

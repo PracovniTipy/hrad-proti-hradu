@@ -432,4 +432,13 @@
     cp_ours: ['Střed je náš! +35 % mincí', 'The centre is ours! +35% coins', '中心归我们了！金币 +35%', 'केंद्र हमारा है! +35% सिक्के', '¡El centro es nuestro! +35 % monedas', 'Le centre est à nous ! +35 % pièces', 'الوسط لنا! +35% عملات', 'কেন্দ্র আমাদের! +৩৫% মুদ্রা', 'O centro é nosso! +35% moedas', 'Центр наш! +35% монет', 'مرکز ہمارا ہے! +35% سکے', 'Tengah milik kita! +35% koin', 'Die Mitte gehört uns! +35 % Münzen', '中央を確保！コイン+35%', 'Merkez bizim! +%35 altın', '중앙 점령! 코인 +35%'],
     cp_theirs: ['Nepřítel obsadil střed!', 'The enemy took the centre!', '敌人占领了中心！', 'दुश्मन ने केंद्र ले लिया!', '¡El enemigo tomó el centro!', 'L’ennemi a pris le centre !', 'العدو استولى على الوسط!', 'শত্রু কেন্দ্র দখল করেছে!', 'O inimigo tomou o centro!', 'Враг занял центр!', 'دشمن نے مرکز لے لیا!', 'Musuh merebut tengah!', 'Der Feind hat die Mitte!', '敵が中央を占領！', 'Düşman merkezi aldı!', '적이 중앙을 점령!']
   });
+
+  /* Nové texty (čeština + angličtina, ostatní jazyky použijí angličtinu) */
+  Object.assign(I18N.D, {
+    nat_pick_eyebrow: ['Za koho hraješ', 'Your nation'],
+    nat_pick_open: ['Vyber národ pro svůj hrad, trénink a souboje. Před každým soubojem si armádu můžeš znovu zvolit.', 'Choose the nation for your castle, training and battles. You can change the army before every battle.'],
+    nat_pick_locked: ['Samurajové a Vikingové se odemknou po dokončení příběhu samurajů (Akt II).', 'Samurai and Vikings unlock after you finish the Samurai story (Act II).'],
+    nat_playing: ['Hraješ', 'Playing'],
+    nat_choose: ['Vybrat', 'Choose'],
+  });
 })();
