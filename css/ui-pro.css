@@ -925,3 +925,4 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .us-row em { font-style: normal; color: #f3e2b6; font-size: 11px; min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
 .uc-vs { margin: 2px 0 0; display: grid; gap: 2px; font-size: 12px; }
 .uc-vs .good { color: #9dffb0; } .uc-vs .bad { color: #ff9e8a; }
+.acc-state .ico, .acc-state svg { width: 16px; height: 16px; vertical-align: -3px; }

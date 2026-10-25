@@ -375,7 +375,6 @@
         <section class="hero-live">
           <canvas id="homeCv" aria-label="Tvůj hrad v krajině"></canvas>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
-          ${Ucet.logged() ? '' : `<button class="acc-nudge" data-acc="register">${ico('shield')} ${t('acc_nudge')}</button>`}
           <button class="daily-btn quest-btn" id="questBtn" aria-label="${t('quests')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M28 10h64a8 8 0 0 1 8 8v70a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V18a8 8 0 0 1 8-8z" fill="#e9d6a8" stroke="#1a0e06" stroke-width="4"/><path d="M34 32h40M34 50h40M34 68h28" stroke="#6b4508" stroke-width="6" stroke-linecap="round"/><path d="M80 28l5 5 9-11M80 46l5 5 9-11" fill="none" stroke="#2f8a3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="88" cy="68" r="8" fill="none" stroke="#6b4508" stroke-width="5"/></svg></span>
             <span class="daily-lbl">${t('quests')}</span>
@@ -1075,8 +1074,8 @@
         <section class="panel lb" id="lbBox">
           ${App.lbTab === 'bots' ? list.slice(0, 10).map(row).join('') + (myRank > 10 ? `<div class="lb-gap">• • •</div>${row(me, myRank - 1)}` : '') : `<div class="lb-load muted">${t('lb_loading')}</div>`}
         </section>
-        <div class="notice"><div>${App.lbTab === 'bots' ? t('lb_notice') : Ucet.logged() ? t('lb_world_note') : t('lb_world_reg')}</div></div>
-        ${App.lbTab !== 'bots' && !Ucet.logged() ? `<button class="btn btn-green" data-acc="register">${t('acc_register')}</button>` : ''}
+        <div class="notice"><div>${App.lbTab === 'bots' ? t('lb_notice') : Ucet.logged() && !Ucet.guest() ? t('lb_world_note') : t('lb_world_reg')}</div></div>
+        ${App.lbTab !== 'bots' && (!Ucet.logged() || Ucet.guest()) ? `<button class="btn btn-green" data-acc="register">${t('acc_set')}</button>` : ''}
       </div>`;
     el.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => { App.lbTab = b.dataset.lbt; App.go('zebricek'); }));
     UcetUI.bind(App, el);

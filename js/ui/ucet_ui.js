@@ -13,15 +13,17 @@
   const UcetUI = {
     /* Sekce v profilu */
     profileHtml() {
-      if (!Ucet.logged()) return `<section class="panel acc-box">
-          <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="muted">${t('acc_why')}</p></div></div>
-          <div class="modal-actions"><button class="btn btn-green" data-acc="register">${t('acc_register')}</button><button class="btn" data-acc="login">${t('acc_login')}</button></div>
+      const S = Ucet.s || {};
+      const state = `<p class="acc-state">${ico('crown')} ${Ucet.logged() ? (Ucet.err ? `<span class="bad">${t('acc_save_err')}</span>` : `${t('acc_auto')} <b>${when(S.savedAt)}</b>`) : t('acc_auto_local')}</p>`;
+      if (!Ucet.logged() || Ucet.guest()) return `<section class="panel acc-box">
+          <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="muted">${t('acc_why2')}</p></div></div>
+          ${state}
+          <div class="modal-actions"><button class="btn btn-green" data-acc="register">${t('acc_set')}</button><button class="btn" data-acc="login">${t('acc_login_other')}</button></div>
         </section>`;
-      const S = Ucet.s;
       return `<section class="panel acc-box on">
           <div class="acc-head"><span class="acc-ico ok">${ico('shield')}</span><div><b>${esc(S.username)}</b><p class="muted">${esc(S.email)}</p></div></div>
-          <p class="acc-state">${Ucet.err ? `<span class="bad">${t('acc_save_err')}</span>` : `${t('acc_saved_at')} <b>${when(S.savedAt)}</b>`}</p>
-          <div class="modal-actions"><button class="btn btn-blue" data-acc="sync">${t('acc_sync')}</button><button class="btn" data-acc="pass">${t('acc_change_pass')}</button><button class="btn" data-acc="logout">${t('acc_logout')}</button></div>
+          ${state}
+          <div class="modal-actions"><button class="btn" data-acc="pass">${t('acc_change_pass')}</button><button class="btn" data-acc="logout">${t('acc_logout')}</button></div>
         </section>`;
     },
     bind(App, el) {
@@ -38,7 +40,7 @@
       const reg = mode === 'register';
       App.modal(`
         <div class="eyebrow">${t('acc_title')}</div>
-        <h2>${reg ? t('acc_register') : t('acc_login')}</h2>
+        <h2>${reg ? t('acc_set') : t('acc_login')}</h2>
         <form class="acc-form" id="accForm" novalidate>
           ${reg ? `<div class="field"><label for="accUser">${t('acc_username')}</label><input id="accUser" maxlength="20" autocomplete="username" required placeholder="${t('acc_username_ph')}"></div>
           <div class="field"><label for="accMail">${t('acc_email')}</label><input id="accMail" type="email" maxlength="120" autocomplete="email" required placeholder="jmeno@email.cz"></div>`
@@ -47,7 +49,7 @@
           <p class="acc-err" id="accErr" role="alert" hidden></p>
           ${reg ? `<p class="muted acc-note">${t('acc_reg_note')}</p>` : ''}
           <div class="modal-actions">
-            <button class="btn btn-green" type="submit" id="accGo">${reg ? t('acc_register') : t('acc_login')}</button>
+            <button class="btn btn-green" type="submit" id="accGo">${reg ? t('acc_save') : t('acc_login')}</button>
             <button class="btn" type="button" data-close>${t('back')}</button>
           </div>
           <button class="acc-switch" type="button" id="accSwitch">${reg ? t('acc_have') : t('acc_new')}</button>
@@ -74,7 +76,7 @@
             }
           } catch (e) {
             err.textContent = Ucet.errText(e); err.hidden = false;
-            go.disabled = false; go.textContent = reg ? t('acc_register') : t('acc_login');
+            go.disabled = false; go.textContent = reg ? t('acc_save') : t('acc_login');
           }
         });
       });
