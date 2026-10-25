@@ -954,3 +954,14 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wczk], [data-skczk], [data-czk]) { display: none !important; }
 .avatar-btn { position: relative; }
 .beta-tag { position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); font-style: normal; font-family: var(--font-display); font-size: 9px; letter-spacing: .08em; padding: 1px 5px; border-radius: 6px; color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 1px #05070b; pointer-events: none; }
+/* tlačítko Nainstalovat na hlavní stránce */
+.install-home { gap: 2px; }
+.install-home .inst-ico { width: 54px; height: 46px; display: grid; place-items: center; font-size: 26px; font-weight: 900; color: #2a1a03; border-radius: 14px;
+  background: linear-gradient(180deg, #ffe9a0, #e0a83a 60%, #b07a1c); box-shadow: 0 0 0 2px #05070b, 0 4px 8px rgba(0,0,0,.6); animation: chestBob 2.4s ease-in-out infinite .3s; }
+.install-home span:last-child { font-family: var(--font-display); font-weight: 900; font-size: 13px; color: #fff3cf; text-shadow: 0 2px 0 #000, 0 0 6px #000; }
+#screen.home-mode .install-home { top: calc(320px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .install-home { top: 222px; } .install-home .inst-ico { width: 44px; height: 38px; font-size: 22px; } }
+@media (orientation: landscape) and (min-height: 521px) { #screen.home-mode .install-home { top: 276px; } }
+.install-home[hidden] { display: none !important; }
+.inst-steps { margin: 6px 0 10px; padding-left: 22px; display: grid; gap: 8px; font-size: 16px; }
+.ios-share { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: #2f6fd0; color: #fff; }

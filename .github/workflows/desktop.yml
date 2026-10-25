@@ -50,15 +50,15 @@ jobs:
       - name: Zveřejnit ke stažení
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: desktop-${{ github.run_number }}
-          name: Castle WARS – počítač ${{ github.run_number }}
+          tag_name: pocitac
+          name: Castle WARS – Windows, Mac, Linux
           body: |
-            **Windows:** stáhni CastleWARS-Windows.exe a spusť (Windows se může zeptat – klikni „Další informace“ → „Přesto spustit“).
-            **Mac:** stáhni CastleWARS-Mac.zip, rozbal, aplikaci přetáhni do Aplikací a poprvé ji otevři pravým tlačítkem → Otevřít.
+            **Windows:** stáhni CastleWARS-Windows.exe a spusť – hra se sama nainstaluje, vytvoří ikonu na ploše a spustí se.
+            **Mac:** stáhni CastleWARS-Mac.dmg, otevři ho a přetáhni Castle WARS do Aplikací.
             **Linux:** CastleWARS-Linux.AppImage (nastav jako spustitelný).
           files: |
             desktop/dist/CastleWARS-Windows.exe
-            desktop/dist/CastleWARS-Mac.zip
+            desktop/dist/CastleWARS-Mac.dmg
             desktop/dist/CastleWARS-Linux.AppImage
           fail_on_unmatched_files: false
           make_latest: false

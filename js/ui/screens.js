@@ -375,6 +375,7 @@
         <section class="hero-live">
           <canvas id="homeCv" aria-label="Tvůj hrad v krajině"></canvas>
           <button class="btn btn-sm hero-edit" data-go="stavitel">${ico('brush')} ${t('edit_castle')}</button>
+          ${Instalace.button('daily-btn install-home')}
           <button class="daily-btn quest-btn" id="questBtn" aria-label="${t('quests')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M28 10h64a8 8 0 0 1 8 8v70a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V18a8 8 0 0 1 8-8z" fill="#e9d6a8" stroke="#1a0e06" stroke-width="4"/><path d="M34 32h40M34 50h40M34 68h28" stroke="#6b4508" stroke-width="6" stroke-linecap="round"/><path d="M80 28l5 5 9-11M80 46l5 5 9-11" fill="none" stroke="#2f8a3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="88" cy="68" r="8" fill="none" stroke="#6b4508" stroke-width="5"/></svg></span>
             <span class="daily-lbl">${t('quests')}</span>
@@ -394,6 +395,8 @@
       el.querySelector('#dailyBtn').addEventListener('click', () => Denni.open(App));
       UcetUI.bind(App, el);
       el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
+      Instalace.bind(App, el);
+      if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
     }
     el.innerHTML = `
@@ -1139,7 +1142,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 55 · beta</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 56 · beta</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

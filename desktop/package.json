@@ -21,7 +21,7 @@
     "win": {
       "target": [
         {
-          "target": "portable",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
@@ -33,7 +33,7 @@
     "mac": {
       "target": [
         {
-          "target": "zip",
+          "target": "dmg",
           "arch": [
             "universal"
           ]
@@ -42,7 +42,7 @@
       "icon": "icon.png",
       "category": "public.app-category.strategy-games",
       "identity": "-",
-      "artifactName": "CastleWARS-Mac.zip"
+      "artifactName": "CastleWARS-Mac.dmg"
     },
     "linux": {
       "target": [
@@ -57,6 +57,34 @@
       "category": "Game",
       "artifactName": "CastleWARS-Linux.AppImage"
     },
-    "publish": null
+    "publish": null,
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Castle WARS",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "dmg": {
+      "title": "Castle WARS",
+      "contents": [
+        {
+          "x": 150,
+          "y": 190
+        },
+        {
+          "x": 420,
+          "y": 190,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 570,
+        "height": 380
+      }
+    }
   }
 }
