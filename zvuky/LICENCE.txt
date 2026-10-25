@@ -9,8 +9,8 @@ Soubory byly zkráceny, převedeny do MP3 a hlasitostně vyrovnány.
 bitva_dav.mp3 je odvozené dílo (mix těchto zvuků) a podléhá stejné licenci CC BY-SA 3.0.
 
 Válečné pokřiky (cry_0.mp3 – cry_11.mp3)
-  Anglické pokřiky („Charge!“, „For the king!“, „Hold the line!“ …) vytvořené
+  Anglické pokřiky („Charge!“, „For the king!“, „Hold the line!“, „Stand and fight!“ …) vytvořené
   syntézou řeči Piper (MIT, https://github.com/rhasspy/piper) s hlasovým modelem
   en-us-libritts-high, licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/),
-  trénovaný na datové sadě LibriTTS (CC BY 4.0). Každý pokřik je směs 13 mužských hlasů
-  s úpravou výšky, zkreslením a dozvukem, podložená řevem davu (viz výše).
+  trénovaný na datové sadě LibriTTS (CC BY 4.0). Povel řekne velitel (jeden hlas), tři vojáci ho tiše
+  zopakují a po povelu zařve armáda (řev davu, viz výše).
