@@ -82,8 +82,43 @@
     lose() { const t = now(); [392, 349, 311, 262].forEach((f, i) => { const g = osc('triangle', f, t + i * 0.28, 0.6, 0.15); g.connect(reverb); }); },
     unlock() { const t = now(); [659, 784, 988, 1318].forEach((f, i) => osc('triangle', f, t + i * 0.09, 0.35, 0.12)); }
   };
+  /* ---------- skutečné nahrávky (0 A.D., CC BY-SA 3.0 – viz zvuky/LICENCE.txt) ---------- */
+  const SADY = { clash: 12, swing: 5, shieldw: 5, shieldm: 5, flesh: 6, bow: 5, arrowhit: 7, spear: 5, death: 10,
+    siegehit: 4, siegeshot: 1, collapse: 3, cry: 12, horse: 4, horsedeath: 2 };
+  const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
+  const BUF = {}; let loading = false, crowd = null;
+  function loadSamples() {
+    if (loading || !ctx) return; loading = true;
+    const get = (url) => fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((ok, no) => ctx.decodeAudioData(a, ok, no)));
+    Object.keys(SADY).forEach(k => { BUF[k] = []; for (let i = 0; i < SADY[k]; i++) get(BASE + k + '_' + i + '.mp3').then(b => BUF[k].push(b)).catch(() => {}); });
+    get(BASE + 'bitva_dav.mp3').then(b => { BUF.dav = b; }).catch(() => {});
+  }
+  /* přehraje náhodnou nahrávku ze sady; vrací false, když ještě není načtená */
+  function sample(set, vol, rate, out) {
+    const arr = BUF[set]; if (!arr || !arr.length) return false;
+    const src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = arr[Math.floor(Math.random() * arr.length)];
+    src.playbackRate.value = rate || (0.92 + Math.random() * 0.16);
+    g.gain.value = vol; src.connect(g); g.connect(out || sfxBus); src.start();
+    return true;
+  }
+  /* zvuky bitvy: nejdřív nahrávka, když chybí, syntéza */
+  const REAL = {
+    sword: v => Math.random() < 0.62 ? sample('clash', v * 0.9) : Math.random() < 0.55 ? sample(Math.random() < 0.5 ? 'shieldw' : 'shieldm', v * 0.8) : sample('flesh', v * 0.8),
+    hit: v => sample(Math.random() < 0.6 ? 'arrowhit' : 'flesh', v * 0.7),
+    bow: v => sample('bow', v * 0.55),
+    death: v => sample('death', v * 0.75),
+    catapult: v => sample('siegeshot', v),
+    boom: v => sample('siegehit', v * 0.9),
+    castle: v => sample(Math.random() < 0.3 ? 'collapse' : 'siegehit', v * 0.6, 0.85 + Math.random() * 0.1),
+    cry: v => sample('cry', v),
+    horse: v => sample('horse', v * 0.7),
+    spear: v => sample('spear', v * 0.7),
+    spawn: v => sample('swing', v * 0.45)
+  };
+
   /* omezení, kolikrát za sekundu se smí stejný zvuk ozvat */
-  const RATE = { sword: 0.07, hit: 0.06, arrow: 0.05, bow: 0.06, death: 0.08, coin: 0.08, spawn: 0.1, castle: 0.15, fire: 0.15, boom: 0.08, catapult: 0.15, magic: 0.1, ice: 0.12, bolt: 0.1 };
+  const RATE = { cry: 0.25, horse: 0.6, spear: 0.08, sword: 0.06, hit: 0.06, arrow: 0.05, bow: 0.07, death: 0.12, coin: 0.08, spawn: 0.1, castle: 0.15, fire: 0.15, boom: 0.08, catapult: 0.15, magic: 0.1, ice: 0.12, bolt: 0.1 };
 
   /* ---------- hudba: krátké motivy se smyčkou, každý národ jinak ---------- */
   const SCALES = {
@@ -153,13 +188,14 @@
       musBus.gain.value = st.music ? 0.55 : 0;
     },
     /* první dotyk odemkne zvuk (prohlížeče jinak nedovolí) */
-    unlock() { if (init() && ctx.state !== 'running') ctx.resume(); },
+    unlock() { if (init()) { if (ctx.state !== 'running') ctx.resume(); loadSamples(); } },
     play(name, vol) {
       if (!ctx || ctx.state !== 'running' || !this.settings().sfx) return;
       const r = RATE[name] || 0, tt = performance.now() / 1000;
       if (r && last[name] && tt - last[name] < r) return;
       last[name] = tt;
-      try { SFX[name] && SFX[name](vol == null ? 1 : Math.max(0.05, Math.min(1, vol))); } catch (e) { /* nic */ }
+      const v = vol == null ? 1 : Math.max(0.05, Math.min(1, vol));
+      try { if (REAL[name] && REAL[name](v)) return; if (SFX[name]) SFX[name](v); } catch (e) { /* nic */ }
     },
     /* zvuk v bitvě – tišší, když se to děje mimo obrazovku */
     at(name, x, battle, vol) {
@@ -168,6 +204,20 @@
       const k = d <= 0 ? 1 : Math.max(0, 1 - d / 900);
       if (k > 0.05) this.play(name, (vol == null ? 1 : vol) * k);
     },
+    /* řev bitvy: hlasitost podle toho, kolik vojáků právě bojuje na obrazovce (0–1) */
+    battle(level) {
+      if (!ctx || !BUF.dav) return;
+      if (!crowd) {
+        const src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        src.buffer = BUF.dav; src.loop = true; f.type = 'lowpass'; f.frequency.value = 2400; g.gain.value = 0;
+        src.connect(f); f.connect(g); g.connect(sfxBus); src.start();
+        crowd = { src, g, f };
+      }
+      const lv = Math.max(0, Math.min(1, level));
+      crowd.g.gain.setTargetAtTime(this.settings().sfx ? lv * 0.55 : 0, ctx.currentTime, 0.6);
+      crowd.f.frequency.setTargetAtTime(900 + lv * 2600, ctx.currentTime, 0.6);
+    },
+    battleEnd() { if (crowd) { try { crowd.g.gain.setTargetAtTime(0, ctx.currentTime, 0.4); crowd.src.stop(ctx.currentTime + 2); } catch (e) { /* nic */ } crowd = null; } },
     music(nat, kind) { if (!this.settings().music) { Music.stop(); return; } Music.start(nat, kind); },
     stopMusic() { Music.stop(); },
     toggle(key) {
@@ -183,5 +233,6 @@
   // klik na tlačítka rozhraní
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button, .tab, [data-go]')) Zvuk.play('click', 0.7); }, true);
   document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else ctx.resume(); });
+  Zvuk._buf = BUF;
   window.Zvuk = Zvuk;
 })();

@@ -1,0 +1,9 @@
+Zvukové efekty v této složce (kromě bitva_dav.mp3, který je z nich smíchaný)
+pocházejí ze hry 0 A.D.:
+
+  Copyright (C) Wildfire Games – https://www.wildfiregames.com/
+  Licence: Creative Commons Attribution-Share Alike 3.0 (CC BY-SA 3.0)
+  https://creativecommons.org/licenses/by-sa/3.0/
+
+Soubory byly zkráceny, převedeny do MP3 a hlasitostně vyrovnány.
+bitva_dav.mp3 je odvozené dílo (mix těchto zvuků) a podléhá stejné licenci CC BY-SA 3.0.

@@ -483,6 +483,7 @@
     u_fast: ['rychlý', 'fast'], u_slow: ['pomalý', 'slow'], u_mid: ['střední', 'medium'], u_strong: ['Silný proti', 'Strong vs'], u_weak: ['Pozor na', 'Weak vs'],
     u_splash: ['zasáhne více nepřátel najednou', 'hits several enemies at once'], u_aura: ['posiluje vojáky kolem sebe', 'boosts soldiers around him'], u_charge: ['první úder v náporu je silnější', 'first strike of a charge is stronger'],
     app_version: ['Verze hry', 'Game version'],
+    credits_sfx: ['Zvuky bitvy:', 'Battle sounds:'],
     snd_sfx: ['Zvuky', 'Sounds'], snd_music: ['Hudba', 'Music'], snd_on: ['zapnuto', 'on'], snd_off: ['vypnuto', 'off'],
     acc_title: ['Účet hráče', 'Player account'],
     bug_report: ['Nahlásit chybu nebo nápad', 'Report a bug or idea'],

@@ -331,6 +331,7 @@
         this.texts.push({ x: u.x - 60, y: 360, txt: t('boss_enters', { name: def.name }), color: '#ff7a4a', t: 0, life: 2.6, big: true });
         for (let i = 0; i < 3; i++) this._explode(u.x - 20 + i * 20, u.y - 20);
       }
+      if (window.Zvuk && GameData.units[unitId] && GameData.units[unitId].roleKey === 'jizda') Zvuk.at('horse', this.side[team].castle.front, this, 0.6);
       if (team === 'player') { this.sent++; this.st.sent[unitId] = (this.st.sent[unitId] || 0) + 1; if (window.Zvuk) Zvuk.play('spawn', 0.5); }
       this._dust(u.x, u.y);
       return true;
@@ -492,6 +493,7 @@
     /* Rozkaz pro armádu: 'utok' | 'formace' | 'ustup' */
     setFormation(team, mode, flagX) {
       const s = this.side[team], cfg = C();
+      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) { Zvuk.play('cry', 1); setTimeout(() => Zvuk.play('cry', 0.8), 300); setTimeout(() => Zvuk.play('cry', 0.6), 650); }
       s.formation = mode;
       if (team === 'player') this.active = 'main';
       if (flagX != null) {
@@ -657,6 +659,7 @@
       if (this._baseCfg) { GameData.battleConfig = this._baseCfg; this._baseCfg = null; }
       this.destroyed = true;
       this.over = true;
+      if (window.Zvuk) Zvuk.battleEnd();
       this.canvas.removeEventListener('pointerdown', this._onDown);
       window.removeEventListener('pointermove', this._onMove);
       window.removeEventListener('pointerup', this._onUp);
@@ -692,6 +695,17 @@
       }
       this._runQueue();
       this._updateCapture(dt);
+      // řev bitvy podle počtu bojujících vojáků na obrazovce + válečné pokřiky při střetu
+      this._sndT = (this._sndT || 0) - dt;
+      if (window.Zvuk && this._sndT <= 0) {
+        this._sndT = 0.4;
+        const c = this.cam, x0 = c.x - 150, x1 = c.x + c.viewW + 150;
+        let fighting = 0;
+        for (const u of this.units) if (!u.dead && u.target && !u.def.ranged && u.x > x0 && u.x < x1) fighting++;
+        Zvuk.battle(Math.min(1, fighting / 14));
+        if (fighting >= 4 && (this._clashWas || 0) < 4) { Zvuk.play('cry', 0.9); setTimeout(() => Zvuk.play('cry', 0.7), 350); }
+        this._clashWas = fighting;
+      }
       if (this.timers.length) {
         const due = this.timers.filter(x => x.at <= this.time);
         if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
@@ -1154,7 +1168,7 @@
       if (from && from.team === 'player' && from.def) this.st.dmg[from.def.id] = (this.st.dmg[from.def.id] || 0) + Math.min(dmg, Math.max(0, target.hp));
       target.hp -= dmg;
       target.hurt = 0.15;
-      if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? 'sword' : 'hit', target.x, this, 0.55);
+      if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? (/kopi|jari|stitonos|rohac/.test(from.def.roleKey + from.def.id) && Math.random() < 0.4 ? 'spear' : 'sword') : 'hit', target.x, this, 0.6);
       this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
       this.texts.push({ x: target.x + (Math.random() - 0.5) * 10, y: target.y - 82 * US(), txt: Math.round(dmg), color: target.team === 'player' ? '#ff8a80' : '#ffffff', t: 0, life: 0.8 });
       if (target.hp <= 0 && !target.dead) {
@@ -1347,7 +1361,7 @@
       const loser = win ? this.side.enemy.castle : this.side.player.castle;
       for (let i = 0; i < 8; i++) this._explode(loser.front + (win ? 1 : -1) * (40 + Math.random() * 200), C().groundY - Math.random() * 220);
       const pc = this.side.player.castle, ec = this.side.enemy.castle;
-      if (window.Zvuk) setTimeout(() => Zvuk.play(win ? 'win' : 'lose'), 500);
+      if (window.Zvuk) { Zvuk.battleEnd(); setTimeout(() => Zvuk.play(win ? 'win' : 'lose'), 500); }
       const res = { win, reason, time: this.time, kills: this.kills, sent: this.sent, st: this.st, playerHp: pc.hp / pc.maxHp, enemyHp: ec.hp / ec.maxHp };
       setTimeout(() => this.o.onEnd && this.o.onEnd(res), 1400);
     }
