@@ -616,6 +616,8 @@
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // bez zapojených plateb se věci za skutečné peníze v obchodě neukazují
+      document.body.classList.toggle('paid-off', !Platby.on());
       // trofeje se počítají od nuly – kdo ještě nehrál souboj, nemá mít darované trofeje
       const stt = this.save.stats || {};
       if (!this.save.mig_tro0) {

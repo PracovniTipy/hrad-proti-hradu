@@ -150,9 +150,9 @@
     return `
       <div class="sec-head"><h2>${t('chests')}</h2><span class="muted">${t('chests_sub')}</span></div>
       <div class="chest-row">${chestCard(C.denni)}${chestCard(C.tydenni)}</div>
-      <div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
+      ${Platby.on() ? `<div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
       <div class="offer-grid">${offers}</div>
-      ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}`;
+      ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}` : `<div class="notice"><div>${t('pay_soon_shop')}</div></div>`}`;
   }
   function bindOffers(App, el) {
     const save = ensure(App.save);
@@ -216,7 +216,7 @@
         </div>
         ${on ? `<button class="btn btn-sm" data-unequip="${g.slot}">${t('take_off')}</button>`
           : owned ? `<button class="btn btn-sm btn-blue" data-gequip="${g.id}">${t('use')}</button>`
-          : `<button class="btn btn-sm ${g.price.czk ? 'btn-green' : 'btn-gold'}" data-gbuy="${g.id}" ${canAfford(save, g.price) ? '' : 'disabled'}>${priceHtml(g.price)}</button>`}
+          : `<button class="btn btn-sm ${g.price.czk ? 'btn-green' : 'btn-gold'}" data-gbuy="${g.id}" ${g.price.czk ? 'data-czk="1"' : ''} ${canAfford(save, g.price) ? '' : 'disabled'}>${priceHtml(g.price)}</button>`}
       </article>`;
     };
     const list = slot => GameData.gear.filter(g => g.role === role && g.slot === slot).map(card).join('');

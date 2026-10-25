@@ -42,6 +42,7 @@
        i na jiném zařízení. */
     async ensure() {
       if (this.logged() || this._ensuring) return;
+      try { if (localStorage.getItem(SKEY + '-bez-serveru')) return; } catch (e) { /* nic */ }
       this._ensuring = true;
       try {
         const r = await rpc('hra_guest', {});
@@ -59,6 +60,7 @@
         : await rpc('hra_register', { p_username: username, p_email: email, p_password: password });
       this.s = { token: r.token, username: r.username, email: r.email, savedAt: null };
       this.store();
+      try { localStorage.removeItem(SKEY + '-bez-serveru'); } catch (e) { /* nic */ }
       await this.upload();
       return r;
     },
@@ -67,6 +69,7 @@
       const r = await rpc('hra_login', { p_login: login, p_password: password });
       this.s = { token: r.token, username: r.username, email: r.email, savedAt: r.updated_at || null };
       this.store();
+      try { localStorage.removeItem(SKEY + '-bez-serveru'); } catch (e) { /* nic */ }
       return r;
     },
     async logout() {
@@ -75,7 +78,17 @@
       if (tok) try { await rpc('hra_logout', { p_token: tok }); } catch (e) { /* nic */ }
       this.ensure();
     },
+    async deleteAccount() {
+      await rpc('hra_delete_account', { p_token: this.s.token });
+      this.s = null; this.store();
+      // po smazání účtu už se nic samo na server neposílá (dokud se hráč znovu nepřihlásí)
+      try { localStorage.setItem(SKEY + '-bez-serveru', '1'); } catch (e) { /* nic */ }
+    },
     async changePassword(oldP, newP) { await rpc('hra_change_password', { p_token: this.s.token, p_old: oldP, p_new: newP }); },
+    async feedback(text) {
+      const info = { v: 50, ua: navigator.userAgent.slice(0, 160), w: innerWidth, h: innerHeight, lang: window.I18N && I18N.lang, act: window.App && App.current };
+      await rpc('hra_feedback', { p_token: (this.s && this.s.token) || '', p_text: text, p_info: info });
+    },
     async leaderboard() { return rpc('hra_leaderboard', { p_limit: 50 }); },
 
     /* Nahrání postupu: po každé změně s malým zpožděním, při zavření hned */

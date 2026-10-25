@@ -930,3 +930,10 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 .uc-vs { margin: 2px 0 0; display: grid; gap: 2px; font-size: 12px; }
 .uc-vs .good { color: #9dffb0; } .uc-vs .bad { color: #ff9e8a; }
 .acc-state .ico, .acc-state svg { width: 16px; height: 16px; vertical-align: -3px; }
+.acc-foot { font-size: 13px; color: #b8a57a; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.acc-foot a, .link-btn { color: #9fd0ff; text-decoration: underline; }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: #ff9e8a; cursor: pointer; }
+/* bez plateb: věci za Kč se neukazují */
+body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wczk], [data-skczk], [data-czk]) { display: none !important; }
+.avatar-btn { position: relative; }
+.beta-tag { position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); font-style: normal; font-family: var(--font-display); font-size: 9px; letter-spacing: .08em; padding: 1px 5px; border-radius: 6px; color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a); box-shadow: 0 0 0 1px #05070b; pointer-events: none; }

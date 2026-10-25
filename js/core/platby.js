@@ -10,6 +10,8 @@
 (function () {
   const Platby = {
     available() { return !!(window.HraPlatby && window.HraPlatby.buy); },
+    /* Dají se teď v obchodě ukazovat věci za skutečné peníze? */
+    on() { return this.available() || !!(window.HraConfig && HraConfig.dev); },
     price(czk) { return `${czk} Kč`; },
     /* onOk se zavolá jen po úspěšném (nebo testovacím) nákupu */
     buy(App, product, onOk) {

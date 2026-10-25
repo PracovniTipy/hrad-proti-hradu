@@ -10,6 +10,8 @@
     return `${t('acc_levels', { n: cl })} · ${ico('trophy')} ${fmt(d && d.trophies)} · ${ico('coin')} ${fmt(d && d.gold)} · ${t('castle_level', { n: GameData.calc.castleLevel(Object.assign({ buildings: {} }, d)) })}`;
   };
 
+  const PRIV = 'https://pracovnitipy.github.io/hrad-proti-hradu/soukromi.html';
+  const privLink = () => `<a href="${PRIV}" target="_blank" rel="noopener">${t('priv_link')}</a>`;
   const UcetUI = {
     /* Sekce v profilu */
     profileHtml() {
@@ -19,11 +21,13 @@
           <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="muted">${t('acc_why2')}</p></div></div>
           ${state}
           <div class="modal-actions"><button class="btn btn-green" data-acc="register">${t('acc_set')}</button><button class="btn" data-acc="login">${t('acc_login_other')}</button></div>
+          ${Ucet.logged() ? `<div class="acc-foot">${privLink()} · <button class="link-btn" data-acc="delete">${t('acc_delete')}</button></div>` : `<div class="acc-foot">${privLink()}</div>`}
         </section>`;
       return `<section class="panel acc-box on">
           <div class="acc-head"><span class="acc-ico ok">${ico('shield')}</span><div><b>${esc(S.username)}</b><p class="muted">${esc(S.email)}</p></div></div>
           ${state}
           <div class="modal-actions"><button class="btn" data-acc="pass">${t('acc_change_pass')}</button><button class="btn" data-acc="logout">${t('acc_logout')}</button></div>
+          <div class="acc-foot">${privLink()} · <button class="link-btn" data-acc="delete">${t('acc_delete')}</button></div>
         </section>`;
     },
     bind(App, el) {
@@ -33,6 +37,13 @@
         if (a === 'logout') { await Ucet.upload(); await Ucet.logout(); App.toast(t('acc_logged_out')); return App.go('profil', { keepScroll: true }); }
         if (a === 'sync') { b.disabled = true; await Ucet.upload(); App.toast(Ucet.err ? t('acc_save_err') : t('acc_synced')); return App.go('profil', { keepScroll: true }); }
         if (a === 'pass') return this.passModal(App);
+        if (a === 'delete') return App.modal(`<h2>${t('acc_delete')}</h2><p>${t('acc_delete_q')}</p><p class="acc-err" id="delErr" hidden></p>
+            <div class="modal-actions"><button class="btn btn-red" id="delYes">${t('acc_delete_yes')}</button><button class="btn" data-close>${t('back')}</button></div>`, (c, close) => {
+            c.querySelector('#delYes').addEventListener('click', async () => {
+              try { await Ucet.deleteAccount(); close(); App.toast(t('acc_deleted')); App.go('profil'); }
+              catch (e) { const er = c.querySelector('#delErr'); er.textContent = Ucet.errText(e); er.hidden = false; }
+            });
+          });
       }));
     },
 
@@ -47,7 +58,7 @@
           : `<div class="field"><label for="accUser">${t('acc_login_id')}</label><input id="accUser" maxlength="120" autocomplete="username" required></div>`}
           <div class="field"><label for="accPass">${t('acc_password')}</label><input id="accPass" type="password" maxlength="100" autocomplete="${reg ? 'new-password' : 'current-password'}" required placeholder="${reg ? t('acc_pass_ph') : ''}"></div>
           <p class="acc-err" id="accErr" role="alert" hidden></p>
-          ${reg ? `<p class="muted acc-note">${t('acc_reg_note')}</p>` : ''}
+          ${reg ? `<p class="muted acc-note">${t('acc_reg_note')} ${privLink()}</p>` : ''}
           <div class="modal-actions">
             <button class="btn btn-green" type="submit" id="accGo">${reg ? t('acc_save') : t('acc_login')}</button>
             <button class="btn" type="button" data-close>${t('back')}</button>

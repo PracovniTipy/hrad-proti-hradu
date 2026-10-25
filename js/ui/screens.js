@@ -635,7 +635,7 @@
         <section class="panel big-offer ${useBig ? 'owned' : ''}">
           <canvas id="bigCv"></canvas>
           <div class="big-txt"><div class="eyebrow">${t('big_eyebrow')}</div><h3>${t('big_name')}</h3><p>${t('big_desc')}</p>
-            ${useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : big ? `<button class="btn btn-blue" data-ctype="velky">${t('use')}</button>` : `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>`}</div>
+            ${useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : big ? `<button class="btn btn-blue" data-ctype="velky">${t('use')}</button>` : (Platby.on() ? `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>` : `<button class="btn" disabled>${t('soon')}</button>`)}</div>
         </section>
         </div>
         <div class="sec-head"><h2>${t('castle_looks')}</h2></div>
@@ -684,7 +684,7 @@
         <div class="skin-grid">
           ${GameData.gemPacks.map(x => `<article class="panel skin r3">${x.badge ? `<span class="offer-badge">${x.badge}</span>` : ''}<div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${t('gems_n', { n: x.gems })}</h3><button class="btn btn-sm btn-green" data-gempack="${x.id}">${x.czk} Kč</button></article>`).join('')}
         </div>
-        ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}`;
+        ${Platby.available() ? '' : `<div class="notice"><div>${Platby.on() ? t('pay_demo_short') : t('pay_soon_shop')}</div></div>`}`;
     }
     const el = App.screenEl;
     el.innerHTML = `
@@ -1137,8 +1137,9 @@
             <button class="btn" data-snd="sfx">${Zvuk.settings().sfx ? '🔊' : '🔇'} ${t('snd_sfx')}: ${Zvuk.settings().sfx ? t('snd_on') : t('snd_off')}</button>
             <button class="btn" data-snd="music">${Zvuk.settings().music ? '🎵' : '🔇'} ${t('snd_music')}: ${Zvuk.settings().music ? t('snd_on') : t('snd_off')}</button>
           </div>
+          <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 49</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 50 · beta</p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
       </div>`;
@@ -1159,6 +1160,15 @@
     UcetUI.bind(App, el); UcetUI.bindBackup(App, el);
     el.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); App.go('profil', { keepScroll: true }); }));
     el.querySelector('#langSel').addEventListener('change', e => App.setLang(e.target.value));
+    el.querySelector('#bugBtn').addEventListener('click', () => App.modal(`<h2>${t('bug_report')}</h2><p class="muted">${t('bug_note')}</p>
+        <textarea class="bk-code" id="bugTxt" maxlength="3000" placeholder="${t('bug_ph')}"></textarea><p class="acc-err" id="bugErr" hidden></p>
+        <div class="modal-actions"><button class="btn btn-green" id="bugGo">${t('bug_send')}</button><button class="btn" data-close>${t('back')}</button></div>`, (c, close) => {
+      c.querySelector('#bugGo').addEventListener('click', async () => {
+        const v = c.querySelector('#bugTxt').value.trim(), er = c.querySelector('#bugErr');
+        if (v.length < 3) { er.textContent = t('bug_short'); er.hidden = false; return; }
+        try { await Ucet.feedback(v); close(); App.toast(t('bug_thanks')); } catch (e) { er.textContent = Ucet.errText(e); er.hidden = false; }
+      });
+    }));
     el.querySelector('#tutAgain').addEventListener('click', () => { save.tut = {}; App.persist(); App.go('hrad'); });
     el.querySelector('#resetBtn').addEventListener('click', () => {
       el.querySelector('#resetBox').innerHTML = `<div style="display:grid;gap:8px"><b style="color:#ff8a80">${t('reset_q')}</b>
