@@ -788,7 +788,7 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
    TELEFON NA ŠÍŘKU: menu jsou malé ikony uprostřed horní lišty,
    obsah zabírá celou šířku obrazovky (žádná boční lišta)
    ===================================================================== */
-@media (orientation: landscape) and (max-height: 520px) {
+@media (orientation: landscape) {
   #topbar { padding-block: 3px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); min-height: 50px; }
   .avatar { width: 36px; height: 36px; border-radius: 9px; }
   .pname-btn b, .profile-chip b { font-size: 13px; max-width: 18vw; }
@@ -824,6 +824,23 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
   .lang-btn { min-height: 40px; padding: 3px 6px; }
   .lang-btn b { font-size: 14px; }
   .lang-btn small { font-size: 10px; }
+}
+/* větší obrazovka na šířku (tablet, počítač): stejné rozložení, jen větší */
+@media (orientation: landscape) and (min-height: 521px) {
+  #topbar { min-height: 64px; }
+  .avatar { width: 46px; height: 46px; }
+  .pname-btn b, .profile-chip b { font-size: 16px; }
+  .pname-btn small, .profile-chip small { font-size: 13px; }
+  .pill { font-size: 15px; }
+  #nav, #nav[style] { height: 64px; padding-left: calc(250px + env(safe-area-inset-left, 0px)) !important; padding-right: calc(260px + env(safe-area-inset-right, 0px)) !important; }
+  #nav .nav-medal, #nav .nav-big .nav-medal { width: 40px !important; height: 38px !important; }
+  #nav .nav-lbl, #nav .nav-big .nav-lbl { font-size: 12px !important; }
+  #screen { padding-top: 84px !important; scroll-padding-top: 84px; }
+  #screen.home-mode { padding: 0 !important; }
+  .sec-head h1 { font-size: 26px !important; }
+  #screen.home-mode .daily-btn { top: 84px; left: 14px; }
+  #screen.home-mode .quest-btn { top: 180px; }
+  #screen.home-mode .hero-edit { top: 80px !important; }
 }
 /* úzký telefon na šířku: popisky menu schovat, zůstanou ikony */
 @media (orientation: landscape) and (max-height: 520px) and (max-width: 760px) {

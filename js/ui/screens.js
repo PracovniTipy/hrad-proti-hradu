@@ -1139,7 +1139,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 50 · beta</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 51 · beta</p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
       </div>`;
