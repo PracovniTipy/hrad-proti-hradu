@@ -785,40 +785,35 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
 @media (max-height: 520px) and (orientation: landscape) { .abtn .rng { font-size: 9px; padding: 1px 4px; top: -2px; } }
 
 /* =====================================================================
-   TELEFON NA ŠÍŘKU: menu jako boční lišta vlevo, obsah vpravo, nic se nepřekrývá
+   TELEFON NA ŠÍŘKU: menu jsou malé ikony uprostřed horní lišty,
+   obsah zabírá celou šířku obrazovky (žádná boční lišta)
    ===================================================================== */
 @media (orientation: landscape) and (max-height: 520px) {
-  :root { --rail: calc(78px + env(safe-area-inset-left, 0px)); }
-  #topbar { margin-left: var(--rail); padding-block: 3px; padding-left: 10px; min-height: 0; }
-  .avatar { width: 34px; height: 34px; border-radius: 9px; }
-  .profile-chip b { font-size: 13px; }
-  .profile-chip small { font-size: 12px; }
+  #topbar { padding-block: 3px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); min-height: 50px; }
+  .avatar { width: 36px; height: 36px; border-radius: 9px; }
+  .pname-btn b, .profile-chip b { font-size: 13px; max-width: 18vw; }
+  .pname-btn small, .profile-chip small { font-size: 11px; }
   .pill { font-size: 13px; padding: 2px 10px 2px 4px; }
   .pill .ico { width: 20px; height: 20px; margin: -4px 2px -4px -2px; }
-  #screen { margin-left: var(--rail); padding: 60px 14px 14px 12px !important; scroll-padding-top: 60px; }
-  #topbar { left: 0; right: 0; background: var(--tex-noise), linear-gradient(180deg, #1e1914, #120e0b) !important; box-shadow: 0 2px 0 #6b4508, 0 3px 0 #e8b84a, 0 6px 12px rgba(0,0,0,.5) !important; }
-  #topbar::before { display: none; }
-  #app:has(#screen.home-mode) #topbar { background: none !important; box-shadow: none !important; }
+  #screen { padding: 66px max(14px, env(safe-area-inset-right, 0px)) 14px max(14px, env(safe-area-inset-left, 0px)) !important; scroll-padding-top: 66px; }
   #screen.home-mode { padding: 0 !important; }
   .scr { gap: 10px; }
   .sec-head h1 { font-size: 20px !important; }
   .sec-head h2 { font-size: 16px; }
+  #topbar { background: var(--tex-noise), linear-gradient(180deg, #1e1914, #120e0b) !important; box-shadow: 0 2px 0 #6b4508, 0 3px 0 #e8b84a, 0 6px 12px rgba(0,0,0,.5) !important; }
+  #topbar::before { display: none; }
+  #app:has(#screen.home-mode) #topbar { background: linear-gradient(180deg, rgba(6,8,12,.7), rgba(6,8,12,0)) !important; box-shadow: none !important; }
   #nav, #nav[style] {
-    top: 0; bottom: 0; left: 0; right: auto; width: var(--rail);
-    flex-direction: column; justify-content: space-between; align-items: stretch;
-    padding: max(6px, env(safe-area-inset-top, 0px)) 4px max(6px, env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-left, 0px));
-    pointer-events: auto;
-    background: var(--tex-noise), linear-gradient(90deg, #1e1914, #120e0b);
-    box-shadow: 2px 0 0 #6b4508, 3px 0 0 #e8b84a, 4px 0 0 #3a2608, 8px 0 18px rgba(0,0,0,.5);
+    top: 0; bottom: auto; left: 50%; right: auto; transform: translateX(-50%); width: auto; height: 50px;
+    flex-direction: row; justify-content: center; align-items: center; gap: 2px;
+    padding: 2px 0 0; background: none; box-shadow: none; z-index: 21; pointer-events: none;
   }
   #nav::before { display: none; }
-  .nav-group { flex-direction: column; align-items: stretch; gap: 0; }
-  .nav-group.nav-right { gap: 2px; }
-  #nav button, #nav button[aria-current="page"] { min-width: 0; width: 100%; padding: 1px 0; border-radius: 10px; }
-  #nav button[aria-current="page"] { background: radial-gradient(90% 80% at 50% 40%, color-mix(in srgb, var(--tint) 35%, transparent), transparent 75%) !important; }
-  #nav .nav-medal { width: 34px !important; height: 32px !important; }
-  #nav .nav-big .nav-medal { width: 40px !important; height: 38px !important; }
-  #nav .nav-lbl, #nav .nav-big .nav-lbl { font-size: 10px !important; margin-top: -3px; }
+  .nav-group, .nav-group.nav-right { flex-direction: row; align-items: center; gap: 2px; }
+  #nav button, #nav button[aria-current="page"] { min-width: 50px; width: auto; padding: 1px 3px; border-radius: 10px; pointer-events: auto; }
+  #nav button[aria-current="page"] { background: radial-gradient(90% 90% at 50% 40%, color-mix(in srgb, var(--tint) 45%, transparent), transparent 75%) !important; }
+  #nav .nav-medal, #nav .nav-big .nav-medal { width: 30px !important; height: 28px !important; }
+  #nav .nav-lbl, #nav .nav-big .nav-lbl { font-size: 10px !important; margin-top: -2px; }
   .lang-card { gap: 6px; }
   .lang-crest { height: 70px; }
   .lang-card h1 { font-size: 26px; }
@@ -826,6 +821,12 @@ p, .muted, small, dd, dt, .notice, .kv { font-family: var(--font-body); }
   .lang-btn { min-height: 40px; padding: 3px 6px; }
   .lang-btn b { font-size: 14px; }
   .lang-btn small { font-size: 10px; }
+}
+/* úzký telefon na šířku: popisky menu schovat, zůstanou ikony */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 760px) {
+  #nav .nav-lbl { display: none; }
+  #nav button { min-width: 40px; }
+}
 }
 .train-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; text-align: left; min-height: 0; padding: 10px 14px; }
 .train-row .go { font-family: var(--font-display); font-size: 28px; color: #ffd77a; }
