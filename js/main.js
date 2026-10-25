@@ -698,7 +698,7 @@
       $('#sqDisband').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (this.battle) this.battle.disbandSquad(); });
       document.querySelectorAll('#bForm [data-form]').forEach(btn => btn.addEventListener('pointerdown', e => {
         e.preventDefault(); e.stopPropagation();
-        if (this.battle && !this.battle.over) this.battle.setFormation('player', btn.dataset.form);
+        if (this.battle && !this.battle.over) { this.battle.setFormation('player', btn.dataset.form); if (btn.dataset.form === 'ustup') this.toast(t('retreat_hint')); }
       }));
       // ovládání hrdiny – držení tlačítek
       const ctrlSet = () => {

@@ -118,7 +118,7 @@
   };
 
   /* omezení, kolikrát za sekundu se smí stejný zvuk ozvat */
-  const RATE = { cry: 0.25, horse: 0.6, spear: 0.08, sword: 0.06, hit: 0.06, arrow: 0.05, bow: 0.07, death: 0.12, coin: 0.08, spawn: 0.1, castle: 0.15, fire: 0.15, boom: 0.08, catapult: 0.15, magic: 0.1, ice: 0.12, bolt: 0.1 };
+  const RATE = { cry: 1.6, horse: 0.6, spear: 0.08, sword: 0.06, hit: 0.06, arrow: 0.05, bow: 0.07, death: 0.12, coin: 0.08, spawn: 0.1, castle: 0.15, fire: 0.15, boom: 0.08, catapult: 0.15, magic: 0.1, ice: 0.12, bolt: 0.1 };
 
   /* ---------- hudba: krátké motivy se smyčkou, každý národ jinak ---------- */
   const SCALES = {

@@ -961,7 +961,7 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 .install-home span:last-child { font-family: var(--font-display); font-weight: 900; font-size: 13px; color: #fff3cf; text-shadow: 0 2px 0 #000, 0 0 6px #000; }
 #screen.home-mode .install-home { top: calc(320px + env(safe-area-inset-top, 0px)); }
 @media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .install-home { top: 222px; } .install-home .inst-ico { width: 44px; height: 38px; font-size: 22px; } }
-@media (orientation: landscape) and (min-height: 521px) { #screen.home-mode .install-home { top: 276px; } }
+@media (orientation: landscape) and (min-height: 521px) { #screen.home-mode .install-home { top: 332px; } }
 .install-home[hidden] { display: none !important; }
 .inst-steps { margin: 6px 0 10px; padding-left: 22px; display: grid; gap: 8px; font-size: 16px; }
 .ios-share { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: #2f6fd0; color: #fff; }
@@ -1025,3 +1025,10 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
   .onl-card p { font-size: 12px; }
   .onl-code { font-size: 30px; }
 }
+
+/* Stisk tlačítka nesmí posunout jeho plochu – jinak se klik u okraje
+   nezapočítá (tlačítko „uteče“ zpod kurzoru). Stisk je vidět jen stínem a jasem. */
+.btn:active, .act:active, .ubtn:active, .abtn:active, .lang-btn:active, .hud-btn:active, #nav button:active, .army-card:not(:disabled):hover { transform: none !important; }
+.btn:active, .act:active, .lang-btn:active, .hud-btn:active { filter: brightness(.88); }
+.btn:active > *, .act:active > *, .hud-btn:active > * { transform: translateY(2px); }
+.army-card:not(:disabled):hover { box-shadow: 0 0 0 2px var(--c, #e8b84a), 0 6px 18px rgba(0,0,0,.45); }

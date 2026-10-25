@@ -231,6 +231,9 @@
       window.addEventListener('resize', this._onResize);
     }
     _clampCam(x) { return Math.max(0, Math.min(this.W - this.cam.viewW, x)); }
+    /* ÚSTUP ZA HRADBY: voják za branou svého hradu je v bezpečí –
+       speciální útoky ani nepřátelé na něj nedosáhnou */
+    _sheltered(u) { const s = this.side[u.team], dir = u.team === 'player' ? 1 : -1; return (u.x - s.castle.front) * dir < -30; }
 
     resize() {
       const r = this.canvas.parentElement.getBoundingClientRect();
@@ -401,7 +404,7 @@
       if (!st.ready) return false;
       const s = this.side[team], a = GameData.abilities[id];
       const foeTeam = team === 'player' ? 'enemy' : 'player', dir = team === 'player' ? 1 : -1, cfg = C();
-      const foes = () => this.units.filter(u => u.team === foeTeam && !u.dead);
+      const foes = () => this.units.filter(u => u.team === foeTeam && !u.dead && !this._sheltered(u));
       const mine = () => this.units.filter(u => u.team === team && !u.dead);
       const midY = (cfg.laneTop + cfg.laneBottom) / 2;
       // cíl: nepřítel nejblíž mému hradu, jinak před nepřátelskou bránou
@@ -544,7 +547,7 @@
     setFormation(team, mode, flagX) {
       const s = this.side[team], cfg = C();
       if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
-      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) { Zvuk.play('cry', 1); setTimeout(() => Zvuk.play('cry', 0.8), 300); setTimeout(() => Zvuk.play('cry', 0.6), 650); }
+      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný anglický pokřik celé armády
       s.formation = mode;
       if (team === 'player') this.active = 'main';
       if (flagX != null) {
@@ -684,7 +687,7 @@
     _assignList(team, units, mode, flagX) {
       const s = this.side[team], cfg = C(), FC = GameData.formationConfig, R = GameData.formationRank;
       const dir = team === 'player' ? 1 : -1;
-      const anchor = mode === 'ustup' ? s.castle.front + dir * 70 : flagX;
+      const anchor = mode === 'ustup' ? s.castle.front - dir * 120 : flagX;
       const list = units
         .sort((a, b) => (R[a.def.roleKey] ?? 1) - (R[b.def.roleKey] ?? 1) || a.id - b.id);
       const rows = FC.rows, lane = cfg.laneBottom - cfg.laneTop - 10;
@@ -695,6 +698,8 @@
         if (prevRank != null && rk !== prevRank && row > 0) { col++; row = 0; }
         prevRank = rk;
         u.slotX = anchor - dir * col * FC.colSpacing;
+        // za hradbami je místa jen tolik, kolik má hrad – další řady se stáhnou těsně k bráně
+        if (mode === 'ustup') { const back = s.castle.front - dir * 400, gate = s.castle.front - dir * 45; u.slotX = dir === 1 ? Math.min(gate, Math.max(back, u.slotX)) : Math.max(gate, Math.min(back, u.slotX)); }
         u.slotY = cfg.laneTop + 5 + (rows === 1 ? lane / 2 : (row / (rows - 1)) * lane) + (col % 2 ? 6 : 0);
         row++;
         if (row >= rows) { row = 0; col++; }
@@ -758,7 +763,7 @@
         let fighting = 0;
         for (const u of this.units) if (!u.dead && u.target && !u.def.ranged && u.x > x0 && u.x < x1) fighting++;
         Zvuk.battle(Math.min(1, fighting / 14));
-        if (fighting >= 4 && (this._clashWas || 0) < 4) { Zvuk.play('cry', 0.9); setTimeout(() => Zvuk.play('cry', 0.7), 350); }
+        if (fighting >= 4 && (this._clashWas || 0) < 4) Zvuk.play('cry', 0.9);
         this._clashWas = fighting;
       }
       if (this.timers.length) {
@@ -806,7 +811,7 @@
         // najdi nejbližšího nepřítele před sebou
         let best = null, bestD = 1e9;
         for (const e of this.units) {
-          if (e.team === u.team || e.dead) continue;
+          if (e.team === u.team || e.dead || this._sheltered(e)) continue;
           const d = (e.x - u.x) * u.dir;
           if (d < -30) continue;
           const ad = Math.abs(e.x - u.x);
@@ -1024,7 +1029,7 @@
       this.walls = this.walls.filter(w => w.until > t);
       for (const o of this.tornados) {
         o.x += o.vx * dt; o.tick -= dt;
-        for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 60 && !e.def.boss) { e.x += o.vx * 0.55 * dt; e.slotX = null; }
+        for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 60 && !e.def.boss && !this._sheltered(e)) { e.x += o.vx * 0.55 * dt; e.slotX = null; }
         if (o.tick <= 0) { o.tick = 0.3; for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 70) this._damage(e, o.dps * 0.3, null); }
       }
       this.tornados = this.tornados.filter(o => o.until > t && o.x > 0 && o.x < this.W);
@@ -1202,6 +1207,7 @@
     }
 
     _damage(target, raw, from, fire) {
+      if (!from && this._sheltered(target)) return;   // schovaný za hradbami
       const s = this.side[target.team];
       let dmg = raw * (1 - Math.min(0.8, target.def.armor + (target.armorBonus || 0)));
       if (from && from.crit && this.rand() < from.crit) {
@@ -1534,7 +1540,12 @@
         if (u.def.aura && !u.dead) { ctx.save(); ctx.globalAlpha = 0.18 + Math.sin(t * 3) * 0.05; ctx.beginPath(); ctx.ellipse(u.x, u.y, 190, 26, 0, 0, Math.PI * 2); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd77a'; ctx.stroke(); ctx.restore(); }
         const age = t - (u.born || 0);
         const pop = age < 0.25 ? 0.6 + 0.4 * Art.ease(age / 0.25) : 1;
+        // voják za branou mizí v hradu
+        const deep = -(u.x - this.side[u.team].castle.front) * (u.team === 'player' ? 1 : -1) - 10;
+        if (deep > 0 && age > 0.6) { if (deep > 70) continue; ctx.globalAlpha = 1 - deep / 70; }
         this._drawUnitSprite(ctx, u, pop, shield);
+        ctx.globalAlpha = 1;
+        if (deep > 20 && age > 0.6) continue;
         if (u === this.hero) this._heroMarkAbove(ctx, u, t);
         else if (!u.dead && u.hp < u.maxHp) this._hpBar(ctx, u);
       }
