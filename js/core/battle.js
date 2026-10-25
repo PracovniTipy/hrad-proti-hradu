@@ -102,7 +102,7 @@
       this.def = opts.player.defense || null;
       this.defShot = []; this.defTimer = [];
       this.clouds = []; this.bolts = [];
-      this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0; this.blasts = []; this.flash = null;
+      this.timers = []; this.walls = []; this.tornados = []; this.beams = []; this.spikes = []; this.shake = 0; this.blasts = []; this.flash = null; this.vfx = new VFX();
       if (this.def && this.def.slots.length) {
         this.side.player.castle.tower = 0;   // věž nahrazují obránci na hradbách
         this.def.slots.forEach((_, i) => (this.defTimer[i] = 0.6 + i * 0.35));
@@ -371,7 +371,7 @@
           this.meteors.push({ team, x0: tx - 420 * dir, y0: -240, x1: tx + dir * 30, y1: midY, t: 0, dur: 1.15, done: false, dmg: a.power, radius: a.radius, big: true });
           break;
         case 'shield': s.shieldUntil = this.time + a.duration; break;
-        case 'element': this._catImpact({ team, tx, ty: midY, dmg: a.power * (team === 'player' ? s.dmgMult : 1), el: a.el, slow: a.slow }); break;
+        case 'element': this._catImpact({ team, tx, ty: midY, dmg: a.power * (team === 'player' ? s.dmgMult : 1), el: a.el, slow: a.slow, big: true }); break;
         case 'volley': {
           const pool = near(tx, a.radius).concat(foes()).slice(0, 12);
           const ox = s.castle.front - dir * 40, oy = cfg.groundY - 260;
@@ -382,7 +382,7 @@
               if (tgt && !tgt.dead) {
                 this._shoot(team, ox + (Math.random() - 0.5) * 60, oy + (Math.random() - 0.5) * 40, tgt, a.power, 700, null);
                 const pr = this.projectiles[this.projectiles.length - 1];
-                pr.arc = 180; if (a.poison) pr.poison = true;
+                pr.arc = 180; pr.big = true; if (a.poison) pr.poison = true;
               } else {
                 const x = tx + (Math.random() - 0.5) * a.radius * 2;
                 this.projectiles.push({ team, kind: 'arrow', x0: ox, y0: oy, tx: x, ty: midY + (Math.random() - 0.5) * 60, target: null, castle: null, dmg: 0, from: null, t: 0, dur: 0.9, arc: 180, done: false });
@@ -395,35 +395,33 @@
           for (let i = 0; i < 6; i++) this.later(i * 0.5, () => {
             const f = foes().sort((p, q) => q.hp - p.hp)[Math.floor(Math.random() * 2)];
             if (!f) return;
-            const pts = [[f.x + (Math.random() - 0.5) * 80, -40]];
-            for (let k = 1; k < 7; k++) pts.push([f.x + (Math.random() - 0.5) * 34, -40 + (f.y - 20) * k / 7]);
-            pts.push([f.x, f.y - 30]);
-            this.bolts.push({ pts, t: 0 }); ring(f.x, f.y - 20, '#fffbe0', 20); puff(f.x, f.y - 20, '#fff6b0', 10);
+            this.vfx.lightning(f.x, (this.H - this.cam.viewH) - 20, f.y - 6); this.flash = { color: '#fff6c8', t: 0, life: 0.18 }; this.shake = Math.max(this.shake, 0.3);
             near(f.x, 70).forEach(e => this._damage(e, a.power * (e === f ? 1 : 0.5), null));
           });
           break;
         case 'heal':
-          mine().forEach(u => { u.hp = Math.min(u.maxHp, u.hp + u.maxHp * a.power); puff(u.x, u.y - 40, '#9dffb0', 4, 120); });
+          mine().forEach(u => { u.hp = Math.min(u.maxHp, u.hp + u.maxHp * a.power); this.vfx.rise(u.x, u.y, 'heal', 14); this.vfx.pillar(u.x, u.y, 40, 'rgba(120,255,150,.55)', 1.1); });
           break;
-        case 'buff': s.hornUntil = this.time + a.duration; mine().forEach(u => puff(u.x, u.y - 50, '#ffd77a', 3, 120)); break;
-        case 'curse': this.side[foeTeam].curseUntil = this.time + a.duration; foes().forEach(u => puff(u.x, u.y - 60, '#c07cff', 4, 60)); break;
+        case 'buff': s.hornUntil = this.time + a.duration; mine().forEach(u => { this.vfx.rise(u.x, u.y, 'gold', 16); this.vfx.explosion(u.x, u.y - 50, 40, 'gold'); }); break;
+        case 'curse': this.side[foeTeam].curseUntil = this.time + a.duration; foes().forEach(u => { this.vfx.rise(u.x, u.y, 'shadow', 12); this.vfx.explosion(u.x, u.y - 40, 50, 'shadow'); }); break;
         case 'stun':
           near(tx, a.radius).forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? a.duration * 0.4 : a.duration); e.frozen = a.icon === 'snow' || a.icon === 'icespike'; });
-          ring(tx, midY, '#cfeeff', 30); puff(tx, midY, '#e6f8ff', 26);
-          for (let i = 0; i < 9; i++) this.spikes.push({ x: tx + (i - 4) * a.radius / 4.5, y: midY + (Math.random() - 0.5) * 70, t: 0, life: a.duration + 0.4, h: 30 + Math.random() * 30 });
+          this.vfx.explosion(tx, midY, 120, 'ice'); this.vfx.iceSpikes(tx, midY, a.radius * 2, a.duration + 0.4);
+          near(tx, a.radius).forEach(e => this.vfx.explosion(e.x, e.y - 30, 40, 'ice'));
           break;
         case 'quake':
           this.shake = 0.9;
-          foes().forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? 0.5 : a.duration); puff(e.x, e.y, '#a08060', 5, 40); });
+          foes().forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? 0.5 : a.duration); this.vfx.explosion(e.x, e.y, 70, 'stone'); });
+          for (let x = this.cam.x; x < this.cam.x + this.cam.viewW; x += 160) this.vfx.explosion(x + Math.random() * 80, midY + (Math.random() - 0.5) * 60, 60, 'stone');
           break;
         case 'summon': {
           const uid = GameData.unitForRole(s.faction, a.role);
-          for (let i = 0; i < a.count; i++) this.later(i * 0.35, () => this.spawn(team, uid, true));
+          for (let i = 0; i < a.count; i++) this.later(i * 0.35, () => { this.spawn(team, uid, true); const u = this.units[this.units.length - 1]; if (u) { this.vfx.pillar(u.x, u.y, 50, 'rgba(255,240,180,.7)', 0.9); this.vfx.rise(u.x, u.y, 'holy', 12); } });
           break;
         }
-        case 'repair': s.castle.hp = Math.min(s.castle.maxHp, s.castle.hp + s.castle.maxHp * a.power); puff(s.castle.front - dir * 80, cfg.groundY - 140, '#ffe9a0', 20, 60); break;
-        case 'gold': s.coins += a.power; puff(s.castle.front - dir * 60, cfg.groundY - 200, '#ffd24a', 24, 140); break;
-        case 'firearrows': s.fireArrowsUntil = this.time + a.duration; break;
+        case 'repair': s.castle.hp = Math.min(s.castle.maxHp, s.castle.hp + s.castle.maxHp * a.power); for (let i = 0; i < 5; i++) this.vfx.rise(s.castle.front - dir * (40 + i * 50), cfg.groundY, 'heal', 12); this.vfx.pillar(s.castle.front - dir * 140, cfg.groundY, 160, 'rgba(160,255,180,.5)', 1.2); break;
+        case 'gold': s.coins += a.power; for (let i = 0; i < 4; i++) this.vfx.explosion(s.castle.front - dir * (60 + i * 50), cfg.groundY - 150, 50, 'gold'); this.vfx.rise(s.castle.front - dir * 100, cfg.groundY - 60, 'gold', 30); break;
+        case 'firearrows': s.fireArrowsUntil = this.time + a.duration; mine().filter(u => u.def.ranged).forEach(u => this.vfx.explosion(u.x, u.y - 50, 46, 'fire')); break;
         case 'barrage': {
           const f = foes().sort((p, q) => dir === 1 ? p.x - q.x : q.x - p.x).slice(0, 5);
           const ox = s.castle.front - dir * 120, oy = cfg.groundY - 220;
@@ -434,10 +432,10 @@
           });
           break;
         }
-        case 'wall': this.walls.push({ team, x: tx - dir * 30, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
+        case 'wall': this.walls.push({ team, x: tx - dir * 30, until: this.time + a.duration, dps: a.power, tick: 0 }); for (let k = 0; k < 4; k++) this.vfx.burn(tx - dir * 30, cfg.laneTop + k * (cfg.laneBottom - cfg.laneTop) / 3, 70, a.duration); this.vfx.explosion(tx - dir * 30, midY, 110, 'fire'); break;
         case 'tornado': this.tornados.push({ team, x: s.castle.front + dir * 120, y: midY, vx: dir * 320, until: this.time + a.duration, dps: a.power, tick: 0 }); break;
         case 'holy':
-          this.beams.push({ x: tx, t: 0, life: 1.1, color: '#fff3b0' });
+          this.vfx.pillar(tx, midY, a.radius * 0.8, 'rgba(255,248,210,.85)', 1.4); this.vfx.explosion(tx, midY, 150, 'holy');
           near(tx, a.radius).forEach(e => this._damage(e, a.power, null));
           mine().filter(u => Math.abs(u.x - tx) < a.radius * 1.4).forEach(u => { u.hp = Math.min(u.maxHp, u.hp + u.maxHp * 0.3); });
           puff(tx, midY, '#fff6c4', 24, 120);
@@ -445,10 +443,8 @@
         case 'breath': {
           const lim = (this.side.player.castle.front + this.side.enemy.castle.front) / 2;
           const sx = s.castle.front - dir * 30, sy = cfg.groundY - 300;
-          for (let i = 0; i < 70; i++) this.later(i * 0.012, () => {
-            const sp = 600 + Math.random() * 500, an = (Math.random() * 0.35 + 0.05);
-            this.particles.push({ x: sx, y: sy, vx: dir * Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 120, t: 0, life: 1.1, r: 5 + Math.random() * 7, color: Math.random() < 0.5 ? '#ff7a2a' : '#ffd27a' });
-          });
+          this.vfx.breath(sx, sy, lim, dir);
+          this.later(0.45, () => { for (let x = s.castle.front + dir * 200; (x - lim) * dir < 0; x += dir * 260) this.vfx.burn(x, midY, 200, 3); });
           this.later(0.45, () => foes().filter(e => (e.x - lim) * dir < 0).forEach(e => { this._damage(e, a.power, null, true); e.dot = { until: this.time + 3, dps: a.power * 0.15, c: 'rgba(255,120,40,.45)' }; }));
           break;
         }
@@ -463,10 +459,9 @@
         if (a.kind in AREA && AREA[a.kind]) {
           if (camFree) { this.cam.x = this._clampCam(tx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 6; }
           const delay = a.kind === 'meteor' ? 1.1 : a.kind === 'meteors' ? 0.7 : a.kind === 'volley' ? 0.9 : a.kind === 'barrage' ? 0.8 : 0;
-          this.later(delay, () => { this.blasts.push({ x: tx, y: midY, r: (a.radius || 160) * (a.kind === 'meteor' ? 1.4 : 1.15), color: col, t: 0, life: 1.0 }); this.shake = Math.max(this.shake, a.kind === 'meteor' ? 1 : 0.45); puff(tx, midY, col, 40, 160); });
+          this.later(delay, () => { this.shake = Math.max(this.shake, a.kind === 'meteor' ? 1 : 0.45); puff(tx, midY, col, 40, 160); });
         } else if (a.kind in SELF) {
           const my = mine(); if (my.length && camFree) { const mx = my.reduce((q, u) => q + u.x, 0) / my.length; this.cam.x = this._clampCam(mx - this.cam.viewW / 2); this.cam.manualUntil = this.time + 6; }
-          mine().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 46, color: col, t: 0, life: 0.9, small: true }));
         } else if (a.kind === 'curse' || a.kind === 'quake') {
           foes().forEach(u => this.blasts.push({ x: u.x, y: u.y, r: 50, color: col, t: 0, life: 1.0, small: true }));
           if (a.kind === 'quake') this.shake = 1.4;
@@ -688,6 +683,10 @@
         if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
       }
       this._updateSkillFx(dt);
+      this.vfx.update(dt);
+      // hořící vojáci: plameny na těle
+      this._burnT = (this._burnT || 0) - dt;
+      if (this._burnT <= 0) { this._burnT = 0.08; for (const u of this.units) if (!u.dead && u.dot && this.time < u.dot.until && /255,120/.test(u.dot.c || '')) this.vfx.flame(u.x + (Math.random() - 0.5) * 20, u.y - 20 - Math.random() * 60, 18 + Math.random() * 14, 0.4); }
       // aura velení: vojáci v okolí velitele mají vyšší útok
       this._auraT = (this._auraT || 0) - dt;
       if (this._auraT <= 0) {
@@ -806,6 +805,7 @@
       // projektily
       for (const p of this.projectiles) {
         p.t += dt / p.dur;
+        if (p.burn && !p.done && Math.random() < 0.6) { const k = Math.min(1, p.t); this.vfx.flame(p.x0 + (p.tx - p.x0) * k, p.y0 + (p.ty - p.y0) * k - p.arc * 4 * k * (1 - k), 14, 0.25); }
         if (p.t >= 1 && !p.done) {
           p.done = true;
           if (p.kind === 'fire') this._sparks(p.tx, p.ty, '#ff9a3c', 6);
@@ -821,6 +821,7 @@
             const second = this.units.find(e => e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 70);
             if (second) this._damage(second, p.dmg * 0.6, null);
           }
+          if (p.big && p.target) this.vfx.explosion(p.target.x, p.target.y - 30, 30, p.poison ? 'poison' : 'stone');
           if (p.target && !p.target.dead) {
             this._damage(p.target, p.dmg, p.from, p.kind === 'fire' || p.burn);
             if (p.burn && !p.target.dead) p.target.dot = { until: this.time + 3, dps: Math.max(6, p.dmg * 0.3), c: 'rgba(255,120,40,.45)' };
@@ -834,9 +835,11 @@
       // meteory
       for (const m of this.meteors) {
         m.t += dt;
+        if (m.t > 0 && !m.done) { const k = Math.min(1, m.t / m.dur); this.vfx.meteor({ x: m.x0 + (m.x1 - m.x0) * k, y: m.y0 + (m.y1 - m.y0) * k, big: m.big }); }
         if (!m.done && m.t >= m.dur) {
           m.done = true;
-          this._explode(m.x1, m.y1);
+          this.vfx.explosion(m.x1, m.y1, m.big ? 190 : 90, 'fire');
+          this.shake = Math.max(this.shake, m.big ? 1.2 : 0.35);
           for (const e of this.units) {
             if (e.team === m.team || e.dead) continue;
             if (Math.hypot(e.x - m.x1, (e.y - m.y1) * 1.6) < m.radius) this._damage(e, m.dmg, null, true);
@@ -982,7 +985,7 @@
         void foe;
       }
       const cfg = C();
-      for (const w of this.walls) {
+      for (const w of []) {
         const a = Math.min(1, (w.until - t) / 0.5);
         for (let i = 0; i < 9; i++) {
           const y = cfg.laneTop + i * (cfg.laneBottom - cfg.laneTop) / 8, fl = 110 + Math.sin(t * 9 + i * 1.7) * 30;
@@ -1248,7 +1251,13 @@
       const near = r => this.units.filter(e => e.team !== p.team && !e.dead && Math.hypot(e.x - x, (e.y - y) * 1.5) < r);
       const E = GameData.catapultEl(p.el);
       const burst = (n, col) => { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 180; this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 80, g: 300, t: 0, life: 0.6, r: 2 + Math.random() * 3, color: col }); } };
-      this.particles.push({ x, y, vx: 0, vy: 0, g: 0, t: 0, life: 0.4, r: 12, ring: true, color: E.color });
+      const S = p.big ? 140 : 62;
+      const V = this.vfx;
+      if (p.el === 'ohen') V.explosion(x, y, S, 'fire');
+      else if (p.el === 'led') { V.explosion(x, y, S * 0.9, 'ice'); V.iceSpikes(x, y, S * 1.6, p.big ? 2.2 : 1.2); }
+      else if (p.el === 'kamen') V.explosion(x, y, S, 'stone');
+      else if (p.el === 'voda') { V.explosion(x, y, S * 0.8, 'water'); V.wave(x - (p.team === 'player' ? 1 : -1) * 120, y + 10, p.team === 'player' ? 1 : -1); }
+      else if (p.el === 'jed') { V.explosion(x, y, S * 0.7, 'poison'); V.poison(x, y, S * 1.2, p.big ? 5 : 4); }
       if (p.el === 'ohen') {
         burst(20, '#ff9a3c'); near(95).forEach(e => { this._damage(e, dmg, null, true); e.dot = { until: t + 3, dps: dmg * 0.18, c: 'rgba(255,120,40,.45)' }; });
       } else if (p.el === 'led') {
@@ -1265,7 +1274,7 @@
           const pts = [[px, py]];
           for (let k = 1; k < 6; k++) pts.push([px + (cur.x - px) * k / 6 + (Math.random() - 0.5) * 24, py + (cur.y - 40 - py) * k / 6 + (Math.random() - 0.5) * 18]);
           pts.push([cur.x, cur.y - 40]);
-          this.bolts.push({ pts, t: 0 });
+          this.vfx.lightning(cur.x, (this.H - this.cam.viewH) - 20, cur.y - 10);
           this._damage(cur, dmg * (n ? 0.75 : 1), null);
           px = cur.x; py = cur.y - 40;
           const from = cur;
@@ -1380,6 +1389,7 @@
       }
 
       this._drawCapture(ctx, t);
+      this.vfx.drawBack(ctx);
       this._drawSkillFx(ctx, t);
       if (this.o.hostages) this._drawCages(ctx, t);
       // jednotky seřazené podle hloubky
@@ -1422,7 +1432,7 @@
           ctx.restore(); continue;
         }
         if (p.kind === 'cat') { Art.drawCatShot(ctx, x, y, p.el, this.time); continue; }
-        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a); if (p.big) ctx.scale(1.8, 1.8);
         ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(8, 0); ctx.lineWidth = 3.2; ctx.strokeStyle = Art.OUT; ctx.stroke();
         ctx.lineWidth = 1.6; ctx.strokeStyle = '#e1cfa6'; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(8, -3); ctx.lineTo(13, 0); ctx.lineTo(8, 3); ctx.closePath(); Art.fs(ctx, '#cfd4dc', 1);
@@ -1462,6 +1472,7 @@
       }
       ctx.globalAlpha = 1;
 
+      this.vfx.drawFront(ctx, t);
       // texty (zranění, mince)
       for (const tx of this.texts) {
         const a = 1 - tx.t / tx.life;
