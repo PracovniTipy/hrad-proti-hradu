@@ -561,6 +561,8 @@
       if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
       if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný anglický pokřik celé armády
       s.formation = mode;
+      // nový povel (mimo útok): vojáci na chvíli přestanou bojovat a přesunou se, kam velitel chce
+      s.calmUntil = mode === 'utok' ? 0 : this.time + 3;
       if (team === 'player') this.active = 'main';
       if (flagX != null) {
         const lo = team === 'player' ? cfg.playerFront + 90 : cfg.playerFront + 400;
@@ -835,9 +837,23 @@
           const ad = Math.abs(e.x - u.x);
           if (ad <= reach && ad < bestD) { best = e; bestD = ad; }
         }
-        let target = best;
+        const mode0 = this.modeOf(u);
+        const calm = mode0 !== 'utok' && (this.side[u.team].calmUntil || 0) > this.time;
+        let target = calm ? null : best;
         let castleTarget = false;
-        if (!target) {
+        // SAMI SE PUSTÍ DO BOJE: když se nepřítel přiblíží k šiku, vojáci mu vyrazí naproti
+        // (ne při ústupu a chvíli po novém povelu); od svého místa se ale moc nevzdálí
+        let chase = null;
+        if (!target && !calm && mode0 !== 'utok' && mode0 !== 'ustup' && !this._sheltered(u)) {
+          const eng = Math.max(430, reach + 160), home = u.slotX != null ? u.slotX : u.x;
+          let cd = 1e9;
+          for (const e of this.units) {
+            if (e.team === u.team || e.dead || this._sheltered(e)) continue;
+            const ad = Math.abs(e.x - u.x);
+            if (ad < eng && ad < cd && (e.x - u.x) * u.dir > -40 && Math.abs(e.x - home) < 680) { chase = e; cd = ad; }
+          }
+        }
+        if (!target && !calm) {
           const front = this.side[foeTeam].castle.front;
           const d = (front - u.x) * u.dir;
           if (d <= u.def.range * (C().rangeScale || 1) + 10) { castleTarget = true; }
@@ -853,8 +869,13 @@
         } else {
           u.target = null; u.castleTarget = false;
           const sp = u.def.speed * (C().speedScale || 1) * slowK;
-          const mode = this.modeOf(u);
-          if (mode !== 'utok' && u.slotX != null) {
+          const mode = mode0;
+          if (chase) {
+            const dx = chase.x - u.x, dy = chase.y - u.y, dist = Math.hypot(dx, dy) || 1;
+            const k = Math.min(1, (sp * dt) / dist);
+            u.x += dx * k; u.y += dy * k * 0.6;
+            u.moving = true; u.face = Math.sign(dx) || u.dir; u.walk += dt * u.def.speed * 0.17;
+          } else if (mode !== 'utok' && u.slotX != null) {
             // pochod na své místo v šiku
             const dx = u.slotX - u.x, dy = u.slotY - u.y;
             const dist = Math.hypot(dx, dy);
@@ -1328,7 +1349,7 @@
             if ((avgHp > 0.85 && since > 4) || since > 15) set(ratio > 1.2 ? 'utok' : 'hradby');
             break;
           case 'utok':
-            if (since > 20 && ratio < 0.6) set(foesAtGate ? 'hradby' : 'sbira');
+            if (since > 20 && ratio < (this.side.player.formation === 'utok' ? 0.35 : 0.6)) set(foesAtGate ? 'hradby' : 'sbira');
             else if (mine <= 1 && foesAtGate === 0) { set('sbira'); ai.attackAt = this.time + 60; }
             break;
           default: {
@@ -1337,6 +1358,8 @@
               set('ustup'); ai.retreatAt = this.time;
               if (window.Zvuk) Zvuk.play('horn', 0.7);
               this.texts.push({ x: front - 200, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.4, txt: t('ai_retreat'), color: '#ff9e9e', t: 0, life: 2, big: true });
+            } else if (this.side.player.formation === 'utok' && ratio >= 0.3 && mine >= 2 && this.units.some(u => u.team === 'player' && !u.dead && u.x > this.W * 0.35)) {
+              set('utok');   // hráč útočí → počítač vyrazí do protiútoku
             } else if ((ratio > 1.3 && mine >= 4) || (this.time >= ai.attackAt && ratio > 0.8) || (foesAtGate && ratio > 1.1)) set('utok');
             else if (foesAtGate) set('hradby');
             else if (ratio >= 0.85 && mine >= 3 && this.time > 20 && this.cp.owner !== 'enemy') set('stred');
