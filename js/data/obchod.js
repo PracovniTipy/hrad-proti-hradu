@@ -22,11 +22,13 @@ GameData.castleCustom = {
     { id: 'havran', name: 'Havran' }, { id: 'sekery', name: 'Sekery' }
   ],
   decorations: [
-    { id: 'pochodne', name: 'Pochodně u brány', desc: 'Dvě planoucí pochodně, které osvětlují bránu.', price: 400 },
-    { id: 'prapory', name: 'Velké prapory', desc: 'Dlouhé prapory se znakem hradu na hradbách.', price: 500 },
-    { id: 'stity', name: 'Erbovní štíty', desc: 'Řada štítů se znakem podél hradeb.', price: 600 },
-    { id: 'zahrada', name: 'Zahrada', desc: 'Keře a květiny kolem paty hradu.', price: 350 },
-    { id: 'zlato', name: 'Zlacení', desc: 'Zlaté pásy, okraje brány a zlaté špice na stožárech.', price: 900 }
+    { id: 'pochodne', name: 'Pochodně', desc: 'Velké planoucí pochodně u brány a na hradbě.', price: 400 },
+    { id: 'prapory', name: 'Velké prapory', desc: 'Čtyři dlouhé prapory se znakem hradu přes celou hradbu.', price: 500 },
+    { id: 'stity', name: 'Erbovní štíty', desc: 'Velké štíty se znakem hradu na hradbě.', price: 600 },
+    { id: 'zahrada', name: 'Zahrada', desc: 'Velké keře, tvarované stromky a záhony kolem hradu.', price: 350 },
+    { id: 'zlato', name: 'Zlacení', desc: 'Široké zlaté pásy, zlatý rám brány a zlaté koule na stožárech.', price: 900 },
+    { id: 'sochy', name: 'Kamenní strážci', desc: 'Dva velcí kamenní lvi na podstavcích před hradbou.', price: 1200 },
+    { id: 'ohne', name: 'Ohně na hradbách', desc: 'Planoucí železné mísy na hradbách – hrad září na celé bojiště.', price: 1500 }
   ]
 };
 

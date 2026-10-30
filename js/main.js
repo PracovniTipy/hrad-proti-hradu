@@ -430,8 +430,8 @@
       p.querySelectorAll('[data-sq]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sq === mode));
     },
 
-    _formUi(mode) {
-      document.querySelectorAll('#bForm [data-form]').forEach(b => b.setAttribute('aria-pressed', b.dataset.form === mode));
+    _formUi(kind) {
+      document.querySelectorAll('#bOrders [data-order]').forEach(b => b.setAttribute('aria-pressed', b.dataset.order === kind));
     },
 
     _flash(btn) {
@@ -652,6 +652,8 @@
         if (this.save.trophies === 1200 && !(stt.pvpWins || 0) && !(stt.pvpLosses || 0)) { this.save.trophies = 0; this.save.pvp.opponents = []; }
         this.save.mig_tro0 = 1; Save.save();
       }
+      // skiny 2.0: skiny po jednotkách, Zbrojnice převedená na skiny (jednou, nic se neztratí)
+      if (GameData.skinMigrate && GameData.skinMigrate(this.save)) Save.save();
       // národ, který ještě není odemčený příběhem, nelze hrát
       if (!GameData.campaignHelpers.factionUnlocked(this.save, this.save.faction)) { this.save.faction = 'kralovstvi'; this.save.avatar = 'rytir'; }
       I18N.set(this.save.lang || (navigator.language || 'cs').slice(0, 2));
@@ -696,9 +698,14 @@
         if (this.battle && !this.battle.over) this.battle.setSquad(btn.dataset.sq);
       }));
       $('#sqDisband').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (this.battle) this.battle.disbandSquad(); });
-      document.querySelectorAll('#bForm [data-form]').forEach(btn => btn.addEventListener('pointerdown', e => {
+      document.querySelectorAll('#bOrders [data-order]').forEach(btn => btn.addEventListener('pointerdown', e => {
         e.preventDefault(); e.stopPropagation();
-        if (this.battle && !this.battle.over) { this.battle.setFormation('player', btn.dataset.form); if (btn.dataset.form === 'ustup') this.toast(t('retreat_hint')); }
+        if (!this.battle || this.battle.over) return;
+        const k = btn.dataset.order;
+        this.battle.order(k);
+        if (k === 'ustup') this.toast(t('retreat_hint'));
+        else if (k === 'hradby') this.toast(t('walls_hint'));
+        else if (k === 'stred') this.toast(t('center_hint'));
       }));
       // ovládání hrdiny – držení tlačítek
       const ctrlSet = () => {
@@ -744,8 +751,8 @@
         if (n >= 1 && n <= btns.length && !b.paused) b.enqueue(btns[n - 1].dataset.spawn);
         const ab = document.querySelectorAll('#bAbil [data-abil]'), ki = { q: 0, w: 1, e: 2 }[e.key.toLowerCase()];
         if (ki != null && ab[ki]) b.useAbility('player', ab[ki].dataset.abil);
-        const fk = { a: 'utok', s: 'formace', d: 'ustup' }[e.key.toLowerCase()];
-        if (fk) b.setFormation('player', fk);
+        const fk = { d: 'utok', a: 'ustup', s: 'hradby', f: 'stred' }[e.key.toLowerCase()];
+        if (fk) b.order(fk);
       });
       let rt;
       window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (this.onResize) this.onResize(); else if (this.current === 'hrad' && !this.battle) this.go('hrad', { keepScroll: true }); }, 150); });

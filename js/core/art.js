@@ -841,7 +841,7 @@
       const fy = groundY - img.h + f.y;
       ctx.beginPath(); ctx.moveTo(fx, fy + 4); ctx.lineTo(fx, fy - 26);
       ctx.lineWidth = 2.4; ctx.strokeStyle = OUT; ctx.stroke();
-      if (dec.zlato) { ctx.beginPath(); ctx.arc(fx, fy - 28, 3.2, 0, TAU); fs(ctx, '#f2c94c', 1.4); }
+      if (dec.zlato) { ctx.beginPath(); ctx.arc(fx, fy - 30, 5.5, 0, TAU); fs(ctx, '#f2c94c', 1.6); ctx.beginPath(); ctx.arc(fx - 1.6, fy - 31.6, 1.8, 0, TAU); ctx.fillStyle = '#fff6c8'; ctx.fill(); }
       const dir = facing;
       ctx.beginPath(); ctx.moveTo(fx, fy - 26);
       for (let i = 0; i <= 8; i++) {
@@ -854,20 +854,39 @@
       }
       ctx.closePath(); fs(ctx, flagColor, 1.6);
     }
-    // pochodně u brány (dekorace)
-    if (dec.pochodne) {
-      for (const lx of [244, 310]) {
-        const tx = facing === 1 ? x0 + lx : front - 2 + (img.w - lx), ty = groundY - img.h + 298;
-        const gl = ctx.createRadialGradient(tx, ty - 10, 2, tx, ty - 10, 34);
-        gl.addColorStop(0, 'rgba(255,200,90,.45)'); gl.addColorStop(1, 'rgba(255,160,60,0)');
-        ctx.fillStyle = gl; ctx.fillRect(tx - 36, ty - 46, 72, 72);
-        ctx.beginPath(); ctx.moveTo(tx - 3, ty + 12); ctx.lineTo(tx + 3, ty + 12); ctx.lineTo(tx + 4, ty - 2); ctx.lineTo(tx - 4, ty - 2); ctx.closePath(); fs(ctx, '#4a3424', 1.4);
-        const fl = Math.sin(t * 13 + lx) * 1.6, fh = 13 + Math.sin(t * 9 + lx * 0.3) * 2.5;
-        ctx.beginPath(); ctx.moveTo(tx - 5, ty - 2); ctx.quadraticCurveTo(tx - 6 + fl, ty - fh * 0.6, tx + fl, ty - fh); ctx.quadraticCurveTo(tx + 6 + fl, ty - fh * 0.5, tx + 5, ty - 2); ctx.closePath();
-        ctx.fillStyle = '#ff8a2a'; ctx.fill();
-        ctx.beginPath(); ctx.moveTo(tx - 2.5, ty - 2); ctx.quadraticCurveTo(tx - 2 + fl * 0.5, ty - fh * 0.45, tx + fl * 0.6, ty - fh * 0.75); ctx.quadraticCurveTo(tx + 3, ty - fh * 0.4, tx + 2.5, ty - 2); ctx.closePath();
-        ctx.fillStyle = '#ffe9a0'; ctx.fill();
+    // POCHODNĚ a OHNĚ NA HRADBÁCH (dekorace) – přepočet z původního hradu (malý / velký hrad)
+    const BX = img.big || { S: 1, ox: 0, oy: 0 };
+    const at = ([lx, ly]) => { const x = BX.ox + lx * BX.S, y = BX.oy + ly * BX.S; return [facing === 1 ? x0 + x : front - 2 + (img.w - x), groundY - img.h + y]; };
+    const k = BX.S * 1.7;
+    if (dec.pochodne && img.torchPts) for (const p of img.torchPts) {
+      const [tx, ty] = at(p), seed = p[0];
+      const gl = ctx.createRadialGradient(tx, ty - 12 * k, 2, tx, ty - 12 * k, 44 * k);
+      gl.addColorStop(0, 'rgba(255,200,90,.4)'); gl.addColorStop(1, 'rgba(255,160,60,0)');
+      ctx.fillStyle = gl; ctx.fillRect(tx - 46 * k, ty - 58 * k, 92 * k, 92 * k);
+      ctx.save(); ctx.translate(tx, ty); ctx.scale(k, k);
+      ctx.beginPath(); ctx.moveTo(-3, 12); ctx.lineTo(3, 12); ctx.lineTo(4.5, -2); ctx.lineTo(-4.5, -2); ctx.closePath(); fs(ctx, '#4a3424', 1.4);
+      ctx.beginPath(); ctx.rect(-5.5, -4, 11, 3); fs(ctx, '#8a8f96', 1);
+      const fl = Math.sin(t * 13 + seed) * 1.6, fh = 15 + Math.sin(t * 9 + seed * 0.3) * 3;
+      ctx.beginPath(); ctx.moveTo(-5.5, -3); ctx.quadraticCurveTo(-6.5 + fl, -fh * 0.6, fl, -fh); ctx.quadraticCurveTo(6.5 + fl, -fh * 0.5, 5.5, -3); ctx.closePath(); ctx.fillStyle = '#ff7a1a'; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-2.8, -3); ctx.quadraticCurveTo(-2 + fl * 0.5, -fh * 0.45, fl * 0.6, -fh * 0.75); ctx.quadraticCurveTo(3, -fh * 0.4, 2.8, -3); ctx.closePath(); ctx.fillStyle = '#ffe9a0'; ctx.fill();
+      ctx.restore();
+    }
+    if (img.firePts && img.firePts.length) for (const p of img.firePts) {
+      const [tx, ty] = at(p), seed = p[0];
+      const gl = ctx.createRadialGradient(tx, ty - 16 * k, 3, tx, ty - 16 * k, 60 * k);
+      gl.addColorStop(0, 'rgba(255,170,60,.32)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
+      ctx.fillStyle = gl; ctx.fillRect(tx - 62 * k, ty - 78 * k, 124 * k, 124 * k);
+      ctx.save(); ctx.translate(tx, ty); ctx.scale(k, k);
+      // železná mísa na trojnožce
+      ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(0, -2); ctx.lineTo(6, 6); ctx.lineWidth = 2.4; ctx.strokeStyle = OUT; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-10, -4); ctx.quadraticCurveTo(0, 6, 10, -4); ctx.closePath(); fs(ctx, '#3a3a40', 1.6);
+      for (let i = 0; i < 3; i++) {
+        const fl = Math.sin(t * (11 + i) + seed + i) * 2, fh = 18 + Math.sin(t * 8 + seed * 0.2 + i * 2) * 5 - i * 3, ox = (i - 1) * 4.5;
+        ctx.beginPath(); ctx.moveTo(ox - 5, -4); ctx.quadraticCurveTo(ox - 6 + fl, -fh * 0.6, ox + fl, -fh); ctx.quadraticCurveTo(ox + 6 + fl, -fh * 0.5, ox + 5, -4); ctx.closePath();
+        ctx.fillStyle = i === 1 ? '#ff9a2a' : '#ff6a1a'; ctx.fill();
       }
+      ctx.beginPath(); ctx.moveTo(-3, -4); ctx.quadraticCurveTo(0, -14, 3, -4); ctx.closePath(); ctx.fillStyle = '#ffe9a0'; ctx.fill();
+      ctx.restore();
     }
     // praskliny při poškození
     if (hpRatio < 0.66) {

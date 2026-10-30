@@ -100,7 +100,7 @@
       save.login.lastClaim = today();
       if (r.skin) {
         App.persist();
-        const owned = save.skins.ownedUnit.includes(r.skin);
+        const own = save.skins.own || {}; const owned = Object.keys(own).some(u => (own[u] || []).includes(r.skin));
         if (owned) { // skin už má → místo něj drahokamy
           const got = Shop.grant(App, { gems: 150 });
           Shop.rewardsModal(App, t('day_n', { n: day }), got, 'tydenni');
@@ -126,7 +126,7 @@
         c.querySelectorAll('canvas[data-pcv]').forEach(cv => Art.renderUnitIcon(cv, cv.dataset.pcv, 'player', skinId, { zoom: 0.95 }));
         c.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => {
           const id = b.dataset.pick;
-          if (!save.skins.ownedUnit.includes(skinId)) save.skins.ownedUnit.push(skinId);
+          GameData.skinOwn.add(save, id, skinId);
           save.loyalSkinUnit = id;
           save.skins.unit[id] = skinId;
           App.persist(); close();

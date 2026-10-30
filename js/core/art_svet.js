@@ -359,34 +359,62 @@
     const pal = img.pal;
     const rand = rng(77);
     const B = 380;
+    const J = style === 'japonsko', N = style === 'sever';
     // znak klanu na bráně (japonský hrad) a na věži (vikingská pevnost)
-    if (style === 'japonsko') {
+    if (J) {
       ctx.beginPath(); ctx.arc(276, 262, 10, 0, TAU); fs(ctx, '#f3efe6', 1.8);
       drawEmblem(ctx, pal.emblemId, 276, 262, 7.5, pal.banner);
-    } else if (style === 'sever') heraldShield(ctx, 276, 222, pal);
-    if (d.prapory) {
-      const pos = style === 'japonsko' ? [[70, 202], [168, 202]] : (style === 'sever' ? [[248, 196], [292, 196]] : [[18, 262], [198, 262]]);
-      pos.forEach(([x, y]) => hangBanner(ctx, x, y, 22, 58, pal));
-    }
-    if (d.stity) {
-      const ys = style === 'japonsko' ? 268 : (style === 'sever' ? 320 : 282);
-      const xs = style === 'japonsko' ? [60, 100, 140, 180] : (style === 'sever' ? [30, 80, 130, 180] : [30, 75, 120, 165, 210]);
-      xs.forEach(x => heraldShield(ctx, x, ys, pal));
-    }
+    } else if (N) heraldShield(ctx, 276, 222, pal);
+    // ZLACENÍ: široké zlaté pásy, zlatý rám brány a zlaté cimbuří
     if (d.zlato) {
-      const y = style === 'japonsko' ? 197 : (style === 'sever' ? 300 : 248);
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(style === 'sever' ? 236 : 248, y); ctx.lineWidth = 3; ctx.strokeStyle = '#f2c94c'; ctx.stroke();
-      ctx.beginPath(); ctx.rect(250, 312, 54, 4); ctx.fillStyle = '#f2c94c'; ctx.fill();
+      const y = J ? 197 : (N ? 300 : 250);
+      const x1 = N ? 236 : 248;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, y - 4, x1, 9); const g = ctx.createLinearGradient(0, y - 4, 0, y + 5); g.addColorStop(0, '#fff3b0'); g.addColorStop(0.5, '#f2c94c'); g.addColorStop(1, '#a8761a'); fs(ctx, g, 1.8);
+      ctx.beginPath(); ctx.rect(0, B - 26, x1, 7); fs(ctx, g, 1.6);
+      ctx.beginPath(); ctx.arc(277, 316, 31, Math.PI, 0); ctx.lineWidth = 9; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 6; ctx.strokeStyle = '#f2c94c'; ctx.stroke();
+      for (const x of [249, 305]) { ctx.beginPath(); ctx.rect(x - 4, 316, 8, B - 316); fs(ctx, '#f2c94c', 1.6); }
+      ctx.restore();
     }
-    if (d.zahrada) {
-      const leaf = ['#2f6a2e', '#4a8f3a', '#79b956'];
-      for (let x = 6; x < 240; x += 26 + rand() * 10) bush(ctx, x, B, 0.85 + rand() * 0.3, rand, leaf);
-      const fcol = ['#e8463a', '#ffffff', '#f2c94c', '#d86bd0'];
-      for (let i = 0; i < 26; i++) {
-        const x = 4 + rand() * 236, y = B - 2 - rand() * 6;
-        ctx.fillStyle = fcol[i % 4]; ctx.beginPath(); ctx.arc(x, y, 2, 0, TAU); ctx.fill();
+    // VELKÉ PRAPORY se znakem hradu
+    if (d.prapory) {
+      const pos = J ? [[60, 200], [118, 200], [176, 200]] : (N ? [[30, 300], [96, 300], [160, 300]] : [[14, 252], [74, 252], [134, 252], [194, 252]]);
+      pos.forEach(([x, y]) => hangBanner(ctx, x, y, 34, J ? 92 : (N ? 70 : 104), pal));
+    }
+    // ERBOVNÍ ŠTÍTY – velké, na hradbě
+    if (d.stity) {
+      const ys = J ? 300 : (N ? 340 : 322);
+      const xs = J ? [70, 130, 190] : [40, 100, 160, 220];
+      xs.forEach(x => { ctx.save(); ctx.translate(x, ys); ctx.scale(1.9, 1.9); heraldShield(ctx, 0, 0, pal); ctx.restore(); });
+    }
+    // KAMENNÍ STRÁŽCI: dva lvi na podstavcích před hradbou
+    if (d.sochy) {
+      for (const [x, f] of [[200, 1], [118, -1]]) {
+        ctx.save(); ctx.translate(x, B); ctx.scale(f * 1.6, 1.6);
+        ctx.beginPath(); ctx.rect(-14, -14, 28, 14); fs(ctx, '#8b8f96', 1.8);
+        ctx.beginPath(); ctx.rect(-16, -18, 32, 5); fs(ctx, '#a8adb6', 1.6);
+        ctx.beginPath(); ctx.moveTo(-12, -18); ctx.quadraticCurveTo(-14, -30, -6, -34); ctx.quadraticCurveTo(0, -46, 8, -40); ctx.quadraticCurveTo(14, -36, 12, -28); ctx.lineTo(10, -18); ctx.closePath(); fs(ctx, '#c7ccd3', 1.8);
+        ctx.beginPath(); ctx.arc(6, -38, 7.5, 0, TAU); fs(ctx, '#b6bcc5', 1.6);
+        ctx.beginPath(); ctx.moveTo(-1, -44); for (let k = 0; k < 7; k++) { const a = -2.6 + k * 0.5; ctx.lineTo(6 + Math.cos(a) * 11, -38 + Math.sin(a) * 11); ctx.lineTo(6 + Math.cos(a + 0.25) * 8, -38 + Math.sin(a + 0.25) * 8); } ctx.closePath(); fs(ctx, '#9aa0aa', 1.4);
+        ctx.fillStyle = OUT; ctx.beginPath(); ctx.arc(9, -39, 1.2, 0, TAU); ctx.fill();
+        ctx.restore();
       }
     }
+    // ZAHRADA: velké keře, tvarované stromky a záhony
+    if (d.zahrada) {
+      const leaf = ['#2f6a2e', '#4a8f3a', '#79b956'];
+      for (let x = 6; x < 240; x += 30 + rand() * 10) bush(ctx, x, B, 1.4 + rand() * 0.4, rand, leaf);
+      for (const x of [30, 150]) { ctx.beginPath(); ctx.rect(x - 2, B - 18, 4, 18); fs(ctx, '#6b4528', 1.2); ctx.beginPath(); ctx.ellipse(x, B - 34, 11, 20, 0, 0, TAU); fs(ctx, '#2f7a3a', 1.6); ctx.beginPath(); ctx.ellipse(x - 3, B - 40, 4, 8, 0, 0, TAU); ctx.fillStyle = '#5aa84a'; ctx.fill(); }
+      const fcol = ['#e8463a', '#ffffff', '#f2c94c', '#d86bd0'];
+      for (let i = 0; i < 60; i++) {
+        const x = 4 + rand() * 236, y = B - 2 - rand() * 10;
+        ctx.fillStyle = fcol[i % 4]; ctx.beginPath(); ctx.arc(x, y, 3, 0, TAU); ctx.fill();
+      }
+    }
+    // pozice pochodní a ohňů (animace v drawCastle) – v souřadnicích základního hradu
+    img.torchPts = J || N ? [[240, 304], [312, 304]] : [[240, 300], [313, 300]];
+    if (d.pochodne) img.torchPts = img.torchPts.concat(J ? [[40, 214], [200, 214]] : N ? [[60, 316], [190, 316]] : [[60, 270], [180, 270]]);
+    img.firePts = d.ohne ? (J ? [[30, 190], [120, 190], [210, 190]] : N ? [[40, 292], [130, 292], [220, 292]] : [[20, 240], [110, 240], [200, 240], [278, 172]]) : [];
   }
 
   Object.assign(Art, { drawEmblem, decorateCastle, makeLayers, drawClouds, makeClouds, roundTree, bush, rock, flower, grassTuft });

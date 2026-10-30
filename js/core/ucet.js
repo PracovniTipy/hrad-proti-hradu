@@ -11,7 +11,8 @@
   const ERR = {
     username_invalid: 'acc_e_user', email_invalid: 'acc_e_email', password_short: 'acc_e_pass',
     username_taken: 'acc_e_user_taken', email_taken: 'acc_e_email_taken', login_failed: 'acc_e_login',
-    login_locked: 'acc_e_locked', session_invalid: 'acc_e_session', network: 'acc_e_net'
+    login_locked: 'acc_e_locked', session_invalid: 'acc_e_session', network: 'acc_e_net',
+    code_invalid: 'code_e_invalid', code_used: 'code_e_used', code_spent: 'code_e_spent', code_busy: 'code_e_busy'
   };
 
   async function rpc(fn, args, opts) {
@@ -90,6 +91,8 @@
       await rpc('hra_feedback', { p_token: (this.s && this.s.token) || '', p_text: text, p_info: info });
     },
     async leaderboard() { return rpc('hra_leaderboard', { p_limit: 50 }); },
+    /* uplatnění kódu: odměnu vrací server (každý kód jednou na účet) */
+    async redeem(code) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_redeem', { p_token: this.s.token, p_code: code }); },
 
     /* Nahrání postupu: po každé změně s malým zpožděním, při zavření hned */
     queue() {

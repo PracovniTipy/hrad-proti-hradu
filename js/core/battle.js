@@ -206,10 +206,12 @@
           const wx = this.cam.x + (e.clientX - r.left) / this.cam.scale;
           const wy = (this.H - this.cam.viewH) + (e.clientY - r.top) / this.cam.scale;
           const u = this.unitAt(wx, wy);
-          if (u && !this.net) this.takeControl(u);
-          else if (!this.hero) {
-            if (this.squad && this.active === 'squad') this.setSquad('formace', wx);
-            else this.setFormation('player', 'formace', wx);
+          if (u && !this.net && u !== this.hero) this.takeControl(u);
+          else if (this.squad && this.active === 'squad') this.setSquad('formace', wx);
+          else {
+            // rozkaz „sem“: armáda (bez vojáka, kterého ovládáš) jde na místo klepnutí
+            this.setFormation('player', 'formace', wx, 'mapa');
+            this.texts.push({ x: wx, y: wy - 30, txt: '⚑', color: '#ffd77a', t: 0, life: 0.9, big: true });
           }
         }
         drag = null;
@@ -544,8 +546,18 @@
     later(sec, fn) { this.timers.push({ at: this.time + sec, fn }); }
 
     /* Rozkaz pro armádu: 'utok' | 'formace' | 'ustup' */
-    setFormation(team, mode, flagX) {
+    /* ROZKAZY Z HORNÍ LIŠTY: útok, ústup za hradby, obrana hradeb, obsazení středu */
+    order(kind) {
+      const cfg = C(), P = this.side.player;
+      if (kind === 'utok') this.setFormation('player', 'utok', null, 'utok');
+      else if (kind === 'ustup') this.setFormation('player', 'ustup', null, 'ustup');
+      else if (kind === 'hradby') this.setFormation('player', 'formace', P.castle.front + 190, 'hradby');
+      else if (kind === 'stred') this.setFormation('player', 'formace', this.cp.x - 40, 'stred');
+      if (this.squad && kind) this.disbandSquad();
+    }
+    setFormation(team, mode, flagX, kind) {
       const s = this.side[team], cfg = C();
+      s.order = kind || (mode === 'formace' ? 'mapa' : mode);
       if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
       if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný anglický pokřik celé armády
       s.formation = mode;
@@ -555,7 +567,7 @@
         const hi = team === 'player' ? cfg.enemyFront - 400 : cfg.enemyFront - 90;
         s.flagX = Math.max(lo, Math.min(hi, flagX));
       }
-      if (team === 'player' && this.o.onFormation) this.o.onFormation(mode);
+      if (team === 'player' && this.o.onFormation) this.o.onFormation(s.order);
     }
 
     /* ---------------- ODDÍL (výběr tažením prstu) ----------------
@@ -1279,16 +1291,36 @@
         this.spawn('enemy', ai.next);
         ai.next = null;
       }
-      // NEPŘÍTEL ČEKÁ A SHROMAŽĎUJE VELKOU ARMÁDU: vyrazí po 1,5 / 2 / 3 minutách
-      // (náhodně), takže z toho je velká bitva. Mezitím brání svou polovinu.
+      // STRATEGIE POČÍTAČE
+      // - shromažďuje armádu a vyrazí po 1,5 / 2 / 3 minutách (nebo když je výrazně silnější)
+      // - když prohrává (malá armáda proti přesile), stáhne vojáky za hradby, kde je kryje věž
+      //   a speciální útoky na ně nedosáhnou; jakmile se posílí, vyjde znovu
+      // - když má převahu a střed nikdo nedrží, obsadí střed bojiště
+      const cfg = C();
+      const power = team => this.units.reduce((a, u) => a + (u.team === team && !u.dead ? (u.hp / u.maxHp) * (u.def.cost || 50) : 0), 0);
       const mine = this.units.filter(u => u.team === 'enemy' && !u.dead).length;
+      const myP = power('enemy'), foeP = power('player');
+      const foeNear = this.units.filter(u => u.team === 'player' && !u.dead && u.x > cfg.worldW * 0.45).length;
       const threat = this.units.some(u => u.team === 'player' && !u.dead && u.x > s.flagX - 320);
       const WAITS = [90, 120, 180];
       if (ai.attackAt == null) ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)];
-      if (s.formation === 'formace') {
-        if (this.time >= ai.attackAt || threat) s.formation = 'utok';
+      const weak = foeP > 0 && myP < foeP * 0.5 && foeNear >= 3;
+      const strong = myP > foeP * 1.35 && mine >= Math.max(4, ai.wave);
+      if (s.formation === 'ustup') {
+        // za hradbami: vyjde, až má dost vojáků, nebo nejpozději po 25 s
+        if ((!weak && mine >= Math.max(3, Math.round(ai.wave * 0.7))) || this.time - (ai.retreatAt || 0) > 25) {
+          s.formation = strong ? 'utok' : 'formace'; s.flagX = cfg.enemyFront - 420;
+        }
+      } else if (weak && this.time - (ai.retreatAt || -99) > 30) {
+        s.formation = 'ustup'; ai.retreatAt = this.time;
+        if (window.Zvuk) Zvuk.play('horn', 0.7);
+        this.texts.push({ x: this.side.enemy.castle.front - 200, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.4, txt: t('ai_retreat'), color: '#ff9e9e', t: 0, life: 2, big: true });
+      } else if (s.formation === 'formace') {
+        if (this.time >= ai.attackAt || strong || (threat && myP >= foeP * 0.8)) s.formation = 'utok';
+        else if (!this.cp.owner && myP >= foeP && mine >= 4 && this.time > 25) s.flagX = Math.max(cfg.playerFront + 400, this.cp.x + 60);   // obsadit střed
+        else if (this.cp.owner === 'player' || threat) s.flagX = cfg.enemyFront - 420;
       } else if (s.formation === 'utok' && mine <= 2 && !threat) {
-        s.formation = 'formace';
+        s.formation = 'formace'; s.flagX = cfg.enemyFront - 420;
         ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * 0.75;
       }
       // čím déle bitva trvá, tím rychleji nepřítel získává mince (je to těžší a těžší)

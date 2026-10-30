@@ -17,7 +17,7 @@
 
   /* ---------------- kategorie zbraní podle vzhledu jednotky ---------------- */
   const CAT = { sword: 'melee', longsword: 'melee', katana: 'melee', katana2: 'melee', axe: 'melee', daneaxe: 'melee', flamesword: 'melee',
-    spear: 'pole', yari: 'pole', trident: 'pole', bow: 'bow', yumi: 'bow' };
+    spear: 'pole', yari: 'pole', trident: 'pole', bow: 'bow', yumi: 'bow', staff: 'staff' };
   const weaponCat = w => CAT[w] || null;
 
   /* barvy modelu: z modelu, jinak z palety jednotky */
@@ -273,6 +273,7 @@
     // ozdoby skinů
     if (id === 'elfi') for (const k of [0.2, 0.8]) { const p = at(k); ctx.beginPath(); ctx.ellipse(p[0] - 3, p[1], 4, 1.6, k < 0.5 ? 0.6 : -0.6, 0, TAU); fs(ctx, '#9be07a', 0.8); }
     if (id === 'draci') for (const k of [0.15, 0.3, 0.7, 0.85]) { const p = at(k); ctx.beginPath(); ctx.moveTo(p[0], p[1] - 2); ctx.lineTo(p[0] - 6, p[1]); ctx.lineTo(p[0], p[1] + 2); ctx.closePath(); fs(ctx, c.blade, 0.9); }
+    if (A.bowDecor && A.bowDecor[id]) A.bowDecor[id](ctx, at, c, T, B, gem);
     if (id === 'hvezdny' || id === 'mesic') for (const k of [0.3, 0.7]) { const p = at(k); gem(ctx, p[0], p[1], 1.9, c.gem || '#bfd0ff'); }
     if (id === 'kost') for (const k of [0.15, 0.3, 0.7, 0.85]) { const p = at(k); ctx.beginPath(); ctx.arc(p[0], p[1], 2, 0, TAU); fs(ctx, '#efe6cf', 0.8); }
     // konce ramen (rohové špičky) a kožený úchop
@@ -435,12 +436,13 @@
   const DEFAULT = { sword: 'mec', longsword: 'dlouhy' };
   /* sekery, kladiva a palcáty se drží hlavicí NAHORU (ne obráceně jako meč) */
   const HEADED = { sekera: 1, kladivo: 1, palcat: 1 };
+  const FLIP = { katana: 1, savle: 1 };
   /* zbraně se kreslí výrazně větší a širší, aby byly v bitvě jasně vidět */
-  function drawMelee(ctx, id, pal, M, icon) { ctx.save(); if (HEADED[id] && !icon) { ctx.rotate(MELEE.HEAD_ROT); ctx.translate(0, 4); } ctx.scale(id === 'katana' || id === 'savle' ? -1.0 : 1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
+  function drawMelee(ctx, id, pal, M, icon) { ctx.save(); if (HEADED[id] && !icon) { ctx.rotate(MELEE.HEAD_ROT); ctx.translate(0, 4); } ctx.scale(FLIP[id] ? -1.0 : 1.0, 0.92); (MELEE[id === 'dvojsekera' ? 'sekera' : id] || MELEE.mec)(ctx, colors(pal, M)); ctx.restore(); }
   function drawPole(ctx, id, pal, M) { ctx.save(); ctx.translate(44, 0); ctx.scale(0.95, 1.05); ctx.translate(-44, 0); (POLE[id] || POLE.kopi)(ctx, colors(pal, M)); ctx.restore(); }
 
   Object.assign(A, { weaponCat, drawMelee, drawPole, drawBowLimbs, drawFeatures, weaponColors: colors, defaultMeleeModel: w => DEFAULT[w] || null,
-    MELEE_REF: MELEE, meleeModels: Object.keys(MELEE).filter(k => k !== 'AXE_SIDE' && k !== 'HEAD_ROT'), poleModels: Object.keys(POLE) });
+    MELEE_REF: MELEE, POLE_REF: POLE, BOW_REF: BOW, HEADED_REF: HEADED, FLIP_REF: FLIP, bladeFill, glowOn, glowOff, gemDot: gem, hiltDraw: hilt, meleeModels: Object.keys(MELEE).filter(k => k !== 'AXE_SIDE' && k !== 'HEAD_ROT'), poleModels: Object.keys(POLE) });
 })();
 
 /* =========================================================================
@@ -458,15 +460,9 @@
     ctx.save(); ctx.translate(hx, hy); ctx.rotate(-0.12 - raise * 0.5 + back * 0.5);
     ctx.beginPath(); ctx.moveTo(0, 26); ctx.lineTo(0, -30); ctx.lineCap = 'round'; ctx.lineWidth = 5.4; ctx.strokeStyle = OUT; ctx.stroke();
     ctx.lineWidth = 3; ctx.strokeStyle = L.staffWood || '#7a4c2a'; ctx.stroke();
-    // hlavice: vidlice držící kouli
-    ctx.beginPath(); ctx.moveTo(-5, -30); ctx.quadraticCurveTo(-6, -38, 0, -40); ctx.quadraticCurveTo(6, -38, 5, -30); ctx.lineWidth = 2.2; ctx.strokeStyle = pal.trim; ctx.stroke();
-    const glow = 0.6 + raise * 0.4 + Math.sin((w || 0) * 2) * 0.05;
-    ctx.save(); ctx.shadowColor = mc; ctx.shadowBlur = 10 + raise * 14;
-    const g = ctx.createRadialGradient(-1.5, -36.5, 0.5, 0, -35, 6);
-    g.addColorStop(0, '#ffffff'); g.addColorStop(0.45, mc); g.addColorStop(1, A.shade(mc, -0.4));
-    ctx.globalAlpha = Math.min(1, glow + 0.2);
-    ctx.beginPath(); ctx.arc(0, -35, 5 + raise * 1.5, 0, TAU); ctx.fillStyle = g; ctx.fill();
-    ctx.restore();
+    // hlavice hole: podle skinu (krystal, lebka, had, strom, slunce, měsíc) nebo vidlice s koulí
+    const SM = pal.wmodel && pal.wmodel.cat === 'staff' ? pal.wmodel : null;
+    A.staffHead(ctx, SM ? SM.id : 'koule', -35, (SM && SM.glow) || mc, pal.trim, raise, SM);
     ctx.restore();
     // paže
     A.limb(ctx, 1, -50, hx - 1, hy + 2, 5.2, pal.tunic);
@@ -560,13 +556,12 @@
       ctx.beginPath(); ctx.moveTo(-26, 0); ctx.lineTo(16, 0); ctx.lineWidth = 3.6; ctx.strokeStyle = A.OUT; ctx.stroke(); ctx.lineWidth = 1.8; ctx.strokeStyle = (M && M.arrow) || '#d8c39a'; ctx.stroke();
       ctx.beginPath(); ctx.moveTo(16, -3.4); ctx.lineTo(23, 0); ctx.lineTo(16, 3.4); ctx.closePath(); A.fs(ctx, (M && M.tip) || '#c9ced6', 1.1);
     } else { // hůl mága
-      const s = h / 100, mc = L.magic || '#7fc8ff';
-      ctx.translate(w / 2, h * 0.9); ctx.scale(s, s); ctx.rotate(0.25);
+      const s = h / 128, mc = L.magic || '#7fc8ff';
+      ctx.translate(w / 2 - 6 * s, h * 0.95); ctx.scale(s, s); ctx.rotate(0.25);
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -78); ctx.lineCap = 'round'; ctx.lineWidth = 6; ctx.strokeStyle = A.OUT; ctx.stroke(); ctx.lineWidth = 3.4; ctx.strokeStyle = L.staffWood || '#7a4c2a'; ctx.stroke();
-      ctx.save(); ctx.shadowColor = (M && M.glow) || pal.glow || mc; ctx.shadowBlur = 16;
-      const og = ctx.createRadialGradient(-2, -86, 1, 0, -84, 8); og.addColorStop(0, '#fff'); og.addColorStop(0.5, (pal.glow || mc)); og.addColorStop(1, A.shade(mc, -0.4));
-      ctx.beginPath(); ctx.arc(0, -84, 8, 0, TAU); ctx.fillStyle = og; ctx.fill(); ctx.restore();
-      ctx.beginPath(); ctx.moveTo(-7, -78); ctx.quadraticCurveTo(-8, -92, 0, -94); ctx.quadraticCurveTo(8, -92, 7, -78); ctx.lineWidth = 2.4; ctx.strokeStyle = pal.trim || '#e8b84a'; ctx.stroke();
+      ctx.save(); ctx.translate(0, -84); ctx.scale(1.5, 1.5);
+      A.staffHead(ctx, M ? M.id : 'koule', 0, (M && M.glow) || pal.glow || mc, pal.trim || '#e8b84a', 0.4, M);
+      ctx.restore();
     }
     ctx.restore();
   }

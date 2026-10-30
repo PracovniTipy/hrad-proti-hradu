@@ -509,7 +509,7 @@
       const fA = [d.f[0], d.f[1]], fB = [d.f[2], d.f[3]];
       const myF = this.myTeam === 'A' ? fA : fB, foF = this.myTeam === 'A' ? fB : fA;
       const P = b.side.player, E = b.side.enemy;
-      if (P.formation !== myF[0]) { P.formation = myF[0]; if (b.o.onFormation) b.o.onFormation(myF[0]); }
+      if (P.formation !== myF[0]) { P.formation = myF[0]; P.order = myF[0] === 'formace' ? (/hradby|stred|mapa/.test(P.order || '') ? P.order : 'mapa') : myF[0]; if (b.o.onFormation) b.o.onFormation(P.order); }
       P.flagX = this.mx(myF[1]); E.formation = foF[0]; E.flagX = this.mx(foF[1]);
       // střed bojiště
       const v = this.myTeam === 'A' ? d.cp[0] : -d.cp[0];

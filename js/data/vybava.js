@@ -65,27 +65,27 @@ GameData.unitSkins.push(
    give: { gold, gems, gear: [id], skins: [id], decor: [id], randomGear: { minTier } }
    limit: kolikrát jde koupit (null = bez omezení) */
 GameData.offers = [
-  { id: 'start', name: 'Startovní balíček', desc: 'Nejvýhodnější začátek: 6 000 zlata, 400 drahokamů, runová zbraň a ocelová zbroj pro pěchotu a skin Lesní hraničáři.', czk: 29, limit: 1, badge: '×20 hodnota',
-    give: { gold: 6000, gems: 400, gear: ['weapon_pech_1', 'armor_pech_1'], skins: ['lesni'] }, art: 'chest' },
+  { id: 'start', name: 'Startovní balíček', desc: 'Nejvýhodnější začátek: 6 000 zlata, 400 drahokamů, skin Lesní hraničáři a tesák pro pěchotu všech národů.', czk: 29, limit: 1, badge: '×20 hodnota',
+    give: { gold: 6000, gems: 400, gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', w: 'w_tesak' }] }, art: 'chest' },
   { id: 'mesec', name: 'Měšec zlata', desc: '8 000 zlata na vylepšení hradu.', czk: 29, give: { gold: 8000 }, art: 'gold' },
-  { id: 'hrst', name: 'Hrst drahokamů', desc: '450 drahokamů na skiny, útoky a výbavu.', czk: 29, give: { gems: 450 }, art: 'gems' },
-  { id: 'kovar', name: 'Balíček kováře', desc: 'Epická nebo legendární zbraň, kterou ještě nemáš (když máš všechny, dostaneš 2 500 zlata), k tomu 3 000 zlata a 100 drahokamů.', czk: 29, give: { gold: 3000, gems: 100, randomGear: { slot: 'weapon', minTier: 2 } }, art: 'weapon' },
-  { id: 'zbrojir', name: 'Balíček zbrojíře', desc: 'Stínová zbroj pro těžkou jednotku, ocelová pro pěchotu a 3 000 zlata.', czk: 29, limit: 1, give: { gold: 3000, gear: ['armor_tezka_2', 'armor_pech_1'] }, art: 'armor' },
-  { id: 'lucist', name: 'Balíček lučištníka', desc: 'Dračí luk a ocelová zbroj pro střelce a 250 drahokamů.', czk: 29, limit: 1, give: { gems: 250, gear: ['weapon_strelec_2', 'armor_strelec_1'] }, art: 'weapon' },
+  { id: 'hrst', name: 'Hrst drahokamů', desc: '450 drahokamů na skiny a útoky.', czk: 29, give: { gems: 450 }, art: 'gems' },
+  { id: 'kovar', name: 'Balíček kováře', desc: 'Epický nebo legendární skin zbraně, který ještě nemáš (když máš všechny, dostaneš 2 500 zlata), k tomu 3 000 zlata a 100 drahokamů.', czk: 29, give: { gold: 3000, gems: 100, random: { kind: 'w', odds: [0, 0, 0.7, 0.3] } }, art: 'weapon' },
+  { id: 'zbrojir', name: 'Balíček zbrojíře', desc: 'Epická zbroj pro těžkou jednotku, vzácná pro pěchotu a 3 000 zlata.', czk: 29, limit: 1, give: { gold: 3000, gift: [{ role: 'tezka', ar: 'Epický' }, { role: 'pech', ar: 'Vzácný' }] }, art: 'armor' },
+  { id: 'lucist', name: 'Balíček lučištníka', desc: 'Dračí luk a vzácná zbroj pro střelce a 250 drahokamů.', czk: 29, limit: 1, give: { gems: 250, gift: [{ role: 'strelec', w: 'l_drak' }, { role: 'strelec', ar: 'Vzácný' }] }, art: 'weapon' },
   { id: 'valecny', name: 'Válečný balíček', desc: '6 000 zlata a 300 drahokamů na další tažení.', czk: 29, give: { gold: 6000, gems: 300 }, art: 'chest' },
-  { id: 'hraniceri', name: 'Balíček hraničářů', desc: 'Tři skiny: Lesní hraničáři, Půlnoční hlídka a Stínová legie + 150 drahokamů.', czk: 29, limit: 1, give: { skins: ['lesni', 'pulnoc', 'stinovy'], gems: 150 }, art: 'skin' },
+  { id: 'hraniceri', name: 'Balíček hraničářů', desc: 'Tři skiny pro pěchotu: Lesní hraničáři, Půlnoční hlídka a Stínová legie + 150 drahokamů.', czk: 29, limit: 1, give: { gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', a: 'pulnoc' }, { role: 'pech', a: 'stinovy' }], gems: 150 }, art: 'skin' },
   { id: 'hradni', name: 'Hradní balíček', desc: 'Pochodně a velké prapory na hrad a 5 000 zlata.', czk: 29, limit: 1, give: { gold: 5000, decor: ['pochodne', 'prapory'] }, art: 'castle' },
-  { id: 'kopinik', name: 'Balíček kopiníků', desc: 'Stínová zbroj a dračí kopí pro kopiníky a 2 000 zlata.', czk: 29, limit: 1, give: { gold: 2000, gear: ['armor_kopi_2', 'weapon_kopi_2'] }, art: 'armor' },
-  { id: 'hrdina', name: 'Balíček hrdiny', desc: 'Legendární Hvězdná ocel a Stínová zbroj pro těžkou jednotku, 8 000 zlata a 500 drahokamů.', czk: 59, limit: 1, badge: 'Legendární zbraň', give: { gems: 500, gold: 8000, gear: ['weapon_tezka_3', 'armor_tezka_2'] }, art: 'weapon' },
+  { id: 'kopinik', name: 'Balíček kopiníků', desc: 'Epická zbroj a dračí kopí pro kopiníky a 2 000 zlata.', czk: 29, limit: 1, give: { gold: 2000, gift: [{ role: 'kopi', ar: 'Epický' }, { role: 'kopi', w: 'k_drak' }] }, art: 'armor' },
+  { id: 'hrdina', name: 'Balíček hrdiny', desc: 'Legendární Hvězdná čepel a epická zbroj pro těžkou jednotku, 8 000 zlata a 500 drahokamů.', czk: 59, limit: 1, badge: 'Legendární zbraň', give: { gems: 500, gold: 8000, gift: [{ role: 'tezka', w: 'w_hvezda' }, { role: 'tezka', ar: 'Epický' }] }, art: 'weapon' },
   { id: 'pevnost', name: 'Velká pevnost', desc: 'Velký hrad: až 10 obránců na hradbách, +25 % životů hradu, navíc 10 000 zlata a 500 drahokamů.', czk: 149, limit: 1, badge: 'Až 10 obránců', give: { bigCastle: true, gold: 10000, gems: 500 }, art: 'castle' },
-  { id: 'kral', name: 'Královský balíček', desc: 'Zbroj krále a Hvězdná ocel pro těžkou jednotku, legendární zbroj pěchoty a luk, 25 000 zlata a 2 000 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 25000, gems: 2000, gear: ['armor_tezka_3', 'weapon_tezka_3', 'armor_pech_3', 'weapon_strelec_3'] }, art: 'crown' }
+  { id: 'kral', name: 'Královský balíček', desc: 'Legendární zbroj a Meč krále pro těžkou jednotku, legendární zbroj pěchoty a Hvězdný luk, 25 000 zlata a 2 000 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 25000, gems: 2000, gift: [{ role: 'tezka', ar: 'Legendární' }, { role: 'tezka', w: 'w_zlato' }, { role: 'pech', ar: 'Legendární' }, { role: 'strelec', w: 'l_hvezdny' }] }, art: 'crown' }
 ];
 
 /* ---- Truhly za drahokamy (herní měna, ne přímo skutečné peníze; šance jsou zveřejněné) ---- */
 GameData.chests = {
   denni: { id: 'denni', name: 'Denní truhla', gemsPrice: 120, period: 'day', desc: 'Jednou denně.',
-    gold: [2500, 4500], gems: [0, 0], gearChance: 0.7, tierOdds: [0.3, 0.45, 0.2, 0.05] },
-  tydenni: { id: 'tydenni', name: 'Týdenní truhla', gemsPrice: 600, period: 'week', desc: 'Jednou týdně. Vždy obsahuje 3 zbraně nebo brnění.',
+    gold: [2500, 4500], gems: [0, 0], gearChance: 0.7, tierOdds: [0.3, 0.45, 0.2, 0.05] },  /* gearChance = šance na skin */
+  tydenni: { id: 'tydenni', name: 'Týdenní truhla', gemsPrice: 600, period: 'week', desc: 'Jednou týdně. Vždy obsahuje 3 skiny zbraní nebo zbroje.',
     gold: [14000, 22000], gems: [0, 0], gearChance: 1, gearCount: 3, tierOdds: [0, 0.4, 0.4, 0.2] }
 };
 
@@ -105,36 +105,33 @@ GameData.gearHelpers = {
     const e = (save.gear && save.gear.eq && save.gear.eq[role]) || {};
     return { weapon: e.weapon ? GameData.gearById(e.weapon) : null, armor: e.armor ? GameData.gearById(e.armor) : null };
   },
-  /* Celkové bonusy jednotky (hp, dmg, armor, crit) */
+  /* Celkové bonusy jednotky (hp, dmg, armor, crit): skin zbroje + skin zbraně této jednotky.
+     (Stará výbava ze Zbrojnice se převedla na skiny – viz skiny_nove.js.) */
   bonus(save, unitId) {
-    const def = GameData.units[unitId];
     const b = { hp: 0, dmg: 0, armor: 0, crit: 0 };
     const add = x => { if (!x) return; for (const k in x) b[k] = (b[k] || 0) + x[k]; };
-    const E = this.equipped(save, def.roleKey);
-    add(E.weapon && E.weapon.bonus); add(E.armor && E.armor.bonus);
-    const sk = GameData.unitSkins.find(s => s.id === (save.skins.unit[unitId] || 'zakladni'));
-    if (sk && GameData.skinFits(sk, unitId)) add(sk.bonus);
+    const O = GameData.skinOwn;
+    const sid = save.skins.unit[unitId] || 'zakladni';
+    const sk = GameData.unitSkins.find(s => s.id === sid);
+    if (sk && GameData.skinFits(sk, unitId) && (!O || O.has(save, unitId, sid))) add(sk.bonus);
     const ws = (save.skins.weapon || {})[unitId];
-    if (ws && GameData.weaponSkinById) add(GameData.weaponSkinById(ws).bonus);
+    if (ws && GameData.weaponSkinById && (!O || O.hasW(save, unitId, ws))) { const W = GameData.weaponSkinById(ws); if (GameData.weaponSkinFits(W, unitId)) add(W.bonus); }
     return b;
   },
-  /* Úpravy vzhledu: barvy (paleta), ozdoba, plášť, delší zbraň */
+  /* Úpravy vzhledu: model zbraně ze skinu zbraně, přilba a štít ze skinu zbroje */
   look(save, unitId) {
     const def = GameData.units[unitId];
-    const E = this.equipped(save, def.roleKey);
     const pal = {}, look = {};
     let key = '';
-    if (E.armor) { Object.assign(pal, E.armor.look); if (E.armor.ornament) pal.ornament = E.armor.ornament; if (E.armor.feat) pal.feat = E.armor.feat; if (E.armor.cape && !def.look.cape) { look.cape = true; look.capeColor = E.armor.look.cape; } key += 'a' + E.armor.tier; }
     const cat = window.Art && Art.weaponCat ? Art.weaponCat(def.look.weapon) : null;
-    if (E.weapon) {
-      if (E.weapon.look.glow) pal.glow = E.weapon.look.glow;
-      if (E.weapon.look.metal && !E.armor) pal.metal = E.weapon.look.metal;
-      // lepší výbava = jiný tvar zbraně
-      const TM = { melee: [null, 'runovy', 'plamen', 'hvezda'], pole: [null, 'partyzana', 'drak', 'hvezdne'], bow: [null, 'reflex', 'draci', 'hvezdny'] };
-      let mid = cat && TM[cat] && TM[cat][E.weapon.tier];
-      if (def.faction === 'samurajove' && cat === 'melee' && mid) mid = 'katana';
-      if (mid) pal.wmodel = { id: mid, cat, glow: E.weapon.look.glow };
-      key += 'w' + E.weapon.tier;
+    const sid = save.skins.unit[unitId] || 'zakladni';
+    const sk = GameData.unitSkins.find(s => s.id === sid);
+    if (sk && sk.look && GameData.skinFits(sk, unitId)) {
+      const P = window.ArtParts || {};
+      if (sk.look.helmet) { look.helmet = sk.look.helmet; key += 'h' + sk.look.helmet; }
+      // štít jen jednotkám, které štít nosí
+      if (sk.look.shield && def.look.shield) { look.shield = sk.look.shield; key += 's' + sk.look.shield; }
+      void P;
     }
     const ws = (save.skins.weapon || {})[unitId];
     if (ws && ws !== 'w_zakladni' && GameData.weaponSkinById) {

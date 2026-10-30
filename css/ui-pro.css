@@ -1032,3 +1032,27 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 .btn:active, .act:active, .lang-btn:active, .hud-btn:active { filter: brightness(.88); }
 .btn:active > *, .act:active > *, .hud-btn:active > * { transform: translateY(2px); }
 .army-card:not(:disabled):hover { box-shadow: 0 0 0 2px var(--c, #e8b84a), 0 6px 18px rgba(0,0,0,.45); }
+
+/* výkon: rozmazání pozadí přes celou obrazovku je na velkých displejích velmi drahé */
+.overlay, .pill, .panel { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.overlay { background: rgba(3,4,8,.82); }
+
+/* ===== ROZKAZY ARMÁDĚ: lišta nahoře uprostřed bojiště ===== */
+.b-orders { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 4; display: flex; gap: 6px; padding: 4px; border-radius: 16px;
+  background: linear-gradient(180deg, rgba(10,13,20,.82), rgba(10,13,20,.62)); box-shadow: 0 0 0 1px rgba(232,184,74,.45), 0 6px 16px rgba(0,0,0,.45); }
+.obtn { display: flex; align-items: center; gap: 6px; min-height: 42px; min-width: 64px; justify-content: center; padding: 4px 12px; border-radius: 12px; border: 0;
+  font-family: var(--font-display); font-weight: 900; font-size: 14px; letter-spacing: .03em; color: #e9e2cf; cursor: pointer; touch-action: manipulation;
+  background: linear-gradient(180deg, #2a3348, #161d2b); box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 0 0 1px #05070b; }
+.obtn svg { width: 22px; height: 22px; flex: none; }
+.obtn[data-order="utok"], .obtn[data-order="ustup"] { min-width: 86px; }
+.obtn[aria-pressed="true"] { color: #2a1a03; background: linear-gradient(180deg, #ffe9a0, #e0a83a 55%, #b07a1c); box-shadow: 0 0 0 1px #05070b, 0 0 14px rgba(232,184,74,.55); }
+.obtn[data-order="utok"][aria-pressed="true"] { color: #fff; background: radial-gradient(130% 120% at 50% 0%, #ff8a7a, #c8362c 45%, #7a1410); box-shadow: 0 0 0 1px #05070b, 0 0 14px rgba(255,90,60,.55); }
+.obtn[data-order="ustup"][aria-pressed="true"] { color: #fff; background: radial-gradient(130% 120% at 50% 0%, #8fc4ff, #2f6fd0 45%, #173a7a); box-shadow: 0 0 0 1px #05070b, 0 0 14px rgba(80,150,255,.55); }
+.obtn:active { filter: brightness(.88); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .b-orders { top: 4px; gap: 4px; padding: 3px; border-radius: 12px; }
+  .obtn { min-height: 32px; min-width: 44px; padding: 2px 8px; font-size: 11px; gap: 4px; border-radius: 9px; }
+  .obtn[data-order="utok"], .obtn[data-order="ustup"] { min-width: 62px; }
+  .obtn svg { width: 17px; height: 17px; }
+}
+@media (max-width: 700px) { .obtn > span:not([data-ico]) { display: none; } .obtn { min-width: 40px !important; } }

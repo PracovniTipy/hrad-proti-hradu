@@ -3,7 +3,9 @@
   "productName": "Castle WARS",
   "version": "1.0.0",
   "description": "Castle WARS – strategická bitva hradů",
-  "author": "BattleCastle",
+  "author": {
+    "name": "BrosWars Studio"
+  },
   "main": "main.js",
   "private": true,
   "devDependencies": {
@@ -55,7 +57,9 @@
       ],
       "icon": "icon.png",
       "category": "Game",
-      "artifactName": "CastleWARS-Linux.AppImage"
+      "artifactName": "CastleWARS-Linux.AppImage",
+      "maintainer": "BrosWars Studio",
+      "vendor": "BrosWars Studio"
     },
     "publish": null,
     "nsis": {
@@ -85,6 +89,7 @@
         "width": 570,
         "height": 380
       }
-    }
+    },
+    "copyright": "© 2026 BrosWars Studio"
   }
 }
