@@ -21,6 +21,32 @@
     pay_opening: ['Otevírám bezpečnou platební stránku…', 'Opening the secure payment page…'],
     pay_ok_wait: ['Platba proběhla – nákup ti za chvíli přijde.', 'Payment done – your purchase is on its way.'],
     pay_more: ['Tvoje nákupy', 'Your purchases'],
+    acc_rescue: ['Záchranný kód', 'Recovery code'],
+    acc_rescue_hint: ['Záchranný kód ti vrátí účet, když zapomeneš heslo. Vytvoř si ho a ulož.', 'A recovery code gets your account back if you forget your password. Create one and keep it safe.'],
+    acc_rescue_q: ['Vytvoříme ti nový záchranný kód. Starý kód (pokud nějaký máš) přestane platit.', 'We will create a new recovery code. Your old code (if any) will stop working.'],
+    acc_rescue_make: ['Vytvořit kód', 'Create code'],
+    acc_rescue_save: ['Opiš si ho nebo vyfoť a ulož na bezpečné místo. Ukážeme ho jen teď. S ním a jménem si nastavíš nové heslo.', 'Write it down or take a photo and keep it safe. We show it only now. With it and your name you can set a new password.'],
+    acc_rescue_copy: ['Zkopírovat', 'Copy'],
+    acc_rescue_copied: ['Zkopírováno', 'Copied'],
+    acc_rescue_done: ['Mám uložený', 'Saved it'],
+    acc_forgot: ['Zapomněl jsi heslo?', 'Forgot your password?'],
+    acc_forgot_note: ['Zadej jméno nebo e-mail, svůj záchranný kód a nové heslo.', 'Enter your name or e-mail, your recovery code and a new password.'],
+    acc_forgot_go: ['Nastavit heslo', 'Set password'],
+    acc_forgot_ok: ['Heslo změněno – jsi přihlášený.', 'Password changed – you are signed in.'],
+    acc_new_pass: ['Nové heslo', 'New password'],
+    acc_e_rescue: ['Jméno nebo záchranný kód nesedí.', 'The name or recovery code is wrong.'],
+    itch_consent: ['Souhlasím s {link} a chci věci dodat hned. Beru na vědomí, že tím ztrácím právo odstoupit od nákupu do 14 dnů.', 'I agree to the {link} and want the items delivered now. I understand I lose the 14-day right of withdrawal.'],
+    itch_terms: ['obchodními podmínkami', 'terms of sale'],
+    itch_need_ok: ['Nejdřív zaškrtni souhlas s podmínkami.', 'Please tick the consent box first.'],
+    terms_link: ['Obchodní podmínky', 'Terms of sale'],
+    itch_buy: ['Koupit na itch.io', 'Buy on itch.io'],
+    itch_how: ['1. Klikni na „Koupit na itch.io“ a zaplať (kartou nebo PayPalem).<br>2. Po zaplacení zkopíruj adresu stránky ke stažení – najdeš ji i v e-mailu od itch.io.<br>3. Vlož ji sem a stiskni Uplatnit. Věci dostaneš hned.', '1. Press “Buy on itch.io” and pay (card or PayPal).<br>2. After paying, copy the address of your download page – it is also in the e-mail from itch.io.<br>3. Paste it here and press Redeem. You get your items right away.'],
+    itch_ph: ['Odkaz ze stránky ke stažení', 'Download page link'],
+    itch_redeem: ['Uplatnit', 'Redeem'],
+    itch_invalid: ['Tenhle odkaz nebo klíč jsme na itch.io nenašli. Zkopíruj celou adresu stránky ke stažení.', 'We could not find this link or key on itch.io. Copy the full address of your download page.'],
+    itch_used: ['Tenhle nákup už byl uplatněný.', 'This purchase has already been redeemed.'],
+    itch_soon: ['Nákupy přes itch.io se právě spouštějí – zkus to prosím za chvíli.', 'itch.io purchases are just being switched on – please try again shortly.'],
+    itch_note: ['Platí se bezpečně přes itch.io. Nákup se uloží k tvému účtu ve hře.', 'You pay securely through itch.io. The purchase is saved to your game account.'],
     pay_soon: ['Platby za skutečné peníze právě spouštíme. Tenhle nákup půjde dokončit, jakmile platby napojíme.', 'Real-money payments are launching. You will be able to complete this purchase as soon as they are connected.'],
     div_title: ['Božské sety', 'Divine sets'],
     div_sub: ['Kompletní zbroj a zbraň pro všech 21 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 21 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
@@ -59,7 +85,7 @@
   }
   const roleName = r => t('role_' + r);
   const shopNation = save => (window.App && App.shopNation) || save.faction;
-  const priceHtml = p => p.czk ? `${p.czk} Kč` : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
+  const priceHtml = p => p.czk ? Platby.price(p.czk) : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
   const canAfford = (save, p) => p.czk ? true : p.gems ? save.gems >= p.gems : save.gold >= p.gold;
   const rarityTag = tier => `<span class="rar" style="color:${GH().rarityColor[tier]}">${t('rar_' + tier)}</span>`;
   const bonusText = b => {
@@ -215,7 +241,7 @@
         <p>${esc(o.desc)}</p>
         <div class="offer-give">${o.give.gold ? `<span>${ico('coin')} ${fmt(o.give.gold)}</span>` : ''}${o.give.gems ? `<span>${ico('gem')} ${fmt(o.give.gems)}</span>` : ''}</div>
         ${o.limit ? `<small class="muted">${t('limit_n', { n: o.limit })}</small>` : ''}
-        <button class="btn ${sold ? '' : 'btn-green'} buy-czk" data-offer="${o.id}" ${sold ? 'disabled' : ''}>${sold ? t('bought') : `${o.czk} Kč`}</button>
+        <button class="btn ${sold ? '' : 'btn-green'} buy-czk" data-offer="${o.id}" ${sold ? 'disabled' : ''}>${sold ? t('bought') : Platby.price(o.czk)}</button>
       </article>`;
     }).join('');
     const DS = GameData.divineSets;
@@ -315,7 +341,8 @@
     const used = save.codes || [];
     return `<section class="panel code-box">
         <div class="eyebrow">${t('codes_title')}</div>
-        <div class="code-row"><input id="codeIn" maxlength="32" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${t('codes_ph')}"><button class="btn btn-gold" id="codeGo">${t('codes_btn')}</button></div>
+        <div class="code-row"><input id="codeIn" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('codes_ph')}"><button class="btn btn-gold" id="codeGo">${t('codes_btn')}</button></div>
+        <label class="itch-ok" id="codeOkRow" hidden><input type="checkbox" id="codeOk"> <span>${t('itch_consent', { link: `<a href="${Platby.terms}" target="_blank" rel="noopener">${t('itch_terms')}</a>` })}</span></label>
         <p class="muted" id="codeMsg">${t('codes_where')}</p>
       </section>
       ${used.length ? `<div class="sec-head"><h2>${t('codes_history')}</h2></div><div class="code-list">${used.slice().reverse().map(u => `<div class="code-used"><b>${esc(u.c)}</b><small>${new Date(u.at).toLocaleDateString()}</small></div>`).join('')}</div>` : ''}`;
@@ -323,10 +350,18 @@
   function bindCodes(App, el) {
     const save = ensure(App.save);
     const inp = el.querySelector('#codeIn'), btn = el.querySelector('#codeGo'), msg = el.querySelector('#codeMsg');
-    inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); });
+    const isItch = v => /itch\.io|\/download\//i.test(v) || v.length > 24;
+    inp.addEventListener('input', () => { if (!isItch(inp.value)) inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); el.querySelector('#codeOkRow').hidden = !isItch(inp.value); });
     const go = async () => {
       const code = inp.value.trim(); if (code.length < 3 || btn.disabled) return;
       btn.disabled = true; msg.textContent = '…';
+      if (isItch(code) && !el.querySelector('#codeOk').checked) { el.querySelector('#codeOkRow').hidden = false; msg.textContent = t('itch_need_ok'); msg.classList.add('err'); btn.disabled = false; return; }
+      if (isItch(code)) {
+        const r = await Platby.redeemItch(App, code);
+        if (r.ok) { save.codes = (save.codes || []).concat([{ c: 'itch.io: ' + r.title, at: Date.now() }]); App.persist(); App.go('obchod', { tab: 'kody', keepScroll: true }); Platby.showGot(App, r); }
+        else { msg.textContent = t(r.err); msg.classList.add('err'); btn.disabled = false; }
+        return;
+      }
       try {
         const reward = await Ucet.redeem(code);
         save.codes = (save.codes || []).concat([{ c: code, at: Date.now() }]);

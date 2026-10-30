@@ -16,3 +16,6 @@ Válečné pokřiky (cry_0.mp3 – cry_11.mp3)
   Povely: „Charge!“, „Advance!“, „For honor!“, „Stand and fight!“, „To victory!“,
   „We shall not falter!“, „Together we rise!“, „Fight for our land!“ + bojový řev.
   Úpravy: ořez, zdvojení hlasu, podklad řevu armády, vyrovnání hlasitosti.
+
+Hudba do bitev: „Battle“ – Wolfgang_ (OpenGameArt.org), licence CC0 1.0 (public domain).
+https://opengameart.org/content/battle-theme-0

@@ -613,7 +613,7 @@
     } else if (tab === 'utoky') {
       const SK = GameData.skillsOf(save);
       const rarN = ['Základní', 'Vzácný', 'Epický', 'Legendární'];
-      const pr = p => p.czk ? `${p.czk} Kč` : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
+      const pr = p => p.czk ? Platby.price(p.czk) : p.gems ? `${ico('gem')} ${fmt(p.gems)}` : `${ico('coin')} ${fmt(p.gold)}`;
       body = `<section class="panel sk-eq"><div><div class="eyebrow">${t('skills_eq')}</div><p class="muted" style="margin:2px 0 0">${t('skills_help')}</p></div>
           <div class="sk-slots">${[0, 1, 2].map(i => { const k = SK.eq[i] && GameData.skillById(SK.eq[i]); return `<div class="sk-slot">${k ? GameData.skillIcon(k, 54) + `<small>${esc(k.name)}</small>` : `<span class="sk-empty">${i + 1}</span>`}</div>`; }).join('')}</div></section>
         <div class="sk-grid">${GameData.skills.slice().sort((a, b) => a.rarity - b.rarity).map(k => {
@@ -629,7 +629,7 @@
             <p class="sk-stats">${ico('coin')} ${t('sk_cost', { n: k.cost || t('free') })} · ⏱ ${t('sk_cd', { n: k.cooldown })}</p>
             ${on ? `<button class="btn btn-sm" data-skoff="${k.id}">✓ ${t('skill_on')}</button>`
               : own ? `<button class="btn btn-sm btn-blue" data-skon="${k.id}">${t('skill_take')}</button>`
-              : k.price.czk ? `<button class="btn btn-sm btn-green" data-skczk="${k.id}">${k.price.czk} Kč</button>`
+              : k.price.czk ? `<button class="btn btn-sm btn-green" data-skczk="${k.id}">${Platby.price(k.price.czk)}</button>`
               : `<button class="btn btn-sm btn-gold" data-skbuy="${k.id}">${t('buy')} ${pr(k.price)}</button>`}
           </article>`;
         }).join('')}</div>`;
@@ -692,7 +692,7 @@
         </div>
         <div class="sec-head"><h2>${t('packs')}</h2></div>
         <div class="skin-grid">
-          ${GameData.gemPacks.map(x => `<article class="panel skin r3">${x.badge ? `<span class="offer-badge">${x.badge}</span>` : ''}<div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${t('gems_n', { n: x.gems })}</h3><button class="btn btn-sm btn-green" data-gempack="${x.id}">${x.czk} Kč</button></article>`).join('')}
+          ${GameData.gemPacks.map(x => `<article class="panel skin r3">${x.badge ? `<span class="offer-badge">${x.badge}</span>` : ''}<div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${t('gems_n', { n: x.gems })}</h3><button class="btn btn-sm btn-green" data-gempack="${x.id}">${Platby.price(x.czk)}</button></article>`).join('')}
         </div>
         ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_launch')}</div></div>`}`;
     }
@@ -1142,7 +1142,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 71 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 72 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

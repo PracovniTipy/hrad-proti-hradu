@@ -92,6 +92,7 @@
     const get = (url) => fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((ok, no) => ctx.decodeAudioData(a, ok, no)));
     Object.keys(SADY).forEach(k => { BUF[k] = []; for (let i = 0; i < SADY[k]; i++) get(BASE + k + '_' + i + '.mp3').then(b => BUF[k].push(b)).catch(() => {}); });
     get(BASE + 'bitva_dav.mp3').then(b => { BUF.dav = b; }).catch(() => {});
+    get(BASE + 'hudba_bitva.mp3').then(b => { BUF.hudba = b; if (Music.on && Music.kind === 'battle' && !Music.track) Music.playTrack(); }).catch(() => {});
   }
   /* přehraje náhodnou nahrávku ze sady; vrací false, když ještě není načtená */
   function sample(set, vol, rate, out) {
@@ -134,6 +135,8 @@
       if (this.on && this.nat === nat && this.kind === kind) return;
       this.stop();
       this.on = true; this.nat = SCALES[nat] ? nat : 'kralovstvi'; this.kind = kind; this.step = 0; this.next = now() + 0.1;
+      // v bitvě hraje opravdová orchestrální hudba (CC0), dokud se nenačte, hraje syntéza
+      if (kind === 'battle' && BUF.hudba) { this.playTrack(); return; }
       this.seed = 1 + Math.floor(Math.random() * 1000);
       const S = SCALES[this.nat];
       if (S.drone) {     // tichý bordun
@@ -145,8 +148,19 @@
       }
       this.timer = setInterval(() => this.tick(), 60);
     },
+    playTrack() {
+      clearInterval(this.timer); this.timer = null;
+      this.nodes.forEach(n => { try { if (n.gain) n.gain.linearRampToValueAtTime(0, now() + 0.5); else n.stop(now() + 0.6); } catch (e) { /* nic */ } });
+      this.nodes = [];
+      const src = ctx.createBufferSource(), g = ctx.createGain();
+      src.buffer = BUF.hudba; src.loop = true;
+      g.gain.value = 0; g.gain.linearRampToValueAtTime(0.62, now() + 1.5);
+      src.connect(g); g.connect(musBus); src.start();
+      this.track = src; this.nodes.push(src, g);
+    },
     stop() {
       clearInterval(this.timer); this.timer = null; this.on = false;
+      this.track = null;
       this.nodes.forEach(n => { try { if (n.gain) n.gain.linearRampToValueAtTime(0, now() + 0.5); else n.stop(now() + 0.6); } catch (e) { /* nic */ } });
       this.nodes = [];
     },

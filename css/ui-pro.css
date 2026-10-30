@@ -1069,3 +1069,12 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 @media (orientation: landscape) and (max-height: 520px) { .div-card canvas { height: 150px; } .div-card h3 { font-size: 16px; } .div-card p { font-size: 12px; } }
 
 .big-buy{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.alive-badge.full{border-color:#e05a4a!important;color:#ffb0a6}
+.itch-how{font-size:.92em;line-height:1.5;margin:10px 0 8px;opacity:.9}
+#modalCard .btn-big#itchBuy{display:block;text-align:center;text-decoration:none;margin:8px 0}
+.rescue-code{font-family:ui-monospace,Menlo,monospace;font-size:34px;letter-spacing:.12em;text-align:center;padding:16px;margin:12px 0;border:2px dashed #f2c14e;border-radius:12px;background:rgba(0,0,0,.35);color:#ffe08a;user-select:all;-webkit-user-select:all}
+.itch-ok{display:flex;gap:10px;align-items:flex-start;font-size:.9em;line-height:1.4;margin:10px 0;cursor:pointer}.itch-ok input{width:20px;height:20px;flex:none;margin-top:2px}.itch-ok a{color:#9fd0ff}
+#modalCard #itchBuy,#modalCard #itchBuy:visited{color:#fff}
+#modalCard .code-row{display:flex;gap:10px;align-items:stretch}
+#modalCard .code-row input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:10px;border:1px solid #3a4560;background:#0d121c;color:#f2ead6}

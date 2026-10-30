@@ -265,6 +265,7 @@
     /* ---------------- BITVA ---------------- */
     startBattle(cfg) {
       const save = this.save;
+      if (window.Stat) Stat.ev('battle', { p: cfg.mode || 'x' });
       if (this._stopLive) { this._stopLive(); this._stopLive = null; }
       cancelAnimationFrame(this.previewRaf);
       $('#app').hidden = true;
@@ -457,7 +458,7 @@
       const coins = Math.floor(P.coins);
       set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', ((v % 500) / 5) + '%'); });
       const alive = b.units.filter(u => u.team === 'player' && !u.dead).length;
-      set('alive', alive, v => ($('#bAlive').textContent = v));
+      set('alive', alive, v => { $('#bAlive').textContent = v >= b.armyCap('player') ? v + '/' + b.armyCap('player') : v; $('#bAlive').parentElement.classList.toggle('full', v >= b.armyCap('player')); });
       const qn = (b.queue || []).length;
       set('max', qn, v => ($('#bCoinMax').textContent = v ? t('queue_n', { n: v }) : ''));
       document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
@@ -509,6 +510,7 @@
     _battleEnd(cfg, res) {
       const save = this.save, R = GameData.pvpRules;
       if (!this.battle) return;
+      if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
       const rewards = [];
@@ -648,7 +650,7 @@
           setTimeout(() => { if (pending === tok && tgt.isConnected && !tgt.disabled) { pending = null; tgt.click(); } }, 350);
         }, true);
         document.addEventListener('click', () => { pending = null; }, true);
-        document.addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault(); }, true);
+        document.addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable], .rescue-code')) e.preventDefault(); }, true);
       })();
       // skin s omezením (např. jezdecký) nasazený na jinou jednotku → vrátit základní
       Object.keys(this.save.skins.unit || {}).forEach(u => { const sk = GameData.unitSkins.find(x => x.id === this.save.skins.unit[u]); if (sk && sk.only && !sk.only.includes(u)) this.save.skins.unit[u] = 'zakladni'; });

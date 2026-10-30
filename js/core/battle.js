@@ -271,7 +271,12 @@
       if (this.over) return { ok: false, why: 'konec' };
       if (s.coins < def.cost) return { ok: false, why: 'mince' };
       if ((s.cooldowns[unitId] || 0) > this.time) return { ok: false, why: 'cooldown' };
+      if (this.aliveCount(team) >= this.armyCap(team)) return { ok: false, why: 'plno' };
       return { ok: true };
+    }
+    /* STROP ARMÁDY: nejvýš 60 vojáků na bojišti (ve dvou na jedné straně 90) – kvůli výkonu i férovosti */
+    armyCap(team) { const g = this.net && this.net.go; return g && (g.mode === 'coop' || g.mode === '2v2') ? 90 : 60; }
+    aliveCount(team) { let n = 0; for (const u of this.units) if (u.team === team && !u.dead) n++; return n;
     }
     /* ZÁSOBNÍK: hráč může klepnout na vojáka až 50× i bez peněz.
        Vojáci se pak posílají postupně, jakmile na ně jsou mince. */

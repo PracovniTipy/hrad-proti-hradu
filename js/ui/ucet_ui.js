@@ -11,7 +11,7 @@
   };
 
   const PRIV = 'https://pracovnitipy.github.io/hrad-proti-hradu/soukromi.html';
-  const privLink = () => `<a href="${PRIV}" target="_blank" rel="noopener">${t('priv_link')}</a>`;
+  const privLink = () => `<a href="${PRIV}" target="_blank" rel="noopener">${t('priv_link')}</a> · <a href="https://pracovnitipy.github.io/hrad-proti-hradu/obchodni-podminky.html" target="_blank" rel="noopener">${t('terms_link')}</a>`;
   const UcetUI = {
     /* Sekce v profilu */
     profileHtml() {
@@ -26,7 +26,8 @@
       return `<section class="panel acc-box on">
           <div class="acc-head"><span class="acc-ico ok">${ico('shield')}</span><div><b>${esc(S.username)}</b><p class="muted">${esc(S.email)}</p></div></div>
           ${state}
-          <div class="modal-actions"><button class="btn" data-acc="pass">${t('acc_change_pass')}</button><button class="btn" data-acc="logout">${t('acc_logout')}</button></div>
+          <div class="modal-actions"><button class="btn btn-gold" data-acc="rescue">${t('acc_rescue')}</button><button class="btn" data-acc="pass">${t('acc_change_pass')}</button><button class="btn" data-acc="logout">${t('acc_logout')}</button></div>
+          <p class="muted acc-note">${t('acc_rescue_hint')}</p>
           <div class="acc-foot">${privLink()} · <button class="link-btn" data-acc="delete">${t('acc_delete')}</button></div>
         </section>`;
     },
@@ -37,6 +38,19 @@
         if (a === 'logout') { await Ucet.upload(); await Ucet.logout(); App.toast(t('acc_logged_out')); return App.go('profil', { keepScroll: true }); }
         if (a === 'sync') { b.disabled = true; await Ucet.upload(); App.toast(Ucet.err ? t('acc_save_err') : t('acc_synced')); return App.go('profil', { keepScroll: true }); }
         if (a === 'pass') return this.passModal(App);
+        if (a === 'rescue') return App.modal(`<div class="eyebrow">${t('acc_title')}</div><h2>${t('acc_rescue')}</h2><p>${t('acc_rescue_q')}</p><p class="acc-err" id="rsErr" hidden></p>
+            <div class="modal-actions"><button class="btn btn-gold" id="rsGo">${t('acc_rescue_make')}</button><button class="btn" data-close>${t('back')}</button></div>`, (c) => {
+            c.querySelector('#rsGo').addEventListener('click', async ev => {
+              ev.target.disabled = true;
+              try {
+                const code = await Ucet.rescueNew();
+                c.innerHTML = `<div class="eyebrow">${t('acc_title')}</div><h2>${t('acc_rescue')}</h2><div class="rescue-code">${esc(code)}</div><p>${t('acc_rescue_save')}</p>
+                  <div class="modal-actions"><button class="btn btn-green" id="rsCopy">${t('acc_rescue_copy')}</button><button class="btn" id="rsDone">${t('acc_rescue_done')}</button></div>`;
+                c.querySelector('#rsCopy').addEventListener('click', () => { try { navigator.clipboard.writeText(code); App.toast(t('acc_rescue_copied')); } catch (e) { /* nic */ } });
+                c.querySelector('#rsDone').addEventListener('click', () => { document.getElementById('modal').hidden = true; });
+              } catch (e) { const er = c.querySelector('#rsErr'); er.textContent = Ucet.errText(e); er.hidden = false; ev.target.disabled = false; }
+            });
+          });
         if (a === 'delete') return App.modal(`<h2>${t('acc_delete')}</h2><p>${t('acc_delete_q')}</p><p class="acc-err" id="delErr" hidden></p>
             <div class="modal-actions"><button class="btn btn-red" id="delYes">${t('acc_delete_yes')}</button><button class="btn" data-close>${t('back')}</button></div>`, (c, close) => {
             c.querySelector('#delYes').addEventListener('click', async () => {
@@ -64,9 +78,11 @@
             <button class="btn" type="button" data-close>${t('back')}</button>
           </div>
           <button class="acc-switch" type="button" id="accSwitch">${reg ? t('acc_have') : t('acc_new')}</button>
+          ${reg ? '' : `<button class="acc-switch" type="button" id="accForgot">${t('acc_forgot')}</button>`}
         </form>`, (c, close) => {
         const err = c.querySelector('#accErr'), go = c.querySelector('#accGo');
         c.querySelector('#accSwitch').addEventListener('click', () => { close(); this.open(App, reg ? 'login' : 'register'); });
+        const fg = c.querySelector('#accForgot'); if (fg) fg.addEventListener('click', () => { close(); this.forgotModal(App); });
         c.querySelector('#accForm').addEventListener('submit', async ev => {
           ev.preventDefault();
           const u = c.querySelector('#accUser').value.trim(), p = c.querySelector('#accPass').value;
@@ -112,6 +128,28 @@
         </div>`, (c, close) => {
         c.querySelector('#useSrv').addEventListener('click', () => { close(); useServer(); });
         c.querySelector('#useLoc').addEventListener('click', () => { close(); useLocal(); });
+      });
+    },
+
+    /* Zapomenuté heslo: jméno (nebo e-mail) + záchranný kód + nové heslo */
+    forgotModal(App) {
+      App.modal(`<div class="eyebrow">${t('acc_title')}</div><h2>${t('acc_forgot')}</h2><p class="muted">${t('acc_forgot_note')}</p>
+        <form class="acc-form" id="fgForm" novalidate>
+          <div class="field"><label for="fgUser">${t('acc_login_id')}</label><input id="fgUser" maxlength="120" autocomplete="username" required></div>
+          <div class="field"><label for="fgCode">${t('acc_rescue')}</label><input id="fgCode" maxlength="20" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX" required></div>
+          <div class="field"><label for="fgPass">${t('acc_new_pass')}</label><input id="fgPass" type="password" maxlength="100" autocomplete="new-password" required placeholder="${t('acc_pass_ph')}"></div>
+          <p class="acc-err" id="fgErr" role="alert" hidden></p>
+          <div class="modal-actions"><button class="btn btn-green" type="submit" id="fgGo">${t('acc_forgot_go')}</button><button class="btn" type="button" data-close>${t('back')}</button></div>
+        </form>`, (c, close) => {
+        const err = c.querySelector('#fgErr'), go = c.querySelector('#fgGo');
+        c.querySelector('#fgForm').addEventListener('submit', async ev => {
+          ev.preventDefault(); err.hidden = true;
+          const u = c.querySelector('#fgUser').value.trim(), code = c.querySelector('#fgCode').value.trim(), p = c.querySelector('#fgPass').value;
+          if (p.length < 6) { err.textContent = t('acc_e_pass'); err.hidden = false; return; }
+          go.disabled = true;
+          try { const r = await Ucet.rescueReset(u, code, p); close(); App.toast(t('acc_forgot_ok')); this.afterLogin(App, r); }
+          catch (e) { err.textContent = Ucet.errText(e); err.hidden = false; go.disabled = false; }
+        });
       });
     },
 

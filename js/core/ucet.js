@@ -11,7 +11,7 @@
   const ERR = {
     username_invalid: 'acc_e_user', email_invalid: 'acc_e_email', password_short: 'acc_e_pass',
     username_taken: 'acc_e_user_taken', email_taken: 'acc_e_email_taken', login_failed: 'acc_e_login',
-    login_locked: 'acc_e_locked', session_invalid: 'acc_e_session', network: 'acc_e_net',
+    login_locked: 'acc_e_locked', rescue_failed: 'acc_e_rescue', session_invalid: 'acc_e_session', network: 'acc_e_net',
     code_invalid: 'code_e_invalid', code_used: 'code_e_used', code_spent: 'code_e_spent', code_busy: 'code_e_busy'
   };
 
@@ -84,6 +84,15 @@
       this.s = null; this.store();
       // po smazání účtu už se nic samo na server neposílá (dokud se hráč znovu nepřihlásí)
       try { localStorage.setItem(SKEY + '-bez-serveru', '1'); } catch (e) { /* nic */ }
+    },
+    /* záchranný kód: nový (staré přestanou platit) a nastavení nového hesla pomocí kódu */
+    async rescueNew() { return rpc('hra_rescue_new', { p_token: this.s.token }); },
+    async rescueReset(login, code, pass) {
+      const r = await rpc('hra_rescue_reset', { p_login: login, p_code: code, p_new: pass });
+      this.s = { token: r.token, username: r.username, email: r.email, savedAt: r.updated_at || null };
+      this.store();
+      try { localStorage.removeItem(SKEY + '-bez-serveru'); } catch (e) { /* nic */ }
+      return r;
     },
     async changePassword(oldP, newP) { await rpc('hra_change_password', { p_token: this.s.token, p_old: oldP, p_new: newP }); },
     async feedback(text) {
