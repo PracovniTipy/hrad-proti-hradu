@@ -17,6 +17,11 @@
     code_e_spent: ['Kód už vyčerpali jiní hráči.', 'This code has been used up by other players.'],
     code_e_busy: ['Moc pokusů. Zkus to za pár minut.', 'Too many attempts. Try again in a few minutes.'],
     rar_4: ['Božský', 'Divine'],
+    div_title: ['Božské sety', 'Divine sets'],
+    div_sub: ['Kompletní zbroj a zbraň pro všech 21 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 21 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
+    div_owned: ['Máš kompletní', 'Complete'],
+    div_andel_d: ['Černozlatá zbroj, obří černá křídla, rudá svatozář a aura. Meč, kopí, luk a hůl padlého anděla.', 'Black-gold armor, huge black wings, a crimson halo and aura. The fallen angel’s sword, spear, bow and staff.'],
+    div_kral_d: ['Bílozlatá zbroj s korunou, zlatá křídla a sluneční svatozář. Meč, kopí, luk a žezlo Božího krále.', 'White-gold armor with a crown, golden wings and a sun halo. The God-King’s sword, spear, bow and scepter.'],
     ai_retreat: ['Nepřítel ustupuje za hradby!', 'The enemy retreats behind the walls!'],
     ord_retreat: ['Ústup', 'Retreat'], ord_walls: ['Hradby', 'Walls'], ord_center: ['Střed', 'Center'], ord_attack: ['Útok', 'Attack'],
     walls_hint: ['Obrana hradeb: armáda se postaví před bránu, kde ji kryjí obránci na hradbách.', 'Defend the walls: the army forms up in front of the gate, covered by the wall defenders.'],
@@ -192,15 +197,56 @@
         <button class="btn ${sold ? '' : 'btn-green'} buy-czk" data-offer="${o.id}" ${sold ? 'disabled' : ''}>${sold ? t('bought') : `${o.czk} Kč`}</button>
       </article>`;
     }).join('');
+    const DS = GameData.divineSets;
+    const divCard = id => {
+      const D = DS[id], own = GameData.divineOwned(save, id);
+      return `<article class="panel div-card div-${id}">
+        <canvas data-divcv="${id}"></canvas>
+        <div class="div-body"><div class="eyebrow" style="color:${GameData.rarityColors['Božský']}">${t('rar_4')}</div>
+          <h3>${esc(I18N.lang === 'cs' ? D.name : D.en)}</h3><p class="muted">${t('div_' + id + '_d')}</p>
+          <p class="gear-bonus">+20 % ${t('b_dmg')} · +20 % ${t('b_hp')}</p>
+          <button class="btn ${own ? '' : 'btn-gold'} btn-big" data-divbuy="${id}" ${own ? 'disabled' : save.gems < D.price.gems ? 'disabled' : ''}>${own ? '✓ ' + t('div_owned') : `${ico('gem')} ${fmt(D.price.gems)}`}</button></div>
+      </article>`;
+    };
     return `
+      <div class="sec-head"><h2>${t('div_title')}</h2><span class="muted">${t('div_sub')}</span></div>
+      <div class="div-row">${divCard('andel')}${divCard('kral')}</div>
       <div class="sec-head"><h2>${t('chests')}</h2><span class="muted">${t('chests_sub')}</span></div>
       <div class="chest-row">${chestCard(C.denni)}${chestCard(C.tydenni)}</div>
       ${Platby.on() ? `<div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
       <div class="offer-grid">${offers}</div>
       ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}` : `<div class="notice"><div>${t('pay_soon_shop')}</div></div>`}`;
   }
+  function paintDivine(cv, id) {
+    const D = GameData.divineSets[id];
+    const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = ctx.createRadialGradient(w / 2, h * 0.7, 10, w / 2, h * 0.6, w * 0.7);
+    g.addColorStop(0, id === 'kral' ? '#7a5a14' : '#4a0a18'); g.addColorStop(1, '#0d121c'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    const GH = GameData.gearHelpers;
+    ['rytir', 'samuraj', 'berserk'].forEach((u, i) => {
+      const def = GameData.units[u];
+      const W = D.weapons.map(x => GameData.weaponSkins.find(y => y.id === x)).find(x => GameData.weaponSkinFits(x, u));
+      const fake = { skins: { unit: { [u]: D.armor }, weapon: { [u]: W ? W.id : null }, own: { [u]: [D.armor] }, ownW: { [u]: W ? [W.id] : [] } } };
+      const lk = GH.look(fake, u), pal = GH.palette('player', D.armor, def.faction, lk);
+      const k = h / 120 * (i === 1 ? 1.05 : 0.92);
+      ctx.save(); ctx.translate(w * (0.24 + i * 0.27), h * (i === 1 ? 0.95 : 0.9)); ctx.scale(k, k);
+      Art.drawUnit(ctx, GH.drawDef(def, lk), pal, { x: 0, y: 0, facing: 1, t: 1.2 + i, atk: -1 });
+      ctx.restore();
+    });
+  }
   function bindOffers(App, el) {
     const save = ensure(App.save);
+    el.querySelectorAll('canvas[data-divcv]').forEach(cv => paintDivine(cv, cv.dataset.divcv));
+    el.querySelectorAll('[data-divbuy]').forEach(b => b.addEventListener('click', () => {
+      const id = b.dataset.divbuy, D = GameData.divineSets[id];
+      if (GameData.divineOwned(save, id) || save.gems < D.price.gems) { if (save.gems < D.price.gems) App.toast(t('t_no_gems')); return; }
+      save.gems -= D.price.gems;
+      const got = grant(App, { set: id });
+      App.go('obchod', { tab: 'nabidky', keepScroll: true });
+      rewardsModal(App, I18N.lang === 'cs' ? D.name : D.en, got, 'tydenni');
+    }));
     el.querySelectorAll('[data-offer]').forEach(b => b.addEventListener('click', () => {
       const o = GameData.offers.find(x => x.id === b.dataset.offer);
       if (o.limit && (save.purchases[o.id] || 0) >= o.limit) return;

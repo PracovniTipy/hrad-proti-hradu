@@ -229,6 +229,13 @@
       ctx.beginPath(); ctx.arc(0, y, 8.4, 0.35, TAU - 0.35); ctx.arc(2.6, y, 6.4, TAU - 0.7, 0.7, true); ctx.closePath(); fs(ctx, '#dfe6ff', 1.3);
       orb(-0.6, y, 3.6);
       ctx.fillStyle = '#fff'; for (const [x2, y2] of [[7, -9], [9, 6]]) { ctx.beginPath(); ctx.arc(x2, y + y2, 0.9, 0, TAU); ctx.fill(); }
+    } else if (id === 'bozi') { // zlaté žezlo: koruna nad zářící modrou koulí
+      ctx.save(); ctx.shadowColor = '#ffe28a'; ctx.shadowBlur = 10 + raise * 12;
+      ctx.beginPath(); for (let k = 0; k < 16; k++) { const a = k / 16 * TAU, r = k % 2 ? 7 : 11; ctx.lineTo(Math.cos(a) * r, y - 2 + Math.sin(a) * r); } ctx.closePath(); fs(ctx, 'rgba(255,226,138,.85)', 0.8);
+      ctx.restore();
+      orb(0, y - 2, 4.4 + raise);
+      ctx.beginPath(); ctx.moveTo(-5, y - 8); ctx.lineTo(-5, y - 14); ctx.lineTo(-2.5, y - 11); ctx.lineTo(0, y - 16); ctx.lineTo(2.5, y - 11); ctx.lineTo(5, y - 14); ctx.lineTo(5, y - 8); ctx.closePath(); fs(ctx, '#ffd24a', 1.1);
+      gem(ctx, 0, y - 12, 1.1, '#5ab8ff');
     } else if (id === 'andel') { // dvě černá křídla svírají rudou kouli
       for (const d of [-1, 1]) {
         ctx.beginPath(); ctx.moveTo(0, y + 6); ctx.quadraticCurveTo(d * 4, y - 2, d * 12, y - 12); ctx.quadraticCurveTo(d * 9, y - 6, d * 11, y - 3); ctx.quadraticCurveTo(d * 7, y - 2, d * 8, y + 2); ctx.quadraticCurveTo(d * 4, y + 2, 0, y + 7); ctx.closePath();
@@ -416,5 +423,73 @@
     GF(ctx);
     rr(ctx, -3.2, 29, 6.4, 12, 1.4); fs(ctx, c.guard || c.dark, 1.3);
     ctx.beginPath(); ctx.moveTo(-1.6, 41); ctx.lineTo(0, 48); ctx.lineTo(1.6, 41); ctx.closePath(); fs(ctx, c.dark, 1.1);
+  };
+  /* ---------------- BOŽSKÝ BOŽÍ KRÁL ---------------- */
+  M.bozi = (ctx, c) => {
+    GO(ctx, c, 18);
+    ctx.beginPath(); ctx.moveTo(-4.6, 6); ctx.lineTo(-4, 42); ctx.lineTo(0, 52); ctx.lineTo(4, 42); ctx.lineTo(4.6, 6); ctx.closePath();
+    fs(ctx, BF(ctx, c, -4.6, 4.6), 1.6); GF(ctx);
+    ctx.beginPath(); ctx.moveTo(0, 9); ctx.lineTo(0, 44); ctx.lineWidth = 2; ctx.strokeStyle = '#ffd24a'; ctx.stroke();
+    // záštita: sluneční kotouč s paprsky
+    ctx.save(); ctx.shadowColor = '#ffe28a'; ctx.shadowBlur = 8;
+    ctx.beginPath(); for (let k = 0; k < 20; k++) { const a = k / 20 * TAU, r = k % 2 ? 6 : 10; ctx.lineTo(Math.cos(a) * r * 1.2, 4 + Math.sin(a) * r * 0.55); } ctx.closePath(); fs(ctx, c.guard, 1.2);
+    ctx.restore();
+    gem(ctx, 0, 4, 2.2, c.gem);
+    rr(ctx, -1.9, -9, 3.8, 12, 1.2); fs(ctx, c.grip, 1.2);
+    ctx.beginPath(); ctx.moveTo(-3.4, -10); ctx.lineTo(-3.4, -15); ctx.lineTo(-1.2, -12.5); ctx.lineTo(0, -16); ctx.lineTo(1.2, -12.5); ctx.lineTo(3.4, -15); ctx.lineTo(3.4, -10); ctx.closePath(); fs(ctx, c.guard, 1.1);
+  };
+  PO.bozi = (ctx, c) => {
+    GO(ctx, c, 16);
+    ctx.beginPath(); ctx.moveTo(48, -3.6); ctx.quadraticCurveTo(64, -4.6, 78, 0); ctx.quadraticCurveTo(64, 4.6, 48, 3.6); ctx.closePath(); fs(ctx, BF(ctx, c, 48, 78), 1.5);
+    GF(ctx);
+    ctx.save(); ctx.shadowColor = '#ffe28a'; ctx.shadowBlur = 8;
+    ctx.beginPath(); for (let k = 0; k < 16; k++) { const a = k / 16 * TAU, r = k % 2 ? 5 : 8.6; ctx.lineTo(45 + Math.cos(a) * r, Math.sin(a) * r); } ctx.closePath(); fs(ctx, c.guard, 1.2);
+    ctx.restore();
+    gem(ctx, 45, 0, 2.2, c.gem);
+  };
+  A.BOW_REF.bozi = [36, 33];
+  A.bowDecor.bozi = (ctx, at, c, T, B, gemFn) => {
+    ctx.save(); ctx.strokeStyle = 'rgba(255,240,180,.85)'; ctx.lineWidth = 1;
+    for (const k of [0.2, 0.35, 0.65, 0.8]) { const p = at(k); for (const d of [-1, 1]) { ctx.beginPath(); ctx.moveTo(p[0] - 1, p[1]); ctx.lineTo(p[0] - 6, p[1] + d * 3); ctx.stroke(); } }
+    ctx.restore();
+    for (const p of [T, B]) { ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, TAU); fs(ctx, '#ffd24a', 1); gemFn(ctx, p[0], p[1], 1.2, c.gem || '#5ab8ff'); }
+  };
+  function divineWings(ctx, F, t, moving, w) {
+    const flap = Math.sin(t * 2) * 0.06 + (moving ? Math.sin((w || 0) * 0.6) * 0.04 : 0);
+    ctx.save(); ctx.translate(-3, -52);
+    for (const [sc, alpha, rot] of [[1, 0.8, -0.2], [0.92, 1, 0.02]]) {
+      ctx.save(); ctx.rotate(rot - flap); ctx.scale(sc, sc); ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-16, -36, -44, -44); ctx.quadraticCurveTo(-36, -32, -44, -24);
+      for (let k = 0; k < 6; k++) { const x = -44 + k * 6.4, y = -24 + k * 5.6; ctx.quadraticCurveTo(x + 1, y + 6, x + 4.6, y + 3.4); }
+      ctx.quadraticCurveTo(-8, 8, 0, 0); ctx.closePath();
+      const g = ctx.createLinearGradient(-44, -44, 0, 10); g.addColorStop(0, '#ffffff'); g.addColorStop(0.6, '#fff3c8'); g.addColorStop(1, '#ffd77a');
+      fs(ctx, g, 1.5);
+      ctx.strokeStyle = 'rgba(214,160,40,.75)'; ctx.lineWidth = 0.8;
+      for (let k = 1; k < 6; k++) { ctx.beginPath(); ctx.moveTo(-4 - k * 2, -4 - k * 3); ctx.lineTo(-40 + k * 6.4, -20 + k * 5.6); ctx.stroke(); }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  function divineAura(ctx, t) {
+    ctx.save();
+    const g = ctx.createRadialGradient(0, -44, 4, 0, -44, 54); g.addColorStop(0, 'rgba(255,236,160,.32)'); g.addColorStop(1, 'rgba(255,236,160,0)');
+    ctx.fillStyle = g; ctx.fillRect(-54, -98, 108, 108);
+    // sluneční svatozář za hlavou
+    ctx.translate(1, -66); ctx.rotate(t * 0.4);
+    ctx.beginPath(); for (let k = 0; k < 24; k++) { const a = k / 24 * TAU, r = k % 2 ? 11 : 17; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); } ctx.closePath();
+    ctx.fillStyle = 'rgba(255,215,110,.55)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, 11.5, 0, TAU); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,240,180,.95)'; ctx.stroke();
+    ctx.restore();
+  }
+  const drawF1 = A.drawFeatures;
+  A.drawFeatures = (ctx, L, pal, st, layer, moving, w) => {
+    const F = pal.feat;
+    if (F && layer === 'back' && (F.aura === 'divine' || F.wings === 'divine')) {
+      if (F.aura === 'divine') divineAura(ctx, st.t || 0);
+      if (F.wings === 'divine') divineWings(ctx, F, st.t || 0, moving, w);
+      const F2 = Object.assign({}, F, { aura: null, wings: null });
+      return drawF1(ctx, L, Object.assign({}, pal, { feat: F2 }), st, layer, moving, w);
+    }
+    return drawF1(ctx, L, pal, st, layer, moving, w);
   };
 })();

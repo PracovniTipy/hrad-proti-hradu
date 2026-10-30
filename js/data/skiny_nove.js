@@ -58,11 +58,16 @@ window.GameData = window.GameData || {};
     Object.assign(W('w_andel', 'Meč padlého anděla', 'Božský', 'melee', { id: 'andel', blade: '#2a2228', dark: '#0e0a0e', edge: '#ffd27a', glow: '#ff3a5a', guard: '#ffd24a', pommel: '#ffd24a', gem: '#ff2a4a', grip: '#1a0a10' }, 'Černá čepel se zlatým ostřím a rudou září. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Sword', desc: 'A black blade with a golden edge and a crimson glow. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
     Object.assign(W('k_andel', 'Kopí padlého anděla', 'Božský', 'pole', { id: 'andel', blade: '#2a2228', dark: '#0e0a0e', edge: '#ffd27a', glow: '#ff3a5a', wood: '#1a0a10', guard: '#ffd24a', gem: '#ff2a4a' }, 'Okřídlený hrot z černé oceli. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Spear', desc: 'A winged black steel head. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
     Object.assign(W('h_andel', 'Hůl padlého anděla', 'Božský', 'staff', { id: 'andel', glow: '#ff3a5a' }, 'Černá hůl s rudou koulí v sevření andělských křídel. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Staff', desc: 'A black staff with a crimson orb held by angel wings. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
+    // BOŽSKÝ BOŽÍ KRÁL
+    Object.assign(W('w_kral', 'Meč Božího krále', 'Božský', 'melee', { id: 'bozi', blade: '#fffdf2', dark: '#c9a24a', edge: '#ffffff', glow: '#ffe28a', guard: '#ffd24a', pommel: '#ffd24a', gem: '#5ab8ff', grip: '#f4efe0' }, 'Bílozlatá čepel zářící jako slunce, záštita se sluneční korunou.', { name: 'God-King’s Sword', desc: 'A white-gold blade shining like the sun, with a sun-crown guard.' }), { codeOnly: true }),
+    Object.assign(W('k_kral', 'Kopí Božího krále', 'Božský', 'pole', { id: 'bozi', blade: '#fffdf2', dark: '#c9a24a', edge: '#ffffff', glow: '#ffe28a', wood: '#f4efe0', guard: '#ffd24a', gem: '#5ab8ff' }, 'Zlatý hrot se slunečním kotoučem na bílé násadě.', { name: 'God-King’s Spear', desc: 'A golden head with a sun disc on a white shaft.' }), { codeOnly: true }),
+    Object.assign(W('l_kral', 'Luk Božího krále', 'Božský', 'bow', { id: 'bozi', wood: '#ffd24a', string: '#ffffff', glow: '#ffe28a', gem: '#5ab8ff', arrow: '#fff6d8', tip: '#ffd24a' }, 'Zlatý luk se slunečními paprsky a tětivou ze světla.', { name: 'God-King’s Bow', desc: 'A golden bow with sun rays and a string of light.' }), { codeOnly: true }),
+    Object.assign(W('h_kral', 'Žezlo Božího krále', 'Božský', 'staff', { id: 'bozi', glow: '#ffe28a' }, 'Zlaté žezlo s korunou a zářící modrou koulí.', { name: 'God-King’s Scepter', desc: 'A golden scepter with a crown and a glowing blue orb.' }), { codeOnly: true }),
     Object.assign(W('l_andel', 'Luk padlého anděla', 'Božský', 'bow', { id: 'andel', wood: '#1a1418', string: '#ffd27a', glow: '#ff3a5a', gem: '#ff2a4a', arrow: '#2a2228', tip: '#ffd27a' }, 'Luk z černých andělských per se zlatou tětivou. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Bow', desc: 'A bow of black angel feathers with a golden string. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true })
   );
   // samurajové: jen meč (katana, tači), kopí a luk
-  G.SAM_OK.melee.push('tachi', 'andel');
-  G.SAM_OK.pole.push('pika', 'jumonji', 'andel');
+  G.SAM_OK.melee.push('tachi', 'andel', 'bozi');
+  G.SAM_OK.pole.push('pika', 'jumonji', 'andel', 'bozi');
 
   /* ---------------- NOVÉ SKINY ZBROJE (každý mění tvar: přilbu, štít, plášť…) ---------------- */
   const S = (id, only, name, rarity, palette, feat, look, desc, en, extra) => Object.assign({ id, only, name, rarity, palette, feat, look, desc, en }, extra || {});
@@ -93,6 +98,10 @@ window.GameData = window.GameData || {};
     S('v_volva_vlk', ['volva'], 'Vlčí věštkyně', 'Vzácný', { tunic: '#3a3a4a', tunicDark: '#24242e', trim: '#9dffd0', fur: '#9aa0aa' }, { aura: 'aurora', collar: 'wolf', furColor: '#9aa0aa' }, { helmet: 'furhood' }, 'Vlčí kožešina a polární záře kolem věštkyně.', { name: 'Wolf Seeress', desc: 'Wolf fur and an aurora around the seeress.' }),
     S('v_jarl_kral', ['jarl'], 'Král fjordů', 'Legendární', { tunic: '#2a2a5a', tunicDark: '#18183a', trim: '#ffd24a', metal: '#f0cf6a', metalDark: '#9a6e1c', cape: '#2a2a5a' }, { cape: 'ermine', capeColor: '#2a2a5a', collar: 'wolf', crest: 'wings', pauldron: 'gold', emblemColor: '#ffd24a' }, { helmet: 'spangen', shield: 'spiral' }, 'Zlatý spangenhelm s křídly, vlčí límec a zlatá spirála.', { name: 'King of the Fjords', desc: 'A golden winged spangenhelm, a wolf collar and a golden spiral.' }),
     /* BOŽSKÝ PADLÝ ANDĚL – zbroj tvůrce hry (jen na kód) */
+    S('kral_bozi', null, 'Božský Boží král', 'Božský',
+      { tunic: '#f4efe0', tunicDark: '#d6cdb6', trim: '#ffd24a', metal: '#ffe9a0', metalDark: '#c9a24a', cape: '#fffbe8', plume: '#ffffff', eyes: '#5ab8ff', hood: '#f4efe0', hat: '#f4efe0', lace: '#ffd24a', mask: '#ffe9a0', sashi: '#fffbe8', mon: '#ffd24a', crest: '#ffd24a', robe: '#f4efe0', fur: '#fffbe8', bear: '#f4efe0', hair: '#f2e0a0' },
+      { wings: 'divine', aura: 'divine', pauldron: 'gold', gem: '#5ab8ff', chest: 'sun', emblemColor: '#ffd24a', cape: 'ermine', capeColor: '#fffbe8', collar: 'ermine', wingColor: '#fffbe8' },
+      null, 'Bílozlatá zbroj, koruna, zlatá křídla a sluneční svatozář. Nejvyšší moc na bojišti.', { name: 'Divine God-King', desc: 'White-gold armor, a crown, golden wings and a sun halo. The highest power on the battlefield.' }, { codeOnly: true, glow: '#ffe28a', ornament: 'crown' }),
     S('andel', null, 'Božský padlý anděl', 'Božský',
       { tunic: '#1a1418', tunicDark: '#0a080a', trim: '#ffd24a', metal: '#2a2228', metalDark: '#0e0a0e', cape: '#3a0a14', plume: '#ff2a4a', eyes: '#ff2a4a', hood: '#1a1418', hat: '#1a1418', lace: '#a8162a', mask: '#1a1418', sashi: '#1a1418', mon: '#ffd24a', crest: '#ffd24a', robe: '#1a1418', fur: '#2a2228', bear: '#2a2228', hair: '#2a2228' },
       { wings: 'fallen', aura: 'fallen', pauldron: 'gold', gem: '#ff2a4a', chest: 'star', emblemColor: '#ffd24a', cape: 'tattered', capeColor: '#2a060c', crest: 'wings', wingColor: '#1a1418' },
@@ -207,17 +216,22 @@ window.GameData = window.GameData || {};
     return all.length ? all[Math.floor(Math.random() * all.length)] : null;
   };
 
-  /* Sety, které se dávají kódem */
-  G.codeSets = {
-    andel: save => {
-      const got = [];
-      const s0 = G.unitSkins.find(x => x.id === 'andel');
-      Own.units().forEach(u => {
-        if (G.skinFits(s0, u)) { Own.add(save, u, 'andel'); save.skins.unit[u] = 'andel'; got.push({ k: 'a', uid: u, id: 'andel' }); }
-        const w = ['w_andel', 'k_andel', 'l_andel', 'h_andel'].map(id => G.weaponSkins.find(x => x.id === id)).find(x => G.weaponSkinFits(x, u));
-        if (w) { Own.addW(save, u, w.id); save.skins.weapon[u] = w.id; got.push({ k: 'w', uid: u, id: w.id }); }
-      });
-      return got;
-    }
+  /* BOŽSKÉ SETY: zbroj + zbraň pro všechny vojáky všech národů (kód nebo balíček v obchodě) */
+  G.divineSets = {
+    andel: { armor: 'andel', weapons: ['w_andel', 'k_andel', 'l_andel', 'h_andel'], name: 'Božský padlý anděl', en: 'Divine Fallen Angel', price: { gems: 2500 } },
+    kral: { armor: 'kral_bozi', weapons: ['w_kral', 'k_kral', 'l_kral', 'h_kral'], name: 'Božský Boží král', en: 'Divine God-King', price: { gems: 2500 } }
   };
+  const giveSet = (save, id) => {
+    const D = G.divineSets[id], got = [];
+    const s0 = G.unitSkins.find(x => x.id === D.armor);
+    Own.units().forEach(u => {
+      if (G.skinFits(s0, u)) { Own.add(save, u, D.armor); save.skins.unit[u] = D.armor; got.push({ k: 'a', uid: u, id: D.armor }); }
+      const w = D.weapons.map(x => G.weaponSkins.find(y => y.id === x)).find(x => G.weaponSkinFits(x, u));
+      if (w) { Own.addW(save, u, w.id); save.skins.weapon[u] = w.id; got.push({ k: 'w', uid: u, id: w.id }); }
+    });
+    return got;
+  };
+  /* má hráč set kompletní? */
+  G.divineOwned = (save, id) => { const D = G.divineSets[id]; Own.ensure(save); return Own.units().every(u => Own.has(save, u, D.armor)); };
+  G.codeSets = { andel: save => giveSet(save, 'andel'), kral: save => giveSet(save, 'kral') };
 })();

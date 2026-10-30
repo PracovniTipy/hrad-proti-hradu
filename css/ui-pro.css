@@ -1056,3 +1056,14 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
   .obtn svg { width: 17px; height: 17px; }
 }
 @media (max-width: 700px) { .obtn > span:not([data-ico]) { display: none; } .obtn { min-width: 40px !important; } }
+
+/* ===== BOŽSKÉ SETY V OBCHODĚ ===== */
+.div-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.div-card { display: grid; grid-template-columns: 46% 1fr; gap: 12px; align-items: center; padding: 12px; border: 2px solid #ff5a8a; box-shadow: 0 0 22px rgba(255,90,138,.25); }
+.div-card.div-kral { border-color: #ffd24a; box-shadow: 0 0 22px rgba(255,210,74,.3); }
+.div-card canvas { width: 100%; height: 190px; border-radius: 10px; display: block; }
+.div-card h3 { margin: 2px 0 6px; font-size: 20px; }
+.div-card p { margin: 0 0 8px; font-size: 14px; }
+.div-card .btn { width: 100%; }
+@media (max-width: 900px) { .div-row { grid-template-columns: 1fr; } }
+@media (orientation: landscape) and (max-height: 520px) { .div-card canvas { height: 150px; } .div-card h3 { font-size: 16px; } .div-card p { font-size: 12px; } }
