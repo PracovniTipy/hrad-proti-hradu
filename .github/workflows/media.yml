@@ -1,0 +1,26 @@
+name: Stažení médií pro trailer
+on:
+  push:
+    paths: ['tools/media.txt']
+permissions:
+  contents: write
+jobs:
+  stahni:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stáhnout
+        run: |
+          mkdir -p /tmp/m
+          grep -v '^#' tools/media.txt | while read url name; do
+            [ -z "$url" ] && continue
+            curl -sfL -o "/tmp/m/$name" "$url" && echo "ok $name $(stat -c %s /tmp/m/$name)"
+          done
+      - name: Uložit do větve media
+        run: |
+          cd /tmp/m
+          git init -q -b media
+          git config user.name "PracovniTipy"
+          git config user.email "dudypetr1@seznam.cz"
+          git add -A && git commit -qm "media"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" media
