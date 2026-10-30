@@ -229,6 +229,13 @@
       ctx.beginPath(); ctx.arc(0, y, 8.4, 0.35, TAU - 0.35); ctx.arc(2.6, y, 6.4, TAU - 0.7, 0.7, true); ctx.closePath(); fs(ctx, '#dfe6ff', 1.3);
       orb(-0.6, y, 3.6);
       ctx.fillStyle = '#fff'; for (const [x2, y2] of [[7, -9], [9, 6]]) { ctx.beginPath(); ctx.arc(x2, y + y2, 0.9, 0, TAU); ctx.fill(); }
+    } else if (id === 'andel') { // dvě černá křídla svírají rudou kouli
+      for (const d of [-1, 1]) {
+        ctx.beginPath(); ctx.moveTo(0, y + 6); ctx.quadraticCurveTo(d * 4, y - 2, d * 12, y - 12); ctx.quadraticCurveTo(d * 9, y - 6, d * 11, y - 3); ctx.quadraticCurveTo(d * 7, y - 2, d * 8, y + 2); ctx.quadraticCurveTo(d * 4, y + 2, 0, y + 7); ctx.closePath();
+        fs(ctx, '#1a1418', 1.3); ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 0.8; ctx.stroke();
+      }
+      orb(0, y - 3, 4.6 + raise * 1.2);
+      ctx.beginPath(); ctx.ellipse(0, y - 12, 5, 1.6, 0, 0, TAU); ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,60,90,.9)'; ctx.stroke();
     } else { // výchozí: vidlice držící kouli
       ctx.beginPath(); ctx.moveTo(-5, y + 5); ctx.quadraticCurveTo(-6, y - 3, 0, y - 5); ctx.quadraticCurveTo(6, y - 3, 5, y + 5); ctx.lineWidth = 2.2; ctx.strokeStyle = trim; ctx.stroke();
       orb(0, y, 5 + raise * 1.5);

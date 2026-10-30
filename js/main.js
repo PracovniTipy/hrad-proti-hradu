@@ -654,6 +654,7 @@
       }
       // skiny 2.0: skiny po jednotkách, Zbrojnice převedená na skiny (jednou, nic se neztratí)
       if (GameData.skinMigrate && GameData.skinMigrate(this.save)) Save.save();
+      if (GameData.andelUpgrade && GameData.andelUpgrade(this.save)) Save.save();
       // národ, který ještě není odemčený příběhem, nelze hrát
       if (!GameData.campaignHelpers.factionUnlocked(this.save, this.save.faction)) { this.save.faction = 'kralovstvi'; this.save.avatar = 'rytir'; }
       I18N.set(this.save.lang || (navigator.language || 'cs').slice(0, 2));

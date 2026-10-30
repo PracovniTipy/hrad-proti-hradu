@@ -57,6 +57,7 @@ window.GameData = window.GameData || {};
     // BOŽSKÝ PADLÝ ANDĚL – jen na kód
     Object.assign(W('w_andel', 'Meč padlého anděla', 'Božský', 'melee', { id: 'andel', blade: '#2a2228', dark: '#0e0a0e', edge: '#ffd27a', glow: '#ff3a5a', guard: '#ffd24a', pommel: '#ffd24a', gem: '#ff2a4a', grip: '#1a0a10' }, 'Černá čepel se zlatým ostřím a rudou září. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Sword', desc: 'A black blade with a golden edge and a crimson glow. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
     Object.assign(W('k_andel', 'Kopí padlého anděla', 'Božský', 'pole', { id: 'andel', blade: '#2a2228', dark: '#0e0a0e', edge: '#ffd27a', glow: '#ff3a5a', wood: '#1a0a10', guard: '#ffd24a', gem: '#ff2a4a' }, 'Okřídlený hrot z černé oceli. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Spear', desc: 'A winged black steel head. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
+    Object.assign(W('h_andel', 'Hůl padlého anděla', 'Božský', 'staff', { id: 'andel', glow: '#ff3a5a' }, 'Černá hůl s rudou koulí v sevření andělských křídel. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Staff', desc: 'A black staff with a crimson orb held by angel wings. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true }),
     Object.assign(W('l_andel', 'Luk padlého anděla', 'Božský', 'bow', { id: 'andel', wood: '#1a1418', string: '#ffd27a', glow: '#ff3a5a', gem: '#ff2a4a', arrow: '#2a2228', tip: '#ffd27a' }, 'Luk z černých andělských per se zlatou tětivou. Vybavení tvůrce hry – BrosWars Studio.', { name: 'Fallen Angel’s Bow', desc: 'A bow of black angel feathers with a golden string. The game creator’s gear – BrosWars Studio.' }), { codeOnly: true })
   );
   // samurajové: jen meč (katana, tači), kopí a luk
@@ -92,8 +93,8 @@ window.GameData = window.GameData || {};
     S('v_volva_vlk', ['volva'], 'Vlčí věštkyně', 'Vzácný', { tunic: '#3a3a4a', tunicDark: '#24242e', trim: '#9dffd0', fur: '#9aa0aa' }, { aura: 'aurora', collar: 'wolf', furColor: '#9aa0aa' }, { helmet: 'furhood' }, 'Vlčí kožešina a polární záře kolem věštkyně.', { name: 'Wolf Seeress', desc: 'Wolf fur and an aurora around the seeress.' }),
     S('v_jarl_kral', ['jarl'], 'Král fjordů', 'Legendární', { tunic: '#2a2a5a', tunicDark: '#18183a', trim: '#ffd24a', metal: '#f0cf6a', metalDark: '#9a6e1c', cape: '#2a2a5a' }, { cape: 'ermine', capeColor: '#2a2a5a', collar: 'wolf', crest: 'wings', pauldron: 'gold', emblemColor: '#ffd24a' }, { helmet: 'spangen', shield: 'spiral' }, 'Zlatý spangenhelm s křídly, vlčí límec a zlatá spirála.', { name: 'King of the Fjords', desc: 'A golden winged spangenhelm, a wolf collar and a golden spiral.' }),
     /* BOŽSKÝ PADLÝ ANDĚL – zbroj tvůrce hry (jen na kód) */
-    S('andel', ['pesak', 'asigaru', 'valecnik', 'kopinik', 'jari', 'stitonos', 'lucistnik', 'jumi', 'lovec'], 'Božský padlý anděl', 'Božský',
-      { tunic: '#1a1418', tunicDark: '#0a080a', trim: '#ffd24a', metal: '#2a2228', metalDark: '#0e0a0e', cape: '#3a0a14', plume: '#ff2a4a', eyes: '#ff2a4a', hood: '#1a1418', hat: '#1a1418' },
+    S('andel', null, 'Božský padlý anděl', 'Božský',
+      { tunic: '#1a1418', tunicDark: '#0a080a', trim: '#ffd24a', metal: '#2a2228', metalDark: '#0e0a0e', cape: '#3a0a14', plume: '#ff2a4a', eyes: '#ff2a4a', hood: '#1a1418', hat: '#1a1418', lace: '#a8162a', mask: '#1a1418', sashi: '#1a1418', mon: '#ffd24a', crest: '#ffd24a', robe: '#1a1418', fur: '#2a2228', bear: '#2a2228', hair: '#2a2228' },
       { wings: 'fallen', aura: 'fallen', pauldron: 'gold', gem: '#ff2a4a', chest: 'star', emblemColor: '#ffd24a', cape: 'tattered', capeColor: '#2a060c', crest: 'wings', wingColor: '#1a1418' },
       null, 'Černozlatá zbroj, obří černá křídla a rudá záře. Zbroj samotného tvůrce hry – BrosWars Studio.', { name: 'Divine Fallen Angel', desc: 'Black-gold armor, huge black wings and a crimson glow. The game creator’s own armor – BrosWars Studio.' }, { codeOnly: true, glow: '#ff3a5a' })
   );
@@ -175,6 +176,21 @@ window.GameData = window.GameData || {};
     return true;
   };
 
+  G.andelUpgrade = save => {
+    if (save.mig_andel2) return false;
+    const sk = Own.ensure(save);
+    const has = Object.keys(sk.own).some(u => (sk.own[u] || []).includes('andel'));
+    save.mig_andel2 = 1;
+    if (!has) return true;
+    const s0 = G.unitSkins.find(x => x.id === 'andel');
+    Own.units().forEach(u => {
+      if (G.skinFits(s0, u) && Own.add(save, u, 'andel') && (!sk.unit[u] || sk.unit[u] === 'zakladni')) sk.unit[u] = 'andel';
+      const w = ['w_andel', 'k_andel', 'l_andel', 'h_andel'].map(id => G.weaponSkins.find(x => x.id === id)).find(x => G.weaponSkinFits(x, u));
+      if (w && Own.addW(save, u, w.id) && (!sk.weapon[u] || sk.weapon[u] === 'w_zakladni')) sk.weapon[u] = w.id;
+    });
+    return true;
+  };
+
   /* Náhodný skin, který hráč ještě NEMÁ (truhly a balíčky).
      rarityOdds = šance [základní, vzácná, epická, legendární]; units = komu může padnout */
   G.randomSkin = (save, rarityOdds, units, kind) => {
@@ -195,13 +211,11 @@ window.GameData = window.GameData || {};
   G.codeSets = {
     andel: save => {
       const got = [];
+      const s0 = G.unitSkins.find(x => x.id === 'andel');
       Own.units().forEach(u => {
-        const s = G.unitSkins.find(x => x.id === 'andel');
-        if (G.skinFits(s, u)) { Own.add(save, u, 'andel'); save.skins.unit[u] = 'andel'; got.push({ k: 'a', uid: u, id: 'andel' }); }
-        ['w_andel', 'k_andel', 'l_andel'].forEach(wid => {
-          const w = G.weaponSkins.find(x => x.id === wid);
-          if (G.weaponSkinFits(w, u) && ['pech', 'kopi', 'strelec'].includes(G.units[u].roleKey)) { Own.addW(save, u, wid); save.skins.weapon[u] = wid; got.push({ k: 'w', uid: u, id: wid }); }
-        });
+        if (G.skinFits(s0, u)) { Own.add(save, u, 'andel'); save.skins.unit[u] = 'andel'; got.push({ k: 'a', uid: u, id: 'andel' }); }
+        const w = ['w_andel', 'k_andel', 'l_andel', 'h_andel'].map(id => G.weaponSkins.find(x => x.id === id)).find(x => G.weaponSkinFits(x, u));
+        if (w) { Own.addW(save, u, w.id); save.skins.weapon[u] = w.id; got.push({ k: 'w', uid: u, id: w.id }); }
       });
       return got;
     }
