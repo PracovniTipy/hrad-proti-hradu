@@ -14,7 +14,7 @@ jobs:
           mkdir -p /tmp/m
           grep -v '^#' tools/media.txt | while read url name; do
             [ -z "$url" ] && continue
-            curl -sfL -o "/tmp/m/$name" "$url" && echo "ok $name $(stat -c %s /tmp/m/$name)"
+            curl -sfL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36" -e "https://battlecastle.itch.io/" -o "/tmp/m/$name" "$url" || echo "FAIL $name" && echo "ok $name $(stat -c %s /tmp/m/$name)"
           done
       - name: Uložit do větve media
         run: |
