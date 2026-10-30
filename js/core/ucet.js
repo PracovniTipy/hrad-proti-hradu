@@ -92,6 +92,10 @@
     },
     async leaderboard() { return rpc('hra_leaderboard', { p_limit: 50 }); },
     /* uplatnění kódu: odměnu vrací server (každý kód jednou na účet) */
+    /* platby: nová platba (cena je z katalogu na serveru) a vyzvednutí zaplacených nákupů */
+    async payStart(product) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_platba_start', { p_token: this.s.token, p_product: product }); },
+    async payClaim() { if (!this.s || !this.s.token) return []; return rpc('hra_platby_vyzvednout', { p_token: this.s.token }); },
+    apiKey: KEY,
     async redeem(code) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_redeem', { p_token: this.s.token, p_code: code }); },
 
     /* Nahrání postupu: po každé změně s malým zpožděním, při zavření hned */

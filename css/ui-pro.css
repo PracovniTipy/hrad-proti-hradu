@@ -1067,3 +1067,5 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 .div-card .btn { width: 100%; }
 @media (max-width: 900px) { .div-row { grid-template-columns: 1fr; } }
 @media (orientation: landscape) and (max-height: 520px) { .div-card canvas { height: 150px; } .div-card h3 { font-size: 16px; } .div-card p { font-size: 12px; } }
+
+.big-buy{display:flex;gap:10px;flex-wrap:wrap;align-items:center}

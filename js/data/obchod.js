@@ -32,6 +32,9 @@ GameData.castleCustom = {
   ]
 };
 
+/* Velká pevnost za drahokamy (nebo jako balíček za skutečné peníze) */
+GameData.bigCastleGems = 10000;
+
 /* Výchozí znak podle národa */
 GameData.defaultEmblem = { kralovstvi: 'lilie', samurajove: 'sakura', vikingove: 'havran' };
 

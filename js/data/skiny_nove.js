@@ -111,7 +111,7 @@ window.GameData = window.GameData || {};
   /* ---------------- PEVNÉ BONUSY A CENY PODLE VZÁCNOSTI ---------------- */
   const WB = [{ dmg: 0.03 }, { dmg: 0.05 }, { dmg: 0.07 }, { dmg: 0.1, hp: 0.1 }, { dmg: 0.2, hp: 0.2 }];
   const AB = [{ hp: 0.03 }, { hp: 0.05 }, { hp: 0.07 }, { hp: 0.1, dmg: 0.1 }, { hp: 0.2, dmg: 0.2 }];
-  const PRICE = [{ gold: 1500 }, { gold: 3500 }, { gems: 180 }, { gems: 450 }, {}];
+  const PRICE = [{ gold: 1800 }, { gold: 4200 }, { gems: 220 }, { gems: 540 }, {}];   // +20 % (říjen 2026)
   G.unitSkins.forEach(s => {
     if (s.id === 'zakladni') { s.bonus = null; return; }
     if (s.exclusive) s.rarity = 'Legendární';

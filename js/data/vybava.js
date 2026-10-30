@@ -64,37 +64,44 @@ GameData.unitSkins.push(
 /* ---- Nabídky za 29 Kč a další balíčky ----
    give: { gold, gems, gear: [id], skins: [id], decor: [id], randomGear: { minTier } }
    limit: kolikrát jde koupit (null = bez omezení) */
+const ALLROLES = ['pech', 'strelec', 'kopi', 'tezka', 'jizda', 'mag', 'velitel'];
 GameData.offers = [
-  { id: 'start', name: 'Startovní balíček', desc: 'Nejvýhodnější začátek: 6 000 zlata, 400 drahokamů, skin Lesní hraničáři a tesák pro pěchotu všech národů.', czk: 29, limit: 1, badge: '×20 hodnota',
-    give: { gold: 6000, gems: 400, gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', w: 'w_tesak' }] }, art: 'chest' },
-  { id: 'mesec', name: 'Měšec zlata', desc: '8 000 zlata na vylepšení hradu.', czk: 29, give: { gold: 8000 }, art: 'gold' },
-  { id: 'hrst', name: 'Hrst drahokamů', desc: '450 drahokamů na skiny a útoky.', czk: 29, give: { gems: 450 }, art: 'gems' },
-  { id: 'kovar', name: 'Balíček kováře', desc: 'Epický nebo legendární skin zbraně, který ještě nemáš (když máš všechny, dostaneš 2 500 zlata), k tomu 3 000 zlata a 100 drahokamů.', czk: 29, give: { gold: 3000, gems: 100, random: { kind: 'w', odds: [0, 0, 0.7, 0.3] } }, art: 'weapon' },
-  { id: 'zbrojir', name: 'Balíček zbrojíře', desc: 'Epická zbroj pro těžkou jednotku, vzácná pro pěchotu a 3 000 zlata.', czk: 29, limit: 1, give: { gold: 3000, gift: [{ role: 'tezka', ar: 'Epický' }, { role: 'pech', ar: 'Vzácný' }] }, art: 'armor' },
-  { id: 'lucist', name: 'Balíček lučištníka', desc: 'Dračí luk a vzácná zbroj pro střelce a 250 drahokamů.', czk: 29, limit: 1, give: { gems: 250, gift: [{ role: 'strelec', w: 'l_drak' }, { role: 'strelec', ar: 'Vzácný' }] }, art: 'weapon' },
-  { id: 'valecny', name: 'Válečný balíček', desc: '6 000 zlata a 300 drahokamů na další tažení.', czk: 29, give: { gold: 6000, gems: 300 }, art: 'chest' },
-  { id: 'hraniceri', name: 'Balíček hraničářů', desc: 'Tři skiny pro pěchotu: Lesní hraničáři, Půlnoční hlídka a Stínová legie + 150 drahokamů.', czk: 29, limit: 1, give: { gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', a: 'pulnoc' }, { role: 'pech', a: 'stinovy' }], gems: 150 }, art: 'skin' },
-  { id: 'hradni', name: 'Hradní balíček', desc: 'Pochodně a velké prapory na hrad a 5 000 zlata.', czk: 29, limit: 1, give: { gold: 5000, decor: ['pochodne', 'prapory'] }, art: 'castle' },
-  { id: 'kopinik', name: 'Balíček kopiníků', desc: 'Epická zbroj a dračí kopí pro kopiníky a 2 000 zlata.', czk: 29, limit: 1, give: { gold: 2000, gift: [{ role: 'kopi', ar: 'Epický' }, { role: 'kopi', w: 'k_drak' }] }, art: 'armor' },
-  { id: 'hrdina', name: 'Balíček hrdiny', desc: 'Legendární Hvězdná čepel a epická zbroj pro těžkou jednotku, 8 000 zlata a 500 drahokamů.', czk: 59, limit: 1, badge: 'Legendární zbraň', give: { gems: 500, gold: 8000, gift: [{ role: 'tezka', w: 'w_hvezda' }, { role: 'tezka', ar: 'Epický' }] }, art: 'weapon' },
-  { id: 'pevnost', name: 'Velká pevnost', desc: 'Velký hrad: až 10 obránců na hradbách, +25 % životů hradu, navíc 10 000 zlata a 500 drahokamů.', czk: 149, limit: 1, badge: 'Až 10 obránců', give: { bigCastle: true, gold: 10000, gems: 500 }, art: 'castle' },
-  { id: 'kral', name: 'Královský balíček', desc: 'Legendární zbroj a Meč krále pro těžkou jednotku, legendární zbroj pěchoty a Hvězdný luk, 25 000 zlata a 2 000 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 25000, gems: 2000, gift: [{ role: 'tezka', ar: 'Legendární' }, { role: 'tezka', w: 'w_zlato' }, { role: 'pech', ar: 'Legendární' }, { role: 'strelec', w: 'l_hvezdny' }] }, art: 'crown' }
+  { id: 'start', name: 'Startovní balíček', desc: 'Nejvýhodnější začátek: 15 000 zlata, 1 500 drahokamů, epická zbroj pro těžké jednotky a skin Lesní hraničáři s tesákem pro pěchotu všech národů.', czk: 29, limit: 1, badge: '×30 hodnota',
+    give: { gold: 15000, gems: 1500, gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', w: 'w_tesak' }, { role: 'tezka', ar: 'Epický' }] }, art: 'chest' },
+  { id: 'mesec', name: 'Měšec zlata', desc: '20 000 zlata na vylepšení hradu.', czk: 29, give: { gold: 20000 }, art: 'gold' },
+  { id: 'hrst', name: 'Hrst drahokamů', desc: '800 drahokamů na skiny a útoky – skoro dvakrát víc než běžný balíček.', czk: 29, limit: 1, badge: 'Jen jednou', give: { gems: 800 }, art: 'gems' },
+  { id: 'kovar', name: 'Balíček kováře', desc: 'Dva epické nebo legendární skiny zbraní, které ještě nemáš, k tomu 6 000 zlata a 300 drahokamů.', czk: 29, give: { gold: 6000, gems: 300, random: { kind: 'w', count: 2, odds: [0, 0, 0.6, 0.4] } }, art: 'weapon' },
+  { id: 'zbrojir', name: 'Balíček zbrojíře', desc: 'Epická zbroj pro těžké jednotky i pěchotu všech národů a 8 000 zlata.', czk: 29, limit: 1, give: { gold: 8000, gift: [{ role: 'tezka', ar: 'Epický' }, { role: 'pech', ar: 'Epický' }] }, art: 'armor' },
+  { id: 'lucist', name: 'Balíček lučištníka', desc: 'Dračí luk a epická zbroj pro všechny střelce a 600 drahokamů.', czk: 29, limit: 1, give: { gems: 600, gift: [{ role: 'strelec', w: 'l_drak' }, { role: 'strelec', ar: 'Epický' }] }, art: 'weapon' },
+  { id: 'valecny', name: 'Válečný balíček', desc: '15 000 zlata a 700 drahokamů na další tažení.', czk: 29, give: { gold: 15000, gems: 700 }, art: 'chest' },
+  { id: 'hraniceri', name: 'Balíček hraničářů', desc: 'Tři skiny pro pěchotu: Lesní hraničáři, Půlnoční hlídka a Stínová legie + 500 drahokamů.', czk: 29, limit: 1, give: { gift: [{ role: 'pech', a: 'lesni' }, { role: 'pech', a: 'pulnoc' }, { role: 'pech', a: 'stinovy' }], gems: 500 }, art: 'skin' },
+  { id: 'hradni', name: 'Hradní balíček', desc: 'Pochodně, velké prapory a erbovní štíty na hrad a 12 000 zlata.', czk: 29, limit: 1, give: { gold: 12000, decor: ['pochodne', 'prapory', 'stity'] }, art: 'castle' },
+  { id: 'kopinik', name: 'Balíček kopiníků', desc: 'Epická zbroj a dračí kopí pro kopiníky a 6 000 zlata.', czk: 29, limit: 1, give: { gold: 6000, gift: [{ role: 'kopi', ar: 'Epický' }, { role: 'kopi', w: 'k_drak' }] }, art: 'armor' },
+  { id: 'hrdina', name: 'Balíček hrdiny', desc: 'Legendární Hvězdná čepel a legendární zbroj pro těžké jednotky, 20 000 zlata a 1 500 drahokamů.', czk: 59, limit: 1, badge: 'Legendární', give: { gems: 1500, gold: 20000, gift: [{ role: 'tezka', w: 'w_hvezda' }, { role: 'tezka', ar: 'Legendární' }] }, art: 'weapon' },
+  { id: 'drak', name: 'Dračí pán', desc: 'Tři nejničivější útoky – Dračí dech, Obří meteor a Ohnivá zeď – k tomu 25 000 zlata a 2 500 drahokamů.', czk: 99, limit: 1, badge: '3 útoky', give: { skills: ['drak', 'meteor', 'zed'], gold: 25000, gems: 2500 }, art: 'crown' },
+  { id: 'pevnost', name: 'Velká pevnost', desc: 'Velký hrad (až 10 obránců na hradbách, +25 % životů hradu), Kamenní strážci a Ohně na hradbách, 30 000 zlata a 3 000 drahokamů.', czk: 149, limit: 1, badge: 'Až 10 obránců', give: { bigCastle: true, decor: ['sochy', 'ohne'], gold: 30000, gems: 3000 }, art: 'castle' },
+  { id: 'kral', name: 'Královský balíček', desc: 'Legendární zbroj a Meč krále pro těžké jednotky, legendární zbroj pěchoty a Hvězdný luk, 50 000 zlata a 5 000 drahokamů.', czk: 149, limit: 1, badge: 'Legendární', give: { gold: 50000, gems: 5000, gift: [{ role: 'tezka', ar: 'Legendární' }, { role: 'tezka', w: 'w_zlato' }, { role: 'pech', ar: 'Legendární' }, { role: 'strelec', w: 'l_hvezdny' }] }, art: 'crown' },
+  { id: 'kniha', name: 'Kniha všech útoků', desc: 'Odemkne naráz všechny speciální útoky ve hře a přidá 3 000 drahokamů.', czk: 149, limit: 1, badge: 'Všechny útoky', give: { skills: 'all', gems: 3000 }, art: 'gems' },
+  { id: 'legie', name: 'Legendární legie', desc: 'Legendární zbroj pro všechny vojáky všech národů – 21 jednotek naráz! K tomu 40 000 zlata a 4 000 drahokamů.', czk: 199, limit: 1, badge: '21 vojáků', give: { gold: 40000, gems: 4000, gift: ALLROLES.map(role => ({ role, ar: 'Legendární' })) }, art: 'armor' },
+  { id: 'arzenal', name: 'Arzenál legend', desc: 'Legendární zbraň pro každého vojáka všech národů a 5 000 drahokamů.', czk: 199, limit: 1, badge: '21 zbraní', give: { gems: 5000, gift: ALLROLES.map(role => ({ role, wr: 'Legendární' })) }, art: 'weapon' },
+  { id: 'cisar', name: 'Císařský poklad', desc: 'Úplně všechno: Velká pevnost, všechny dekorace hradu, všechny útoky, legendární zbroj i zbraň pro všech 21 vojáků, 150 000 zlata a 20 000 drahokamů.', czk: 499, limit: 1, badge: 'MEGA ×50', give: { bigCastle: true, allDecor: true, skills: 'all', gold: 150000, gems: 20000, gift: ALLROLES.map(role => ({ role, ar: 'Legendární', wr: 'Legendární' })) }, art: 'crown' }
 ];
 
 /* ---- Truhly za drahokamy (herní měna, ne přímo skutečné peníze; šance jsou zveřejněné) ---- */
 GameData.chests = {
-  denni: { id: 'denni', name: 'Denní truhla', gemsPrice: 120, period: 'day', desc: 'Jednou denně.',
+  denni: { id: 'denni', name: 'Denní truhla', gemsPrice: 145, period: 'day', desc: 'Jednou denně.',
     gold: [2500, 4500], gems: [0, 0], gearChance: 0.7, tierOdds: [0.3, 0.45, 0.2, 0.05] },  /* gearChance = šance na skin */
-  tydenni: { id: 'tydenni', name: 'Týdenní truhla', gemsPrice: 600, period: 'week', desc: 'Jednou týdně. Vždy obsahuje 3 skiny zbraní nebo zbroje.',
+  tydenni: { id: 'tydenni', name: 'Týdenní truhla', gemsPrice: 720, period: 'week', desc: 'Jednou týdně. Vždy obsahuje 3 skiny zbraní nebo zbroje.',
     gold: [14000, 22000], gems: [0, 0], gearChance: 1, gearCount: 3, tierOdds: [0, 0.4, 0.4, 0.2] }
 };
 
 /* ---- Drahokamy za skutečné peníze ---- */
 GameData.gemPacks = [
   { id: 'g1', gems: 450, czk: 29 },
-  { id: 'g2', gems: 1700, czk: 99, badge: '+10 %' },
-  { id: 'g3', gems: 4700, czk: 249, badge: '+20 %' },
-  { id: 'g4', gems: 10500, czk: 499, badge: '+40 %' }
+  { id: 'g2', gems: 2000, czk: 99, badge: '+30 %' },
+  { id: 'g3', gems: 5500, czk: 249, badge: '+40 %' },
+  { id: 'g4', gems: 13000, czk: 499, badge: '+65 %' },
+  { id: 'g5', gems: 30000, czk: 999, badge: '+90 %' }
 ];
 
 /* ---------------------------------------------------------------------

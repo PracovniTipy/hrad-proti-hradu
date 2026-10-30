@@ -9,6 +9,7 @@ function create() {
   const w = new BrowserWindow({
     width: 1280, height: 720, minWidth: 900, minHeight: 500, show: false,
     backgroundColor: '#0d121c', title: 'Castle WARS', autoHideMenuBar: true,
+    acceptFirstMouse: true,   // macOS: první klik do neaktivního okna rovnou funguje (jinak ho systém spolkne)
     icon: path.join(__dirname, 'icon.png'),
     webPreferences: { contextIsolation: true, autoplayPolicy: 'no-user-gesture-required' }
   });

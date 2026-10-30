@@ -105,6 +105,8 @@ GameData.skillRangeBar = k => {
   return `<div class="rbar z-${I.zone}"><b class="rc me"></b><span class="rf">${zone}</span><b class="rc foe"></b></div>`;
 };
 GameData.skillById = id => GameData.skills.find(s => s.id === id);
+/* CENY: útoky za herní měnu jsou o 20 % dražší (zlato zaokrouhleno na 50, drahokamy na 10) */
+GameData.skills.forEach(s => { const p = s.price || {}; if (p.gold) p.gold = Math.round(p.gold * 1.2 / 50) * 50; if (p.gems) p.gems = Math.round(p.gems * 1.2 / 10) * 10; });
 /* VYVÁŽENÍ: zraňující speciální útoky jsou o 10 % slabší */
 (function () {
   const DMG = { meteors: 1, meteor: 1, element: 1, volley: 1, storm: 1, stun: 1, quake: 1, holy: 1, barrage: 1, wall: 1, tornado: 1, breath: 1 };

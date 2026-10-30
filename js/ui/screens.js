@@ -645,7 +645,7 @@
         <section class="panel big-offer ${useBig ? 'owned' : ''}">
           <canvas id="bigCv"></canvas>
           <div class="big-txt"><div class="eyebrow">${t('big_eyebrow')}</div><h3>${t('big_name')}</h3><p>${t('big_desc')}</p>
-            ${useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : big ? `<button class="btn btn-blue" data-ctype="velky">${t('use')}</button>` : (Platby.on() ? `<button class="btn btn-gold" data-offer="pevnost">${t('buy')} · 149 Kč</button>` : `<button class="btn" disabled>${t('soon')}</button>`)}</div>
+            ${useBig ? `<button class="btn btn-sm" disabled>✓ ${t('in_use')}</button>` : big ? `<button class="btn btn-blue" data-ctype="velky">${t('use')}</button>` : `<div class="big-buy"><button class="btn btn-gold" data-biggems>${ico('gem')} ${fmt(GameData.bigCastleGems)}</button><button class="btn btn-green" data-offer="pevnost">${t('buy')} · ${Platby.price(GameData.offers.find(o => o.id === 'pevnost').czk)}</button></div>`}</div>
         </section>
         </div>
         <div class="sec-head"><h2>${t('castle_looks')}</h2></div>
@@ -834,6 +834,12 @@
         ctx.restore();
       });
       el.querySelectorAll('[data-ctype]').forEach(b => b.addEventListener('click', () => { save.castleType = b.dataset.ctype; App.persist(); App.go('obchod', { keepScroll: true }); }));
+      el.querySelectorAll('[data-biggems]').forEach(b => b.addEventListener('click', () => {
+        const n = GameData.bigCastleGems;
+        if (save.gems < n) { App.toast(t('not_enough')); return; }
+        save.gems -= n; save.bigCastle = true; save.castleType = 'velky';
+        App.toast(t('big_bought')); App.persist(); App.go('obchod', { keepScroll: true });
+      }));
       if (window.Shop && Shop.bindOffers) Shop.bindOffers(App, el);
       el.querySelectorAll('canvas[data-skincastle]').forEach(c => Art.renderCastleIcon(c, 'player', c.dataset.skincastle, GameData.calc.castleLevel(save), F.castleStyle));
       el.querySelectorAll('[data-cequip]').forEach(b => b.addEventListener('click', () => { save.skins.castle = b.dataset.cequip; App.persist(); App.go('obchod', { keepScroll: true }); }));
@@ -1136,7 +1142,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 69 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 70 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

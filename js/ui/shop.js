@@ -18,6 +18,9 @@
     code_e_busy: ['Moc pokusů. Zkus to za pár minut.', 'Too many attempts. Try again in a few minutes.'],
     rar_4: ['Božský', 'Divine'],
     pay_launch: ['Platby za skutečné peníze právě spouštíme. Nabídky už vidíš, zaplatit půjde, jakmile je napojíme – dáme vědět ve hře.', 'Real-money payments are launching. You can already see the offers; paying will work as soon as they are connected – we will let you know in the game.'],
+    pay_opening: ['Otevírám bezpečnou platební stránku…', 'Opening the secure payment page…'],
+    pay_ok_wait: ['Platba proběhla – nákup ti za chvíli přijde.', 'Payment done – your purchase is on its way.'],
+    pay_more: ['Tvoje nákupy', 'Your purchases'],
     pay_soon: ['Platby za skutečné peníze právě spouštíme. Tenhle nákup půjde dokončit, jakmile platby napojíme.', 'Real-money payments are launching. You will be able to complete this purchase as soon as they are connected.'],
     div_title: ['Božské sety', 'Divine sets'],
     div_sub: ['Kompletní zbroj a zbraň pro všech 21 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 21 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
@@ -25,6 +28,9 @@
     div_andel_d: ['Černozlatá zbroj, obří černá křídla, rudá svatozář a aura. Meč, kopí, luk a hůl padlého anděla.', 'Black-gold armor, huge black wings, a crimson halo and aura. The fallen angel’s sword, spear, bow and staff.'],
     div_kral_d: ['Bílozlatá zbroj s korunou, zlatá křídla a sluneční svatozář. Meč, kopí, luk a žezlo Božího krále.', 'White-gold armor with a crown, golden wings and a sun halo. The God-King’s sword, spear, bow and scepter.'],
     ai_retreat: ['Nepřítel ustupuje za hradby!', 'The enemy retreats behind the walls!'],
+    rw_skill: ['Speciální útok', 'Special attack'],
+    rw_all_skills: ['Všech {n} útoků', 'All {n} attacks'],
+    big_bought: ['Velká pevnost je tvoje! Hrad se zvětšil.', 'The Great Fortress is yours! Your castle has grown.'],
     ord_retreat: ['Ústup', 'Retreat'], ord_walls: ['Hradby', 'Walls'], ord_center: ['Střed', 'Center'], ord_attack: ['Útok', 'Attack'],
     walls_hint: ['Obrana hradeb: armáda se postaví před bránu, kde ji kryjí obránci na hradbách.', 'Defend the walls: the army forms up in front of the gate, covered by the wall defenders.'],
     center_hint: ['Obsadit střed: armáda drží střed bojiště (+35 % mincí a +10 % útok, když ho obsadíš).', 'Hold the center: the army holds the middle of the field (+35% coins and +10% attack once captured).'],
@@ -83,6 +89,7 @@
       const key = k + ':' + id; (items[key] = items[key] || { kind: k === 'a' ? 'skinA' : 'skinW', id, units: [] }).units.push(uid);
       return true;
     };
+    if (give.unlimited) { save.unlimited = true; got.push({ kind: 'gold', n: 9999999 }, { kind: 'gems', n: 9999999 }); App._unl && App._unl(); }
     if (give.gold) { save.gold += give.gold; got.push({ kind: 'gold', n: give.gold }); }
     if (give.gems) { save.gems += give.gems; got.push({ kind: 'gems', n: give.gems }); }
     // dárky pro roli (všechny národy): konkrétní skin, nebo náhodný dané vzácnosti
@@ -119,6 +126,16 @@
     });
     // celý set (např. Božský padlý anděl)
     if (give.set && GameData.codeSets[give.set]) GameData.codeSets[give.set](save).forEach(r => { const key = r.k + ':' + r.id; (items[key] = items[key] || { kind: r.k === 'a' ? 'skinA' : 'skinW', id: r.id, units: [] }).units.push(r.uid); });
+    // speciální útoky: seznam id nebo 'all'
+    if (give.skills) {
+      const SK = GameData.skillsOf(save);
+      const ids = give.skills === 'all' ? GameData.skills.filter(k => k.kind !== 'gold').map(k => k.id) : give.skills;
+      let n = 0; ids.forEach(id => { if (GameData.skillById(id) && !SK.owned.includes(id)) { SK.owned.push(id); n++; } });
+      if (give.skills === 'all') got.push({ kind: 'skills', n: ids.length });
+      else ids.forEach(id => got.push({ kind: 'skill', id }));
+      if (!n && give.skills === 'all') { save.gems += 1500; got.push({ kind: 'gems', n: 1500 }); }
+    }
+    if (give.allDecor) give = Object.assign({}, give, { decor: GameData.castleCustom.decorations.map(d => d.id) });
     if (give.bigCastle) { save.bigCastle = true; save.castleType = 'velky'; got.push({ kind: 'big' }); }
     (give.decor || []).forEach(id => { if (!save.ownedDecor.includes(id)) { save.ownedDecor.push(id); save.castleCfg.decor = save.castleCfg.decor || {}; save.castleCfg.decor[id] = true; } got.push({ kind: 'decor', id }); });
     Object.values(items).forEach(x => got.push(x));
@@ -139,6 +156,8 @@
         const names = [...new Set(r.units.map(u => GameData.units[u].name))].join(', ');
         return `<div class="rw rw-gear" style="--rc:${GameData.rarityColors[S.rarity]}"><canvas data-rwi="${i}"></canvas><b>${esc(S.name)}</b><small>${t('skin_for_units', { u: esc(names) })}</small></div>`;
       }
+      if (r.kind === 'skill') { const k = GameData.skillById(r.id); return `<div class="rw"><span class="rw-ico">${GameData.skillIcon ? GameData.skillIcon(k) : '⚡'}</span><b>${esc(k.name)}</b><small>${t('rw_skill')}</small></div>`; }
+      if (r.kind === 'skills') return `<div class="rw"><span class="rw-ico">⚡</span><b>${t('rw_all_skills', { n: r.n })}</b><small>${t('rw_skill')}</small></div>`;
       if (r.kind === 'big') return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${t('big_name')}</b><small>${t('big_short')}</small></div>`;
       if (r.kind === 'decor') { const d = GameData.castleCustom.decorations.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${esc(d.name)}</b><small>${t('decor_word')}</small></div>`; }
       return '';

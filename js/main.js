@@ -12,9 +12,12 @@
     battle: null,
     onResize: null,
 
-    persist() { Save.save(); this.refreshTop(); },
+    persist() { this._unl(); Save.save(); this.refreshTop(); },
+    /* vývojářský kód: neomezené mince a drahokamy – zásoba se pořád doplňuje */
+    _unl() { const s = this.save; if (s && s.unlimited) { if (s.gold < 9999999) s.gold = 9999999; if (s.gems < 9999999) s.gems = 9999999; } },
 
     refreshTop() {
+      this._unl();
       const s = this.save;
       $('#pName').textContent = s.name;
       $('#pTrophies').textContent = fmt(s.trophies);
@@ -630,6 +633,23 @@
     },
 
     init() {
+      if (window.Platby && Platby.init) Platby.init(this);
+      // POJISTKA KLIKNUTÍ: když prohlížeč stisk tlačítka „spolkne“ (prst/myš se při stisku
+      // trochu posune, označí se text, okno nebylo aktivní…), tlačítko se stejně spustí.
+      (() => {
+        const SEL = 'button, .btn, [data-close], [data-go], a[href]';
+        let downEl = null, pending = null;
+        document.addEventListener('pointerdown', e => { downEl = e.button === 0 ? e.target.closest(SEL) : null; }, true);
+        document.addEventListener('pointerup', e => {
+          const el = e.target.closest && e.target.closest(SEL);
+          const tgt = el && el === downEl ? el : null; downEl = null;
+          if (!tgt || tgt.disabled || tgt.closest('#battle')) return;
+          const tok = pending = {};
+          setTimeout(() => { if (pending === tok && tgt.isConnected && !tgt.disabled) { pending = null; tgt.click(); } }, 350);
+        }, true);
+        document.addEventListener('click', () => { pending = null; }, true);
+        document.addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault(); }, true);
+      })();
       // skin s omezením (např. jezdecký) nasazený na jinou jednotku → vrátit základní
       Object.keys(this.save.skins.unit || {}).forEach(u => { const sk = GameData.unitSkins.find(x => x.id === this.save.skins.unit[u]); if (sk && sk.only && !sk.only.includes(u)) this.save.skins.unit[u] = 'zakladni'; });
       // hra je jen na šířku – na telefonu zkusí celou obrazovku a zamknout orientaci
