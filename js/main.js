@@ -458,7 +458,7 @@
       const coins = Math.floor(P.coins);
       set('coins', coins, v => { $('#bCoinNum').textContent = v; $('#bCoins').style.setProperty('--p', ((v % 500) / 5) + '%'); });
       const alive = b.units.filter(u => u.team === 'player' && !u.dead).length;
-      set('alive', alive, v => { $('#bAlive').textContent = v >= b.armyCap('player') ? v + '/' + b.armyCap('player') : v; $('#bAlive').parentElement.classList.toggle('full', v >= b.armyCap('player')); });
+      set('alive', alive, v => ($('#bAlive').textContent = v));
       const qn = (b.queue || []).length;
       set('max', qn, v => ($('#bCoinMax').textContent = v ? t('queue_n', { n: v }) : ''));
       document.querySelectorAll('#bUnits [data-spawn]').forEach(btn => {
