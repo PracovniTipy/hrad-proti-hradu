@@ -811,6 +811,12 @@
       for (const u of this.units) {
         if (u.dead) { u.dead += dt; continue; }
         if (u.hurt > 0) u.hurt -= dt;
+        // ZA HRADBAMI SE VOJÁCI LÉČÍ: 8 % životů za sekundu
+        if (u.hp < u.maxHp && this._sheltered(u)) {
+          u.hp = Math.min(u.maxHp, u.hp + u.maxHp * 0.08 * dt);
+          u.healFx = (u.healFx || 0) - dt;
+          if (u.healFx <= 0) { u.healFx = 0.5; this.particles.push({ x: u.x + (Math.random() - 0.5) * 16, y: u.y - 40, vx: 0, vy: -30, g: 0, t: 0, life: 0.8, r: 3, color: '#7dff9a' }); }
+        }
         if (u.dot && this.time < u.dot.until) {
           u.dotTick = (u.dotTick || 0) - dt;
           if (u.dotTick <= 0) { u.dotTick = 0.5; this._damage(u, u.dot.dps * 0.5, null, true); if (u.dead) continue; }

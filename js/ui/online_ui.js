@@ -47,7 +47,7 @@
     onl_waiting: ['Čekám na hostitele…', 'Waiting for the host…'],
     onl_rules: ['Online: vítězství 1 v 1 = +30 trofejí, 2 v 2 = +20. Prohra ubere 15 / 10. Každý bojuje se svým hradem – vylepšeními, obránci na hradbách, vroucím olejem i výbavou.', 'Online: a 1 v 1 win = +30 trophies, 2 v 2 = +20. A loss costs 15 / 10. Everyone fights with their own castle – upgrades, wall defenders, boiling oil and gear.'],
     credits_cries: ['Válečné pokřiky:', 'War cries:'],
-    retreat_hint: ['Ústup: vojáci se schovají za hradby. Tam na ně nedosáhnou speciální útoky ani nepřátelé.', 'Retreat: troops hide behind the walls. Special attacks and enemies cannot reach them there.'],
+    retreat_hint: ['Ústup: vojáci se schovají za hradby, léčí se a nedosáhnou na ně speciální útoky ani nepřátelé.', 'Retreat: troops hide behind the walls, heal up, and special attacks and enemies cannot reach them.'],
     onl_btn: ['Online s přáteli', 'Online with friends'],
     onl_btn_d: ['1 v 1, 2 v 2 nebo příběh ve dvou', '1 v 1, 2 v 2 or story co-op']
   });
