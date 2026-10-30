@@ -1297,37 +1297,57 @@
         this.spawn('enemy', ai.next);
         ai.next = null;
       }
-      // STRATEGIE POČÍTAČE
-      // - shromažďuje armádu a vyrazí po 1,5 / 2 / 3 minutách (nebo když je výrazně silnější)
-      // - když prohrává (malá armáda proti přesile), stáhne vojáky za hradby, kde je kryje věž
-      //   a speciální útoky na ně nedosáhnou; jakmile se posílí, vyjde znovu
-      // - když má převahu a střed nikdo nedrží, obsadí střed bojiště
+      // MYSL POČÍTAČE – rozhoduje se jednou za sekundu podle síly obou armád a drží se
+      // svého rozhodnutí (nepřepíná sem a tam):
+      //   SBÍRÁ  – stojí před svým hradem a shromažďuje armádu
+      //   STŘED  – když je zhruba stejně silný, obsadí střed bojiště
+      //   ÚTOK   – vyrazí, když má převahu nebo uplyne čas čekání; útoku se drží aspoň 20 s
+      //   HRADBY – když nepřítel dorazí k hradu a počítač je slabší, brání se u brány pod věží
+      //   ÚSTUP  – jen v krajní nouzi (drtivá přesila u hradu), nejvýš jednou za 90 s;
+      //            za hradbami se vyléčí a pak se vrátí k bráně
       const cfg = C();
-      const power = team => this.units.reduce((a, u) => a + (u.team === team && !u.dead ? (u.hp / u.maxHp) * (u.def.cost || 50) : 0), 0);
-      const mine = this.units.filter(u => u.team === 'enemy' && !u.dead).length;
-      const myP = power('enemy'), foeP = power('player');
-      const foeNear = this.units.filter(u => u.team === 'player' && !u.dead && u.x > cfg.worldW * 0.45).length;
-      const threat = this.units.some(u => u.team === 'player' && !u.dead && u.x > s.flagX - 320);
-      const WAITS = [90, 120, 180];
-      if (ai.attackAt == null) ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)];
-      const weak = foeP > 0 && myP < foeP * 0.5 && foeNear >= 3;
-      const strong = myP > foeP * 1.35 && mine >= Math.max(4, ai.wave);
-      if (s.formation === 'ustup') {
-        // za hradbami: vyjde, až má dost vojáků, nebo nejpozději po 25 s
-        if ((!weak && mine >= Math.max(3, Math.round(ai.wave * 0.7))) || this.time - (ai.retreatAt || 0) > 25) {
-          s.formation = strong ? 'utok' : 'formace'; s.flagX = cfg.enemyFront - 420;
+      ai.mind = ai.mind || 'sbira';
+      ai.decide = (ai.decide || 0) - 0.4;
+      if (ai.decide <= 0) {
+        ai.decide = 1;
+        const power = team => this.units.reduce((a, u) => a + (u.team === team && !u.dead ? (u.hp / u.maxHp) * (u.def.cost || 50) : 0), 0);
+        const myUnits = this.units.filter(u => u.team === 'enemy' && !u.dead);
+        const mine = myUnits.length;
+        const myP = power('enemy'), foeP = power('player');
+        const ratio = foeP > 0 ? myP / foeP : 99;
+        const front = s.castle.front;
+        const foesAtGate = this.units.filter(u => u.team === 'player' && !u.dead && front - u.x < 1100).length;
+        const WAITS = [90, 120, 150];
+        if (ai.attackAt == null) ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * (this.o.difficulty >= 1.4 ? 0.7 : 1);
+        const since = this.time - (ai.mindAt || 0);
+        const set = m => { if (ai.mind !== m) { ai.mind = m; ai.mindAt = this.time; } };
+        const avgHp = mine ? myUnits.reduce((a, u) => a + u.hp / u.maxHp, 0) / mine : 1;
+        switch (ai.mind) {
+          case 'ustup':
+            // za hradbami: vyjde, až je vyléčený (nebo po 15 s), a brání bránu
+            if ((avgHp > 0.85 && since > 4) || since > 15) set(ratio > 1.2 ? 'utok' : 'hradby');
+            break;
+          case 'utok':
+            if (since > 20 && ratio < 0.6) set(foesAtGate ? 'hradby' : 'sbira');
+            else if (mine <= 1 && foesAtGate === 0) { set('sbira'); ai.attackAt = this.time + 60; }
+            break;
+          default: {
+            const desperate = ratio < 0.3 && foesAtGate >= 4 && mine >= 2 && this.time - (ai.retreatAt || -999) > 90;
+            if (desperate) {
+              set('ustup'); ai.retreatAt = this.time;
+              if (window.Zvuk) Zvuk.play('horn', 0.7);
+              this.texts.push({ x: front - 200, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.4, txt: t('ai_retreat'), color: '#ff9e9e', t: 0, life: 2, big: true });
+            } else if ((ratio > 1.3 && mine >= 4) || (this.time >= ai.attackAt && ratio > 0.8) || (foesAtGate && ratio > 1.1)) set('utok');
+            else if (foesAtGate) set('hradby');
+            else if (ratio >= 0.85 && mine >= 3 && this.time > 20 && this.cp.owner !== 'enemy') set('stred');
+            else if (ai.mind === 'stred' && ratio < 0.7 && since > 8) set('sbira');
+            else if (ai.mind === 'hradby' && !foesAtGate && since > 6) set('sbira');
+          }
         }
-      } else if (weak && this.time - (ai.retreatAt || -99) > 30) {
-        s.formation = 'ustup'; ai.retreatAt = this.time;
-        if (window.Zvuk) Zvuk.play('horn', 0.7);
-        this.texts.push({ x: this.side.enemy.castle.front - 200, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.4, txt: t('ai_retreat'), color: '#ff9e9e', t: 0, life: 2, big: true });
-      } else if (s.formation === 'formace') {
-        if (this.time >= ai.attackAt || strong || (threat && myP >= foeP * 0.8)) s.formation = 'utok';
-        else if (!this.cp.owner && myP >= foeP && mine >= 4 && this.time > 25) s.flagX = Math.max(cfg.playerFront + 400, this.cp.x + 60);   // obsadit střed
-        else if (this.cp.owner === 'player' || threat) s.flagX = cfg.enemyFront - 420;
-      } else if (s.formation === 'utok' && mine <= 2 && !threat) {
-        s.formation = 'formace'; s.flagX = cfg.enemyFront - 420;
-        ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * 0.75;
+        // provedení rozhodnutí
+        if (ai.mind === 'utok') s.formation = 'utok';
+        else if (ai.mind === 'ustup') s.formation = 'ustup';
+        else { s.formation = 'formace'; s.flagX = ai.mind === 'stred' ? Math.max(cfg.playerFront + 400, this.cp.x + 60) : ai.mind === 'hradby' ? front - 260 : front - 420; }
       }
       // čím déle bitva trvá, tím rychleji nepřítel získává mince (je to těžší a těžší)
       // příjem nepřítele roste s časem, ale nejvýš na 2,5× (bitva teď nemá časový limit)

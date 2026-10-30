@@ -105,6 +105,11 @@ GameData.skillRangeBar = k => {
   return `<div class="rbar z-${I.zone}"><b class="rc me"></b><span class="rf">${zone}</span><b class="rc foe"></b></div>`;
 };
 GameData.skillById = id => GameData.skills.find(s => s.id === id);
+/* VYVÁŽENÍ: zraňující speciální útoky jsou o 10 % slabší */
+(function () {
+  const DMG = { meteors: 1, meteor: 1, element: 1, volley: 1, storm: 1, stun: 1, quake: 1, holy: 1, barrage: 1, wall: 1, tornado: 1, breath: 1 };
+  GameData.skills.forEach(s => { if (DMG[s.kind] && typeof s.power === 'number' && s.power > 1) s.power = Math.round(s.power * 0.9); });
+})();
 /* zpětná kompatibilita: staré GameData.abilities */
 GameData.abilities = {};
 GameData.skills.forEach(s => (GameData.abilities[s.id] = Object.assign({}, s, { damage: s.power, reduction: s.kind === 'shield' ? s.power : undefined })));
