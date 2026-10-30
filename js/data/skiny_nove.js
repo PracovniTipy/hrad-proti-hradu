@@ -218,8 +218,8 @@ window.GameData = window.GameData || {};
 
   /* BOŽSKÉ SETY: zbroj + zbraň pro všechny vojáky všech národů (kód nebo balíček v obchodě) */
   G.divineSets = {
-    andel: { armor: 'andel', weapons: ['w_andel', 'k_andel', 'l_andel', 'h_andel'], name: 'Božský padlý anděl', en: 'Divine Fallen Angel', price: { gems: 2500 } },
-    kral: { armor: 'kral_bozi', weapons: ['w_kral', 'k_kral', 'l_kral', 'h_kral'], name: 'Božský Boží král', en: 'Divine God-King', price: { gems: 2500 } }
+    andel: { armor: 'andel', weapons: ['w_andel', 'k_andel', 'l_andel', 'h_andel'], name: 'Božský padlý anděl', en: 'Divine Fallen Angel', price: { czk: 2500 } },
+    kral: { armor: 'kral_bozi', weapons: ['w_kral', 'k_kral', 'l_kral', 'h_kral'], name: 'Božský Boží král', en: 'Divine God-King', price: { czk: 2500 } }
   };
   const giveSet = (save, id) => {
     const D = G.divineSets[id], got = [];

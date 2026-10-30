@@ -17,6 +17,8 @@
     code_e_spent: ['Kód už vyčerpali jiní hráči.', 'This code has been used up by other players.'],
     code_e_busy: ['Moc pokusů. Zkus to za pár minut.', 'Too many attempts. Try again in a few minutes.'],
     rar_4: ['Božský', 'Divine'],
+    pay_launch: ['Platby za skutečné peníze právě spouštíme. Nabídky už vidíš, zaplatit půjde, jakmile je napojíme – dáme vědět ve hře.', 'Real-money payments are launching. You can already see the offers; paying will work as soon as they are connected – we will let you know in the game.'],
+    pay_soon: ['Platby za skutečné peníze právě spouštíme. Tenhle nákup půjde dokončit, jakmile platby napojíme.', 'Real-money payments are launching. You will be able to complete this purchase as soon as they are connected.'],
     div_title: ['Božské sety', 'Divine sets'],
     div_sub: ['Kompletní zbroj a zbraň pro všech 21 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 21 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
     div_owned: ['Máš kompletní', 'Complete'],
@@ -205,7 +207,7 @@
         <div class="div-body"><div class="eyebrow" style="color:${GameData.rarityColors['Božský']}">${t('rar_4')}</div>
           <h3>${esc(I18N.lang === 'cs' ? D.name : D.en)}</h3><p class="muted">${t('div_' + id + '_d')}</p>
           <p class="gear-bonus">+20 % ${t('b_dmg')} · +20 % ${t('b_hp')}</p>
-          <button class="btn ${own ? '' : 'btn-gold'} btn-big" data-divbuy="${id}" ${own ? 'disabled' : save.gems < D.price.gems ? 'disabled' : ''}>${own ? '✓ ' + t('div_owned') : `${ico('gem')} ${fmt(D.price.gems)}`}</button></div>
+          <button class="btn ${own ? '' : 'btn-green'} btn-big buy-czk" data-divbuy="${id}" ${own ? 'disabled' : ''}>${own ? '✓ ' + t('div_owned') : Platby.price(D.price.czk)}</button></div>
       </article>`;
     };
     return `
@@ -215,7 +217,7 @@
       <div class="chest-row">${chestCard(C.denni)}${chestCard(C.tydenni)}</div>
       ${Platby.on() ? `<div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
       <div class="offer-grid">${offers}</div>
-      ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_demo_short')}</div></div>`}` : `<div class="notice"><div>${t('pay_soon_shop')}</div></div>`}`;
+      ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_launch')}</div></div>`}` : ''}`;
   }
   function paintDivine(cv, id) {
     const D = GameData.divineSets[id];
@@ -240,12 +242,14 @@
     const save = ensure(App.save);
     el.querySelectorAll('canvas[data-divcv]').forEach(cv => paintDivine(cv, cv.dataset.divcv));
     el.querySelectorAll('[data-divbuy]').forEach(b => b.addEventListener('click', () => {
-      const id = b.dataset.divbuy, D = GameData.divineSets[id];
-      if (GameData.divineOwned(save, id) || save.gems < D.price.gems) { if (save.gems < D.price.gems) App.toast(t('t_no_gems')); return; }
-      save.gems -= D.price.gems;
-      const got = grant(App, { set: id });
-      App.go('obchod', { tab: 'nabidky', keepScroll: true });
-      rewardsModal(App, I18N.lang === 'cs' ? D.name : D.en, got, 'tydenni');
+      const id = b.dataset.divbuy, D = GameData.divineSets[id], nm = I18N.lang === 'cs' ? D.name : D.en;
+      if (GameData.divineOwned(save, id)) return;
+      Platby.buy(App, { id: 'set_' + id, name: nm, czk: D.price.czk }, () => {
+        save.purchases[ 'set_' + id] = (save.purchases['set_' + id] || 0) + 1;
+        const got = grant(App, { set: id });
+        App.go('obchod', { tab: 'nabidky', keepScroll: true });
+        rewardsModal(App, nm, got, 'tydenni');
+      });
     }));
     el.querySelectorAll('[data-offer]').forEach(b => b.addEventListener('click', () => {
       const o = GameData.offers.find(x => x.id === b.dataset.offer);
