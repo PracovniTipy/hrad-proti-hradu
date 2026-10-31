@@ -253,6 +253,8 @@
       cisar: ['Imperial Treasure', 'Absolutely everything: the Great Fortress, all castle decorations, all attacks, legendary armor and weapons for all 21 soldiers, 150,000 gold and 20,000 gems.']
     };
     (GameData.offers || []).forEach(o => apply(o, ['name', 'desc'], OEN[o.id] && { name: OEN[o.id][0], desc: OEN[o.id][1] }));
+    const BEN = { '×30 hodnota': '×30 value', 'Jen jednou': 'One time only', 'Legendární': 'Legendary', '3 útoky': '3 attacks', 'Až 10 obránců': 'Up to 10 defenders', 'Všechny útoky': 'All attacks', '21 vojáků': '21 soldiers', '21 zbraní': '21 weapons', 'MEGA ×50': 'MEGA ×50', 'Legendární zbraň': 'Legendary weapon' };
+    (GameData.offers || []).forEach(o => { if (o.badge && BEN[o.badge]) apply(o, ['badge'], { badge: BEN[o.badge] }); });
     if (GameData.chests) { apply(GameData.chests.denni, ['name'], { name: 'Daily Chest' }); apply(GameData.chests.tydenni, ['name'], { name: 'Weekly Chest' }); }
     (GameData.saga || []).forEach(a => apply(a, ['name'], { name: EN.saga[a.id] }));
     Object.keys(GameData.cast || {}).forEach(k => apply(GameData.cast[k], ['name'], { name: EN.cast[k] }));

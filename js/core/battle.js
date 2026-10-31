@@ -1186,6 +1186,9 @@
       this.particles = this.particles.filter(p => p.t < p.life);
       for (const t of this.texts) t.t += dt;
       this.texts = this.texts.filter(t => t.t < t.life);
+      // ve velké bitvě by se čísla zranění jen překrývala a zpomalovala hru – drží se nejvýš 45 malých
+      if (this.texts.length > 60) { let small = this.texts.filter(t => !t.big && !t.huge); const drop = new Set(small.slice(0, small.length - 45)); this.texts = this.texts.filter(t => !drop.has(t)); }
+      if (this.particles.length > 400) this.particles = this.particles.slice(-400);
     }
 
     _camera(dt) {
@@ -1617,7 +1620,9 @@
       this._drawSkillFx(ctx, t);
       if (this.o.hostages) this._drawCages(ctx, t);
       // jednotky seřazené podle hloubky
-      const list = this.units.slice().sort((a, b) => a.y - b.y);
+      // kreslí se jen vojáci na obrazovce (s rezervou) – při stovkách vojáků to hodně šetří výkon
+      const vx0 = this.cam.x - 180, vx1 = this.cam.x + this.cam.viewW + 180;
+      const list = this.units.filter(u => u.x > vx0 && u.x < vx1).sort((a, b) => a.y - b.y);
       for (const u of list) {
         const shield = this.side[u.team].shieldUntil > t;
         if (u === this.hero) this._heroMarkBelow(ctx, u, t);
@@ -1645,7 +1650,7 @@
       ctx.globalAlpha = 1;
       // projektily
       for (const p of this.projectiles) {
-        if (p.done) continue;
+        if (p.done || (p.tx < vx0 && p.x0 < vx0) || (p.tx > vx1 && p.x0 > vx1)) continue;
         const k = Math.min(1, p.t);
         const x = p.x0 + (p.tx - p.x0) * k;
         const y = p.y0 + (p.ty - p.y0) * k - p.arc * 4 * k * (1 - k);
@@ -1704,6 +1709,7 @@
       this.vfx.drawFront(ctx, t);
       // texty (zranění, mince)
       for (const tx of this.texts) {
+        if (tx.x < vx0 || tx.x > vx1) continue;
         const a = 1 - tx.t / tx.life;
         ctx.globalAlpha = Math.max(0, Math.min(1, a * 1.5));
         const size = tx.huge ? 54 : tx.big ? 30 : (tx.coin ? 17 : 14);
@@ -1797,10 +1803,11 @@
         ctx.fillStyle = 'rgba(120,190,255,.16)'; ctx.fill();
         ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(150,210,255,.75)'; ctx.stroke();
       }
-      ctx.save();
-      ctx.translate(u.x, u.y); ctx.scale(f * pop, pop);
+      // bez save()/restore() – při stovkách vojáků je to výrazně rychlejší
+      const sx = f * pop;
+      ctx.translate(u.x, u.y); ctx.scale(sx, pop);
       ctx.drawImage(e.cv, e.bx0, e.by0, e.bw, e.bh);
-      ctx.restore();
+      ctx.scale(1 / sx, 1 / pop); ctx.translate(-u.x, -u.y);
     }
 
     _heroMarkBelow(ctx, u, t) {
