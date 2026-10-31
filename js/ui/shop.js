@@ -17,6 +17,7 @@
     code_e_spent: ['Kód už vyčerpali jiní hráči.', 'This code has been used up by other players.'],
     code_e_busy: ['Moc pokusů. Zkus to za pár minut.', 'Too many attempts. Try again in a few minutes.'],
     rar_4: ['Božský', 'Divine'],
+    pay_ms_off: ['Nákupy přes Microsoft Store teď nejsou dostupné. Aktualizuj Windows a Microsoft Edge a zkus to znovu.', 'Microsoft Store purchases are not available right now. Update Windows and Microsoft Edge and try again.'],
     pay_launch: ['Platby za skutečné peníze právě spouštíme. Nabídky už vidíš, zaplatit půjde, jakmile je napojíme – dáme vědět ve hře.', 'Real-money payments are launching. You can already see the offers; paying will work as soon as they are connected – we will let you know in the game.'],
     pay_opening: ['Otevírám bezpečnou platební stránku…', 'Opening the secure payment page…'],
     pay_ok_wait: ['Platba proběhla – nákup ti za chvíli přijde.', 'Payment done – your purchase is on its way.'],
@@ -350,7 +351,7 @@
   function bindCodes(App, el) {
     const save = ensure(App.save);
     const inp = el.querySelector('#codeIn'), btn = el.querySelector('#codeGo'), msg = el.querySelector('#codeMsg');
-    const isItch = v => Platby.on() && (/itch\.io|\/download\//i.test(v) || v.length > 24);
+    const isItch = v => !Platby.msStore && (/itch\.io|\/download\//i.test(v) || v.length > 24);
     inp.addEventListener('input', () => { if (!isItch(inp.value)) inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); el.querySelector('#codeOkRow').hidden = !isItch(inp.value); });
     const go = async () => {
       const code = inp.value.trim(); if (code.length < 3 || btn.disabled) return;

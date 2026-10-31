@@ -14,8 +14,8 @@
   const TERMS = 'https://pracovnitipy.github.io/hrad-proti-hradu/obchodni-podminky.html';
   /* ceny na itch.io (USD) podle ceny v Kč */
   const USD = { 29: 1.49, 59: 2.49, 99: 3.99, 149: 5.99, 199: 7.99, 249: 9.99, 499: 19.99, 999: 39.99, 2500: 99.99 };
-  /* verze pro Microsoft Store (spuštěná s ?store=ms): pravidla Storu u her nedovolují
-     placení mimo Microsoft, takže nákupy za skutečné peníze se tam vůbec neukazují */
+  /* verze pro Microsoft Store: pravidla Storu u her nedovolují placení mimo Microsoft,
+     takže tam se platí přes Microsoft (Digital Goods API v Edge) a itch.io se neukazuje */
   const MS = (() => {
     try {
       const q = /[?&]store=ms\b/.test(location.search);
@@ -25,10 +25,15 @@
       return q || (app && localStorage.getItem('cw-store') === 'ms');
     } catch (e) { return /[?&]store=ms\b/.test(location.search); }
   })();
+  const MS_BILLING = 'https://store.microsoft.com/billing';
+  const msOk = () => typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
+  /* id doplňku v Partner Center: cw + id bez podtržítek (gems_g1 → cwgemsg1) */
+  const msId = pid => 'cw' + String(pid).replace(/[^a-z0-9]/gi, '').toLowerCase();
   const Platby = {
     msStore: MS,
+    msId,
     available() { return true; },
-    on() { return !MS; },
+    on() { return !MS || msOk(); },
     usd(czk) { return USD[czk] || Math.round(czk / 20) - 0.01; },
     price(czk) { return '$' + this.usd(czk).toFixed(2); },
     terms: TERMS,
@@ -40,6 +45,7 @@
     },
     /* okno nákupu: odkaz na itch.io + pole na vložení odkazu ke stažení */
     buy(App, product) {
+      if (MS) { this.buyMs(App, product); return; }
       if (window.HraPlatby && window.HraPlatby.buy) {
         window.HraPlatby.buy(product).then(ok => { if (ok) this.showGot(App, this.deliver(App, product.id)); }).catch(() => App.toast(t('pay_failed')));
         return;
@@ -82,6 +88,50 @@
         return { ok: false, err };
       } catch (e) { return { ok: false, err: 'acc_e_net' }; }
     },
+    /* ---- Microsoft Store ---- */
+    async msSvc() {
+      if (!msOk()) throw new Error('nodg');
+      if (!this._svc) this._svc = await window.getDigitalGoodsService(MS_BILLING);
+      return this._svc;
+    },
+    _skuToPid(sku) {
+      const all = GameData.offers.map(o => o.id).concat(GameData.gemPacks.map(g => 'gems_' + g.id), Object.keys(GameData.divineSets || {}).map(k => 'set_' + k), ['skill_drak']);
+      return all.find(p => msId(p) === sku) || null;
+    },
+    async buyMs(App, product) {
+      if (this._busy) return;
+      this._busy = true;
+      try {
+        const svc = await this.msSvc();
+        const sku = msId(product.id);
+        const req = new PaymentRequest([{ supportedMethods: MS_BILLING, data: { sku } }],
+          { total: { label: 'Total', amount: { currency: 'USD', value: '0' } } });
+        const resp = await req.show();
+        const token = resp.details && (resp.details.purchaseToken || resp.details.token);
+        await resp.complete('success');
+        const d = this.deliver(App, product.id);
+        if (token) { try { await svc.consume(token); } catch (e) {} }
+        if (App.current === 'obchod') App.go('obchod', { keepScroll: true });
+        this.showGot(App, d);
+      } catch (e) {
+        const m = String(e && (e.name || e.message) || '');
+        if (!/Abort/i.test(m)) App.toast(t(m === 'nodg' ? 'pay_ms_off' : 'pay_failed'));
+      } finally { this._busy = false; }
+    },
+    /* nákupy, které se zaplatily, ale nedoručily (pád, zavřené okno) – doručí se při startu */
+    async msRestore(App) {
+      try {
+        const svc = await this.msSvc();
+        const list = await svc.listPurchases();
+        for (const p of list || []) {
+          const pid = this._skuToPid(p.itemId);
+          if (!pid) continue;
+          const d = this.deliver(App, pid);
+          try { await svc.consume(p.purchaseToken); } catch (e) {}
+          this.showGot(App, d);
+        }
+      } catch (e) {}
+    },
     showGot(App, r) { Shop.rewardsModal(App, '🎉 ' + r.title, r.got, 'tydenni'); },
     /* doručení nákupu podle id produktu */
     deliver(App, pid) {
@@ -97,7 +147,7 @@
       App.persist();
       return { title, got };
     },
-    init() { /* nic – nákupy se uplatňují odkazem z itch.io */ }
+    init(App) { if (MS && msOk()) setTimeout(() => this.msRestore(App), 1500); }
   };
   window.Platby = Platby;
 })();
