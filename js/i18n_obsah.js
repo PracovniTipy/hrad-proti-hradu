@@ -209,7 +209,8 @@
     const EN = window.I18N_EN, cs = this.lang === 'cs';
     const apply = (obj, fields, en) => {
       if (!obj) return;
-      if (!obj.__cs) { Object.defineProperty(obj, '__cs', { value: {}, enumerable: false }); fields.forEach(f => (obj.__cs[f] = obj[f])); }
+      if (!obj.__cs) Object.defineProperty(obj, '__cs', { value: {}, enumerable: false });
+      fields.forEach(f => { if (!(f in obj.__cs)) obj.__cs[f] = obj[f]; });
       fields.forEach(f => { if (obj.__cs[f] === undefined) return; obj[f] = (cs || !en || en[f] == null) ? obj.__cs[f] : en[f]; });
     };
     Object.values(GameData.units).forEach(u => {
