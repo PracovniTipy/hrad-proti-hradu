@@ -106,7 +106,8 @@
       applyIcons(c);
       m.hidden = false;
       const close = () => { m.hidden = true; c.innerHTML = ''; };
-      c.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+      // delegace: funguje i když se obsah okna znovu vykreslí (např. po vyzvednutí odměny)
+      c.onclick = e => { const b = e.target.closest('[data-close]'); if (b && c.contains(b)) close(); };
       if (onMount) onMount(c, close);
       const first = c.querySelector('.btn:not([disabled])');
       if (first) first.focus();
