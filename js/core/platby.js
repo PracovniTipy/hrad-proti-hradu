@@ -18,8 +18,11 @@
      placení mimo Microsoft, takže nákupy za skutečné peníze se tam vůbec neukazují */
   const MS = (() => {
     try {
-      if (/[?&]store=ms\b/.test(location.search)) sessionStorage.setItem('cw-store', 'ms');
-      return sessionStorage.getItem('cw-store') === 'ms';
+      const q = /[?&]store=ms\b/.test(location.search);
+      // aplikace z Microsoft Storu se při spuštění hlásí tímto referrerem
+      if (q || /^app-info:\/\/platform\/microsoft-store/.test(document.referrer || '')) localStorage.setItem('cw-store', 'ms');
+      const app = ['fullscreen', 'standalone', 'minimal-ui'].some(m => matchMedia('(display-mode: ' + m + ')').matches);
+      return q || (app && localStorage.getItem('cw-store') === 'ms');
     } catch (e) { return /[?&]store=ms\b/.test(location.search); }
   })();
   const Platby = {
