@@ -777,7 +777,10 @@
   function bigCastleImage(team, skinId, level, res, style, cfg) {
     const key = 'BIG2|' + team + '|' + skinId + '|' + Math.min(level, 10) + '|' + res + '|' + style + '|' + JSON.stringify(cfg);
     if (castleCache.has(key)) return castleCache.get(key);
-    const base = castleImage(team, skinId, level, res, style, Object.assign({}, cfg, { big: false }));
+    // velké prapory visí u pevnosti na levé (přistavěné) hradbě, ne na původním hradu
+    const bcfg = Object.assign({}, cfg, { big: false });
+    if (cfg && cfg.decor && cfg.decor.prapory) bcfg.decor = Object.assign({}, cfg.decor, { prapory: false });
+    const base = castleImage(team, skinId, level, res, style, bcfg);
     /* Velká pevnost: původní hrad o 8 % větší a vlevo k němu přistavěná dlouhá hradba
        s ochozem a nárožní věží. Pevnost je širší, ne vyšší – vejde se do obrazu. */
     const S = 1.08, bw = base.w * S, bh = base.h * S, EXT = 236;
@@ -799,7 +802,7 @@
     } else {
       stoneBlock(ctx, tx + tw - 6, wy, EXT - tw + 20, H - wy, pal, rand);
       crenels(ctx, tx + tw - 6, wy, EXT - tw + 20, pal, 12);
-      windowSlit(ctx, tx + tw + 30, wy + 40, 12, 26, pal); windowSlit(ctx, tx + tw + 100, wy + 40, 12, 26, pal);
+      if (!(cfg && cfg.decor && cfg.decor.prapory)) { windowSlit(ctx, tx + tw + 30, wy + 40, 12, 26, pal); windowSlit(ctx, tx + tw + 100, wy + 40, 12, 26, pal); }
       stoneBlock(ctx, tx, ty, tw, H - ty, pal, rand);
       crenels(ctx, tx, ty, tw, pal, 11);
       windowSlit(ctx, tx + tw / 2 - 6, ty + 30, 12, 26, pal);
@@ -808,6 +811,11 @@
       } else if (style === 'peklo') {
         for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(tx + 6 + k * 16, ty); ctx.lineTo(tx + 13 + k * 16, ty - 22); ctx.lineTo(tx + 20 + k * 16, ty); ctx.closePath(); fs(ctx, '#2a2024', 1.4); }
       } else roof(ctx, tx + tw / 2, ty - 8, tw, 54, pal);
+    }
+    // VELKÉ PRAPORY na levé (přistavěné) hradbě pevnosti
+    if (cfg && cfg.decor && cfg.decor.prapory && window.Art.hangBanner) {
+      const bh2 = Math.min(84, (H - wy) * 0.6);
+      for (const x of [tx + tw + 8, tx + tw + 52, tx + tw + 96, tx + tw + 140]) window.Art.hangBanner(ctx, x, wy + 10, 34, bh2, pal);
     }
     ctx.drawImage(base.canvas, ox, oy, bw, bh);
     const out = Object.assign({}, base, {

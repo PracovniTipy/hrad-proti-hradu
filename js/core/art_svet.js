@@ -436,5 +436,5 @@
     img.firePts = d.ohne ? (J ? [[30, 190], [120, 190], [210, 190]] : N ? [[40, 292], [130, 292], [220, 292]] : [[20, 240], [110, 240], [200, 240], [278, 172]]) : [];
   }
 
-  Object.assign(Art, { drawEmblem, decorateCastle, makeLayers, drawClouds, makeClouds, roundTree, bush, rock, flower, grassTuft });
+  Object.assign(Art, { hangBanner, drawEmblem, decorateCastle, makeLayers, drawClouds, makeClouds, roundTree, bush, rock, flower, grassTuft });
 })();
