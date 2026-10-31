@@ -256,8 +256,8 @@
       </article>`;
     };
     return `
-      <div class="sec-head"><h2>${t('div_title')}</h2><span class="muted">${t('div_sub')}</span></div>
-      <div class="div-row">${divCard('andel')}${divCard('kral')}</div>
+      ${Platby.on() ? `<div class="sec-head"><h2>${t('div_title')}</h2><span class="muted">${t('div_sub')}</span></div>
+      <div class="div-row">${divCard('andel')}${divCard('kral')}</div>` : ''}
       <div class="sec-head"><h2>${t('chests')}</h2><span class="muted">${t('chests_sub')}</span></div>
       <div class="chest-row">${chestCard(C.denni)}${chestCard(C.tydenni)}</div>
       ${Platby.on() ? `<div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
@@ -350,7 +350,7 @@
   function bindCodes(App, el) {
     const save = ensure(App.save);
     const inp = el.querySelector('#codeIn'), btn = el.querySelector('#codeGo'), msg = el.querySelector('#codeMsg');
-    const isItch = v => /itch\.io|\/download\//i.test(v) || v.length > 24;
+    const isItch = v => Platby.on() && (/itch\.io|\/download\//i.test(v) || v.length > 24);
     inp.addEventListener('input', () => { if (!isItch(inp.value)) inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); el.querySelector('#codeOkRow').hidden = !isItch(inp.value); });
     const go = async () => {
       const code = inp.value.trim(); if (code.length < 3 || btn.disabled) return;

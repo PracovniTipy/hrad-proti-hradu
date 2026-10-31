@@ -14,9 +14,18 @@
   const TERMS = 'https://pracovnitipy.github.io/hrad-proti-hradu/obchodni-podminky.html';
   /* ceny na itch.io (USD) podle ceny v Kč */
   const USD = { 29: 1.49, 59: 2.49, 99: 3.99, 149: 5.99, 199: 7.99, 249: 9.99, 499: 19.99, 999: 39.99, 2500: 99.99 };
+  /* verze pro Microsoft Store (spuštěná s ?store=ms): pravidla Storu u her nedovolují
+     placení mimo Microsoft, takže nákupy za skutečné peníze se tam vůbec neukazují */
+  const MS = (() => {
+    try {
+      if (/[?&]store=ms\b/.test(location.search)) sessionStorage.setItem('cw-store', 'ms');
+      return sessionStorage.getItem('cw-store') === 'ms';
+    } catch (e) { return /[?&]store=ms\b/.test(location.search); }
+  })();
   const Platby = {
+    msStore: MS,
     available() { return true; },
-    on() { return true; },
+    on() { return !MS; },
     usd(czk) { return USD[czk] || Math.round(czk / 20) - 0.01; },
     price(czk) { return '$' + this.usd(czk).toFixed(2); },
     terms: TERMS,

@@ -1078,3 +1078,4 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 #modalCard #itchBuy,#modalCard #itchBuy:visited{color:#fff}
 #modalCard .code-row{display:flex;gap:10px;align-items:stretch}
 #modalCard .code-row input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:10px;border:1px solid #3a4560;background:#0d121c;color:#f2ead6}
+body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { display: none !important; }
