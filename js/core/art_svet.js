@@ -387,16 +387,34 @@
       const xs = J ? [70, 130, 190] : [40, 100, 160, 220];
       xs.forEach(x => { ctx.save(); ctx.translate(x, ys); ctx.scale(1.9, 1.9); heraldShield(ctx, 0, 0, pal); ctx.restore(); });
     }
-    // KAMENNÍ STRÁŽCI: dva lvi na podstavcích před hradbou
+    // KAMENNÍ STRÁŽCI: dvě kamenné sochy strážců se štítem a kopím na podstavcích před hradbou
     if (d.sochy) {
+      const L1 = '#cfd4db', L2 = '#b6bcc5', L3 = '#9aa0aa';
       for (const [x, f] of [[200, 1], [118, -1]]) {
         ctx.save(); ctx.translate(x, B); ctx.scale(f * 1.6, 1.6);
+        // podstavec
         ctx.beginPath(); ctx.rect(-14, -14, 28, 14); fs(ctx, '#8b8f96', 1.8);
         ctx.beginPath(); ctx.rect(-16, -18, 32, 5); fs(ctx, '#a8adb6', 1.6);
-        ctx.beginPath(); ctx.moveTo(-12, -18); ctx.quadraticCurveTo(-14, -30, -6, -34); ctx.quadraticCurveTo(0, -46, 8, -40); ctx.quadraticCurveTo(14, -36, 12, -28); ctx.lineTo(10, -18); ctx.closePath(); fs(ctx, '#c7ccd3', 1.8);
-        ctx.beginPath(); ctx.arc(6, -38, 7.5, 0, TAU); fs(ctx, '#b6bcc5', 1.6);
-        ctx.beginPath(); ctx.moveTo(-1, -44); for (let k = 0; k < 7; k++) { const a = -2.6 + k * 0.5; ctx.lineTo(6 + Math.cos(a) * 11, -38 + Math.sin(a) * 11); ctx.lineTo(6 + Math.cos(a + 0.25) * 8, -38 + Math.sin(a + 0.25) * 8); } ctx.closePath(); fs(ctx, '#9aa0aa', 1.4);
-        ctx.fillStyle = OUT; ctx.beginPath(); ctx.arc(9, -39, 1.2, 0, TAU); ctx.fill();
+        // kopí (za postavou)
+        ctx.beginPath(); ctx.rect(9, -76, 2.4, 58); fs(ctx, L3, 1.2);
+        ctx.beginPath(); ctx.moveTo(10.2, -88); ctx.quadraticCurveTo(14.5, -80, 10.2, -75); ctx.quadraticCurveTo(6, -80, 10.2, -88); fs(ctx, L1, 1.3);
+        // nohy
+        ctx.beginPath(); ctx.rect(-6, -32, 5, 14); fs(ctx, L3, 1.4);
+        ctx.beginPath(); ctx.rect(1, -32, 5, 14); fs(ctx, L3, 1.4);
+        // tělo (suknice a hruď)
+        ctx.beginPath(); ctx.moveTo(-8, -31); ctx.lineTo(8, -31); ctx.lineTo(7, -50); ctx.lineTo(-7, -50); ctx.closePath(); fs(ctx, L2, 1.6);
+        ctx.beginPath(); ctx.moveTo(-9, -31); ctx.lineTo(9, -31); ctx.lineTo(10, -27); ctx.lineTo(-10, -27); ctx.closePath(); fs(ctx, L3, 1.2);
+        // paže držící kopí
+        ctx.beginPath(); ctx.rect(5, -48, 6, 4); fs(ctx, L2, 1.2);
+        ctx.beginPath(); ctx.arc(10.5, -46, 2.6, 0, TAU); fs(ctx, L1, 1.1);
+        // hlava s přilbou (nánosník a hřebínek)
+        ctx.beginPath(); ctx.arc(0, -56, 6, 0, TAU); fs(ctx, L1, 1.5);
+        ctx.beginPath(); ctx.moveTo(-6.5, -56); ctx.quadraticCurveTo(-6.5, -64, 0, -64.5); ctx.quadraticCurveTo(6.5, -64, 6.5, -56); ctx.closePath(); fs(ctx, L2, 1.4);
+        ctx.beginPath(); ctx.rect(-0.8, -57, 1.6, 6); ctx.fillStyle = L3; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-3, -64); ctx.quadraticCurveTo(0, -71, 4, -66); ctx.lineTo(1, -63.5); ctx.closePath(); fs(ctx, L3, 1.1);
+        // štít (mandlový, s křížem)
+        ctx.beginPath(); ctx.moveTo(-14, -50); ctx.lineTo(-2, -50); ctx.lineTo(-2, -38); ctx.quadraticCurveTo(-3, -28, -8, -24); ctx.quadraticCurveTo(-13, -28, -14, -38); ctx.closePath(); fs(ctx, L1, 1.7);
+        ctx.strokeStyle = L3; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(-8, -48); ctx.lineTo(-8, -28); ctx.moveTo(-13, -42); ctx.lineTo(-3, -42); ctx.stroke();
         ctx.restore();
       }
     }

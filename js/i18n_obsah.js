@@ -267,7 +267,7 @@
     GameData.unitSkins.forEach(s => apply(s, ['name', 'desc'], EN.unitSkins[s.id] || s.en));
     (GameData.weaponSkins || []).forEach(s => apply(s, ['name', 'desc'], s.en));
     GameData.castleSkins.forEach(s => apply(s, ['name', 'desc'], EN.castleSkins[s.id]));
-    EN.decor.sochy = EN.decor.sochy || { name: 'Stone Guardians', desc: 'Two great stone lions on pedestals in front of the wall.' };
+    EN.decor.sochy = EN.decor.sochy || { name: 'Stone Guardians', desc: 'Two stone guardian statues with shield and spear on pedestals in front of the wall.' };
     EN.decor.ohne = EN.decor.ohne || { name: 'Wall Fires', desc: 'Blazing iron braziers on the walls – your castle shines across the battlefield.' };
     GameData.castleCustom.decorations.forEach(d => apply(d, ['name', 'desc'], EN.decor[d.id]));
     GameData.castleCustom.emblems.forEach(e => apply(e, ['name'], EN.emblems[e.id]));
