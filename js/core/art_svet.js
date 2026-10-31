@@ -390,8 +390,9 @@
     // KAMENNÍ STRÁŽCI: dvě kamenné sochy strážců se štítem a kopím na podstavcích před hradbou
     if (d.sochy) {
       const L1 = '#cfd4db', L2 = '#b6bcc5', L3 = '#9aa0aa';
-      for (const [x, f] of [[200, 1], [118, -1]]) {
-        ctx.save(); ctx.translate(x, B); ctx.scale(f * 1.6, 1.6);
+      // stojí po obou stranách brány (brána je u všech hradů kolem x = 276)
+      for (const [x, f] of [[226, 1], [318, -1]]) {
+        ctx.save(); ctx.translate(x, B); ctx.scale(f * 1.25, 1.25);
         // podstavec
         ctx.beginPath(); ctx.rect(-14, -14, 28, 14); fs(ctx, '#8b8f96', 1.8);
         ctx.beginPath(); ctx.rect(-16, -18, 32, 5); fs(ctx, '#a8adb6', 1.6);
