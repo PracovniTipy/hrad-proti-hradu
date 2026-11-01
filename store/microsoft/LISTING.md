@@ -21,9 +21,9 @@ Odkaz: https://apps.microsoft.com/detail/9pnwtzcm0mlw
 | 16:9 Super hero art 3840×2160 / 1920×1080 | `hero-3840x2160.png`, `hero-1920x1080.png` |
 | Trailer (16:9, 27 s, s hudbou) | `trailer-1920x1080.mp4` |
 | Náhled traileru | `hero-1920x1080.png` |
-| Screenshoty 1920×1080 | `media/castlewars_1.png` až `castlewars_6.png` |
+| Screenshoty 1920×1080 (v tomto pořadí) | `screenshot-01.png` až `screenshot-08.png` (první: armády těsně před střetem) |
 
-Popisky screenshotů: 1 „Choose your nation“ · 2 „Upgrade your castle“ · 3 „26 special attacks“ · 4 „A five-act story“ · 5 „Equipment and skins“ · 6 „Online 1v1 and 2v2 battles“
+Popisky screenshotů: 1 „Knights vs Vikings: ready for battle“ · 2 „Three nations, one battlefield“ · 3 „Choose your nation“ · 4 „Upgrade your castle“ · 5 „26 special attacks“ · 6 „A five-act story“ · 7 „Equipment and skins“ · 8 „Online 1v1 and 2v2 battles“
 
 ---
 
