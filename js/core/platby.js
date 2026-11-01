@@ -24,7 +24,8 @@
       const app = ['fullscreen', 'standalone', 'minimal-ui'].some(m => matchMedia('(display-mode: ' + m + ')').matches);
       /* nainstalovaná aplikace ve Windows (ne Electron) = verze z Microsoft Storu:
          tam se nikdy nesmí nabízet placení přes itch.io */
-      const winApp = app && /Windows/i.test(navigator.userAgent) && !/Electron/i.test(navigator.userAgent);
+      /* + aplikace pro Windows (Electron) – i ta se instaluje z Microsoft Storu */
+      const winApp = /Windows/i.test(navigator.userAgent) && (app || /Electron/i.test(navigator.userAgent));
       if (winApp) localStorage.setItem('cw-store', 'ms');
       return q || winApp || (app && localStorage.getItem('cw-store') === 'ms');
     } catch (e) { return /[?&]store=ms\b/.test(location.search); }
