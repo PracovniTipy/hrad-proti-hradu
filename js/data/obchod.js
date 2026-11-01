@@ -33,6 +33,7 @@ GameData.castleCustom = {
     { id: 'brectan', name: 'Starý břečťan', desc: 'Husté popínavé rostliny šplhající po kamenných zdech.', price: 500 },
     { id: 'balisty', name: 'Obranné balisty', desc: 'Dvě těžké balisty s nabitými šípy na ochozu hradby.', price: 1300 },
     { id: 'hroty', name: 'Ostrá zátarasa', desc: 'Řada zkřížených zahrocených kůlů před hradbou proti jízdě.', price: 700 },
+    { id: 'drak', name: 'Dračí hlava', desc: 'Obří dračí hlava na věži u brány. Žhnou jí oči, z nozder se kouří a při útoku Dračí dech z ní šlehá oheň. Získáš ji koupí útoku Dračí dech.', price: 0, skill: 'drak' },
     { id: 'zbrojnice', name: 'Stojany se zbraněmi', desc: 'Dřevěné stojany s kopími, meči a štíty před hradbou.', price: 800 }
   ]
 };

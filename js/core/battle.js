@@ -515,7 +515,10 @@
           break;
         case 'breath': {
           const lim = s.castle.front + dir * (a.range || 1000);   // dračí dech je obrana hradu na blízko
-          const sx = s.castle.front - dir * 30, sy = cfg.groundY - 300;
+          let sx = s.castle.front - dir * 30, sy = cfg.groundY - 300;
+          // s dračí hlavou na věži šlehá oheň přímo z její tlamy
+          const mouth = Art.dragonMouth && Art.dragonMouth(s.castleImg, s.castle.front, cfg.groundY, dir);
+          if (mouth) { sx = mouth[0]; sy = mouth[1]; s.castleImg._breathUntil = performance.now() + 1600 / (this.speed || 1); }
           this.vfx.breath(sx, sy, lim, dir);
           this.later(0.45, () => { for (let x = s.castle.front + dir * 200; (x - lim) * dir < 0; x += dir * 260) this.vfx.burn(x, midY, 200, 3); });
           this.later(0.45, () => foes().filter(e => (e.x - lim) * dir < 0).forEach(e => { this._damage(e, a.power, null, true); e.dot = { until: this.time + 3, dps: a.power * 0.15, c: 'rgba(255,120,40,.45)' }; }));

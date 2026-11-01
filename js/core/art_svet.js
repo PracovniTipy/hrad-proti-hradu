@@ -516,6 +516,8 @@
         ctx.restore();
       }
     }
+    // DRAČÍ HLAVA (kreslí se živě v drawCastle) – úchyt na věži u brány
+    img.dragonPt = d.drak ? (J ? [300, 232] : N ? [304, 236] : [304, 236]) : null;
     // pozice pochodní a ohňů (animace v drawCastle) – v souřadnicích základního hradu
     img.torchPts = J || N ? [[240, 304], [312, 304]] : [[240, 300], [313, 300]];
     if (d.pochodne) img.torchPts = img.torchPts.concat(J ? [[40, 214], [200, 214]] : N ? [[60, 316], [190, 316]] : [[60, 270], [180, 270]]);

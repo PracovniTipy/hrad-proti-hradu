@@ -830,6 +830,84 @@
     return out;
   }
 
+
+  /* Dračí hlava v místních souřadnicích: úchyt na zdi v (0,0), tlama míří doprava (+x).
+     jaw = otevření dolní čelisti (rad), fire = právě chrlí oheň */
+  function dragonHead(ctx, t, jaw, fire) {
+    const RED = '#9c2018', RED2 = '#c3372a', DARK = '#5a0e0a', BONE = '#efe3c2', BELLY = '#d99a5a';
+    // kamenný úchyt na zdi
+    ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); fs(ctx, '#8b8f96', 2);
+    ctx.beginPath(); ctx.arc(0, 0, 11, 0, Math.PI * 2); fs(ctx, '#a8adb6', 1.4);
+    // ostny na šíji
+    for (const [x, y, a] of [[-6, -12, -2.2], [-10, -2, -2.8], [-6, 9, 2.6]]) {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+      ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(0, -11); ctx.lineTo(4, 0); ctx.closePath(); fs(ctx, DARK, 1.3);
+      ctx.restore();
+    }
+    // rohy (za hlavou)
+    ctx.beginPath(); ctx.moveTo(10, -16); ctx.quadraticCurveTo(-6, -30, -22, -30); ctx.quadraticCurveTo(-8, -24, 4, -12); ctx.closePath(); fs(ctx, BONE, 1.6);
+    ctx.beginPath(); ctx.moveTo(16, -17); ctx.quadraticCurveTo(6, -34, -10, -40); ctx.quadraticCurveTo(2, -30, 10, -14); ctx.closePath(); fs(ctx, '#d8caa4', 1.5);
+    // vnitřek tlamy
+    ctx.save(); ctx.translate(16, 3); ctx.rotate(jaw);
+    ctx.beginPath(); ctx.moveTo(-2, -4); ctx.lineTo(34, -6); ctx.lineTo(30, 2); ctx.lineTo(0, 4); ctx.closePath(); ctx.fillStyle = fire ? '#ff9a2a' : '#3a0a06'; ctx.fill();
+    ctx.restore();
+    ctx.beginPath(); ctx.moveTo(16, 0); ctx.lineTo(48, -4); ctx.lineTo(48, 2); ctx.lineTo(16, 6); ctx.closePath(); ctx.fillStyle = fire ? '#ffd27a' : '#3a0a06'; ctx.fill();
+    // dolní čelist se zuby
+    ctx.save(); ctx.translate(16, 3); ctx.rotate(jaw);
+    ctx.beginPath(); ctx.moveTo(-4, -1); ctx.lineTo(30, -1); ctx.quadraticCurveTo(34, 0, 32, 4); ctx.lineTo(4, 11); ctx.quadraticCurveTo(-4, 10, -4, -1); ctx.closePath(); fs(ctx, RED, 1.8);
+    ctx.beginPath(); ctx.moveTo(2, 7); ctx.lineTo(28, 2); ctx.lineTo(26, 4.5); ctx.lineTo(4, 10); ctx.closePath(); ctx.fillStyle = BELLY; ctx.fill();
+    for (let x = 6; x < 30; x += 5.5) { ctx.beginPath(); ctx.moveTo(x, -1); ctx.lineTo(x + 2, -5.5); ctx.lineTo(x + 4, -1); ctx.closePath(); fs(ctx, BONE, 0.8); }
+    ctx.restore();
+    // horní část hlavy a čenich
+    ctx.beginPath();
+    ctx.moveTo(2, -14); ctx.quadraticCurveTo(10, -24, 24, -19);
+    ctx.lineTo(42, -12); ctx.quadraticCurveTo(51, -10, 50, -3);
+    ctx.lineTo(34, -1); ctx.lineTo(16, 3); ctx.quadraticCurveTo(4, 10, -2, 8); ctx.quadraticCurveTo(-6, -6, 2, -14); ctx.closePath();
+    fs(ctx, RED, 2);
+    // šupiny a hřbet čenichu
+    ctx.strokeStyle = RED2; ctx.lineWidth = 1.2;
+    for (const [x, y] of [[8, -10], [14, -6], [6, -2], [20, -12], [28, -10], [34, -8]]) { ctx.beginPath(); ctx.arc(x, y, 3, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(22, -19); ctx.quadraticCurveTo(34, -15, 46, -9); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,190,150,.35)'; ctx.stroke();
+    // horní zuby a tesák
+    for (let x = 20; x < 46; x += 6) { ctx.beginPath(); ctx.moveTo(x, -1 + (x - 20) * -0.08); ctx.lineTo(x + 2, 4 + (x - 20) * -0.08); ctx.lineTo(x + 4, -1.6 + (x - 20) * -0.08); ctx.closePath(); fs(ctx, BONE, 0.8); }
+    ctx.beginPath(); ctx.moveTo(40, -3); ctx.lineTo(42, 6); ctx.lineTo(44, -3.5); ctx.closePath(); fs(ctx, BONE, 1);
+    // nozdra
+    ctx.beginPath(); ctx.ellipse(46, -7.5, 2.2, 1.4, -0.3, 0, Math.PI * 2); ctx.fillStyle = DARK; ctx.fill();
+    // obočí a žhnoucí oko
+    ctx.beginPath(); ctx.moveTo(14, -19); ctx.quadraticCurveTo(24, -24, 31, -16); ctx.lineTo(27, -14); ctx.quadraticCurveTo(22, -18, 15, -15); ctx.closePath(); fs(ctx, DARK, 1.2);
+    const pulse = 0.75 + Math.sin(t * 3) * 0.25;
+    const gl = ctx.createRadialGradient(23, -12, 0.5, 23, -12, 12);
+    gl.addColorStop(0, `rgba(255,220,90,${0.65 * pulse})`); gl.addColorStop(1, 'rgba(255,140,30,0)');
+    ctx.fillStyle = gl; ctx.fillRect(10, -25, 26, 26);
+    ctx.beginPath(); ctx.ellipse(23, -12, 4.6, 3, -0.2, 0, Math.PI * 2); fs(ctx, '#ffd23a', 1.2);
+    ctx.beginPath(); ctx.ellipse(23.6, -12, 1, 2.6, 0, 0, Math.PI * 2); ctx.fillStyle = '#2a0a04'; ctx.fill();
+    // kouř z nozder (když nechrlí)
+    if (!fire) for (let i = 0; i < 3; i++) {
+      const ph = ((t * 0.6 + i / 3) % 1), x = 48 + ph * 10 + Math.sin(t * 2 + i) * 2, y = -9 - ph * 26, r = 2 + ph * 6;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = `rgba(90,90,96,${0.45 * (1 - ph)})`; ctx.fill();
+    }
+    // plamen z tlamy při útoku
+    if (fire) {
+      for (let i = 0; i < 4; i++) {
+        const L = 26 + i * 8 + Math.sin(t * 20 + i) * 4;
+        ctx.beginPath(); ctx.moveTo(46, 0); ctx.quadraticCurveTo(46 + L * 0.5, -10 - i * 2, 46 + L, -2 + Math.sin(t * 17 + i) * 3); ctx.quadraticCurveTo(46 + L * 0.5, 12 + i * 2, 46, 6); ctx.closePath();
+        ctx.fillStyle = ['rgba(255,90,20,.75)', 'rgba(255,150,40,.7)', 'rgba(255,210,90,.65)', 'rgba(255,245,200,.6)'][i]; ctx.fill();
+      }
+    }
+  }
+  /* bod hradu (v souřadnicích obrázku) → bod ve světě bitvy */
+  function castleWorldPt(img, front, groundY, facing, p) {
+    const BX = img.big || { S: 1, ox: 0, oy: 0 };
+    const x0 = facing === 1 ? front - img.w + 2 : front - 2;
+    const x = BX.ox + p[0] * BX.S, y = BX.oy + p[1] * BX.S;
+    return [facing === 1 ? x0 + x : front - 2 + (img.w - x), groundY - img.h + y];
+  }
+  /* kde má dračí hlava tlamu (pro Dračí dech) */
+  function dragonMouth(img, front, groundY, facing) {
+    if (!img || !img.dragonPt || !img.cfg || !img.cfg.decor || !img.cfg.decor.drak) return null;
+    const [hx, hy] = castleWorldPt(img, front, groundY, facing, img.dragonPt), K = (img.big ? img.big.S : 1) * 1.45;
+    return [hx + facing * 48 * K, hy + 2 * K];
+  }
   /* Vykreslí hrad do scény. front = x souřadnice brány, groundY = patka. */
   function drawCastle(ctx, img, front, groundY, facing, t, hpRatio, flagColor) {
     flagColor = img.flagColor || flagColor;
@@ -894,6 +972,14 @@
         ctx.fillStyle = i === 1 ? '#ff9a2a' : '#ff6a1a'; ctx.fill();
       }
       ctx.beginPath(); ctx.moveTo(-3, -4); ctx.quadraticCurveTo(0, -14, 3, -4); ctx.closePath(); ctx.fillStyle = '#ffe9a0'; ctx.fill();
+      ctx.restore();
+    }
+    // DRAČÍ HLAVA (patří k útoku Dračí dech) – žhnoucí oči, kouř z nozder, při útoku otevřená tlama
+    if (dec.drak && img.dragonPt) {
+      const [hx, hy] = at(img.dragonPt), K = BX.S * 1.45;
+      const now = performance.now(), breathing = img._breathUntil && now < img._breathUntil;
+      ctx.save(); ctx.translate(hx, hy); ctx.scale(facing * K, K);
+      dragonHead(ctx, t, breathing ? 0.5 : 0.06 + Math.max(0, Math.sin(t * 0.9)) * 0.05, breathing);
       ctx.restore();
     }
     // praskliny při poškození
@@ -1130,7 +1216,7 @@
 
   window.Art = {
     OUT, rng, shade, fs, rr, limb, ease, lerp, fist, face, SH, drawSwordArm, drawBow, drawSpear, stoneBlock, crenels, windowSlit, banner, CASTLE_W, CASTLE_H,
-    unitPalette, castlePalette, drawUnit, castleImage, drawCastle,
+    unitPalette, castlePalette, drawUnit, castleImage, drawCastle, dragonMouth, castleWorldPt,
     drawBattleBackground, drawStoryMap, renderUnitIcon, renderCastleIcon, pine, mountains
   };
 })();

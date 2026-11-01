@@ -152,7 +152,18 @@
   }
 
   /* Nastavení hradu hráče (znak, barvy, zapnuté a koupené dekorace) */
+  /* Dračí hlava patří k útoku Dračí dech (za skutečné peníze) – kdo ho má, má i hlavu */
+  function syncSkillDecor(save) {
+    try {
+      const own = save.ownedDecor || (save.ownedDecor = []);
+      for (const d of GameData.castleCustom.decorations) {
+        if (!d.skill || own.includes(d.id) || !GameData.skillsOf(save).owned.includes(d.skill)) continue;
+        own.push(d.id); save.castleCfg = save.castleCfg || {}; save.castleCfg.decor = save.castleCfg.decor || {}; save.castleCfg.decor[d.id] = true;
+      }
+    } catch (e) {}
+  }
   function castleCfg(save) {
+    syncSkillDecor(save);
     const c = save.castleCfg || {};
     const decor = {};
     Object.keys(c.decor || {}).forEach(k => { if (c.decor[k] && (save.ownedDecor || []).includes(k)) decor[k] = true; });
@@ -506,6 +517,7 @@
               return `<div class="dec-row">
                 <div><b>${esc(d.name)}</b><small>${esc(d.desc)}</small></div>
                 ${owned ? `<button class="toggle ${on ? 'on' : ''}" data-decor="${d.id}" aria-pressed="${!!on}"><i></i>${on ? t('on') : t('off')}</button>`
+                  : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.lang === 'cs' ? 'Získat s útokem' : 'Get with attack'}</button>`
                   : `<button class="btn btn-sm btn-gold" data-buydecor="${d.id}" ${save.gold < d.price ? 'disabled' : ''}>${ico('coin')} ${fmt(d.price)}</button>`}
               </div>`;
             }).join('')}</div>
@@ -524,6 +536,7 @@
       save.skins.castle = b.dataset.mat; redo();
     }));
     el.querySelectorAll('[data-decor]').forEach(b => b.addEventListener('click', () => { c.decor = c.decor || {}; c.decor[b.dataset.decor] = !c.decor[b.dataset.decor]; redo(); }));
+    el.querySelectorAll('[data-goskill]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: 'utoky' })));
     el.querySelectorAll('[data-buydecor]').forEach(b => b.addEventListener('click', () => {
       const d = CC.decorations.find(x => x.id === b.dataset.buydecor);
       if (save.gold < d.price) return;
@@ -670,6 +683,7 @@
               <canvas data-deccv="${d.id}"></canvas>
               <h3>${esc(d.name)}</h3><p>${esc(d.desc)}</p>
               ${owned ? `<button class="btn btn-sm btn-blue" data-go="stavitel">${t('set_in_editor')}</button>`
+                : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.lang === 'cs' ? 'Získat s útokem Dračí dech' : 'Get with Dragon Breath'}</button>`
                 : `<button class="btn btn-sm btn-gold" data-dbuy="${d.id}" ${save.gold < d.price ? 'disabled' : ''}>${t('buy')} ${ico('coin')} ${fmt(d.price)}</button>`}
             </article>`;
           }).join('')}
@@ -860,6 +874,7 @@
         const s = Math.min(w / (img.w + 20), h / (img.h + 20));
         ctx.save(); ctx.scale(s, s); Art.drawCastle(ctx, img, (w / 2 + img.w * s / 2) / s, h / s - 4, 1, 0.3, 1, F.color); ctx.restore();
       });
+      el.querySelectorAll('[data-goskill]').forEach(b => b.addEventListener('click', () => App.go('obchod', { tab: 'utoky' })));
       el.querySelectorAll('[data-dbuy]').forEach(b => b.addEventListener('click', () => {
         const d = GameData.castleCustom.decorations.find(x => x.id === b.dataset.dbuy);
         if (save.gold < d.price) return;
@@ -1142,7 +1157,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 84 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 85 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

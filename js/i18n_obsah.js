@@ -192,7 +192,7 @@
     zed: { name: 'Wall of Fire', desc: 'A wall of fire blazes in front of your soldiers for 6 s. Whoever crosses it burns.' },
     vir: { name: 'Whirlwind', desc: 'A whirlwind bursts from the gate, races forward, hurts and throws enemies back.' },
     svetlo: { name: 'Holy Light', desc: 'A beam from the sky hurts enemies in the area and heals your soldiers.' },
-    drak: { name: 'Dragon’s Breath', desc: 'A dragon on the walls breathes fire right in front of the castle: burns every enemy that came close.' },
+    drak: { name: 'Dragon’s Breath', desc: 'A dragon on the walls breathes fire right in front of the castle: burns every enemy that came close. Comes with a dragon head for your castle.' },
     jedsipy: { name: 'Poison Volley', desc: 'Archers on the walls fire 24 poisoned arrows; every hit poisons the enemy for 4 s.' },
     ledkopi: { name: 'Ice Spears', desc: 'Ice spears burst from the ground: hurt enemies and stop them for 2 s.' }
   };
@@ -273,6 +273,7 @@
     EN.decor.brectan = EN.decor.brectan || { name: 'Old Ivy', desc: 'Thick climbing ivy creeping up the stone walls.' };
     EN.decor.balisty = EN.decor.balisty || { name: 'Defensive Ballistae', desc: 'Two heavy ballistae with loaded bolts on the wall walk.' };
     EN.decor.hroty = EN.decor.hroty || { name: 'Spiked Barricade', desc: 'A row of crossed sharpened stakes in front of the wall against cavalry.' };
+    EN.decor.drak = EN.decor.drak || { name: 'Dragon Head', desc: 'A huge dragon head on the gate tower. Its eyes glow, smoke rises from its nostrils and Dragon Breath bursts from its jaws. Comes with the Dragon Breath attack.' };
     EN.decor.zbrojnice = EN.decor.zbrojnice || { name: 'Weapon Racks', desc: 'Wooden racks with spears, swords and shields in front of the wall.' };
     GameData.castleCustom.decorations.forEach(d => apply(d, ['name', 'desc'], EN.decor[d.id]));
     GameData.castleCustom.emblems.forEach(e => apply(e, ['name'], EN.emblems[e.id]));
