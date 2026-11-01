@@ -430,6 +430,92 @@
         ctx.fillStyle = fcol[i % 4]; ctx.beginPath(); ctx.arc(x, y, 3, 0, TAU); ctx.fill();
       }
     }
+    const WT = J ? 242 : (N ? 252 : 246);          // horní hrana hlavní hradby
+    // STARÝ BŘEČŤAN: popínavé šlahouny po zdi
+    if (d.brectan) {
+      const vine = (x0, h, sway) => {
+        ctx.strokeStyle = '#3d5a24'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x0, B);
+        for (let y = B; y > B - h; y -= 8) ctx.lineTo(x0 + Math.sin(y * 0.09 + sway) * 6, y);
+        ctx.stroke();
+        for (let y = B - 4; y > B - h; y -= 5) {
+          const xx = x0 + Math.sin(y * 0.09 + sway) * 6;
+          for (const sd of [-1, 1]) {
+            if (rand() < 0.25) continue;
+            const lx = xx + sd * (3 + rand() * 6), ly = y + rand() * 3, r = 2.6 + rand() * 2.2;
+            ctx.beginPath(); ctx.ellipse(lx, ly, r, r * 0.75, sd * 0.6, 0, TAU);
+            ctx.fillStyle = ['#2f6a2e', '#3f8a35', '#5aa84a'][(rand() * 3) | 0]; ctx.fill();
+            ctx.strokeStyle = 'rgba(20,40,15,.55)'; ctx.lineWidth = 0.8; ctx.stroke();
+          }
+        }
+      };
+      vine(18, B - WT + 6, 0); vine(84, (B - WT) * 0.75, 1.7); vine(150, B - WT - 10, 3.1); vine(214, (B - WT) * 0.6, 4.4);
+    }
+    // VODNÍ PŘÍKOP s padacím mostem k bráně
+    if (d.prikop) {
+      const y0 = B - 9;
+      const g = ctx.createLinearGradient(0, y0, 0, B); g.addColorStop(0, '#3f7fb8'); g.addColorStop(1, '#1f4f7a');
+      ctx.beginPath(); ctx.rect(0, y0, 248, 9); ctx.fillStyle = g; ctx.fill();
+      ctx.strokeStyle = OUT; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(248, y0); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1.2;
+      for (let x = 8; x < 240; x += 22) { ctx.beginPath(); ctx.moveTo(x, y0 + 3.5); ctx.quadraticCurveTo(x + 5, y0 + 1.5, x + 10, y0 + 3.5); ctx.stroke(); }
+      ctx.beginPath(); ctx.rect(0, y0 - 3, 248, 3); fs(ctx, '#7d8290', 1.2);
+      // padací most
+      for (let x = 248; x < 306; x += 7) { ctx.beginPath(); ctx.rect(x, B - 11, 7, 11); fs(ctx, (x / 7) % 2 ? '#8a5a32' : '#7a4c2a', 1.2); }
+      ctx.strokeStyle = '#3a3a44'; ctx.lineWidth = 1.6;
+      for (const x of [252, 302]) { ctx.beginPath(); ctx.moveTo(x, B - 11); ctx.lineTo(x + (x < 270 ? 8 : -8), B - 92); ctx.stroke(); }
+    }
+    // OSTRÁ ZÁTARASA: zkřížené zahrocené kůly
+    if (d.hroty) {
+      const stake = (x1, y1, x2, y2) => {
+        const a = Math.atan2(y2 - y1, x2 - x1), w = 2.4, nx = -Math.sin(a) * w, ny = Math.cos(a) * w, tip = 7;
+        const ex = x2 - Math.cos(a) * tip, ey = y2 - Math.sin(a) * tip;
+        ctx.beginPath(); ctx.moveTo(x1 + nx, y1 + ny); ctx.lineTo(ex + nx, ey + ny); ctx.lineTo(x2, y2); ctx.lineTo(ex - nx, ey - ny); ctx.lineTo(x1 - nx, y1 - ny); ctx.closePath();
+        fs(ctx, '#8a5a32', 1.3);
+        ctx.beginPath(); ctx.moveTo(ex + nx, ey + ny); ctx.lineTo(x2, y2); ctx.lineTo(ex - nx, ey - ny); ctx.closePath(); fs(ctx, '#d8c49a', 1);
+      };
+      for (let x = 14; x < 236; x += 30) {
+        ctx.beginPath(); ctx.rect(x - 1, B - 14, 26, 5); fs(ctx, '#6b4528', 1.2);
+        stake(x, B, x + 26, B - 28); stake(x + 24, B, x - 2, B - 28);
+      }
+    }
+    // STOJANY SE ZBRANĚMI
+    if (d.zbrojnice) {
+      for (const x0 of [40, 150]) {
+        ctx.beginPath(); ctx.rect(x0, B - 30, 46, 4); fs(ctx, '#6b4528', 1.4);
+        ctx.beginPath(); ctx.rect(x0 + 2, B - 30, 4, 30); fs(ctx, '#5a3a1e', 1.2);
+        ctx.beginPath(); ctx.rect(x0 + 40, B - 30, 4, 30); fs(ctx, '#5a3a1e', 1.2);
+        // kopí
+        for (const k of [0, 1, 2]) {
+          const sx = x0 + 11 + k * 10;
+          ctx.beginPath(); ctx.rect(sx - 1, B - 62, 2.2, 62); fs(ctx, '#7a5530', 1);
+          ctx.beginPath(); ctx.moveTo(sx, B - 72); ctx.quadraticCurveTo(sx + 4, B - 66, sx, B - 61); ctx.quadraticCurveTo(sx - 4, B - 66, sx, B - 72); fs(ctx, '#d9dee6', 1.1);
+        }
+        // meč opřený o stojan
+        ctx.save(); ctx.translate(x0 + 40, B - 2); ctx.rotate(-0.25);
+        ctx.beginPath(); ctx.rect(-1.6, -40, 3.2, 30); fs(ctx, '#e1e6ee', 1.1);
+        ctx.beginPath(); ctx.rect(-6, -11, 12, 2.6); fs(ctx, '#c9a06a', 1); ctx.beginPath(); ctx.rect(-1.4, -9, 2.8, 8); fs(ctx, '#4a2e18', 1);
+        ctx.restore();
+        // štít
+        ctx.save(); ctx.translate(x0 + 24, B - 14); ctx.scale(0.95, 0.95); heraldShield(ctx, 0, 0, pal); ctx.restore();
+      }
+    }
+    // OBRANNÉ BALISTY na ochozu
+    if (d.balisty) {
+      for (const [x0, f] of [[70, 1], [178, 1]]) {
+        ctx.save(); ctx.translate(x0, WT - 2); ctx.scale(f, 1);
+        ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-6, -12); ctx.lineTo(6, -12); ctx.lineTo(14, 0); ctx.closePath(); fs(ctx, '#6b4528', 1.5);
+        ctx.beginPath(); ctx.rect(-18, -17, 36, 5); fs(ctx, '#8a5a32', 1.4);
+        // luk
+        ctx.strokeStyle = OUT; ctx.lineWidth = 3.4; ctx.beginPath(); ctx.moveTo(10, -32); ctx.quadraticCurveTo(18, -15, 10, 2); ctx.stroke();
+        ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(10, -32); ctx.quadraticCurveTo(18, -15, 10, 2); ctx.stroke();
+        ctx.strokeStyle = '#e8dcc0'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(10, -32); ctx.lineTo(-10, -15); ctx.lineTo(10, 2); ctx.stroke();
+        // šíp
+        ctx.beginPath(); ctx.rect(-12, -16, 34, 2.2); fs(ctx, '#7a5530', 0.9);
+        ctx.beginPath(); ctx.moveTo(22, -18.5); ctx.lineTo(29, -15); ctx.lineTo(22, -11.5); ctx.closePath(); fs(ctx, '#d9dee6', 1);
+        ctx.restore();
+      }
+    }
     // pozice pochodní a ohňů (animace v drawCastle) – v souřadnicích základního hradu
     img.torchPts = J || N ? [[240, 304], [312, 304]] : [[240, 300], [313, 300]];
     if (d.pochodne) img.torchPts = img.torchPts.concat(J ? [[40, 214], [200, 214]] : N ? [[60, 316], [190, 316]] : [[60, 270], [180, 270]]);

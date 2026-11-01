@@ -269,6 +269,11 @@
     GameData.castleSkins.forEach(s => apply(s, ['name', 'desc'], EN.castleSkins[s.id]));
     EN.decor.sochy = EN.decor.sochy || { name: 'Stone Guardians', desc: 'Two stone guardian statues with shield and spear on pedestals in front of the wall.' };
     EN.decor.ohne = EN.decor.ohne || { name: 'Wall Fires', desc: 'Blazing iron braziers on the walls – your castle shines across the battlefield.' };
+    EN.decor.prikop = EN.decor.prikop || { name: 'Water Moat', desc: 'A water moat along the whole wall and an oak drawbridge to the gate.' };
+    EN.decor.brectan = EN.decor.brectan || { name: 'Old Ivy', desc: 'Thick climbing ivy creeping up the stone walls.' };
+    EN.decor.balisty = EN.decor.balisty || { name: 'Defensive Ballistae', desc: 'Two heavy ballistae with loaded bolts on the wall walk.' };
+    EN.decor.hroty = EN.decor.hroty || { name: 'Spiked Barricade', desc: 'A row of crossed sharpened stakes in front of the wall against cavalry.' };
+    EN.decor.zbrojnice = EN.decor.zbrojnice || { name: 'Weapon Racks', desc: 'Wooden racks with spears, swords and shields in front of the wall.' };
     GameData.castleCustom.decorations.forEach(d => apply(d, ['name', 'desc'], EN.decor[d.id]));
     GameData.castleCustom.emblems.forEach(e => apply(e, ['name'], EN.emblems[e.id]));
     Object.values(GameData.abilities).forEach(a => apply(a, ['name', 'desc'], EN.abilities[a.id]));

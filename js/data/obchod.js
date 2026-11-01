@@ -28,7 +28,12 @@ GameData.castleCustom = {
     { id: 'zahrada', name: 'Zahrada', desc: 'Velké keře, tvarované stromky a záhony kolem hradu.', price: 350 },
     { id: 'zlato', name: 'Zlacení', desc: 'Široké zlaté pásy, zlatý rám brány a zlaté koule na stožárech.', price: 900 },
     { id: 'sochy', name: 'Kamenní strážci', desc: 'Dvě kamenné sochy strážců se štítem a kopím na podstavcích před hradbou.', price: 1200 },
-    { id: 'ohne', name: 'Ohně na hradbách', desc: 'Planoucí železné mísy na hradbách – hrad září na celé bojiště.', price: 1500 }
+    { id: 'ohne', name: 'Ohně na hradbách', desc: 'Planoucí železné mísy na hradbách – hrad září na celé bojiště.', price: 1500 },
+    { id: 'prikop', name: 'Vodní příkop', desc: 'Příkop s vodou před celou hradbou a dubový padací most k bráně.', price: 1100 },
+    { id: 'brectan', name: 'Starý břečťan', desc: 'Husté popínavé rostliny šplhající po kamenných zdech.', price: 500 },
+    { id: 'balisty', name: 'Obranné balisty', desc: 'Dvě těžké balisty s nabitými šípy na ochozu hradby.', price: 1300 },
+    { id: 'hroty', name: 'Ostrá zátarasa', desc: 'Řada zkřížených zahrocených kůlů před hradbou proti jízdě.', price: 700 },
+    { id: 'zbrojnice', name: 'Stojany se zbraněmi', desc: 'Dřevěné stojany s kopími, meči a štíty před hradbou.', price: 800 }
   ]
 };
 
