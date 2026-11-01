@@ -16,7 +16,7 @@
   const USD = { 29: 1.49, 59: 2.49, 99: 3.99, 149: 5.99, 199: 7.99, 249: 9.99, 499: 19.99, 999: 39.99, 2500: 99.99 };
   /* verze pro Microsoft Store: pravidla Storu u her nedovolují placení mimo Microsoft,
      takže tam se platí přes Microsoft (Digital Goods API v Edge) a itch.io se neukazuje */
-  const MS = (() => {
+  let MS = (() => {
     try {
       const q = /[?&]store=ms\b/.test(location.search);
       // aplikace z Microsoft Storu se při spuštění hlásí tímto referrerem
@@ -34,7 +34,7 @@
   /* id doplňku v Partner Center: cw + id bez podtržítek (gems_g1 → cwgemsg1) */
   const msId = pid => 'cw' + String(pid).replace(/[^a-z0-9]/gi, '').toLowerCase();
   const Platby = {
-    msStore: MS,
+    get msStore() { return MS; },
     msId,
     available() { return true; },
     on() { return !MS || (msOk() && this._msItems !== false); },
@@ -152,6 +152,15 @@
       return { title, got };
     },
     init(App) {
+      /* záchrana: služba plateb Microsoft Storu funguje jen v aplikaci nainstalované z Microsoft Storu */
+      if (!MS && msOk()) {
+        window.getDigitalGoodsService(MS_BILLING).then(svc => {
+          MS = true; this._svc = svc;
+          try { localStorage.setItem('cw-store', 'ms'); } catch (e) {}
+          this.init(App);
+        }).catch(() => {});
+        return;
+      }
       if (!MS) return;
       this._msItems = false;
       if (!msOk()) return;
