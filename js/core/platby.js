@@ -22,7 +22,11 @@
       // aplikace z Microsoft Storu se při spuštění hlásí tímto referrerem
       if (q || /^app-info:\/\/platform\/microsoft-store/.test(document.referrer || '')) localStorage.setItem('cw-store', 'ms');
       const app = ['fullscreen', 'standalone', 'minimal-ui'].some(m => matchMedia('(display-mode: ' + m + ')').matches);
-      return q || (app && localStorage.getItem('cw-store') === 'ms');
+      /* nainstalovaná aplikace ve Windows (ne Electron) = verze z Microsoft Storu:
+         tam se nikdy nesmí nabízet placení přes itch.io */
+      const winApp = app && /Windows/i.test(navigator.userAgent) && !/Electron/i.test(navigator.userAgent);
+      if (winApp) localStorage.setItem('cw-store', 'ms');
+      return q || winApp || (app && localStorage.getItem('cw-store') === 'ms');
     } catch (e) { return /[?&]store=ms\b/.test(location.search); }
   })();
   const MS_BILLING = 'https://store.microsoft.com/billing';
@@ -33,7 +37,7 @@
     msStore: MS,
     msId,
     available() { return true; },
-    on() { return !MS || msOk(); },
+    on() { return !MS || (msOk() && this._msItems !== false); },
     usd(czk) { return USD[czk] || Math.round(czk / 20) - 0.01; },
     price(czk) { return '$' + this.usd(czk).toFixed(2); },
     terms: TERMS,
@@ -147,7 +151,17 @@
       App.persist();
       return { title, got };
     },
-    init(App) { if (MS && msOk()) setTimeout(() => this.msRestore(App), 1500); }
+    init(App) {
+      if (!MS) return;
+      this._msItems = false;
+      if (!msOk()) return;
+      /* ověř, že doplňky jsou v Microsoft Storu opravdu nastavené; jinak placené věci skryj */
+      this.msSvc().then(svc => svc.getDetails(GameData.gemPacks.map(g => msId('gems_' + g.id)).concat(GameData.offers.map(o => msId(o.id)))))
+        .then(d => { this._msItems = !!(d && d.length); })
+        .catch(() => { this._msItems = false; })
+        .finally(() => { document.body.classList.toggle('paid-off', !this.on()); if (App.current === 'obchod') App.go('obchod', { keepScroll: true }); });
+      setTimeout(() => this.msRestore(App), 1500);
+    }
   };
   window.Platby = Platby;
 })();
