@@ -233,7 +233,7 @@
       const pal = id => sv ? GHs.palette('player', st.skins[id] || 'zakladni', st.faction, lkOf(id)) : Art.unitPalette('player', st.skins[id] || 'zakladni', st.faction);
       const dd = id => sv ? GHs.drawDef(GameData.units[id], lkOf(id)) : GameData.units[id];
       const U = GameData.units;
-      const guard = (id, x, y, f) => Art.drawUnit(ctx, dd(id), pal(id), { x, y, facing: f, t, ring: false, scaleMul: 1.45, walk: 0 });
+      const guard = (id, x, y, f) => Art.drawUnit(ctx, dd(id), pal(id), { x, y, facing: f, t, ring: false, scaleMul: 1.38, walk: 0 });
       guard(F.roles.tezka, 700 + 210, 508, -1);
       guard(F.roles.kopi, 700 - 236, 506, 1);
       // hlídka chodí po cestě sem a tam
@@ -241,8 +241,8 @@
       const ph = (t % period) / period;
       const pos = ph < 0.5 ? ph * 2 : 2 - ph * 2;
       const px = 700 - span / 2 + pos * span;
-      Art.drawUnit(ctx, dd(F.roles.pech), pal(F.roles.pech), { x: px, y: 530, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7, t, ring: false, scaleMul: 1.45 });
-      Art.drawUnit(ctx, dd(F.roles.strelec), pal(F.roles.strelec), { x: px - (ph < 0.5 ? 46 : -46), y: 524, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7 + 1.5, t, ring: false, scaleMul: 1.45 });
+      Art.drawUnit(ctx, dd(F.roles.pech), pal(F.roles.pech), { x: px, y: 530, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7, t, ring: false, scaleMul: 1.38 });
+      Art.drawUnit(ctx, dd(F.roles.strelec), pal(F.roles.strelec), { x: px - (ph < 0.5 ? 48 : -48), y: 524, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7 + 1.5, t, ring: false, scaleMul: 1.38 });
       // částice
       const amb = (window.ArtThemes.ambient || {})[theme];
       if (amb) {
@@ -1142,7 +1142,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 83 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 84 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

@@ -762,7 +762,7 @@
       window.addEventListener('keyup', e => { const k = keyMap[e.key]; if (k) { this._keys[k] = false; ctrlSet(); } });
       $('#bSpeed').addEventListener('click', () => {
         if (!this.battle) return;
-        const v = this.battle.speed === 1 ? 2 : 1;
+        const v = this.battle.speed >= 3 ? 1 : this.battle.speed + 1;   // ×1 → ×2 → ×3
         this.battle.setSpeed(v); this.save.settings.speed = v; Save.save();
         $('#bSpeed').textContent = '×' + v;
       });

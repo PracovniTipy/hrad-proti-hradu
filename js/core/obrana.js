@@ -158,7 +158,7 @@ GameData.defenseOf = save => {
       } else {
         const atk = since < 0.7 ? since / 0.7 : -1;
         const def2 = sl.kind === 'kuse' ? CROSS : GameData.units[F.roles.strelec];
-        Art.drawUnit(ctx, def2, pal, { x, y, facing, t, atk, scaleMul: 0.72 * k, noShadow: true });
+        Art.drawUnit(ctx, def2, pal, { x, y, facing, t, atk, scaleMul: 0.684 * k, noShadow: true });
       }
     });
     // cimbuří před obránci: kola katapultů a nohy střelců jsou schované za hradbou

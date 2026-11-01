@@ -119,7 +119,7 @@ GameData.formations = {
 };
 /* Pořadí v šiku: menší číslo = blíž k nepříteli */
 GameData.formationRank = { rytir: 0, pesak: 1, kopinik: 2, lucistnik: 3 };
-GameData.formationConfig = { rows: 4, colSpacing: 40 };
+GameData.formationConfig = { rows: 4, colSpacing: 42 };  // rozestup o 5 % větší
 
 /* Základní nastavení souboje */
 GameData.battleConfig = {
@@ -134,7 +134,7 @@ GameData.battleConfig = {
   timeLimit: Infinity,  // bitva nemá časový limit – končí pádem jednoho z hradů
   startCoins: 120,
   killRewardRatio: 0.3, // podíl ceny jednotky, který dostaneš za zabití
-  unitScale: 1.45,      // velikost postav na bojišti
+  unitScale: 1.38,      // velikost postav na bojišti (o 5 % menší než dřív 1,45)
   rangeScale: 1.3,      // dosah se násobí kvůli velikosti postav
   speedScale: 1.2       // rychlost chůze se násobí
 };
