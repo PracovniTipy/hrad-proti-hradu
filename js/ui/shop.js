@@ -129,10 +129,11 @@
           if (!s) { const pool = O.armorFor(uid, g.ar || (want && want.rarity) || 'Vzácný').filter(x => !O.has(save, uid, x.id)); s = pool.sort((a, b) => (b.only ? 1 : 0) - (a.only ? 1 : 0))[0]; }
           if (s && put('a', uid, s.id)) any = true;
         }
-        if (g.w || g.wr) {
-          const want = g.w && GameData.weaponSkins.find(x => x.id === g.w);
+        if (g.w || g.wr || g.ws) {
+          const want = g.ws ? g.ws.map(id => GameData.weaponSkins.find(x => x.id === id)).find(x => x && GameData.weaponSkinFits(x, uid))
+            : g.w && GameData.weaponSkins.find(x => x.id === g.w);
           let w = want && GameData.weaponSkinFits(want, uid) ? want : null;
-          if (!w) w = O.weaponFor(uid, g.wr || (want && want.rarity) || 'Vzácný').filter(x => !O.hasW(save, uid, x.id))[0];
+          if (!w && !g.ws) w = O.weaponFor(uid, g.wr || (want && want.rarity) || 'Vzácný').filter(x => !O.hasW(save, uid, x.id))[0];
           if (w && put('w', uid, w.id)) any = true;
         }
       });
@@ -379,9 +380,9 @@
   }
 
   window.Shop = {
-    tabs: ['nabidky', 'kody'],
-    body(App, tab, opts) { return tab === 'kody' ? bodyCodes(App) : bodyOffers(App); },
-    bind(App, tab, el) { if (tab === 'kody') bindCodes(App, el); else bindOffers(App, el); },
+    tabs: ['nabidky', 'kody', 'pas'],
+    body(App, tab, opts) { return tab === 'pas' ? Pas.body(App) : tab === 'kody' ? bodyCodes(App) : bodyOffers(App); },
+    bind(App, tab, el) { if (tab === 'pas') Pas.bind(App, el); else if (tab === 'kody') bindCodes(App, el); else bindOffers(App, el); },
     grant, rewardsModal, ensure, bonusText, bindOffers
   };
 })();

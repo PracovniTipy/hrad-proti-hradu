@@ -68,7 +68,7 @@
         const bind = () => c.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => {
           const id = b.dataset.q, Q = save.quests;
           if (id === 'bonus') { if (Q.bonus) return; Q.bonus = true; save.gold += BONUS.gold; save.gems += BONUS.gems; }
-          else { const q = this.list(save).find(x => x.id === id); if (!q || !q.done || q.claimed) return; Q.claimed[id] = true; save.gold += q.gold || 0; save.gems += q.gems || 0; }
+          else { const q = this.list(save).find(x => x.id === id); if (!q || !q.done || q.claimed) return; Q.claimed[id] = true; save.gold += q.gold || 0; save.gems += q.gems || 0; if (window.Pas) Pas.onQuest(save); }
           if (window.Zvuk) Zvuk.play('coin', 1);
           App.persist(); c.innerHTML = render(); bind();
           const dot = document.querySelector('#questBtn .daily-dot'); if (dot && !this.ready(save)) dot.remove();

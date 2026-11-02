@@ -404,6 +404,11 @@
             <span class="daily-lbl">${t('daily_short')}</span>
             ${Denni.available(save) ? '<i class="daily-dot">!</i>' : ''}
           </button>
+          <button class="daily-btn pass-btn" id="passBtn" aria-label="${t('tab_pas')}">
+            <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M24 14h72l-6 74-30-14-30 14z" fill="#2a3a52" stroke="#0e1420" stroke-width="4" stroke-linejoin="round"/><path d="M24 14h72l-2 22H26z" fill="#bfe6ff" stroke="#0e1420" stroke-width="4" stroke-linejoin="round"/><path d="M60 40l7 14 15 2-11 10 3 15-14-8-14 8 3-15-11-10 15-2z" fill="#ffd24a" stroke="#0e1420" stroke-width="3" stroke-linejoin="round"/></svg></span>
+            <span class="daily-lbl">${t('tab_pas')}</span>
+            ${window.Pas && Pas.ready(save) ? '<i class="daily-dot">!</i>' : ''}
+          </button>
         </section>
       </div>`;
     if (!sprava) {
@@ -413,6 +418,7 @@
       el.querySelector('#dailyBtn').addEventListener('click', () => Denni.open(App));
       UcetUI.bind(App, el);
       el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
+      el.querySelector('#passBtn').addEventListener('click', () => App.go('obchod', { tab: 'pas' }));
       Instalace.bind(App, el);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
@@ -581,6 +587,7 @@
       const uName = esc(GameData.units[unitSel].name);
       const costBtn = (c, attr) => c.gold ? `<button class="btn btn-sm btn-gold" ${attr} ${save.gold < c.gold ? 'disabled' : ''}>${t('buy')} ${ico('coin')} ${fmt(c.gold)}</button>`
         : `<button class="btn btn-sm btn-gold" ${attr} ${save.gems < (c.gems || 0) ? 'disabled' : ''}>${t('buy')} ${ico('gem')} ${fmt(c.gems || 0)}</button>`;
+      const realBtn = (r, k, id) => { const c = Pas.skinCzk(r); return c && Platby.on() ? `<button class="btn btn-sm btn-green buy-czk" data-rbuy="${k}|${id}|${r}">${Platby.price(c)}</button>` : ''; };
       const rarN = r => t('rar_' + GameData.rarityRank(r));
       const rarB = r => `<span class="rar" style="color:${GameData.rarityColors[r]}">${rarN(r)}</span>`;
       body = natBar + `
@@ -598,14 +605,14 @@
             .sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity) || (b.only ? 1 : 0) - (a.only ? 1 : 0)).map(s => {
             const owned = O.has(save, unitSel, s.id);
             const eq = (save.skins.unit[unitSel] || 'zakladni') === s.id;
-            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''} ${s.only ? 'nat' : ''} ${s.codeOnly ? 'divine' : ''}">
-              ${s.only || s.codeOnly ? `<span class="skin-tag">${s.codeOnly ? t('rar_4') : s.mount ? t('skin_mount') : t('skin_nation')}</span>` : ''}
+            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''} ${s.only ? 'nat' : ''} ${s.codeOnly && !s.season ? 'divine' : ''} ${s.season ? 'season' : ''}">
+              ${s.only || s.codeOnly ? `<span class="skin-tag">${s.season ? t('skin_season') : s.codeOnly ? t('rar_4') : s.mount ? t('skin_mount') : t('skin_nation')}</span>` : ''}
               <canvas data-skinunit="${s.id}"></canvas>
               <h3>${esc(s.name)}</h3>${rarB(s.rarity)}<p>${esc(s.desc)}</p>
               ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
               ${eq ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : owned ? `<button class="btn btn-sm btn-blue" data-equip="${s.id}">${t('use')}</button>`
-                : costBtn(s.cost || {}, `data-abuy="${s.id}"`)}
+                : s.season ? '' : `<div class="buy-2">${costBtn(s.cost || {}, `data-abuy="${s.id}"`)}${realBtn(s.rarity, 'a', s.id)}</div>`}
             </article>`;
           }).join('')}
         </div>` : `
@@ -613,13 +620,13 @@
           ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel) && (!w.codeOnly || O.hasW(save, unitSel, w.id))).sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity)).map(w => {
             const ownedW = O.hasW(save, unitSel, w.id);
             const eqW = ((save.skins.weapon || {})[unitSel] || 'w_zakladni') === w.id;
-            return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''} ${w.codeOnly ? 'divine' : ''}">
+            return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''} ${w.codeOnly && !w.season ? 'divine' : ''} ${w.season ? 'season' : ''}">
               <canvas data-wskin="${w.id}"></canvas>
               <h3>${esc(w.name)}</h3>${rarB(w.rarity)}${w.desc ? `<p>${esc(w.desc)}</p>` : ''}
               ${w.bonus ? `<p class="gear-bonus">${Shop.bonusText(w.bonus)}</p>` : ''}
               ${eqW ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : ownedW ? `<button class="btn btn-sm btn-blue" data-wequip="${w.id}">${t('use')}</button>`
-                : costBtn(w.cost || {}, `data-wbuy="${w.id}"`)}
+                : w.season ? '' : `<div class="buy-2">${costBtn(w.cost || {}, `data-wbuy="${w.id}"`)}${realBtn(w.rarity, 'w', w.id)}</div>`}
             </article>`;
           }).join('')}
         </div>`);
@@ -725,7 +732,7 @@
           </div>
         </section>` : ''}
         <div class="tabs shop-tabs" role="tablist">
-          ${[['nabidky', t('tab_offers'), 'crown'], ['vojaci', t('tab_units'), 'helmet'], ['utoky', t('tab_skills'), 'swords'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem'], ['kody', t('tab_codes'), 'key']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
+          ${[['pas', t('tab_pas'), 'crown'], ['nabidky', t('tab_offers'), 'chest'], ['vojaci', t('tab_units'), 'helmet'], ['utoky', t('tab_skills'), 'swords'], ['hrady', t('tab_castles'), 'castle'], ['dekorace', t('tab_decor'), 'flag'], ['drahokamy', t('tab_gems'), 'gem'], ['kody', t('tab_codes'), 'key']].map(([id, n, ic]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${tab === id}">${ico(ic)}<span>${n}</span></button>`).join('')}
         </div>
         <p class="shop-hint muted">${t('shop_hint_' + tab)}</p>
         ${['vojaci', 'utoky', 'hrady'].includes(tab) ? `<div class="rar-legend">${['Základní', 'Vzácný', 'Epický', 'Legendární'].map((r, i) => `<span style="--rc:${GameData.rarityColors[r]}">${t('rar_' + i)}</span>`).join('<i>‹</i>')}<small>${t('rarity_legend')}</small></div>` : ''}
@@ -781,6 +788,13 @@
         if (O.has(save, unitSel, sk.id) || !pay(sk.cost || {})) return;
         O.add(save, unitSel, sk.id); save.skins.unit[unitSel] = sk.id;
         App.persist(); App.toast(t('t_bought', { name: sk.name })); App.go('obchod', { keepScroll: true });
+      }));
+      el.querySelectorAll('[data-rbuy]').forEach(b => b.addEventListener('click', () => {
+        const [k, id, r] = b.dataset.rbuy.split('|');
+        const item = k === 'w' ? GameData.weaponSkinById(id) : GameData.unitSkins.find(x => x.id === id);
+        if (k === 'w' ? O.hasW(save, unitSel, id) : O.has(save, unitSel, id)) return;
+        save.pendingSkin = { k, uid: unitSel, id }; App.persist();
+        Platby.buy(App, { id: r === 'Legendární' ? 'skin_l' : 'skin_e', name: item.name + ' · ' + GameData.units[unitSel].name, czk: Pas.skinCzk(r) });
       }));
       const pv = el.querySelector('#skinPrev');
       const anim = () => {
@@ -1157,7 +1171,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 85 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 91 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

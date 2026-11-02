@@ -49,7 +49,10 @@
       if (!w) location.href = url;
     },
     /* okno nákupu: odkaz na itch.io + pole na vložení odkazu ke stažení */
+    /* produkty, které ještě nemají stránku na itch.io / doplněk v Microsoft Storu */
+    soon: /^(pass|sada_|skin_)/,
     buy(App, product) {
+      if (this.soon && this.soon.test(product.id)) { App.toast(t('pay_soon')); return; }
       if (MS) { this.buyMs(App, product); return; }
       if (window.HraPlatby && window.HraPlatby.buy) {
         window.HraPlatby.buy(product).then(ok => { if (ok) this.showGot(App, this.deliver(App, product.id)); }).catch(() => App.toast(t('pay_failed')));
@@ -100,7 +103,7 @@
       return this._svc;
     },
     _skuToPid(sku) {
-      const all = GameData.offers.map(o => o.id).concat(GameData.gemPacks.map(g => 'gems_' + g.id), Object.keys(GameData.divineSets || {}).map(k => 'set_' + k), ['skill_drak']);
+      const all = GameData.offers.map(o => o.id).concat(GameData.gemPacks.map(g => 'gems_' + g.id), Object.keys(GameData.divineSets || {}).map(k => 'set_' + k), ['skill_drak', 'pass', 'skin_e', 'skin_l'], (GameData.wolfSets || []).map(w => 'sada_' + w.role));
       return all.find(p => msId(p) === sku) || null;
     },
     async buyMs(App, product) {
@@ -147,6 +150,7 @@
       if (o) { title = o.name; got = Shop.grant(App, o.give); }
       else if (pid.startsWith('gems_')) { const x = GameData.gemPacks.find(g => 'gems_' + g.id === pid); if (x) { title = t('gems_n', { n: x.gems }); got = Shop.grant(App, { gems: x.gems }); } }
       else if (pid.startsWith('set_')) { const id = pid.slice(4), D = GameData.divineSets[id]; if (D) { title = I18N.lang === 'cs' ? D.name : D.en; got = Shop.grant(App, { set: id }); } }
+      else if (window.Pas && /^(pass|sada_|skin_)/.test(pid)) { const r = Pas.deliver(App, pid); if (r) { title = r.title; got = r.got; } }
       else if (pid.startsWith('skill_')) { const k = GameData.skillById(pid.slice(6)); if (k) { title = k.name; got = Shop.grant(App, { skills: [k.id] }); } }
       if (window.Stat) Stat.ev('purchase', { p: pid });
       App.persist();

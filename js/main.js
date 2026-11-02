@@ -587,6 +587,9 @@
         note = t('note_training');
       }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
+      const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
+      if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
+      if (bp && bp.up) note += (note ? '<br>' : '') + `★ ${t('pas_lvl_up', { n: Pas.level(save) })}`;
       if (qDone) note += (note ? '<br>' : '') + `${ico('crown')} ${t('quests_ready', { n: qDone })}`;
       this.persist();
       // nejlepší jednotka bitvy (MVP) a přehled podle druhu vojáka
