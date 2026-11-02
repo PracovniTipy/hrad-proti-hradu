@@ -1331,16 +1331,27 @@
         this.spawn('enemy', ai.next);
         ai.next = null;
       }
-      // MYSL POČÍTAČE – rozhoduje se jednou za sekundu podle síly obou armád a drží se
-      // svého rozhodnutí (nepřepíná sem a tam):
-      //   SBÍRÁ  – stojí před svým hradem a shromažďuje armádu
-      //   STŘED  – když je zhruba stejně silný, obsadí střed bojiště
-      //   ÚTOK   – vyrazí, když má převahu nebo uplyne čas čekání; útoku se drží aspoň 20 s
-      //   HRADBY – když nepřítel dorazí k hradu a počítač je slabší, brání se u brány pod věží
-      //   ÚSTUP  – jen v krajní nouzi (drtivá přesila u hradu), nejvýš jednou za 90 s;
-      //            za hradbami se vyléčí a pak se vrátí k bráně
+      // MYSL POČÍTAČE – každá bitva má jinou TAKTIKU (vybere se na začátku, jiná než minule):
+      //   ztec   – rychlý útok: vyráží brzy a v neustálých vlnách, nikdy necouvá
+      //   vlny   – sbírá stále větší vlny a pak jde naplno, dokud vlna nepadne
+      //   stred  – co nejdřív obsadí střed, drží ho a z něj tlačí dál
+      //   past   – láká hráče k hradbám pod věže a pak udeří protiútokem až k jeho hradu
+      //   postup – pomalu a neustále posouvá frontu dopředu (lučištníci za pěchotou)
+      //   nájezd – když hráč vyrazí, nečeká: udeří proti němu hned a útok drží
+      // Rozhodnutí drží (žádné couvání ve chvíli, kdy hráč zaútočí).
+      // Když taktika selhává (hrad počítače je hodně poškozený), jednou ji změní.
       const cfg = C();
-      ai.mind = ai.mind || 'sbira';
+      if (!ai.strat) {
+        const ALL = ['ztec', 'vlny', 'stred', 'past', 'postup', 'najezd'];
+        let last = null; try { last = localStorage.getItem('cw-ai-last'); } catch (e) {}
+        const pool = ALL.filter(x => x !== last);
+        ai.strat = (this.o.aiStrategy && ALL.includes(this.o.aiStrategy)) ? this.o.aiStrategy : pool[Math.floor(this.rand() * pool.length)];
+        try { localStorage.setItem('cw-ai-last', ai.strat); } catch (e) {}
+        ai.waveN = Math.min(10, Math.round(3 + (this.o.difficulty || 1) * 2));
+        ai.creep = cfg.enemyFront - 420;
+        ai.mind = 'sbira'; ai.mindAt = 0;
+        this.later(2.5, () => { if (!this.over) this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.32, txt: t('ai_strat_' + ai.strat), color: '#ff9e9e', t: 0, life: 2.6, big: true }); });
+      }
       ai.decide = (ai.decide || 0) - 0.4;
       if (ai.decide <= 0) {
         ai.decide = 1;
@@ -1350,40 +1361,65 @@
         const myP = power('enemy'), foeP = power('player');
         const ratio = foeP > 0 ? myP / foeP : 99;
         const front = s.castle.front;
-        const foesAtGate = this.units.filter(u => u.team === 'player' && !u.dead && front - u.x < 1100).length;
-        const WAITS = [90, 120, 150];
-        if (ai.attackAt == null) ai.attackAt = this.time + WAITS[Math.floor(this.rand() * WAITS.length)] * (this.o.difficulty >= 1.4 ? 0.7 : 1);
+        const foes = this.units.filter(u => u.team === 'player' && !u.dead);
+        const foesAtGate = foes.filter(u => front - u.x < 1100).length;
+        const foeFar = foes.length ? Math.max(...foes.map(u => u.x)) : cfg.playerFront;
         const since = this.time - (ai.mindAt || 0);
         const set = m => { if (ai.mind !== m) { ai.mind = m; ai.mindAt = this.time; } };
-        const avgHp = mine ? myUnits.reduce((a, u) => a + u.hp / u.maxHp, 0) / mine : 1;
-        switch (ai.mind) {
-          case 'ustup':
-            // za hradbami: vyjde, až je vyléčený (nebo po 15 s), a brání bránu
-            if ((avgHp > 0.85 && since > 4) || since > 15) set(ratio > 1.2 ? 'utok' : 'hradby');
+        const hpK = s.castle.hp / s.castle.maxHp;
+        // selhávající taktika → jednou za bitvu ji vymění
+        if (!ai.switched && hpK < 0.45) {
+          ai.switched = true;
+          const alt = { ztec: 'past', vlny: 'stred', stred: 'past', past: 'ztec', postup: 'najezd', najezd: 'vlny' };
+          ai.strat = alt[ai.strat] || 'ztec'; ai.mind = 'sbira'; ai.mindAt = this.time;
+          this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.32, txt: t('ai_strat_' + ai.strat), color: '#ff9e9e', t: 0, life: 2.4, big: true });
+        }
+        const playerAttacks = this.side.player.formation === 'utok' && foes.some(u => u.x > this.W * 0.35);
+        switch (ai.strat) {
+          case 'ztec':
+            if (ai.mind === 'utok') { if (mine === 0) set('sbira'); }
+            else if (mine >= 3 || (mine >= 1 && this.time > 25) || foesAtGate) set('utok');
             break;
-          case 'utok':
-            if (since > 20 && ratio < (this.side.player.formation === 'utok' ? 0.35 : 0.6)) set(foesAtGate ? 'hradby' : 'sbira');
-            else if (mine <= 1 && foesAtGate === 0) { set('sbira'); ai.attackAt = this.time + 60; }
+          case 'vlny':
+            if (ai.mind === 'utok') { if (mine <= 1) { set('sbira'); ai.waveN = Math.min(14, ai.waveN + 2); } }
+            else if (mine >= ai.waveN || (foesAtGate && ratio > 1)) set('utok');
+            else set(foesAtGate ? 'hradby' : 'sbira');
             break;
-          default: {
-            const desperate = ratio < 0.3 && foesAtGate >= 4 && mine >= 2 && this.time - (ai.retreatAt || -999) > 90;
-            if (desperate) {
-              set('ustup'); ai.retreatAt = this.time;
-              if (window.Zvuk) Zvuk.play('horn', 0.7);
-              this.texts.push({ x: front - 200, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.4, txt: t('ai_retreat'), color: '#ff9e9e', t: 0, life: 2, big: true });
-            } else if (this.side.player.formation === 'utok' && ratio >= 0.3 && mine >= 2 && this.units.some(u => u.team === 'player' && !u.dead && u.x > this.W * 0.35)) {
-              set('utok');   // hráč útočí → počítač vyrazí do protiútoku
-            } else if ((ratio > 1.3 && mine >= 4) || (this.time >= ai.attackAt && ratio > 0.8) || (foesAtGate && ratio > 1.1)) set('utok');
-            else if (foesAtGate) set('hradby');
-            else if (ratio >= 0.85 && mine >= 3 && this.time > 20 && this.cp.owner !== 'enemy') set('stred');
-            else if (ai.mind === 'stred' && ratio < 0.7 && since > 8) set('sbira');
-            else if (ai.mind === 'hradby' && !foesAtGate && since > 6) set('sbira');
-          }
+          case 'stred':
+            if (ai.mind === 'utok') { if (since > 15 && ratio < 0.5) set('stred'); }
+            else if (mine >= 2) set(ratio > 1.25 && mine >= 5 && this.cp.owner === 'enemy' ? 'utok' : 'stred');
+            else set(foesAtGate ? 'hradby' : 'sbira');
+            break;
+          case 'past':
+            if (ai.mind === 'utok') { if (mine === 0) set('sbira'); }
+            else if (foesAtGate >= 2 && ratio > 0.9 && since > 4) set('utok');           // nepřítel je pod věžemi → protiúder
+            else if (this.time > 150 && ratio > 1.2) set('utok');
+            else set('hradby');
+            break;
+          case 'postup':
+            if (ai.mind === 'utok') { if (mine <= 1) { set('postup'); ai.creep = cfg.enemyFront - 420; } }
+            else if (mine >= 2) {
+              set('postup');
+              ai.creep -= ratio >= 0.8 ? 70 : ratio < 0.5 ? -40 : 15;           // fronta se posouvá dopředu
+              ai.creep = Math.max(cfg.playerFront + 400, Math.min(cfg.enemyFront - 300, ai.creep));
+              if (ai.creep < cfg.playerFront + 700 || ratio > 1.6) set('utok');
+            } else set(foesAtGate ? 'hradby' : 'sbira');
+            break;
+          case 'najezd':
+          default:
+            if (ai.mind === 'utok') { if (mine === 0 || (since > 25 && ratio < 0.3)) set('sbira'); }
+            else if (mine >= 2 && (playerAttacks || foesAtGate || foeFar > this.cp.x)) set('utok');   // hráč vyrazil → udeří proti němu
+            else if (mine >= 6) set('utok');
+            else set('stred');
         }
         // provedení rozhodnutí
         if (ai.mind === 'utok') s.formation = 'utok';
-        else if (ai.mind === 'ustup') s.formation = 'ustup';
-        else { s.formation = 'formace'; s.flagX = ai.mind === 'stred' ? Math.max(cfg.playerFront + 400, this.cp.x + 60) : ai.mind === 'hradby' ? front - 260 : front - 420; }
+        else {
+          s.formation = 'formace';
+          s.flagX = ai.mind === 'stred' ? Math.max(cfg.playerFront + 400, this.cp.x + 60)
+            : ai.mind === 'hradby' ? front - 260
+            : ai.mind === 'postup' ? ai.creep : front - 420;
+        }
       }
       // čím déle bitva trvá, tím rychleji nepřítel získává mince (je to těžší a těžší)
       // příjem nepřítele roste s časem, ale nejvýš na 2,5× (bitva teď nemá časový limit)
@@ -1428,6 +1464,12 @@
       const foes = this.units.filter(u => u.team !== team && !u.dead);
       const role = r => foes.filter(u => u.def.roleKey === r).length;
       const w = { pech: 4, strelec: 3, kopi: 2, tezka: 1.6 };
+      const st = team === 'enemy' && this.ai && this.ai.strat;
+      if (st === 'ztec') { w.pech += 2; w.jizda = 3; }
+      else if (st === 'postup') { w.strelec += 3; w.mag = 2; }
+      else if (st === 'past') { w.kopi += 2; w.tezka += 1.5; }
+      else if (st === 'najezd') { w.jizda = 4; w.tezka += 1; }
+      else if (st === 'stred') { w.kopi += 1; w.strelec += 1; }
       if (role('strelec') >= 3) { w.tezka += 3; w.pech += 2; }
       if (role('tezka') >= 2 || foes.some(u => u.def.boss)) w.kopi += 4;
       if (role('pech') >= 4) w.strelec += 3;
