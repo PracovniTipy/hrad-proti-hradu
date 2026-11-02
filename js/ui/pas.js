@@ -294,6 +294,24 @@
       if (tr) { const nx = tr.querySelector('.bp-col.next') || tr.querySelector('.bp-col.reached:last-child'); if (nx) tr.scrollLeft = Math.max(0, nx.offsetLeft - tr.clientWidth / 2); }
     }
   };
+  /* efekty legendární a božské výbavy na bojišti (kreslí battle.js) */
+  G.gearHelpers.fx = (save, uid) => {
+    const O = G.skinOwn, sk = save.skins || {};
+    const sid = (sk.unit || {})[uid], wid = (sk.weapon || {})[uid];
+    const S = sid && G.unitSkins.find(x => x.id === sid), W = wid && G.weaponSkins.find(x => x.id === wid);
+    const okS = S && G.skinFits(S, uid) && (!O || O.has(save, uid, sid));
+    const okW = W && W.model && G.weaponSkinFits(W, uid) && (!O || O.hasW(save, uid, wid));
+    const ar = okS ? G.rarityRank(S.rarity) : 0, wr = okW ? G.rarityRank(W.rarity) : 0;
+    if (ar < 3 && wr < 3) return null;
+    const div = (okS && /andel|kral_bozi/.test(sid)) ? (sid === 'andel' ? 'andel' : 'kral') : (okW && /_andel$/.test(wid)) ? 'andel' : (okW && /_kral$/.test(wid)) ? 'kral' : null;
+    return { ar, wr, div,
+      ac: okS ? (S.glow || (S.palette && (S.palette.trim || S.palette.plume)) || '#ffe28a') : null,
+      wc: okW ? (W.model.glow || W.model.gem || W.model.guard || '#ffe28a') : null };
+  };
+  Object.assign(I18N.D, {
+    fx_leg: ['✦ Efekt v bitvě: záře a jiskry', '✦ Battle effect: glow and sparks'],
+    fx_div: ['✦ Božský efekt: aura a sloup světla', '✦ Divine effect: aura and light pillar']
+  });
   /* ceny jednotlivých skinů za skutečné peníze */
   Pas.skinCzk = rarity => rarity === 'Legendární' ? 29 : rarity === 'Epický' ? 19 : 0;
   window.Pas = Pas;

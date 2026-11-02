@@ -337,7 +337,7 @@
         speed: save.settings.speed || 1,
         seed: (cfg.title || '').length * 31 + 7,
         player: { stats, unitSkins: save.skins.unit, castleSkin: save.skins.castle, castleLevel: GameData.calc.castleLevel(save), castleCfg: Screens.castleCfg(save),
-          loadout: id => ({ bonus: GameData.gearHelpers.bonus(save, id), lk: GameData.gearHelpers.look(save, id) }),
+          loadout: id => ({ bonus: GameData.gearHelpers.bonus(save, id), lk: GameData.gearHelpers.look(save, id), fx: GameData.gearHelpers.fx ? GameData.gearHelpers.fx(save, id) : null }),
           defense: GameData.defenseOf(save) },
         onUpdateHud: b => this._hud(b, lastHud),
         onEnd: res => this._battleEnd(cfg, res),

@@ -364,6 +364,7 @@
         u.hp *= 1 + (b.hp || 0); u.maxHp = u.hp; u.dmg *= 1 + (b.dmg || 0);
         u.armorBonus = b.armor || 0; u.crit = b.crit || 0;
         u.drawDef = GameData.gearHelpers.drawDef(def, L.lk);
+        if (L.fx && (L.fx.ar >= 3 || L.fx.wr >= 3)) u.fx = L.fx;
       }
       // hostitel: bonusy výbavy vzdáleného hráče (vzhled vidí jen on sám)
       const OB = this._owner && this._owner.bonus && this._owner.bonus[unitId];
@@ -371,6 +372,7 @@
       if (F && F.hp) { u.maxHp = F.mh || F.hp; u.hp = F.hp; }
       u.owner = F ? F.o : (this._owner ? this._owner.pid : (this.net && team === 'player' ? this.net.me : null));
       this.units.push(u);
+      if (u.fx) this._gearSpawnFx(u);
       if (this.net && this.net.role === 'host') this.net.onSpawn(u);
       if (def.boss) {
         this.bossUnit = u;
@@ -791,6 +793,7 @@
         if (due.length) { this.timers = this.timers.filter(x => x.at > this.time); due.forEach(x => x.fn()); }
       }
       this._updateSkillFx(dt);
+      this._gearFx(dt);
       this.vfx.update(dt);
       // hořící vojáci: plameny na těle
       this._burnT = (this._burnT || 0) - dt;
@@ -1288,6 +1291,7 @@
       target.hurt = 0.15;
       if (window.Zvuk) Zvuk.at(from && from.def && !from.def.ranged ? (/kopi|jari|stitonos|rohac/.test(from.def.roleKey + from.def.id) && Math.random() < 0.4 ? 'spear' : 'sword') : 'hit', target.x, this, 0.6);
       this._sparks(target.x, target.y - 34 * US(), fire ? '#ff9a3c' : '#fff1b0', 5);
+      if (from && from.fx && from.fx.wr >= 3) this._gearHitFx(from, target, target.hp - dmg <= 0);
       this.texts.push({ x: target.x + (Math.random() - 0.5) * 10, y: target.y - 82 * US(), txt: Math.round(dmg), color: target.team === 'player' ? '#ff8a80' : '#ffffff', t: 0, life: 0.8 });
       if (target.hp <= 0 && !target.dead) {
         target.dead = 0.001;
@@ -1535,6 +1539,64 @@
     }
 
     /* ---------------- efekty ---------------- */
+    /* ---------- EFEKTY LEGENDÁRNÍ A BOŽSKÉ VÝBAVY ----------
+       legendární (3): záře pod vojákem, třpytky, jiskry a prstenec při zásahu
+       božská (4): sloup světla při příchodu, pulzující aura s částicemi,
+       rázová vlna při zásahu a záblesk světla při zabití */
+    _gearSpawnFx(u) {
+      const F = u.fx, top = Math.max(F.ar, F.wr), c = F.ac || F.wc || '#ffe28a';
+      if (top >= 4) { this.vfx.pillar(u.x, u.y, 70, F.div === 'andel' ? 'rgba(255,60,90,.55)' : 'rgba(255,240,180,.75)', 1.2); this.vfx.rise(u.x, u.y, F.div === 'andel' ? 'shadow' : 'holy', 18); }
+      else { this.vfx.rise(u.x, u.y, 'gold', 8); this.vfx.spark(u.x, u.y - 40, 0, -60, 0.6, 16, c, 0); }
+    }
+    _gearFx(dt) {
+      this._gfxT = (this._gfxT || 0) - dt;
+      if (this._gfxT > 0) return;
+      this._gfxT = 0.12;
+      const x0 = this.cam.x - 60, x1 = this.cam.x + this.cam.viewW + 60, s = US();
+      let n = 0;
+      for (const u of this.units) {
+        if (!u.fx || u.dead || u.x < x0 || u.x > x1) continue;
+        if (++n > 60) break;
+        const F = u.fx, sc = s * (u.def.look.scale || 1);
+        if (F.ar >= 3 && Math.random() < (F.ar >= 4 ? 0.9 : 0.45)) {
+          const c = F.ac || '#ffe28a';
+          this.vfx.spark(u.x + (Math.random() - 0.5) * 34 * sc, u.y - Math.random() * 80 * sc, (Math.random() - 0.5) * 12, -40 - Math.random() * 50, 0.9, F.ar >= 4 ? 5 + Math.random() * 3 : 3 + Math.random() * 2, c, 0);
+        }
+        if (F.wr >= 3 && Math.random() < (F.wr >= 4 ? 0.7 : 0.35)) {
+          const c = F.wc || '#ffe28a', f = u.face || u.dir;
+          this.vfx.spark(u.x + f * (16 + Math.random() * 18) * sc, u.y - (40 + Math.random() * 40) * sc, f * 10, -20 - Math.random() * 30, 0.5, F.wr >= 4 ? 5 : 3.5, c, 0);
+        }
+      }
+    }
+    _gearAura(ctx, u, t) {
+      const F = u.fx, top = Math.max(F.ar, F.wr), sc = US() * (u.def.look.scale || 1);
+      const c = F.ac || F.wc || '#ffe28a';
+      const ph = Math.sin(t * (top >= 4 ? 4 : 2.6) + u.id);
+      const rx = (top >= 4 ? 34 : 26) * sc * (1 + ph * 0.08), ry = rx * 0.3;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = top >= 4 ? 0.55 + ph * 0.15 : 0.32 + ph * 0.1;
+      const g = ctx.createRadialGradient(u.x, u.y, 0, u.x, u.y, rx);
+      g.addColorStop(0, c); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.ellipse(u.x, u.y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+      if (top >= 4) {
+        ctx.lineWidth = 2.2; ctx.strokeStyle = c; ctx.globalAlpha = 0.7;
+        ctx.beginPath(); ctx.ellipse(u.x, u.y, rx * 1.1, ry * 1.1, 0, t * 2, t * 2 + Math.PI * 1.3); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(u.x, u.y, rx * 1.1, ry * 1.1, 0, t * 2 + Math.PI, t * 2 + Math.PI * 2.3); ctx.stroke();
+      }
+      ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    }
+    _gearHitFx(from, target, kill) {
+      const F = from.fx, c = F.wc || '#ffe28a', y = target.y - 40 * US();
+      if (F.wr >= 4) {
+        if (Math.random() < 0.6) this.vfx.fx.push({ k: 'ring', x: target.x, y, s: 46, t: 0, life: 0.35, c });
+        for (let i = 0; i < 7; i++) { const a = Math.random() * Math.PI * 2, sp = 120 + Math.random() * 220; this.vfx.spark(target.x, y, Math.cos(a) * sp, Math.sin(a) * sp - 60, 0.45, 5 + Math.random() * 3, c, 400); }
+        if (kill) { this.vfx.pillar(target.x, target.y, 40, F.div === 'andel' ? 'rgba(255,60,90,.6)' : 'rgba(255,244,200,.75)', 0.7); this.vfx.explosion(target.x, y, 34, F.div === 'andel' ? 'shadow' : 'holy'); }
+      } else {
+        for (let i = 0; i < 4; i++) { const a = Math.random() * Math.PI * 2, sp = 90 + Math.random() * 160; this.vfx.spark(target.x, y, Math.cos(a) * sp, Math.sin(a) * sp - 40, 0.35, 3.5 + Math.random() * 2, c, 400); }
+        if (kill) this.vfx.fx.push({ k: 'ring', x: target.x, y: target.y, s: 50, t: 0, life: 0.45, c, flat: true });
+      }
+    }
     _sparks(x, y, color, n) {
       for (let i = 0; i < n; i++) this.particles.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 120, g: 380, t: 0, life: 0.35 + Math.random() * 0.2, r: 1.6 + Math.random() * 1.4, color });
     }
@@ -1630,6 +1692,7 @@
         const shield = this.side[u.team].shieldUntil > t;
         if (u === this.hero) this._heroMarkBelow(ctx, u, t);
         if (u.def.aura && !u.dead) { ctx.save(); ctx.globalAlpha = 0.18 + Math.sin(t * 3) * 0.05; ctx.beginPath(); ctx.ellipse(u.x, u.y, 190, 26, 0, 0, Math.PI * 2); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd77a'; ctx.stroke(); ctx.restore(); }
+        if (u.fx && !u.dead) this._gearAura(ctx, u, t);
         const age = t - (u.born || 0);
         const pop = age < 0.25 ? 0.6 + 0.4 * Art.ease(age / 0.25) : 1;
         // voják za branou mizí v hradu

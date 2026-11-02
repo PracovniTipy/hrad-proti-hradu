@@ -610,6 +610,7 @@
               <canvas data-skinunit="${s.id}"></canvas>
               <h3>${esc(s.name)}</h3>${rarB(s.rarity)}<p>${esc(s.desc)}</p>
               ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
+              ${GameData.rarityRank(s.rarity) >= 3 ? `<p class="gear-fx">${t(GameData.rarityRank(s.rarity) >= 4 ? 'fx_div' : 'fx_leg')}</p>` : ''}
               ${eq ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : owned ? `<button class="btn btn-sm btn-blue" data-equip="${s.id}">${t('use')}</button>`
                 : s.season ? '' : `<div class="buy-2">${costBtn(s.cost || {}, `data-abuy="${s.id}"`)}${realBtn(s.rarity, 'a', s.id)}</div>`}
@@ -624,6 +625,7 @@
               <canvas data-wskin="${w.id}"></canvas>
               <h3>${esc(w.name)}</h3>${rarB(w.rarity)}${w.desc ? `<p>${esc(w.desc)}</p>` : ''}
               ${w.bonus ? `<p class="gear-bonus">${Shop.bonusText(w.bonus)}</p>` : ''}
+              ${GameData.rarityRank(w.rarity) >= 3 ? `<p class="gear-fx">${t(GameData.rarityRank(w.rarity) >= 4 ? 'fx_div' : 'fx_leg')}</p>` : ''}
               ${eqW ? `<button class="btn btn-sm" disabled>${t('in_use')}</button>`
                 : ownedW ? `<button class="btn btn-sm btn-blue" data-wequip="${w.id}">${t('use')}</button>`
                 : w.season ? '' : `<div class="buy-2">${costBtn(w.cost || {}, `data-wbuy="${w.id}"`)}${realBtn(w.rarity, 'w', w.id)}</div>`}
@@ -1171,7 +1173,7 @@
           </div>
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 91 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 92 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
