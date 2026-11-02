@@ -1171,9 +1171,10 @@
             <button class="btn" data-snd="sfx">${Zvuk.settings().sfx ? '🔊' : '🔇'} ${t('snd_sfx')}: ${Zvuk.settings().sfx ? t('snd_on') : t('snd_off')}</button>
             <button class="btn" data-snd="music">${Zvuk.settings().music ? '🎵' : '🔇'} ${t('snd_music')}: ${Zvuk.settings().music ? t('snd_on') : t('snd_off')}</button>
           </div>
+          ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 96 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 97 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -1194,6 +1195,7 @@
     }));
     UcetUI.bind(App, el); UcetUI.bindBackup(App, el);
     el.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); App.go('profil', { keepScroll: true }); }));
+    if (Zvuk.bindVol) Zvuk.bindVol(el);
     el.querySelector('#langSel').addEventListener('change', e => App.setLang(e.target.value));
     el.querySelector('#bugBtn').addEventListener('click', () => App.modal(`<h2>${t('bug_report')}</h2><p class="muted">${t('bug_note')}</p>
         <textarea class="bk-code" id="bugTxt" maxlength="3000" placeholder="${t('bug_ph')}"></textarea><p class="acc-err" id="bugErr" hidden></p>

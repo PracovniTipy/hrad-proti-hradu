@@ -100,6 +100,13 @@
       await rpc('hra_feedback', { p_token: (this.s && this.s.token) || '', p_text: text, p_info: info });
     },
     async leaderboard() { return rpc('hra_leaderboard', { p_limit: 50 }); },
+    async towerBoard(sort) { return rpc('hra_tower_board', { p_sort: sort || 'floor', p_limit: 50 }); },
+    async towerReport(T) {
+      if (!this.logged()) return null;
+      const wk = T.weekBest || {};
+      return rpc('hra_tower_report', { p_token: this.s.token, p_best: T.best || 0, p_generals: T.wins || 0, p_wins: T.wins || 0, p_losses: T.losses || 0,
+        p_fastest: T.fastest || null, p_week: wk.w || null, p_week_best: wk.t || null });
+    },
     /* uplatnění kódu: odměnu vrací server (každý kód jednou na účet) */
     /* platby: nová platba (cena je z katalogu na serveru) a vyzvednutí zaplacených nákupů */
     async payStart(product) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_platba_start', { p_token: this.s.token, p_product: product }); },

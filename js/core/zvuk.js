@@ -194,12 +194,33 @@
   };
 
   const Zvuk = {
-    settings() { const s = (window.App && App.save && App.save.settings) || {}; return { sfx: s.sfx !== false, music: s.music !== false }; },
+    settings() { const s = (window.App && App.save && App.save.settings) || {}; const v = (x, d) => (x == null ? d : Math.max(0, Math.min(100, x))); return { sfx: s.sfx !== false, music: s.music !== false, sfxVol: v(s.sfxVol, 100), musicVol: v(s.musicVol, 100) }; },
     apply() {
       if (!ctx) return;
       const st = this.settings();
-      sfxBus.gain.value = st.sfx ? 0.8 : 0;
-      musBus.gain.value = st.music ? 0.55 : 0;
+      sfxBus.gain.value = st.sfx ? 0.8 * Math.pow(st.sfxVol / 100, 1.4) : 0;
+      musBus.gain.value = st.music ? 0.55 * Math.pow(st.musicVol / 100, 1.4) : 0;
+    },
+    /* hlasitost hudby nebo efektů 0–100 % (uloží se do nastavení) */
+    setVol(kind, v) {
+      if (!window.App || !App.save) return;
+      const S = App.save.settings = App.save.settings || {};
+      S[kind === 'music' ? 'musicVol' : 'sfxVol'] = Math.round(Math.max(0, Math.min(100, v)));
+      if (S[kind === 'music' ? 'musicVol' : 'sfxVol'] > 0) S[kind === 'music' ? 'music' : 'sfx'] = true;
+      this.apply();
+      clearTimeout(this._vt); this._vt = setTimeout(() => App.persist && App.persist(), 400);
+    },
+    /* posuvníky hlasitosti (HTML) a jejich napojení */
+    volHtml() {
+      const st = this.settings();
+      const row = (k, ico, val) => `<label class="vol-row"><span class="vol-lbl">${ico} ${t(k === 'music' ? 'snd_music' : 'snd_sfx')}</span><input type="range" min="0" max="100" step="5" value="${val}" data-vol="${k}" aria-label="${t(k === 'music' ? 'snd_music' : 'snd_sfx')}"><b class="vol-val">${val} %</b></label>`;
+      return `<div class="vol-box">${row('music', '🎵', st.music ? st.musicVol : 0)}${row('sfx', '🔊', st.sfx ? st.sfxVol : 0)}</div>`;
+    },
+    bindVol(root) {
+      root.querySelectorAll('input[data-vol]').forEach(inp => {
+        const out = inp.parentElement.querySelector('.vol-val');
+        inp.addEventListener('input', () => { this.setVol(inp.dataset.vol, +inp.value); out.textContent = inp.value + ' %'; if (inp.dataset.vol === 'sfx') this.play('coin', 0.8); });
+      });
     },
     /* první dotyk odemkne zvuk (prohlížeče jinak nedovolí) */
     unlock() { if (init()) { if (ctx.state !== 'running') ctx.resume(); loadSamples(); } },

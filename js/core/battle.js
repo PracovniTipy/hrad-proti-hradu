@@ -770,7 +770,7 @@
 
       for (const team of ['player', 'enemy']) {
         const s = this.side[team];
-        const inc = s.income * dt * (this.cp.owner === team ? 1.35 : 1);
+        const inc = s.income * dt * (this.cp.owner === team ? (this.cpDouble ? 1.7 : 1.35) : 1);
         s.coins = Math.min(s.maxCoins, s.coins + inc);
         if (s.extra) s.extra.coins += inc;
       }
@@ -834,6 +834,7 @@
         }
         const slowK = (u.slowUntil > this.time ? 0.5 : 1) * ((this.side[u.team].hornUntil || 0) > this.time ? 1.3 : 1);
         if (u === this.hero) { this._updateHero(u, dt); continue; }
+        if (u.gen && this._updateGeneral) { this._updateGeneral(u, dt, slowK); continue; }
         if (u.stunUntil > this.time) { u.moving = false; continue; }
         const foeTeam = u.team === 'player' ? 'enemy' : 'player';
         const reach = u.def.range * (C().rangeScale || 1) + 18;
@@ -1258,7 +1259,8 @@
     }
 
     _damage(target, raw, from, fire) {
-      if (!from && this._sheltered(target)) return;   // schovaný za hradbami
+      if (!from && this._sheltered(target)) return;
+      if (target.gen && from && from.def && from.def.ranged && this._genEvade && this._genEvade(target)) return;   // schovaný za hradbami
       const s = this.side[target.team];
       let dmg = raw * (1 - Math.min(0.8, target.def.armor + (target.armorBonus || 0)));
       if (from && from.crit && this.rand() < from.crit) {
@@ -1274,7 +1276,7 @@
       }
       if (s.shieldUntil > this.time) dmg *= 1 - GameData.abilities.stit.reduction;
       if ((s.curseUntil || 0) > this.time) dmg *= 1.5;
-      if (from && from.team && this.cp && this.cp.owner === from.team) dmg *= 1.1;
+      if (from && from.team && this.cp && this.cp.owner === from.team) dmg *= this.cpDouble ? 1.2 : 1.1;
       if (from && from.team && (this.side[from.team].hornUntil || 0) > this.time) dmg *= 1.4;
       if (from && from.inspired > this.time) dmg *= 1 + (from.inspiredBy || 0.15);
       if (from && from.def && from.def.charge && !from.charged) { from.charged = true; dmg *= from.def.charge; this.texts.push({ x: target.x, y: target.y - 120 * US(), txt: t('charge'), color: '#ffd77a', t: 0, life: 0.9 }); }
@@ -1298,6 +1300,7 @@
         target.atk = -1;
         if (window.Zvuk) Zvuk.at('death', target.x, this, 0.6);
         if (target === this.hero) this.releaseHero(true);
+        if (target.gen && this._genDown) this._genDown(target);
         if (target.def.boss) this._bossDown(target);
         const killer = target.team === 'player' ? 'enemy' : 'player';
         const reward = Math.round(target.def.cost * C().killRewardRatio);
@@ -1689,6 +1692,7 @@
       }
       Art.drawCastle(ctx, P.castleImg, P.castle.front, cfg.groundY, 1, t, P.castle.hp / P.castle.maxHp, '#2f62b8');
       Art.drawCastle(ctx, E.castleImg, E.castle.front, cfg.groundY, -1, t, E.castle.hp / E.castle.maxHp, '#a8262a');
+      if (this._drawGenTower) this._drawGenTower(ctx, t);
       this._castleFire(ctx, P, 1, t);
       this._castleFire(ctx, E, -1, t);
       if (this.def && this.def.slots.length) Art.drawDefense(ctx, P.castleImg, (GameData.factions[P.faction] || {}).castleStyle || 'evropa', P.castle.front, cfg.groundY, 1, t, this.def, P.faction, 'player', { shot: this.defShot });
@@ -1820,6 +1824,7 @@
       ctx.globalAlpha = 1;
 
       this.vfx.drawFront(ctx, t);
+      if (this._drawGenUi) this._drawGenUi(ctx, t);
       // texty (zranění, mince)
       for (const tx of this.texts) {
         if (tx.x < vx0 || tx.x > vx1) continue;

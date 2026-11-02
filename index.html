@@ -44,6 +44,7 @@
     </div>
     <div class="nav-group nav-right">
       <button class="nav-big" data-go="pvp" style="--tint:#d6453c"><span class="nav-medal" data-ico="navPvp"></span><span class="nav-lbl" data-i18n="nav_pvp">Souboj</span></button>
+      <button class="nav-big" data-go="vez" style="--tint:#8a5ad6"><span class="nav-medal" data-ico="navVez"></span><span class="nav-lbl" data-i18n="nav_vez">Věž</span></button>
       <button class="nav-big" data-go="pribeh" style="--tint:#c9a24a"><span class="nav-medal" data-ico="navPribeh"></span><span class="nav-lbl" data-i18n="nav_pribeh">Příběh</span></button>
     </div>
   </nav>
@@ -79,12 +80,13 @@
       <button class="fbtn fbtn-sel" id="bSelect" aria-pressed="false" title="Vybrat oddíl tažením prstu"><span data-ico="select"></span><span data-i18n="squad_pick">Oddíl</span></button>
       <div class="alive-badge" title="Tvoji vojáci v bitvě"><span data-ico="helmet"></span><b id="bAlive">0</b></div>
     </div>
-    <div class="b-squad" id="bSquad" hidden>
-      <b class="sq-name"><span data-i18n="squad">Oddíl</span> <i id="sqCount">0</i></b>
-      <button class="fbtn" data-sq="utok" aria-pressed="false"><span data-ico="swords"></span></button>
-      <button class="fbtn" data-sq="formace" aria-pressed="true"><span data-ico="flag"></span></button>
-      <button class="fbtn" data-sq="ustup" aria-pressed="false"><span data-ico="castle"></span></button>
-      <button class="fbtn sq-x" id="sqDisband" aria-label="Rozpustit oddíl">✕</button>
+    <div class="b-squad" id="bSquad" hidden role="group" aria-label="Rozkazy oddílu">
+      <b class="sq-name"><span data-ico="select"></span><span data-i18n="squad">Oddíl</span> <i id="sqCount">0</i></b>
+      <button class="obtn sqb" data-sq="ustup" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-8 7 8 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="ord_retreat">Ústup</span></button>
+      <button class="obtn sqb" data-sq="hradby" aria-pressed="false"><span data-ico="wall"></span><span data-i18n="ord_walls">Hradby</span></button>
+      <button class="obtn sqb" data-sq="stred" aria-pressed="false"><span data-ico="flag"></span><span data-i18n="ord_center">Střed</span></button>
+      <button class="obtn sqb" data-sq="utok" aria-pressed="false"><span data-i18n="ord_attack">Útok</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l8 7-8 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="obtn sqb sq-x" id="sqDisband" aria-label="Rozpustit oddíl">✕</button>
     </div>
     <div class="b-selhint" id="bSelHint" hidden data-i18n="squad_hint">Táhni prstem přes vojáky, které chceš dát do oddílu</div>
     <div class="b-hero" id="bHero" hidden>
@@ -146,6 +148,7 @@
 <script src="js/data/skiny_vic.js"></script>
 <script src="js/data/skiny_nove.js"></script>
 <script src="js/data/skills.js"></script>
+<script src="js/data/vez.js"></script>
 <!-- Jádro -->
 <script src="js/i18n_obsah.js"></script>
 <script src="js/core/save.js"></script>
@@ -161,6 +164,7 @@
 <script src="js/core/obrana.js"></script>
 <script src="js/core/vfx.js"></script>
 <script src="js/core/battle.js"></script>
+<script src="js/core/general.js"></script>
 <script src="js/core/platby.js"></script>
 <script src="js/core/stat.js"></script>
 <script src="js/core/online.js"></script>
@@ -173,6 +177,7 @@
 <script src="js/ui/pas.js"></script>
 <script src="js/ui/instalace.js"></script>
 <script src="js/ui/screens.js"></script>
+<script src="js/ui/vez.js"></script>
 <script src="js/ui/online_ui.js"></script>
 <script src="js/ui/tutorial.js"></script>
 <script src="js/ui/scene.js"></script>

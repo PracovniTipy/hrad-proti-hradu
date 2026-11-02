@@ -130,7 +130,7 @@
     /* XP za bitvu – volá main.js po skončení bitvy */
     onBattle(save, cfg, res) {
       if (res.reason === 'spojeni') return { xp: 0, up: 0 };
-      const X = S.xp, train = !['campaign', 'pvp', 'online'].includes(cfg.mode);
+      const X = S.xp, train = !['campaign', 'pvp', 'online', 'tower'].includes(cfg.mode);
       const xp = train ? (res.win ? X.train : 0) : (res.win ? X.win : X.loss);
       return { xp, up: this.addXp(save, xp) };
     },

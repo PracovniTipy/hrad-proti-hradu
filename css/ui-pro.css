@@ -1124,3 +1124,68 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .bp-pill { color: #ffd24a; }
 @media (max-width: 640px) { .bp-head { grid-template-columns: 1fr; } .bp-head canvas { height: 150px; } .bp-col { flex-basis: 100px; } }
 .panel.skin p.gear-fx, .gear-fx { -webkit-line-clamp: unset; display: block; overflow: visible; margin: 2px 0 4px; font-size: 11.5px; font-weight: 700; color: #ffd77a; text-shadow: 0 0 8px rgba(255,210,74,.45); }
+
+/* ===== Oddíl: vlastní menší panel rozkazů pod hlavním panelem ===== */
+.b-squad { left: 50%; top: 64px; transform: translateX(-50%); z-index: 4; gap: 5px; padding: 3px 5px 3px 10px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(10,34,18,.9), rgba(8,22,12,.82)); border: 0; box-shadow: 0 0 0 1px rgba(79,210,122,.75), 0 6px 14px rgba(0,0,0,.45); }
+.b-squad .sq-name { display: flex; align-items: center; gap: 4px; font-size: 12.5px; }
+.b-squad .sq-name svg { width: 16px; height: 16px; }
+.b-squad .obtn.sqb { min-height: 32px; min-width: 0; padding: 2px 9px; font-size: 12px; border-radius: 10px; gap: 4px; }
+.b-squad .obtn.sqb svg { width: 16px; height: 16px; }
+.b-squad .obtn.sqb[aria-pressed="true"] { color: #062a12; background: linear-gradient(180deg, #c8ffd4, #4fd27a 55%, #1f8a44); box-shadow: 0 0 0 1px #05070b, 0 0 12px rgba(120,255,150,.55); }
+.b-squad .obtn.sqb[data-sq="utok"][aria-pressed="true"] { color: #fff; background: radial-gradient(130% 120% at 50% 0%, #ff8a7a, #c8362c 45%, #7a1410); }
+.b-squad .sq-x { color: #ffb4a8; font-size: 15px; padding: 2px 10px; }
+@media (max-height: 430px) and (orientation: landscape) { .b-squad { top: 52px; } .b-squad .obtn.sqb { min-height: 28px; font-size: 11px; padding: 2px 7px; } }
+/* ===== Hlasitost hudby a efektů ===== */
+.vol-box { display: grid; gap: 8px; width: 100%; }
+.vol-row { display: grid; grid-template-columns: minmax(90px, auto) 1fr 52px; align-items: center; gap: 10px; font-weight: 700; }
+.vol-row input[type=range] { width: 100%; accent-color: #e8b84a; height: 28px; cursor: pointer; }
+.vol-val { text-align: right; font-variant-numeric: tabular-nums; color: #ffd77a; }
+#bSnd .vol-box { grid-column: 1 / -1; margin-top: 6px; }
+
+/* ===== CASTLE TOWER ===== */
+.vz-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
+.vz-stats > div { display: grid; gap: 2px; text-align: center; } .vz-stats small { color: #9aa6b8; font-size: 11px; } .vz-stats b { font-size: 17px; color: #fff3cf; }
+.vz-rank b { color: #ffd24a; }
+.vz-strip { display: flex; gap: 6px; overflow-x: auto; padding: 10px 2px; }
+.vz-step { flex: 0 0 64px; display: grid; justify-items: center; gap: 2px; padding: 6px 0; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.05); color: #e9e2cf; cursor: pointer; font-family: var(--font-display); }
+.vz-step b { font-size: 16px; } .vz-step small { font-size: 12px; }
+.vz-step.done { opacity: .7; } .vz-step.cur { border-color: #ffd24a; box-shadow: 0 0 12px rgba(255,210,74,.45); }
+.vz-step.sel { background: linear-gradient(180deg, color-mix(in srgb, var(--tc) 45%, transparent), rgba(0,0,0,.2)); border-color: var(--tc); }
+.vz-step.major b { color: #ffd24a; } .vz-step:disabled { opacity: .35; cursor: default; }
+.vz-floor { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); gap: 14px; padding: 12px; border: 1px solid var(--tc); }
+.vz-floor.major { box-shadow: 0 0 22px color-mix(in srgb, var(--tc) 45%, transparent), inset 0 0 30px rgba(255,210,74,.08); }
+.vz-scene { position: relative; min-height: 260px; border-radius: 10px; overflow: hidden; }
+.vz-scene #vzCastle { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vz-scene #vzGen { position: absolute; left: 6px; bottom: 6px; width: 120px; height: 120px; border-radius: 12px; background: rgba(10,8,8,.55); border: 2px solid #ff9a7a; }
+.vz-tier { position: absolute; right: 8px; top: 8px; padding: 3px 10px; border-radius: 10px; background: rgba(0,0,0,.6); color: var(--tc); font-weight: 800; font-size: 13px; }
+.vz-tier small { color: #c9ced6; font-weight: 600; }
+.vz-info h2 { margin: 2px 0 6px; color: #ffe0d0; }
+.tag-major { background: #ffd24a; color: #2a1a03; padding: 1px 8px; border-radius: 8px; font-size: 11px; }
+.vz-rival { color: #ff9e9e; font-weight: 800; margin-bottom: 6px; }
+.vz-kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 10px; margin: 0 0 8px; font-size: 14px; }
+.vz-kv dt { color: #9aa6b8; } .vz-kv dd { margin: 0; }
+.vz-sub { font-family: var(--font-display); color: #ffd77a; font-size: 13px; margin: 8px 0 4px; letter-spacing: .04em; text-transform: uppercase; }
+.vz-mods { display: grid; gap: 4px; } .vz-mod { display: grid; padding: 5px 9px; border-radius: 8px; background: rgba(255,120,80,.1); border-left: 3px solid #ff8a5a; }
+.vz-mod small { color: #c9ced6; }
+.vz-rew { justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
+.vz-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.vz-week { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px; margin-top: 12px; border: 1px solid #4fd27a; }
+.vz-week h3 { margin: 2px 0; }
+.vz-lore { display: grid; gap: 10px; } .vz-ch h3 { margin: 2px 0 4px; } .vz-ch p { margin: 0; } .vz-ch.locked { opacity: .5; }
+.vz-ach { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.vz-a { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 10px; } .vz-a div { display: grid; } .vz-a small { color: #9aa6b8; }
+.vz-a-i { font-size: 24px; } .vz-a.ok { border: 1px solid #ffd24a; } .vz-a:not(.ok) { opacity: .7; }
+.vz-lbt { margin-bottom: 8px; }
+@media (max-width: 760px) { .vz-floor { grid-template-columns: 1fr; } .vz-stats { grid-template-columns: repeat(3, 1fr); } .vz-week { grid-template-columns: 1fr; } }
+.vz-tabs .tab { min-height: 0; padding: 8px 14px; flex-direction: row; gap: 8px; }
+.vz-tabs .tab svg { width: 24px !important; height: 24px !important; }
+.vz-ch { padding: 12px 18px; } .vz-ach .vz-a { padding: 10px 14px; }
+/* ===== PC: ikony o 20 % větší ===== */
+@media (pointer: fine) and (min-width: 1000px) and (min-height: 600px) {
+  #nav .nav-medal, #nav button[aria-current="page"] .nav-medal { width: 53px !important; height: 50px !important; }
+  #nav .nav-big .nav-medal, #nav .nav-big[aria-current="page"] .nav-medal { width: 48px !important; height: 48px !important; }
+  .daily-btn .daily-chest svg { width: 74px; height: 62px; }
+  .install-home .inst-ico { width: 65px; height: 55px; font-size: 31px; }
+  #nav .nav-medal { margin-top: -6px; margin-bottom: 4px; }
+}

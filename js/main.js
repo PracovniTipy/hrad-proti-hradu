@@ -247,6 +247,16 @@
       });
     },
 
+    /* ---------------- CASTLE TOWER ---------------- */
+    startTower(n, weekly) {
+      const TW = GameData.tower, T = TW.state(this.save);
+      if (!weekly && n > T.cur) { this.toast(t('vez_locked', { n: T.cur })); return; }
+      const f = weekly ? TW.weekly(T.best) : TW.floor(n);
+      const cfg = TW.battleCfg(this.save, f);
+      if (weekly) { cfg.weekly = true; cfg.title = t('vez_week') + ' · ' + cfg.title; }
+      this.pickArmy(pf => this.startBattle(Object.assign(cfg, { playFaction: pf })));
+    },
+
     /* ---------------- PVP ---------------- */
     startPvp(oppId) {
       const R = GameData.pvpRules, P = GameData.pvpHelpers;
@@ -259,13 +269,18 @@
         enemyUnits: GameData.factionUnits(o.faction), enemyName: o.name,
         enemyFaction: o.faction, theme: GameData.factions[o.faction].theme,
         enemyCastleSkin: o.castleSkin, enemyUnitSkin: o.unitSkin, enemyCastleLevel: o.castleLevel,
-        opp: o, attackIndex: i
+        opp: o, attackIndex: i,
+        general: { name: o.name, field: true, persona: GameData.generalPersonaFor ? GameData.generalPersonaFor(o.id) : null, skill: Math.min(0.9, 0.3 + i * 0.2 + (o.level || 0) * 0.02), power: 0.35 + i * 0.25, id: 'pvp_' + o.id }
       }));
     },
 
     /* ---------------- BITVA ---------------- */
     startBattle(cfg) {
       const save = this.save;
+      // soupeř má na hradbách obránce (lučištníky, kuše, katapulty) podle své síly
+      if (!cfg.enemyDefense && !cfg.net && cfg.mode !== 'online' && GameData.enemyDefenseFor) {
+        cfg.enemyDefense = GameData.enemyDefenseFor(Math.max(0, Math.min(1.2, ((cfg.difficulty || 1) - 0.55) / 1.6)), cfg.enemyCastleCfg && cfg.enemyCastleCfg.big);
+      }
       if (window.Stat) Stat.ev('battle', { p: cfg.mode || 'x' });
       if (this._stopLive) { this._stopLive(); this._stopLive = null; }
       cancelAnimationFrame(this.previewRaf);
@@ -332,6 +347,7 @@
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
         world: facs.length > 1 ? Object.assign({}, cfg.world || {}, { playerFront: GameData.battleConfig.playerFront + 560 }) : (cfg.world || null), enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
         playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0, allyFactions: facs.length > 1 ? facs : null,
+        general: cfg.general || null, noSkills: !!cfg.noSkills, enemyDefense: cfg.enemyDefense || null, enemyOil: cfg.enemyOil || 0, enemyCastleCfg: cfg.enemyCastleCfg || undefined, enemyStats: cfg.enemyStats || undefined, showEnemyFlag: cfg.showEnemyFlag,
         playerFaction: (cfg.playFaction && cfg.playFaction !== 'spojenectvi') ? cfg.playFaction : save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
@@ -354,6 +370,7 @@
         Object.assign(bopts, cfg.battleOpts, { player: pl });
       }
       const battle = new Battle(bopts);
+      if (cfg.tweak) try { cfg.tweak(battle); } catch (e) { /* nic */ }
       if (cfg.net) cfg.net.attach(battle);
       this.battle = battle;
       if (!(save.tut || {}).battle && !cfg.net) {
@@ -432,7 +449,8 @@
       const p = $('#bSquad');
       p.hidden = !n;
       $('#sqCount').textContent = n;
-      p.querySelectorAll('[data-sq]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sq === mode));
+      const kind = this.battle && this.battle.squad ? (this.battle.squad.kind || (mode === 'formace' ? 'mapa' : mode)) : mode;
+      p.querySelectorAll('[data-sq]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sq === kind));
     },
 
     _formUi(kind) {
@@ -496,8 +514,9 @@
     _sndBtns() {
       const box = $('#bSnd'); if (!box || !window.Zvuk) return;
       const st = Zvuk.settings();
-      box.innerHTML = `<button class="btn btn-sm" data-snd="sfx">${st.sfx ? '🔊' : '🔇'} ${t('snd_sfx')}</button><button class="btn btn-sm" data-snd="music">${st.music ? '🎵' : '🔇'} ${t('snd_music')}</button>`;
+      box.innerHTML = `<button class="btn btn-sm" data-snd="sfx">${st.sfx ? '🔊' : '🔇'} ${t('snd_sfx')}</button><button class="btn btn-sm" data-snd="music">${st.music ? '🎵' : '🔇'} ${t('snd_music')}</button>${Zvuk.volHtml ? Zvuk.volHtml() : ''}`;
       box.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); this._sndBtns(); }));
+      if (Zvuk.bindVol) Zvuk.bindVol(box);
     },
 
     _closeBattle() {
@@ -509,6 +528,7 @@
 
     /* Vyhodnocení bitvy a odměny */
     _battleEnd(cfg, res) {
+      if (this.battle && this.battle.aiRemember) try { this.battle.aiRemember(res); } catch (e) { /* nic */ }
       const save = this.save, R = GameData.pvpRules;
       if (!this.battle) return;
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
@@ -556,6 +576,9 @@
             if (lv.hostages) { save.gems += lv.hostages * 10; note += (note ? '<br>' : '') + t('hostages_saved', { n: lv.hostages, g: lv.hostages * 10 }); }
           }
         } else note = t('note_tip');
+      } else if (cfg.mode === 'tower' && window.Vez) {
+        const o = Vez.onEnd(this, cfg, res);
+        rewards.push(...o.rewards); note = o.notes.join('<br>');
       } else if (cfg.mode === 'pvp') {
         const id = cfg.opp.id;
         save.pvp.attacks[id] = (save.pvp.attacks[id] || []).concat([res.win ? 'win' : 'loss']);
@@ -603,7 +626,7 @@
           ${ids.slice(0, 7).map(id => `<tr><td>${esc(GameData.units[id].name)}</td><td>${ST.sent[id] || 0}</td><td>${fmt(ST.dmg[id] || 0)}</td><td>${ST.kills[id] || 0}</td></tr>`).join('')}</table>
         </div>` : '';
       const reason = res.reason === 'cas' ? t('r_time') : res.reason === 'spojeni' ? t('onl_conn_lost') : res.reason === 'odpojeni' ? t('onl_foe_left') : res.reason === 'vzdal' ? t('onl_you_quit') : (res.win ? t('r_enemy') : t('r_you'));
-      const back = cfg.net ? 'online' : cfg.mode === 'pvp' ? 'pvp' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      const back = cfg.net ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       this.modal(`
         <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
         ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
@@ -722,7 +745,11 @@
       });
       document.querySelectorAll('#bSquad [data-sq]').forEach(btn => btn.addEventListener('pointerdown', e => {
         e.preventDefault(); e.stopPropagation();
-        if (this.battle && !this.battle.over) this.battle.setSquad(btn.dataset.sq);
+        const B = this.battle; if (!B || B.over || !B.squad) return;
+        const k = btn.dataset.sq; B.squad.kind = k;
+        if (k === 'hradby') B.setSquad('formace', B.side.player.castle.front + 190);
+        else if (k === 'stred') B.setSquad('formace', B.cp.x - 40);
+        else B.setSquad(k);
       }));
       $('#sqDisband').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (this.battle) this.battle.disbandSquad(); });
       document.querySelectorAll('#bOrders [data-order]').forEach(btn => btn.addEventListener('pointerdown', e => {
