@@ -231,106 +231,145 @@
     return allowed[0];
   }
 
-  /* rozhodování: plán → postoj armády (a oddíl pro návnadu / nájezd) */
+  /* rozhodování: plán → postoj armády
+     Armáda má HLAVNÍ SÍLU (drží pozici podle plánu: shromaždiště, hradby, střed,
+     posouvající se fronta) a ÚTOČNÉ VLNY (oddíl, který jde na hráče a po ztrátách
+     se vrátí). Plný útok všemi silami jen při převaze nebo na dorážku hradu,
+     a vždy jen na omezenou dobu – pak se armáda přeskupí. */
   function decide(B, br, S) {
     const cfg = C(), E = B.side.enemy, front = E.castle.front, per = br.per;
     const since = B.time - br.planAt;
     const D = br.planData;
+    const mineU = () => B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen);
+    const news = (key, cs, en) => announce(B, br, key, L(cs, en));
     const setPlan = p => {
       br.plan = p; br.planAt = B.time; br.history.push(p); if (br.history.length > 6) br.history.shift();
-      br.planData = {};
-      B.esquad = null; B.units.forEach(u => { if (u.team === 'enemy') u.esq = false; });
+      br.planData = {}; endWave(B, br);
+      if (p === 'center') news('center', 'Nepřítel obsazuje střed bojiště', 'The enemy moves to take the center');
+      else if (p === 'defend') news('defend', 'Nepřítel se opevňuje u hradeb', 'The enemy digs in at its walls');
+      else if (p === 'siege') news('siege', 'Nepřítel postupuje krok za krokem', 'The enemy advances step by step');
+      else if (p === 'mass') news('mass', 'Nepřítel shromažďuje armádu', 'The enemy is massing its army');
     };
-    if (!br.plan) setPlan(pickWeighted(scorePlans(B, br, S), 0.6 + (1 - br.skill) * 1.2));
-    let stance = 'gather';   // gather | strike | center | walls | creep | retreat
+    const replan = () => setPlan(pickWeighted(scorePlans(B, br, S), 0.7 + (1 - br.skill)));
+    if (!br.plan) replan();
     const plan = br.plan;
-    const strikeNow = () => { stance = 'strike'; };
+    // vyhodnocení běžící vlny / plného útoku (konec podle ztrát a času – NE podle toho, že hráč zaútočil)
+    if (br.wave) {
+      const W = br.wave, alive = W.ids.filter(id => B.units.some(u => u.id === id && !u.dead)).length;
+      const lost = 1 - alive / Math.max(1, W.ids.length);
+      const dur = B.time - W.at;
+      const pcHp = B.side.player.castle.hp / B.side.player.castle.maxHp;
+      const winning = pcHp < W.pcHp - 0.08 || S.ratio > 1.4;
+      if (lost > 0.65 || alive <= 1 || (dur > W.max && !winning) || dur > W.max * 2) {
+        endWave(B, br);
+        br.lastAttack = B.time;
+        br.regroupUntil = B.time + 6 + per.pat * 8;
+        news('regroup', 'Nepřítel se stahuje a přeskupuje', 'The enemy pulls back to regroup');
+      }
+    }
+    const waveReady = n => !br.wave && S.nMine >= n && B.time > (br.regroupUntil || 0);
+    let hold = 'gather';   // kde stojí hlavní síla: gather | center | walls | creep
     switch (plan) {
-      case 'rush':
-        if (S.nMine >= 2 || B.time > 18) strikeNow();
-        if (since > 70 && S.ratio < 0.5) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
+      case 'rush':          // časté menší vlny, hlavní síla drží střed
+        hold = 'center';
+        if (waveReady(3)) launchWave(B, br, 0.75, 22 + per.aggr * 10);
+        if (since > 90) replan();
         break;
-      case 'mass':
-        if (!D.striking && (S.nMine >= br.waveN || (S.atGate && S.ratio > 1.1))) { D.striking = true; say(B, 'strike'); }
-        if (D.striking) { strikeNow(); if (S.nMine <= 1) { D.striking = false; br.waveN = Math.min(16, br.waveN + 2); if (since > 40) setPlan(pickWeighted(scorePlans(B, br, S), 0.8)); } }
-        else stance = S.atGate ? 'walls' : 'gather';
+      case 'mass':          // velká vlna, která roste
+        hold = S.atGate ? 'walls' : 'gather';
+        if (waveReady(br.waveN)) { launchWave(B, br, 1, 35 + per.aggr * 15); br.waveN = Math.min(18, br.waveN + 2); }
+        if (since > 120 && !br.wave) replan();
         break;
-      case 'center':
-        stance = S.nMine >= 2 ? 'center' : (S.atGate ? 'walls' : 'gather');
-        if (S.cpOwner === 'enemy' && S.ratio > 1.15 && S.nMine >= 5) strikeNow();
-        if (since > 90) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
+      case 'center':        // drží střed, vlny pouští jen když střed drží
+        hold = S.nMine >= 2 ? 'center' : (S.atGate ? 'walls' : 'gather');
+        if (S.cpOwner === 'enemy' && waveReady(6) && S.ratio > 1.05) launchWave(B, br, 0.6, 30);
+        if (since > 100 && !br.wave) replan();
         break;
-      case 'ambush': {
-        // návnada: pár levných vojáků vyrazí, hlavní síla čeká pod věžemi; když hráč vleze pod hradby → protiúder
-        stance = 'walls';
-        if (!D.bait && S.nMine >= 4) {
-          const cheap = B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen).sort((a, b) => a.def.cost - b.def.cost).slice(0, 2 + Math.round(br.skill));
+      case 'ambush': {      // návnada vyláká hráče pod věže, pak protiúder
+        hold = 'walls';
+        if (!D.bait && !br.wave && S.nMine >= 4) {
+          const cheap = mineU().sort((a, b) => a.def.cost - b.def.cost).slice(0, 2 + Math.round(br.skill));
           cheap.forEach(u => (u.esq = true)); B.esquad = { mode: 'utok', flagX: 0 }; D.bait = B.time;
         }
-        if (D.bait && B.esquad && B.time - D.bait > 12) { B.esquad = { mode: 'formace', flagX: front - 300 }; }   // návnada couvá a táhne hráče za sebou
-        if (S.underTowers >= 2 || (S.atGate >= 4 && S.ratio > 0.8)) { if (!D.sprung) { D.sprung = true; say(B, 'ambush'); B.esquad = null; } }
-        if (D.sprung) strikeNow();
-        if (D.sprung && S.nMine <= 1) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
-        if (!D.sprung && since > 55) { D.sprung = true; B.esquad = null; }     // hráč na léčku neskočil → útok stejně
+        if (D.bait && !D.sprung && B.esquad && B.time - D.bait > 12) B.esquad = { mode: 'formace', flagX: front - 300 };   // návnada couvá a táhne hráče za sebou
+        if (!D.sprung && (S.underTowers >= 2 || (S.atGate >= 4 && S.ratio > 0.8))) { D.sprung = true; endWave(B, br); say(B, 'ambush'); news('ambush', 'Léčka! Nepřítel udeřil ze zálohy', 'Ambush! The enemy strikes from cover'); launchWave(B, br, 1, 25, true); }
+        if (!D.sprung && since > 60) { D.sprung = true; endWave(B, br); launchWave(B, br, 1, 30); }   // na léčku hráč neskočil → útok stejně
+        if (D.sprung && !br.wave) replan();
         break;
       }
-      case 'siege':
-        stance = S.nMine >= 3 ? 'creep' : (S.atGate ? 'walls' : 'gather');
+      case 'siege':         // fronta se pomalu posouvá, na konci útok
+        hold = S.nMine >= 3 ? 'creep' : (S.atGate ? 'walls' : 'gather');
         D.creep = D.creep == null ? front - 420 : D.creep;
-        if (stance === 'creep') D.creep -= S.ratio >= 0.8 ? 60 : S.ratio < 0.5 ? -40 : 15;
+        if (hold === 'creep' && !br.wave) D.creep -= S.ratio >= 0.8 ? 45 : S.ratio < 0.5 ? -40 : 10;
         D.creep = clamp(D.creep, cfg.playerFront + 420, front - 300);
-        if (D.creep < cfg.playerFront + 700 || S.ratio > 1.6) strikeNow();
+        if (D.creep < cfg.playerFront + 800 && waveReady(4)) launchWave(B, br, 1, 40, true);
+        if (D.sprungAt == null && br.wave) D.sprungAt = B.time;
+        if (D.sprungAt != null && !br.wave) replan();
         break;
-      case 'raid': {
-        // hlavní síla drží střed / bránu, rychlí jezdci jdou na hráčův hrad, když jeho armáda odešla dopředu
-        stance = S.atGate ? 'walls' : 'center';
-        const fast = B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen && (u.def.roleKey === 'jizda' || u.def.speed > 80));
-        if (fast.length >= 2 && (S.foesPastMid >= 3 || since > 30)) { fast.forEach(u => (u.esq = true)); B.esquad = { mode: 'utok', flagX: 0 }; }
-        if (S.ratio > 1.3 && S.nMine >= 6) { strikeNow(); B.esquad = null; }
-        if (since > 80) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
+      case 'raid': {        // jízda na hráčův hrad, když jeho armáda odešla
+        hold = S.atGate ? 'walls' : 'center';
+        const fast = mineU().filter(u => u.def.roleKey === 'jizda' || u.def.speed > 80);
+        if (!br.wave && fast.length >= 2 && (S.foesPastMid >= 3 || since > 35) && B.time > (br.regroupUntil || 0)) launchWave(B, br, 0, 30, false, fast);
+        if (since > 90 && !br.wave) replan();
         break;
       }
-      case 'skillbait':
-        // čeká, až hráč použije kouzlo (2,5 min obnova) – pak má okno a udeří naplno
-        stance = S.atGate ? 'walls' : 'center';
-        if (B.time - br.obs.lastSkillAt < 60 && S.nMine >= 4) { if (!D.go) { D.go = true; say(B, 'strike'); } }
-        if (!D.go && since > 35 && S.nMine >= 3 && !D.probe) {
-          D.probe = true;   // sonda: pár vojáků, ať hráč vyplýtvá kouzlo
-          B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen).slice(0, 3).forEach(u => (u.esq = true)); B.esquad = { mode: 'utok', flagX: 0 };
-        }
-        if (D.go) strikeNow();
-        if (D.go && S.nMine <= 1) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
+      case 'skillbait':     // čeká, až hráč použije kouzlo – pak má okno 2,5 min
+        hold = S.atGate ? 'walls' : 'center';
+        if (!D.probe && !br.wave && since > 30 && S.nMine >= 4) { D.probe = true; launchWave(B, br, 0.3, 18); }
+        if (B.time - br.obs.lastSkillAt < 50 && waveReady(5)) { say(B, 'strike'); launchWave(B, br, 1, 35, true); D.go = true; }
+        if ((D.go && !br.wave) || since > 110) replan();
         break;
       case 'defend':
-      default:
-        stance = 'walls';
-        // protiútok, když se hráč zakousne do hradeb, nebo když je slabý
-        if ((S.underTowers >= 2 && S.ratio > 0.9) || S.ratio > 1.35) strikeNow();
-        if (since > 60) setPlan(pickWeighted(scorePlans(B, br, S), 0.8));
+      default:              // brání hradby pod věžemi, protiúder když se hráč zakousne
+        hold = 'walls';
+        if (S.underTowers >= 3 && S.ratio > 0.85 && waveReady(4)) { news('counter', 'Nepřítel vyráží do protiútoku', 'The enemy launches a counterattack'); launchWave(B, br, 1, 25, true); }
+        if (since > 80 && !br.wave) replan();
     }
-    // ústup jen v krajní nouzi (drtivá přesila u brány), nejvýš jednou za 90 s, a hned zpátky
-    if (stance !== 'strike' && per.caut > 0.45 && S.ratio < 0.25 && S.atGate >= 5 && S.nMine >= 3 && B.time - (br.retreatAt || -999) > 90) {
-      br.retreatAt = B.time; stance = 'retreat';
-      if (window.Zvuk) Zvuk.play('horn', 0.6);
-    }
-    if (br.retreatAt && B.time - br.retreatAt < 10 && stance !== 'strike') stance = 'retreat';
-    // POJISTKA: počítač musí útočit – velká armáda nebo dlouhé čekání = útok
-    const bigArmy = S.nMine >= Math.max(7, br.waveN + 2);
-    const waitMax = 35 + per.pat * 35;
-    if (stance !== 'strike' && stance !== 'retreat' && S.nMine >= 2 && (bigArmy || B.time - br.lastAttack > waitMax) && !(plan === 'ambush' && since < 50)) stance = 'strike';
-    // chyba: občas přežene útok s malou armádou
-    if (stance !== 'strike' && Math.random() < br.mistake * 0.3 && S.nMine >= 2) stance = 'strike';
-    if (stance === 'strike') br.lastAttack = B.time;
-    // provedení
-    br.stance = stance;
-    if (stance === 'strike') E.formation = 'utok';
-    else if (stance === 'retreat') E.formation = 'ustup';
+    // dorážka: hráčův hrad je skoro zničený a mám převahu → všechno do útoku
+    if (!br.wave && S.foeHp < 0.3 && S.ratio > 1.2 && S.nMine >= 4) launchWave(B, br, 1, 40, true);
+    // ústup jen v krajní nouzi (drtivá přesila u brány), nejvýš jednou za 90 s, a brzy zpátky
+    let retreat = false;
+    if (per.caut > 0.45 && S.ratio < 0.25 && S.atGate >= 5 && S.nMine >= 3 && B.time - (br.retreatAt || -999) > 90) { br.retreatAt = B.time; endWave(B, br); if (window.Zvuk) Zvuk.play('horn', 0.6); }
+    if (br.retreatAt && B.time - br.retreatAt < 8) retreat = true;
+    // dlouho nic? (trpělivost) → aspoň útočná vlna, ať bitva nestojí
+    const waitMax = 70 + per.pat * 50;
+    if (!br.wave && !retreat && S.nMine >= 4 && B.time - br.lastAttack > waitMax && B.time > (br.regroupUntil || 0)) launchWave(B, br, 0.8, 30);
+    // chyba: občas pošle vlnu předčasně
+    if (!br.wave && Math.random() < br.mistake * 0.08 && S.nMine >= 3) launchWave(B, br, 0.5, 15);
+    // provedení: hlavní síla drží pozici, vlna (oddíl) útočí
+    br.stance = br.wave ? (br.wave.full ? 'strike' : 'wave') : retreat ? 'retreat' : hold;
+    if (retreat) { E.formation = 'ustup'; B.esquad = null; }
+    else if (br.wave && br.wave.full) E.formation = 'utok';
     else {
       E.formation = 'formace';
-      E.flagX = stance === 'center' ? Math.max(cfg.playerFront + 400, B.cp.x + 60)
-        : stance === 'walls' ? front - 260
-        : stance === 'creep' ? (D.creep || front - 420) : front - 420;
+      E.flagX = hold === 'center' ? Math.max(cfg.playerFront + 400, B.cp.x + 60)
+        : hold === 'walls' ? front - 260
+        : hold === 'creep' ? (D.creep || front - 420) : front - 420;
     }
+  }
+  /* vypustí útočnou vlnu: podíl armády (0–1) nebo zadané jednotky; full = všichni včetně nových */
+  function launchWave(B, br, share, maxDur, full, list) {
+    const units = list || B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen);
+    const pick = list ? units : units.slice().sort((a, b) => (b.hp / b.maxHp) - (a.hp / a.maxHp)).slice(0, Math.max(2, Math.ceil(units.length * share)));
+    const all = full || share >= 1;
+    B.units.forEach(u => { if (u.team === 'enemy') u.esq = false; });
+    if (!all) { pick.forEach(u => (u.esq = true)); B.esquad = { mode: 'utok', flagX: 0 }; } else B.esquad = null;
+    br.wave = { ids: pick.map(u => u.id), at: B.time, max: maxDur, full: all, pcHp: B.side.player.castle.hp / B.side.player.castle.maxHp };
+    br.lastAttack = B.time;
+    if (all) { say(B, 'strike'); announce(B, br, 'strike', L('Nepřítel útočí všemi silami!', 'The enemy attacks with everything!')); }
+    else announce(B, br, 'wave', L('Útočná vlna nepřítele!', 'Enemy attack wave!'));
+  }
+  function endWave(B, br) {
+    br.wave = null; B.esquad = null;
+    B.units.forEach(u => { if (u.team === 'enemy') u.esq = false; });
+  }
+  /* krátké hlášení na bojišti, co nepřítel dělá (ať je jeho taktika vidět) */
+  function announce(B, br, key, txt) {
+    br.ann = br.ann || {};
+    if (br.ann[key] && B.time - br.ann[key] < 30) return;
+    if (B.time - (br.annLast || -99) < 5) return;
+    br.ann[key] = B.time; br.annLast = B.time;
+    B.texts.push({ x: B.cam.x + B.cam.viewW / 2, y: (B.H - B.cam.viewH) + B.cam.viewH * 0.3, txt, color: '#ff9e9e', t: 0, life: 2.2, big: true });
   }
 
   /* kouzla nepřítele: stejná pravidla jako hráč (mince, obnova 2,5 min) */
@@ -354,11 +393,11 @@
         case 'meteors': case 'meteor': case 'element': case 'storm': case 'quake': case 'stun': case 'tornado': case 'holy': case 'wall':
           use = cluster() >= need; break;
         case 'volley': case 'barrage': case 'breath': case 'firearrows':
-          use = S.underTowers >= Math.max(2, need - 2) || (a.kind === 'firearrows' && br.stance === 'strike'); break;
-        case 'curse': case 'buff': use = br.stance === 'strike' && S.nMine >= 5; break;
+          use = S.underTowers >= Math.max(2, need - 2) || (a.kind === 'firearrows' && !!br.wave); break;
+        case 'curse': case 'buff': use = !!br.wave && br.wave.ids.length >= 4; break;
         case 'shield': case 'heal': use = S.atGate >= 4 || B.units.filter(u => u.team === 'enemy' && !u.dead && u.hp < u.maxHp * 0.5).length >= 4; break;
         case 'repair': use = S.myHp < 0.55; break;
-        case 'summon': use = S.atGate >= 3 || br.stance === 'strike'; break;
+        case 'summon': use = S.atGate >= 3 || !!br.wave; break;
         case 'gold': use = true; break;
         default: use = cluster() >= need;
       }
@@ -445,7 +484,7 @@
     if (g.inTower) {
       g.hpK = Math.min(1, g.hpK + 0.04 * br.react);           // ve věži se léčí
       const per = br.per;
-      const decisive = S.myHp < 0.62 || (br.stance === 'strike' && S.nMine >= 5 + Math.round((1 - per.hero) * 4)) || S.underTowers >= 4
+      const decisive = S.myHp < 0.62 || (br.wave && br.wave.ids.length >= 4 + Math.round((1 - per.hero) * 4)) || S.underTowers >= 4
         || (this.hero && S.atGate) || this.time > 150 - per.hero * 90 || (G.early && this.time > 8);
       if (decisive && g.hpK > 0.8 && this.time - (g.backAt || -99) > 10) this._genSortie(g.outs ? 'back' : 'sortie');
     }
@@ -561,7 +600,8 @@
         } else {
           // žádný cíl v dohledu: drží se u své armády, nebo jde na hrad hráče
           const ally = this.units.filter(e => e.team === 'enemy' && !e.dead && !e.gen).sort((a, b) => a.x - b.x)[0];
-          g.goal = E.formation === 'utok' || !ally ? { x: this.side.player.castle.front + 60, y: u.y } : { x: ally.x + 60, y: ally.y };
+          const wv = br.wave && this.units.find(e => e.team === 'enemy' && !e.dead && br.wave.ids.includes(e.id));
+          g.goal = E.formation === 'utok' || !ally ? { x: this.side.player.castle.front + 60, y: u.y } : wv && per.hero > 0.5 ? { x: wv.x + 50, y: wv.y } : { x: ally.x + 60, y: ally.y };
         }
       }
     }

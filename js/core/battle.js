@@ -561,7 +561,7 @@
       else if (kind === 'ustup') this.setFormation('player', 'ustup', null, 'ustup');
       else if (kind === 'hradby') this.setFormation('player', 'formace', P.castle.front + 190, 'hradby');
       else if (kind === 'stred') this.setFormation('player', 'formace', this.cp.x - 40, 'stred');
-      if (this.squad && kind) this.disbandSquad();
+      // označený oddíl si drží vlastní rozkaz – hlavní rozkaz platí jen pro zbytek armády
     }
     setFormation(team, mode, flagX, kind) {
       const s = this.side[team], cfg = C();

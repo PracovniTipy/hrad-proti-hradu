@@ -250,10 +250,9 @@
     /* ---------------- CASTLE TOWER ---------------- */
     startTower(n, weekly) {
       const TW = GameData.tower, T = TW.state(this.save);
-      if (!weekly && n > T.cur) { this.toast(t('vez_locked', { n: T.cur })); return; }
-      const f = weekly ? TW.weekly(T.best) : TW.floor(n);
+      if (n > T.cur) { this.toast(t('vez_locked', { n: T.cur })); return; }
+      const f = TW.floor(n);
       const cfg = TW.battleCfg(this.save, f);
-      if (weekly) { cfg.weekly = true; cfg.title = t('vez_week') + ' · ' + cfg.title; }
       this.pickArmy(pf => this.startBattle(Object.assign(cfg, { playFaction: pf })));
     },
 

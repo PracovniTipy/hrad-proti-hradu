@@ -79,7 +79,6 @@
       const f = TW.floor(n);
       const rank = TW.rankOf(T.best);
       const tot = T.wins + T.losses;
-      const wk = TW.weekly(T.best), wkDone = T.weekDone[wk.week];
       const strip = [];
       for (let i = Math.max(1, n - 4); i <= n + 5; i++) {
         const F = TW.floor(i), done = i < T.cur, cur = i === T.cur;
@@ -125,17 +124,12 @@
               </div>
             </div>
           </section>
-          <section class="panel vz-week">
-            <div><div class="eyebrow">${t('vez_week')} · ${esc(wk.week)}</div><h3>${t('vez_floor', { n: wk.n })} · ${esc(wk.name)}</h3><p class="muted">${t('vez_week_d')}</p>
-              <div class="vz-mods">${this.modsHtml(wk)}</div><div class="offer-give vz-rew">${this.rewardHtml(wk.reward)}</div></div>
-            <button class="btn ${wkDone ? '' : 'btn-green'} btn-big" id="vzWeek" ${wkDone ? 'disabled' : ''}>${wkDone ? '✓ ' + t('vez_week_done') : t('vez_fight') + ' ⚔'}</button>
-          </section>`}
+`}
           </div>
         </div>`;
       el.querySelectorAll('[data-vt]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.vt; App.go('vez', { keepScroll: true }); }));
       el.querySelectorAll('[data-vf]').forEach(b => b.addEventListener('click', () => { this.view = +b.dataset.vf; App.go('vez', { keepScroll: true }); }));
       const go = el.querySelector('#vzGo'); if (go) go.addEventListener('click', () => App.startTower(n));
-      const wb = el.querySelector('#vzWeek'); if (wb) wb.addEventListener('click', () => App.startTower(wk.n, true));
       if (this.tab === 'patro') this.paint(el, f);
       if (this.tab === 'zebricek') this.loadLb(App, el);
       const st = el.querySelector('.vz-step.sel'); if (st) st.scrollIntoView({ block: 'nearest', inline: 'center' });
@@ -176,14 +170,14 @@
     },
     loadLb(App, el) {
       const box = el.querySelector('#vzLb');
-      const sorts = [['floor', t('vez_lb_floor')], ['generals', t('vez_lb_gens')], ['fastest', t('vez_lb_fast')], ['week', t('vez_lb_week')]];
+      const sorts = [['floor', t('vez_lb_floor')], ['generals', t('vez_lb_gens')], ['fastest', t('vez_lb_fast')]];
       const head = `<div class="tabs vz-lbt">${sorts.map(([k, nm]) => `<button class="tab" data-lbs="${k}" aria-selected="${this.lbSort === k}">${nm}</button>`).join('')}</div>`;
       box.insertAdjacentHTML('beforebegin', head);
       el.querySelectorAll('[data-lbs]').forEach(b => b.addEventListener('click', () => { this.lbSort = b.dataset.lbs; App.go('vez', { keepScroll: true }); }));
       if (!Ucet.logged() || Ucet.guest()) box.insertAdjacentHTML('afterend', `<div class="notice"><div>${t('vez_lb_reg')}</div></div><button class="btn btn-green" data-acc="register">${t('acc_set')}</button>`);
       UcetUI.bind(App, el);
       const wk = GameData.tower.weekKey();
-      Ucet.towerBoard(this.lbSort === 'week' ? 'floor' : this.lbSort).then(rows => {
+      Ucet.towerBoard(this.lbSort).then(rows => {
         if (App.current !== 'vez') return;
         let list = rows || [];
         if (this.lbSort === 'week') list = list.filter(r => r.week === wk && r.week_best).sort((a, b) => a.week_best - b.week_best);

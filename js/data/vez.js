@@ -229,8 +229,7 @@ window.GameData = window.GameData || {};
     { id: 'fast', cs: ['Blesková válka', 'Zdolej patro za méně než 2 minuty.'], en: ['Blitzkrieg', 'Clear a floor in under 2 minutes.'], test: T => T.fastest && T.fastest < 120, gems: 80 },
     { id: 'clean', cs: ['Nedotčené hradby', 'Zdolej patro 20+ s hradem nad 90 % životů.'], en: ['Untouched Walls', 'Clear floor 20+ with your castle above 90% health.'], test: T => !!T.clean, gems: 100 },
     { id: 'nomagic', cs: ['Bez kouzel', 'Zdolej patro s podmínkou Bez magie.'], en: ['No Magic Needed', 'Clear a floor with the No magic condition.'], test: T => !!T.nomagic, gems: 80 },
-    { id: 'streak10', cs: ['Neporazitelný', 'Vyhraj 10 pater v řadě bez prohry.'], en: ['Unbeatable', 'Win 10 floors in a row without a loss.'], test: T => (T.bestStreak || 0) >= 10, gems: 200 },
-    { id: 'week', cs: ['Výzva týdne', 'Splň týdenní výzvu.'], en: ['Weekly Challenge', 'Complete the weekly challenge.'], test: T => (T.weeks || 0) >= 1, gems: 60 }
+    { id: 'streak10', cs: ['Neporazitelný', 'Vyhraj 10 pater v řadě bez prohry.'], en: ['Unbeatable', 'Win 10 floors in a row without a loss.'], test: T => (T.bestStreak || 0) >= 10, gems: 200 }
   ];
 
   /* ---------------- TÝDENNÍ VÝZVA (sezónní) ---------------- */
