@@ -249,12 +249,12 @@
       pevnost: ['Great Fortress', 'Big castle (up to 10 defenders on the walls, +25% castle health), Stone Guardians and Wall Fires, 30,000 gold and 3,000 gems.'],
       kral: ['Royal Pack', 'Legendary armor and the King’s Sword for heavy units, legendary infantry armor and the Star Bow, 50,000 gold and 5,000 gems.'],
       kniha: ['Book of All Attacks', 'Unlocks every special attack in the game at once and adds 3,000 gems.'],
-      legie: ['Legendary Legion', 'Legendary armor for every soldier of every nation – 21 units at once! Plus 40,000 gold and 4,000 gems.'],
+      legie: ['Legendary Legion', 'Legendary armor for every soldier of every nation – 20 units at once! Plus 40,000 gold and 4,000 gems.'],
       arzenal: ['Arsenal of Legends', 'A legendary weapon for every soldier of every nation and 5,000 gems.'],
-      cisar: ['Imperial Treasure', 'Absolutely everything: the Great Fortress, all castle decorations, all attacks, legendary armor and weapons for all 21 soldiers, 150,000 gold and 20,000 gems.']
+      cisar: ['Imperial Treasure', 'Absolutely everything: the Great Fortress, all castle decorations, all attacks, legendary armor and weapons for all 20 soldiers, 150,000 gold and 20,000 gems.']
     };
     (GameData.offers || []).forEach(o => apply(o, ['name', 'desc'], OEN[o.id] && { name: OEN[o.id][0], desc: OEN[o.id][1] }));
-    const BEN = { '×30 hodnota': '×30 value', 'Jen jednou': 'One time only', 'Legendární': 'Legendary', '3 útoky': '3 attacks', 'Až 10 obránců': 'Up to 10 defenders', 'Všechny útoky': 'All attacks', '21 vojáků': '21 soldiers', '21 zbraní': '21 weapons', 'MEGA ×50': 'MEGA ×50', 'Legendární zbraň': 'Legendary weapon' };
+    const BEN = { '×30 hodnota': '×30 value', 'Jen jednou': 'One time only', 'Legendární': 'Legendary', '3 útoky': '3 attacks', 'Až 10 obránců': 'Up to 10 defenders', 'Všechny útoky': 'All attacks', '20 vojáků': '20 soldiers', '20 zbraní': '20 weapons', 'MEGA ×50': 'MEGA ×50', 'Legendární zbraň': 'Legendary weapon' };
     (GameData.offers || []).forEach(o => { if (o.badge && BEN[o.badge]) apply(o, ['badge'], { badge: BEN[o.badge] }); });
     if (GameData.chests) { apply(GameData.chests.denni, ['name'], { name: 'Daily Chest' }); apply(GameData.chests.tydenni, ['name'], { name: 'Weekly Chest' }); }
     (GameData.saga || []).forEach(a => apply(a, ['name'], { name: EN.saga[a.id] }));

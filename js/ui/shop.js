@@ -50,7 +50,7 @@
     itch_note: ['Platí se bezpečně přes itch.io. Nákup se uloží k tvému účtu ve hře.', 'You pay securely through itch.io. The purchase is saved to your game account.'],
     pay_soon: ['Platby za skutečné peníze právě spouštíme. Tenhle nákup půjde dokončit, jakmile platby napojíme.', 'Real-money payments are launching. You will be able to complete this purchase as soon as they are connected.'],
     div_title: ['Božské sety', 'Divine sets'],
-    div_sub: ['Kompletní zbroj a zbraň pro všech 21 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 21 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
+    div_sub: ['Kompletní zbroj a zbraň pro všech 20 vojáků všech tří národů. +20 % útok a +20 % životy za zbroj i za zbraň – dvakrát víc než legendární.', 'Full armor and weapon for all 20 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.'],
     div_owned: ['Máš kompletní', 'Complete'],
     div_andel_d: ['Černozlatá zbroj, obří černá křídla, rudá svatozář a aura. Meč, kopí, luk a hůl padlého anděla.', 'Black-gold armor, huge black wings, a crimson halo and aura. The fallen angel’s sword, spear, bow and staff.'],
     div_kral_d: ['Bílozlatá zbroj s korunou, zlatá křídla a sluneční svatozář. Meč, kopí, luk a žezlo Božího krále.', 'White-gold armor with a crown, golden wings and a sun halo. The God-King’s sword, spear, bow and scepter.'],
