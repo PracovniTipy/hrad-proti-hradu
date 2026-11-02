@@ -38,9 +38,9 @@ Po schválení se placené věci ve hře z Microsoft Storu objeví samy, nic dal
 | `cwpevnost` | Great Fortress | $5.99 | Big castle (up to 10 defenders on the walls, +25% castle health), Stone Guardians and Wall Fires, 30,000 gold and 3,000 gems. |
 | `cwkral` | Royal Pack | $5.99 | Legendary armor and the King’s Sword for heavy units, legendary infantry armor and the Star Bow, 50,000 gold and 5,000 gems. |
 | `cwkniha` | Book of All Attacks | $5.99 | Unlocks every special attack in the game at once and adds 3,000 gems. |
-| `cwlegie` | Legendary Legion | $7.99 | Legendary armor for every soldier of every nation – 21 units at once! Plus 40,000 gold and 4,000 gems. |
+| `cwlegie` | Legendary Legion | $7.99 | Legendary armor for every soldier of every nation – 18 units at once! Plus 40,000 gold and 4,000 gems. |
 | `cwarzenal` | Arsenal of Legends | $7.99 | A legendary weapon for every soldier of every nation and 5,000 gems. |
-| `cwcisar` | Imperial Treasure | $19.99 | Absolutely everything: the Great Fortress, all castle decorations, all attacks, legendary armor and weapons for all 21 soldiers, 150,000 gold and 20,000 gems. |
+| `cwcisar` | Imperial Treasure | $19.99 | Absolutely everything: the Great Fortress, all castle decorations, all attacks, legendary armor and weapons for all 18 soldiers, 150,000 gold and 20,000 gems. |
 | `cwsetandel` | Divine Fallen Angel set | $99.99 | Divine skin set: the Fallen Angel look for your army. |
 | `cwsetkral` | Divine God King set | $99.99 | Divine skin set: the God King look for your army. |
 | `cwskilldrak` | Dragon’s Breath | $2.49 | A dragon on the walls breathes fire right in front of the castle: burns every enemy that came close. Comes with a dragon head for your castle. |

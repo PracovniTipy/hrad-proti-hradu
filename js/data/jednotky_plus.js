@@ -69,11 +69,15 @@ for (const f of Object.keys(ADD)) {
 /* Království: Rytíř (160) a Velitel (220) vypadali skoro stejně – v armádě zůstává jen Velitel.
    Rytíř zůstává jen v příběhu (postavy ve scénách); skiny, které hráč na rytíře koupil, se nemažou. */
 GameData.factions.kralovstvi.units = GameData.factions.kralovstvi.units.filter(u => u !== 'rytir');
+/* Všude stejný počet vojáků (6): samurajové a vikingové taky bez těžké jednotky – zůstává jejich velitel.
+   Velitel je pak k dispozici hned od začátku (jako dřív samuraj a berserk). */
+GameData.factions.samurajove.units = GameData.factions.samurajove.units.filter(u => u !== 'samuraj');
+GameData.factions.vikingove.units = GameData.factions.vikingove.units.filter(u => u !== 'berserk');
 const UNL = (id, lvl, act) => { GameData.units[id].unlock = { campaign: lvl, text: `Odemkne se po splnění úrovně ${lvl.replace(/^[a-z]/, '')} v Aktu ${act}.` }; };
 // Rytíři: pěšák od začátku, pak postupně všichni ostatní
 UNL('lucistnik', '1-1', 'I'); UNL('kopinik', '1-3', 'I'); UNL('jezdec', '1-5', 'I'); UNL('rytir', '2-2', 'I'); UNL('mag', '2-5', 'I'); UNL('velitel', '2-2', 'I');
-UNL('jari', 's1-3', 'II'); UNL('kiba', 's1-5', 'II'); UNL('onmyoji', 's2-3', 'II'); UNL('taisho', 's3-2', 'II');
-UNL('stitonos', 'v1-3', 'III'); UNL('jezdec_sever', 'v1-5', 'III'); UNL('volva', 'v2-3', 'III'); UNL('jarl', 'v3-2', 'III');
+UNL('jari', 's1-3', 'II'); UNL('kiba', 's1-5', 'II'); UNL('onmyoji', 's2-3', 'II'); GameData.units.taisho.unlock = null;
+UNL('stitonos', 'v1-3', 'III'); UNL('jezdec_sever', 'v1-5', 'III'); UNL('volva', 'v2-3', 'III'); GameData.units.jarl.unlock = null;
 GameData.unitOrder = GameData.factionOrder.flatMap(f => GameData.factions[f].units);
 
 /* pořadí v šiku podle role: menší číslo = blíž k nepříteli */
