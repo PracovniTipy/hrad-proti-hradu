@@ -14,7 +14,7 @@ Hra platí v Microsoft verzi **jen přes Microsoft** (Digital Goods API + Paymen
 
 Po schválení se placené věci ve hře z Microsoft Storu objeví samy, nic dalšího se nastavovat nemusí.
 
-## Seznam doplňků (26)
+## Seznam doplňků (33)
 
 | Product ID | Název (EN) | Cena | Popis (EN) |
 |---|---|---|---|
@@ -44,5 +44,12 @@ Po schválení se placené věci ve hře z Microsoft Storu objeví samy, nic dal
 | `cwsetandel` | Divine Fallen Angel set | $99.99 | Divine skin set: the Fallen Angel look for your army. |
 | `cwsetkral` | Divine God King set | $99.99 | Divine skin set: the God King look for your army. |
 | `cwskilldrak` | Dragon’s Breath | $2.49 | A dragon on the walls breathes fire right in front of the castle: burns every enemy that came close. Comes with a dragon head for your castle. |
+| `cwpass` | Battle Pass · Wolf Winter | $3.99 | Premium Battle Pass for the Wolf Winter season: the full epic Wolf set for infantry right away, the Wolf set for archers and spearmen on levels 5–20, plus extra gold and gems. |
+| `cwsadatezka` | Wolf set: Heavy units | $1.49 | Epic Wolf Winter armor and weapon for the heavy units of all three nations. |
+| `cwsadajizda` | Wolf set: Cavalry | $1.49 | Epic Wolf Winter armor and weapon for the cavalry of all three nations. |
+| `cwsadamag` | Wolf set: Mages | $1.49 | Epic Wolf Winter armor and weapon for the mages of all three nations. |
+| `cwsadavelitel` | Wolf set: Commanders | $1.49 | Epic Wolf Winter armor and weapon for the commanders of all three nations. |
+| `cwskine` | Epic skin | $0.99 | One epic armor or weapon skin of your choice for one soldier. |
+| `cwskinl` | Legendary skin | $1.49 | One legendary armor or weapon skin of your choice for one soldier. |
 
 Stejná tabulka je i jako `addons.csv` (dá se otevřít v Excelu).
