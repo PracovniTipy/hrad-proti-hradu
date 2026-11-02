@@ -113,6 +113,9 @@ GameData.skills.forEach(s => { const p = s.price || {}; if (p.gold) p.gold = Mat
   GameData.skills.forEach(s => { if (DMG[s.kind] && typeof s.power === 'number' && s.power > 1) s.power = Math.round(s.power * 0.9); });
 })();
 /* zpětná kompatibilita: staré GameData.abilities */
+/* každý speciální útok jde znovu použít až za 2,5 minuty (hráč i počítač) */
+GameData.skillCooldown = 150;
+GameData.skills.forEach(s => (s.cooldown = GameData.skillCooldown));
 GameData.abilities = {};
 GameData.skills.forEach(s => (GameData.abilities[s.id] = Object.assign({}, s, { damage: s.power, reduction: s.kind === 'shield' ? s.power : undefined })));
 GameData.skillsOf = save => {
