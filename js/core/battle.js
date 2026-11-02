@@ -1393,7 +1393,7 @@
           case 'past':
             if (ai.mind === 'utok') { if (mine === 0) set('sbira'); }
             else if (foesAtGate >= 2 && ratio > 0.9 && since > 4) set('utok');           // nepřítel je pod věžemi → protiúder
-            else if (this.time > 150 && ratio > 1.2) set('utok');
+            else if (this.time > 50 || ratio > 1.3) set('utok');
             else set('hradby');
             break;
           case 'postup':
@@ -1412,6 +1412,11 @@
             else if (mine >= 6) set('utok');
             else set('stred');
         }
+        // POJISTKA: počítač MUSÍ útočit – velká armáda nebo dlouhé čekání = útok
+        const bigArmy = mine >= Math.max(6, Math.round(4 + (this.o.difficulty || 1) * 2));
+        const waited = this.time - (ai.lastAttack || 0);
+        if (ai.mind !== 'utok' && mine >= 2 && (bigArmy || waited > 40 || (ai.strat !== 'past' && ratio > 1.2 && mine >= 4))) set('utok');
+        if (ai.mind === 'utok') ai.lastAttack = this.time;
         // provedení rozhodnutí
         if (ai.mind === 'utok') s.formation = 'utok';
         else {
