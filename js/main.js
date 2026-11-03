@@ -845,7 +845,13 @@
       }
       const start = location.hash.slice(1);
       // výběr jazyka: při prvním spuštění a jednou po přejmenování na Castle WARS (postup zůstává)
-      if (!this.save.lang || !this.save.langAsked2) {
+      if ((!this.save.lang || !this.save.langAsked2) && window.CW_PORTAL) {
+        // herní portály: bez úvodního výběru jazyka – jazyk prohlížeče, jinak angličtina
+        const nav = String(navigator.language || 'en').slice(0, 2).toLowerCase();
+        const ok = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko'];
+        this.save.langAsked2 = 1; this.setLang(ok.includes(nav) ? nav : 'en');
+        this.go('hrad');
+      } else if (!this.save.lang || !this.save.langAsked2) {
         this.go('hrad');
         Tutorial.pickLanguage(l => { this.save.langAsked2 = 1; this.setLang(l); });
       } else {
