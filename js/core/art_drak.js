@@ -193,7 +193,7 @@
     const y = groundY - 46;                       // stojí v pozadí za cestou, vojáci chodí před ním
     // hlava na konci krku: v klidu se rozhlíží, při chrlení se natáhne k nepřátelům
     const sw = Math.sin(t * 0.7), sw2 = Math.sin(t * 1.3 + 1);
-    const hx = lerp(92 + sw * 10, 128, heat), hy = lerp(-128 + sw2 * 9 - Math.max(0, Math.sin(t * 0.23)) * 14, -112, heat);
+    const hx = lerp(112 + sw * 10, 150, heat), hy = lerp(-150 + sw2 * 8 - Math.max(0, Math.sin(t * 0.23)) * 12, -128, heat);
     const tilt = lerp(sw * 0.08 - 0.05, 0.22, heat);
     return { x, y, S, hx, hy, tilt };
   }
@@ -206,70 +206,197 @@
     if (!img || !img.cfg || !img.cfg.decor || !img.cfg.decor.drak) return origMouth ? origMouth.apply(this, arguments) : null;
     return mouthOf(pose(img, front, groundY, facing, performance.now() / 1000, 1), facing);
   };
-  function chain(ctx, a, b, sag, t) {
-    // články řetězu po prověšené křivce
+  /* ================= PŘIKOVANÝ DRAK – nová postava =================
+     Místní souřadnice: drak hledí doprava (+x), tlapy stojí na zemi (y = 0).
+     Statická část (tělo, nohy, složená křídla, ocas, kotva, řetěz k noze) se kreslí
+     jednou do obrázku; každý snímek se kreslí jen krk, obojek s řetězem a hlava. */
+  const STEEL = '#8d939c', STEEL2 = '#5a5f68', STEEL3 = '#c9ced6';
+  const path = (ctx, pts, close) => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) { const p = pts[i]; if (p.length === 4) ctx.quadraticCurveTo(p[0], p[1], p[2], p[3]); else if (p.length === 6) ctx.bezierCurveTo(p[0], p[1], p[2], p[3], p[4], p[5]); else ctx.lineTo(p[0], p[1]); } if (close) ctx.closePath(); };
+  function vgrad(ctx, y0, y1, top, mid, bot) { const g = ctx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, top); g.addColorStop(0.5, mid); g.addColorStop(1, bot); return g; }
+  function scales(ctx, x0, y0, x1, y1, s, col) { ctx.save(); ctx.clip(); ctx.strokeStyle = col; ctx.lineWidth = 1; for (let y = y0, r = 0; y < y1; y += s * 0.75, r++) for (let x = x0 + (r % 2) * s / 2; x < x1; x += s) { ctx.beginPath(); ctx.arc(x, y, s / 2, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke(); } ctx.restore(); }
+  function claws(ctx, x, y, n, dir, len) { for (let i = 0; i < n; i++) { const cx = x + i * 5.2 * dir; ctx.beginPath(); ctx.moveTo(cx - 2.2, y - 3); ctx.quadraticCurveTo(cx + dir * len * 0.9, y - 3, cx + dir * len, y + 1); ctx.quadraticCurveTo(cx + dir * len * 0.4, y + 0.4, cx + 2.2, y - 1); ctx.closePath(); fs(ctx, C.horn, 0.9); } }
+  // článek řetězu: střídá se čelní (ovál) a boční (tyčka) – tak vypadá skutečný řetěz
+  function heavyChain(ctx, a, b, sag, L) {
+    L = L || 12;
     const cx = (a[0] + b[0]) / 2, cy = Math.max(a[1], b[1]) + sag;
-    const n = Math.max(6, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 7));
-    for (let i = 0; i <= n; i++) {
-      const k = i / n, u = 1 - k;
-      const x = u * u * a[0] + 2 * u * k * cx + k * k * b[0], y = u * u * a[1] + 2 * u * k * cy + k * k * b[1];
-      const k2 = Math.min(1, k + 0.01), u2 = 1 - k2;
-      const ang = Math.atan2((u2 * u2 * a[1] + 2 * u2 * k2 * cy + k2 * k2 * b[1]) - y, (u2 * u2 * a[0] + 2 * u2 * k2 * cx + k2 * k2 * b[0]) - x);
+    const pt = k => { const u = 1 - k; return [u * u * a[0] + 2 * u * k * cx + k * k * b[0], u * u * a[1] + 2 * u * k * cy + k * k * b[1]]; };
+    let len = 0, prev = pt(0); const S = [[0, prev]]; for (let i = 1; i <= 40; i++) { const p = pt(i / 40); len += Math.hypot(p[0] - prev[0], p[1] - prev[1]); S.push([len, p]); prev = p; }
+    const n = Math.max(3, Math.round(len / (L * 0.78)));
+    for (let i = 0; i < n; i++) {
+      const d = (i + 0.5) / n * len; let j = 1; while (j < S.length - 1 && S[j][0] < d) j++;
+      const p0 = S[j - 1][1], p1 = S[j][1], k = (d - S[j - 1][0]) / Math.max(0.001, S[j][0] - S[j - 1][0]);
+      const x = lerp(p0[0], p1[0], k), y = lerp(p0[1], p1[1], k), ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
       ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
-      ctx.beginPath(); if (i % 2) ctx.ellipse(0, 0, 4.6, 1.5, 0, 0, TAU); else ctx.ellipse(0, 0, 4.6, 2.8, 0, 0, TAU);
-      ctx.lineWidth = 3.4; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 1.8; ctx.strokeStyle = i % 2 ? '#7a7f88' : '#a4a9b2'; ctx.stroke();
+      if (i % 2 === 0) {
+        ctx.beginPath(); ctx.ellipse(0, 0, L * 0.56, L * 0.36, 0, 0, TAU); ctx.lineWidth = L * 0.3 + 2; ctx.strokeStyle = OUT; ctx.stroke();
+        ctx.lineWidth = L * 0.3; ctx.strokeStyle = STEEL; ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(0, -L * 0.05, L * 0.5, L * 0.3, 0, Math.PI * 1.1, Math.PI * 1.9); ctx.lineWidth = 1.2; ctx.strokeStyle = STEEL3; ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.rect(-L * 0.6, -L * 0.13, L * 1.2, L * 0.26); fs(ctx, STEEL2, 1.4);
+        ctx.beginPath(); ctx.moveTo(-L * 0.5, -L * 0.06); ctx.lineTo(L * 0.5, -L * 0.06); ctx.lineWidth = 1; ctx.strokeStyle = STEEL3; ctx.stroke();
+      }
       ctx.restore();
     }
   }
-  function chained(ctx, P, t, heat, fire, part) {
-    const stake = [-128, -4];
-    if (part !== 'dyn') {
-    // spálená zem, kosti a kolík v zemi
-    ctx.beginPath(); ctx.ellipse(10, 2, 150, 16, 0, 0, TAU); ctx.fillStyle = 'rgba(40,24,16,.35)'; ctx.fill();
-    ctx.beginPath(); ctx.ellipse(10, 2, 105, 10, 0, 0, TAU); ctx.fillStyle = 'rgba(20,12,8,.35)'; ctx.fill();
-    const bone = (x, y, a, l) => { ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.beginPath(); ctx.rect(-l / 2, -1.6, l, 3.2); fs(ctx, C.horn, 1); [-l / 2, l / 2].forEach(e => { ctx.beginPath(); ctx.arc(e, -1.8, 2.4, 0, TAU); ctx.arc(e, 1.8, 2.4, 0, TAU); fs(ctx, C.horn, 1); }); ctx.restore(); };
-    bone(120, 2, 0.3, 22); bone(-118, 4, -0.5, 18); bone(140, 6, -1.2, 14);
-    ctx.save(); ctx.translate(150, 4); ctx.beginPath(); ctx.arc(0, -6, 9, Math.PI, 0); ctx.lineTo(9, 0); ctx.lineTo(-9, 0); ctx.closePath(); fs(ctx, '#e8dcbc', 1.2);
-    ctx.beginPath(); ctx.arc(-3.5, -6, 2.2, 0, TAU); ctx.arc(3.5, -6, 2.2, 0, TAU); ctx.fillStyle = '#2a1a10'; ctx.fill(); ctx.restore();
-    ctx.beginPath(); ctx.moveTo(stake[0] - 6, 4); ctx.lineTo(stake[0] - 4, -22); ctx.lineTo(stake[0] + 4, -22); ctx.lineTo(stake[0] + 6, 4); ctx.closePath(); fs(ctx, '#4a4e56', 1.8);
-    ctx.beginPath(); ctx.rect(stake[0] - 8, -26, 16, 6); fs(ctx, '#6a6f78', 1.6);
-    ctx.beginPath(); ctx.arc(stake[0], -30, 6, 0, TAU); ctx.lineWidth = 4.5; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 2.6; ctx.strokeStyle = '#8a8f98'; ctx.stroke();
-    // složené křídlo za tělem
-    ctx.save(); ctx.translate(14, -96); wing(ctx, 0.2, -1.2 + Math.sin(t * 0.6) * 0.04, true, heat); ctx.restore();
-    // tělo s ocasem a zadní tlapou (sedí na zemi)
-    ctx.save(); ctx.translate(0, -70); body(ctx, t, heat, 0); ctx.restore();
-    // pouto na zadní noze a řetěz ke kolíku
-    ctx.beginPath(); ctx.rect(-22, -18, 22, 7); fs(ctx, '#6a6f78', 1.6);
-    for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.arc(-18 + k * 7, -14.5, 1.3, 0, TAU); ctx.fillStyle = '#c8ccd2'; ctx.fill(); }
-    chain(ctx, [-22, -14], [stake[0] + 2, -28], 14, t);
-    // přední tlapa opřená o zem
-    ctx.save(); ctx.translate(34, -40);
-    ctx.beginPath(); ctx.moveTo(-10, -14); ctx.quadraticCurveTo(-12, 14, -4, 34); ctx.lineTo(14, 36); ctx.quadraticCurveTo(10, 10, 12, -14); ctx.closePath(); fs(ctx, C.sc2, 1.8);
-    for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(-2 + k * 5, 34); ctx.quadraticCurveTo(4 + k * 5, 38, 2 + k * 5, 42); ctx.lineTo(4 + k * 5, 34); ctx.closePath(); fs(ctx, C.horn, 0.9); }
+  function rivetBand(ctx, cx, cy, rx, ry, ang, n) {
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+    ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, TAU); fs(ctx, vgrad(ctx, -ry, ry, STEEL3, STEEL, STEEL2), 2);
+    ctx.beginPath(); ctx.ellipse(0, -ry * 0.35, rx * 0.9, ry * 0.25, 0, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fill();
+    for (let i = 0; i < n; i++) { const a = -Math.PI * 0.9 + i / (n - 1) * Math.PI * 0.8; ctx.beginPath(); ctx.arc(Math.cos(a) * rx * 0.78, Math.sin(a) * ry * 0.6, 1.6, 0, TAU); fs(ctx, STEEL3, 0.8); }
     ctx.restore();
-    if (part === 'static') return;
+  }
+
+  // KOTVA: obří kamenný kvádr s železnou deskou a kruhem, napůl zapadlý v zemi
+  const ANCHOR = [-168, -18];
+  function anchor(ctx) {
+    const [x, y] = ANCHOR;
+    ctx.beginPath(); ctx.ellipse(x, 2, 46, 7, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fill();
+    path(ctx, [[x - 38, 2], [x - 34, y - 22], [x - 10, y - 30], [x + 30, y - 24], [x + 38, 2]], true); fs(ctx, vgrad(ctx, y - 30, 2, '#9aa096', '#7a8078', '#5a5f58'), 2.2);
+    ctx.strokeStyle = 'rgba(40,40,36,.55)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x - 20, y - 26); ctx.lineTo(x - 14, y - 10); ctx.lineTo(x - 22, y + 4); ctx.moveTo(x + 18, y - 22); ctx.lineTo(x + 24, y - 6); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x - 26, y - 4, 7, 4, 0.4, 0, TAU); ctx.fillStyle = '#5a8a3a'; ctx.fill();
+    ctx.beginPath(); ctx.rect(x - 12, y - 22, 26, 18); fs(ctx, vgrad(ctx, y - 22, y - 4, STEEL3, STEEL, STEEL2), 1.6);
+    [[x - 8, y - 18], [x + 10, y - 18], [x - 8, y - 8], [x + 10, y - 8]].forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], 1.6, 0, TAU); fs(ctx, STEEL3, 0.8); });
+    ctx.beginPath(); ctx.arc(x + 1, y - 13, 8, 0, TAU); ctx.lineWidth = 6; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 3.8; ctx.strokeStyle = STEEL; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x + 1, y - 13, 8, Math.PI * 1.1, Math.PI * 1.7); ctx.lineWidth = 1.2; ctx.strokeStyle = STEEL3; ctx.stroke();
+  }
+  const ANCHOR_RING = [ANCHOR[0] + 1, ANCHOR[1] - 5];
+
+  // drápy: zahnuté pařáty mířící dopředu do země
+  function talons(ctx, x, y, n, len, col) {
+    for (let i = 0; i < n; i++) {
+      const cx = x + i * len * 0.62, cy = y - 2 + (i === n - 1 ? 0.5 : 0);
+      ctx.beginPath(); ctx.moveTo(cx - 2.6, cy - 2.6); ctx.quadraticCurveTo(cx + len * 0.7, cy - 4.4, cx + len, cy + 2); ctx.quadraticCurveTo(cx + len * 0.45, cy + 0.6, cx + 1.6, cy + 1.6); ctx.closePath(); fs(ctx, col || C.horn, 1);
     }
-    // blízké složené křídlo přitisknuté k boku (při chrlení se lehce pootevře)
-    ctx.save(); ctx.translate(-4, -98); wing(ctx, 0.18 + heat * 0.25, -1.5 + heat * 0.5 + Math.sin(t * 0.6) * 0.04, false, heat); ctx.restore();
-    // krk od ramen k hlavě
-    const base = [38, -78], H = [P.hx - 4, P.hy + 6];
-    const neck = bez(base, [62, -96 - heat * 6], [H[0] - 30, H[1] + 14], H, 12);
-    tube(ctx, neck, 34, 21, C.sc, C.belly);
-    spikes(ctx, neck.map(p => [p[0], p[1], 0.9]), 11, C.dark);
-    magma(ctx, neck.slice(2, 10).map((p, i) => [p[0] + Math.sin(i * 1.9) * 3, p[1] + 2 + Math.cos(i * 2.3) * 2]), t, heat, 5);
-    // ostnatý obojek na krku a hlavní řetěz ke kolíku – napne se, když se drak natáhne
-    const cp = neck[5], cq = neck[6], ca = Math.atan2(cq[1] - cp[1], cq[0] - cp[0]);
-    chain(ctx, [cp[0] - 4, cp[1] + 6], [stake[0] + 4, -32], lerp(40, 6, heat), t);
-    ctx.save(); ctx.translate(cp[0], cp[1]); ctx.rotate(ca + Math.PI / 2);
-    ctx.beginPath(); ctx.ellipse(0, 0, 17, 5.5, 0, 0, TAU); fs(ctx, '#5a5f68', 2);
-    for (let k = -2; k <= 2; k++) { ctx.beginPath(); ctx.moveTo(k * 6.5 - 2.4, -4); ctx.lineTo(k * 6.5, -11); ctx.lineTo(k * 6.5 + 2.4, -4); ctx.closePath(); fs(ctx, '#b8bcc4', 1); }
-    ctx.beginPath(); ctx.arc(0, 6, 4, 0, TAU); ctx.lineWidth = 3.6; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 2; ctx.strokeStyle = '#a4a9b2'; ctx.stroke();
+  }
+  function limb(ctx, pts, w0, w1, col, joints) {
+    tube(ctx, pts, w0, w1, col);
+    if (joints) joints.forEach(([x, y, r]) => { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); fs(ctx, col, 1.6); });
+  }
+  // SLOŽENÉ KŘÍDLO: rameno → loket → zápěstí (vrchol s drápem) → prsty složené dozadu, blána v záhybech
+  function foldedWing(ctx, far, lift) {
+    const S = [16, -96], E = [-22, -128 - lift * 22], W = [10 - lift * 4, -150 - lift * 40];
+    const F = [[-50, -132 - lift * 30], [-86, -110 - lift * 16], [-106, -82 - lift * 6], [-96, -58]];
+    const root = [-60, -68];
+    const shades = far ? ['#3a0c0a', '#2e0908', '#3a0c0a', '#2e0908', '#260706'] : ['#7a1a14', '#5e130f', '#7a1a14', '#5e130f', '#4a0e0b'];
+    // záhyby blány: panel mezi zápěstím a dvěma sousedními prsty, okraj vykrojený dovnitř
+    const pts = [E, ...F, root];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      const dx = W[0] - mx, dy = W[1] - my, d = Math.hypot(dx, dy) || 1, cut = i === 0 ? 0 : 0.16;
+      ctx.beginPath(); ctx.moveTo(W[0], W[1]); ctx.lineTo(a[0], a[1]);
+      ctx.quadraticCurveTo(mx + dx * cut, my + dy * cut, b[0], b[1]); ctx.closePath();
+      const g = ctx.createLinearGradient(W[0], W[1], mx, my); g.addColorStop(0, shades[i]); g.addColorStop(1, far ? '#1e0605' : '#3a0a08');
+      ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 1.6; ctx.strokeStyle = OUT; ctx.stroke();
+      if (!far) { ctx.save(); ctx.clip(); ctx.strokeStyle = 'rgba(255,140,100,.22)'; ctx.lineWidth = 1; for (let k = 1; k <= 2; k++) { const t = k / 3; ctx.beginPath(); ctx.moveTo(lerp(W[0], a[0], t), lerp(W[1], a[1], t)); ctx.quadraticCurveTo(lerp(W[0], mx, t) + dx / d * -3, lerp(W[1], my, t) + dy / d * -3, lerp(W[0], b[0], t), lerp(W[1], b[1], t)); ctx.stroke(); } ctx.restore(); }
+    }
+    if (!far) { // stará trhlina
+      ctx.beginPath(); ctx.moveTo(-96, -92); ctx.lineTo(-84, -98); ctx.lineTo(-90, -86); ctx.closePath(); ctx.fillStyle = 'rgba(10,4,4,.65)'; ctx.fill();
+    }
+    // kosti křídla (zúžené), klouby
+    const boneCol = far ? '#2a0806' : '#8a2219';
+    const bone = (a, b, w0, w1) => { tube(ctx, [a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], b], w0 * 1.15, w1 * 1.15, boneCol); };
+    bone(S, E, 6.5, 4.6); bone(E, W, 4.6, 3.4);
+    F.forEach((f, i) => bone(W, f, 2.4 - i * 0.25, 1.1));
+    [E, W].forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], p === E ? 3.6 : 3, 0, TAU); fs(ctx, boneCol, 1.2); });
+    if (!far) { ctx.beginPath(); ctx.moveTo(S[0], S[1] - 3); ctx.lineTo(E[0], E[1] - 3); ctx.lineTo(W[0], W[1] - 2); ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(255,170,130,.4)'; ctx.stroke(); }
+    // palcový dráp na zápěstí a kostěné hroty prstů
+    ctx.save(); ctx.translate(W[0], W[1]); ctx.beginPath(); ctx.moveTo(-3.4, 0); ctx.quadraticCurveTo(3, -14, 15, -17); ctx.quadraticCurveTo(7, -7, 4, 3); ctx.closePath(); fs(ctx, C.horn, 1.3); ctx.restore();
+    F.forEach(f => { const a = Math.atan2(f[1] - W[1], f[0] - W[0]); ctx.save(); ctx.translate(f[0], f[1]); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(7, 0); ctx.lineTo(0, 2); ctx.closePath(); fs(ctx, C.horn2, 0.8); ctx.restore(); });
+  }
+  // ZADNÍ NOHA: mohutné stehno, holeň dozadu k hleznu, nárt dopředu, tři pařáty
+  function hindLeg(ctx, dx, dark, cuff) {
+    ctx.save(); ctx.translate(dx, 0);
+    const col = dark ? '#3e0e0b' : C.sc2;
+    limb(ctx, bez([-46, -38], [-54, -30], [-66, -22], [-70, -12], 6), 18, 12, col, [[-70, -12, 6.5]]);   // holeň
+    limb(ctx, bez([-70, -12], [-64, -6], [-54, -3], [-42, -3], 5), 12, 9, col);                            // nárt
+    // stehno
+    ctx.beginPath(); ctx.ellipse(-66, -56, 34, 26, -0.55, 0, TAU); fs(ctx, dark ? col : vgrad(ctx, -84, -30, C.sc3, C.sc2, C.sc), 2.2);
+    if (!dark) { ctx.save(); ctx.beginPath(); ctx.ellipse(-66, -56, 34, 26, -0.55, 0, TAU); ctx.clip(); scales(ctx, -100, -84, -30, -28, 8, 'rgba(30,6,4,.33)'); ctx.beginPath(); ctx.arc(-74, -66, 20, Math.PI * 1.05, Math.PI * 1.7); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,170,130,.3)'; ctx.stroke(); ctx.restore(); }
+    if (cuff) rivetBand(ctx, -64, -16, 9, 6, -0.5, 4);
+    talons(ctx, -44, 0, 3, 9, dark ? C.horn2 : C.horn);
     ctx.restore();
+  }
+  // PŘEDNÍ NOHA: rameno, loket dozadu, předloktí dopředu, ruka se čtyřmi drápy
+  function foreLeg(ctx, dx, dark) {
+    ctx.save(); ctx.translate(dx, 0);
+    const col = dark ? '#3e0e0b' : C.sc2;
+    limb(ctx, bez([40, -84], [34, -66], [28, -52], [26, -42], 6), 24, 16, col, [[26, -42, 8]]);           // nadloktí
+    limb(ctx, bez([26, -42], [32, -28], [40, -14], [46, -6], 6), 16, 11, col, [[46, -6, 5.5]]);          // předloktí
+    limb(ctx, bez([46, -6], [50, -3], [56, -2], [60, -2], 4), 11, 8, col);                                 // ruka
+    if (!dark) { ctx.beginPath(); ctx.moveTo(36, -80); ctx.quadraticCurveTo(28, -60, 24, -46); ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(255,170,130,.3)'; ctx.stroke(); }
+    talons(ctx, 56, 0, 4, 8, dark ? C.horn2 : C.horn);
+    ctx.restore();
+  }
+  function trunk(ctx, heat) {
+    // trup: záda se zvedají k ramenům, hrudník vpřed, břicho s pláty
+    const outline = [[-104, -70], [-80, -104, -30, -104], [10, -104, 34, -112], [56, -118, 70, -98], [80, -82, 66, -60], [56, -42, 30, -36], [-20, -30, -60, -34], [-96, -40, -104, -70]];
+    path(ctx, outline, true); fs(ctx, vgrad(ctx, -118, -30, C.sc3, C.sc2, C.sc), 2.4);
+    ctx.save(); path(ctx, outline, true); ctx.clip();
+    scales(ctx, -110, -120, 80, -30, 9, 'rgba(30,6,4,.35)');
+    // břišní pláty
+    path(ctx, [[-90, -44], [-40, -30, 20, -36], [54, -44, 68, -64], [70, -52, 56, -38], [20, -26, -40, -24], [-96, -32, -90, -44]], true); ctx.fillStyle = C.belly; ctx.fill();
+    ctx.strokeStyle = C.belly2; ctx.lineWidth = 1.4; for (let x = -80; x <= 60; x += 11) { ctx.beginPath(); ctx.moveTo(x, -46 + Math.abs(x) * 0.02); ctx.lineTo(x + 2, -26); ctx.stroke(); }
+    // světlo na hřbetě
+    ctx.beginPath(); ctx.moveTo(-90, -86); ctx.quadraticCurveTo(-30, -108, 30, -106); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,170,130,.28)'; ctx.stroke();
+    ctx.restore();
+    magma(ctx, [[-84, -66], [-62, -76], [-44, -64], [-20, -78], [4, -70], [26, -86]], 0, heat, 2);
+    magma(ctx, [[-60, -50], [-40, -56], [-24, -48]], 0, heat, 3);
+    // hřbetní ostny
+    spikes(ctx, [[-110, -68], [-96, -88], [-76, -100], [-52, -104], [-28, -104], [-4, -106], [20, -110], [42, -116], [60, -110]].map(p => [p[0], p[1], 1.2]), 15, C.dark);
+  }
+  function tailOnGround(ctx, t, heat) {
+    const tail = bez([-96, -56], [-150, -40], [-200, -6], [-150, -4], 18);
+    tube(ctx, tail, 38, 8, C.sc, C.belly);
+    spikes(ctx, tail.filter((_, i) => i % 2 === 0).map(p => [p[0], p[1], 0.9]), 10, C.dark);
+    magma(ctx, tail.slice(2, 12).map((p, i) => [p[0] + Math.sin(i * 2.1) * 2, p[1] + Math.cos(i * 1.7) * 2]), t, heat, 1);
+    const tip = tail[tail.length - 1], pre = tail[tail.length - 2], ta = Math.atan2(tip[1] - pre[1], tip[0] - pre[0]);
+    ctx.save(); ctx.translate(tip[0], tip[1]); ctx.rotate(ta);
+    path(ctx, [[-3, 0], [6, -16, 24, -10], [32, 0], [24, 10, 6, 16], [-3, 0]], true); fs(ctx, C.horn2, 1.6);
+    ctx.restore();
+  }
+  function drakStatic(ctx) {
+    // stín a spálená zem, kosti
+    ctx.beginPath(); ctx.ellipse(-20, 2, 190, 15, 0, 0, TAU); ctx.fillStyle = 'rgba(30,18,12,.35)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-10, 2, 120, 9, 0, 0, TAU); ctx.fillStyle = 'rgba(10,6,4,.3)'; ctx.fill();
+    const bone = (x, y, a, l) => { ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.beginPath(); ctx.rect(-l / 2, -1.6, l, 3.2); fs(ctx, C.horn, 1); [-l / 2, l / 2].forEach(e => { ctx.beginPath(); ctx.arc(e, -1.8, 2.4, 0, TAU); ctx.arc(e, 1.8, 2.4, 0, TAU); fs(ctx, C.horn, 1); }); ctx.restore(); };
+    bone(112, 2, 0.3, 22); bone(-60, 5, -0.5, 18); bone(132, 5, -1.2, 14);
+    ctx.save(); ctx.translate(100, 4); ctx.beginPath(); ctx.arc(0, -6, 8, Math.PI, 0); ctx.lineTo(8, 0); ctx.lineTo(-8, 0); ctx.closePath(); fs(ctx, '#e8dcbc', 1.2); ctx.beginPath(); ctx.arc(-3, -6, 2, 0, TAU); ctx.arc(3, -6, 2, 0, TAU); ctx.fillStyle = '#2a1a10'; ctx.fill(); ctx.restore();
+    // vzdálené končetiny a křídlo (tmavší, za tělem)
+    foldedWing(ctx, true, 0);
+    hindLeg(ctx, 18, true);
+    foreLeg(ctx, 16, true);
+    tailOnGround(ctx, 0, 0);
+    anchor(ctx);
+    trunk(ctx, 0);
+    hindLeg(ctx, 0, false, true);
+    foreLeg(ctx, 0, false);
+    // řetěz od pouta na zadní noze ke kotvě (leží na zemi)
+    heavyChain(ctx, [-70, -14], ANCHOR_RING, 18, 9);
+  }
+  function drakDyn(ctx, P, t, heat, fire) {
+    // blízké křídlo – při chrlení se zvedne
+    foldedWing(ctx, false, heat * 0.8 + Math.sin(t * 0.6) * 0.03);
+    // krk: esovitě od ramen k hlavě
+    const base = [46, -96], H = [P.hx - 4, P.hy + 6];
+    const neck = bez(base, [74, -112 - heat * 4], [H[0] - 40, H[1] + 22], H, 14);
+    tube(ctx, neck, 40, 22, C.sc2, C.belly);
+    spikes(ctx, neck.map(p => [p[0], p[1], 0.9]), 11, C.dark);
+    magma(ctx, neck.slice(2, 11).map((p, i) => [p[0] + Math.sin(i * 1.9) * 3, p[1] + 2 + Math.cos(i * 2.3) * 2]), t, heat, 5);
+    // obojek s ostny a velkým kruhem, řetěz ke kotvě – při chrlení se napne
+    const cp = neck[5], cq = neck[6], ca = Math.atan2(cq[1] - cp[1], cq[0] - cp[0]);
+    const ring = [cp[0] - Math.sin(ca) * -14, cp[1] + Math.cos(ca) * 14];
+    heavyChain(ctx, ring, ANCHOR_RING, lerp(46, 4, heat), 12);
+    ctx.save(); ctx.translate(cp[0], cp[1]); ctx.rotate(ca + Math.PI / 2);
+    for (let k = -2; k <= 2; k++) { ctx.beginPath(); ctx.moveTo(k * 6.5 - 2.6, -5); ctx.lineTo(k * 6.5, -14); ctx.lineTo(k * 6.5 + 2.6, -5); ctx.closePath(); fs(ctx, STEEL3, 1); }
+    ctx.restore();
+    rivetBand(ctx, cp[0], cp[1], 20, 7, ca + Math.PI / 2, 5);
+    ctx.beginPath(); ctx.arc(ring[0], ring[1], 6, 0, TAU); ctx.lineWidth = 5.4; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 3.4; ctx.strokeStyle = STEEL; ctx.stroke();
     // hlava
     ctx.save(); ctx.translate(P.hx, P.hy); ctx.rotate(P.tilt); ctx.scale(HS, HS);
     head(ctx, t, fire ? 0.5 : 0.08 + Math.max(0, Math.sin(t * 0.9)) * 0.06, fire, heat);
     ctx.restore();
   }
+  function chained(ctx, P, t, heat, fire, part) { if (part === 'static') drakStatic(ctx); else drakDyn(ctx, P, t, heat, fire); }
   const orig = Art.drawCastle;
   Art.drawCastle = function (ctx, img, front, groundY, facing, t, hpRatio, flagColor) {
     const dec = img && img.cfg && img.cfg.decor;
@@ -288,7 +415,7 @@
     ctx.fillStyle = g; ctx.fillRect(-120, -250, 360, 280);
     // nehybné tělo se kreslí jen jednou do obrázku (plynulost), živý je jen krk, hlava a křídlo
     if (!img._dragStatic) {
-      const R = 2.2, X0 = -240, Y0 = -280, W = 450, H = 320, cv = document.createElement('canvas');
+      const R = 2.2, X0 = -250, Y0 = -260, W = 420, H = 280, cv = document.createElement('canvas');
       cv.width = Math.round(W * R * P.S); cv.height = Math.round(H * R * P.S);
       const c2 = cv.getContext('2d'); c2.scale(R * P.S, R * P.S); c2.translate(-X0, -Y0);
       chained(c2, P, 0, 0, false, 'static');

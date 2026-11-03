@@ -450,6 +450,11 @@
         Zvuk.play('skill', 0.7); setTimeout(() => Zvuk.play(snd, 1), 120);
       }
       const tx = frontX();
+      // OMEZENÍ SÍLY: útok zasáhne naplno jen přední řady nepřátel (2 řady, nad 50 vojáků 3 řady,
+      // nad 100 vojáků 3 řady + 2 další řady lehce) – žádný útok nezničí celou armádu
+      const prevGate = this._abGate, lens = ['meteors', 'walls', 'tornados', 'projectiles', 'clouds'].map(k => (this[k] || []).length);
+      { const f = foes(); let fx = null; for (const e of f) if (fx == null || (e.x - fx) * dir < 0) fx = e.x; this._abGate = { foe: foeTeam, dir, fx: fx == null ? tx : fx, n: f.length }; }
+      const gate = this._abGate;
       switch (a.kind) {
         case 'meteors':
           for (let i = 0; i < 7; i++) {
@@ -496,13 +501,13 @@
         case 'buff': s.hornUntil = this.time + a.duration; mine().forEach(u => { this.vfx.rise(u.x, u.y, 'gold', 16); this.vfx.explosion(u.x, u.y - 50, 40, 'gold'); }); break;
         case 'curse': this.side[foeTeam].curseUntil = this.time + a.duration; foes().forEach(u => { this.vfx.rise(u.x, u.y, 'shadow', 12); this.vfx.explosion(u.x, u.y - 40, 50, 'shadow'); }); break;
         case 'stun':
-          near(tx, a.radius).forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? a.duration * 0.4 : a.duration); e.frozen = a.icon === 'snow' || a.icon === 'icespike'; });
+          near(tx, a.radius).forEach(e => { if (this._damage(e, a.power, null) === false) return; e.stunUntil = this.time + (e.def.boss ? a.duration * 0.4 : a.duration); e.frozen = a.icon === 'snow' || a.icon === 'icespike'; });
           this.vfx.explosion(tx, midY, 120, 'ice'); this.vfx.iceSpikes(tx, midY, a.radius * 2, a.duration + 0.4);
           near(tx, a.radius).forEach(e => this.vfx.explosion(e.x, e.y - 30, 40, 'ice'));
           break;
         case 'quake':
           this.shake = 0.9;
-          foes().forEach(e => { this._damage(e, a.power, null); e.stunUntil = this.time + (e.def.boss ? 0.5 : a.duration); this.vfx.explosion(e.x, e.y, 70, 'stone'); });
+          foes().forEach(e => { if (this._damage(e, a.power, null) === false) return; e.stunUntil = this.time + (e.def.boss ? 0.5 : a.duration); this.vfx.explosion(e.x, e.y, 70, 'stone'); });
           for (let x = this.cam.x; x < this.cam.x + this.cam.viewW; x += 160) this.vfx.explosion(x + Math.random() * 80, midY + (Math.random() - 0.5) * 60, 60, 'stone');
           break;
         case 'summon': {
@@ -539,10 +544,12 @@
           if (mouth) { sx = mouth[0]; sy = mouth[1]; s.castleImg._breathUntil = performance.now() + 1600 / (this.speed || 1); }
           this.vfx.breath(sx, sy, lim, dir);
           this.later(0.45, () => { for (let x = s.castle.front + dir * 200; (x - lim) * dir < 0; x += dir * 260) this.vfx.burn(x, midY, 200, 3); });
-          this.later(0.45, () => foes().filter(e => (e.x - lim) * dir < 0).forEach(e => { this._damage(e, a.power, null, true); e.dot = { until: this.time + 3, dps: a.power * 0.15, c: 'rgba(255,120,40,.45)' }; }));
+          this.later(0.45, () => foes().filter(e => (e.x - lim) * dir < 0).forEach(e => { if (this._damage(e, a.power, null, true) === false) return; e.dot = { until: this.time + 3, dps: a.power * 0.15, c: 'rgba(255,120,40,.45)' }; }));
           break;
         }
       }
+      ['meteors', 'walls', 'tornados', 'projectiles', 'clouds'].forEach((k, i) => { const A = this[k] || []; for (let j = lens[i]; j < A.length; j++) A[j].gate = gate; });
+      this._abGate = prevGate;
       // VÝRAZNÉ EFEKTY: kamera se podívá na místo útoku, záblesk obrazovky,
       // velká tlaková vlna na zemi a sloup světla v barvě útoku
       const AREA = { meteors: 1, meteor: 1, element: 1, volley: 1, storm: 1, stun: 1, holy: 1, barrage: 1, wall: 1, tornado: 0, breath: 0, quake: 0 };
@@ -567,7 +574,20 @@
       return true;
     }
     /* spustí akci se zpožděním (v čase bitvy) */
-    later(sec, fn) { this.timers.push({ at: this.time + sec, fn }); }
+    later(sec, fn) {
+      const g = this._abGate;
+      if (!g) { this.timers.push({ at: this.time + sec, fn }); return; }
+      // zpožděná část speciálního útoku si nese stejné omezení řad
+      this.timers.push({ at: this.time + sec, fn: () => { const o = this._abGate, n0 = this.projectiles.length; this._abGate = g; try { fn(); } finally { this._abGate = o; for (let j = n0; j < this.projectiles.length; j++) this.projectiles[j].gate = g; } } });
+    }
+    /* kolik zranění dostane voják od speciálního útoku podle toho, ve které řadě stojí */
+    _gateK(G, e) {
+      const ROW = 45, depth = (e.x - G.fx) * G.dir, row = Math.max(0, Math.floor(depth / ROW));
+      const N = G.n > 50 ? 3 : 2;
+      if (row < N) return 1;
+      if (G.n > 100 && row < N + 2) return 0.25;
+      return 0;
+    }
 
     /* Rozkaz pro armádu: 'utok' | 'formace' | 'ustup' */
     /* ROZKAZY Z HORNÍ LIŠTY: útok, ústup za hradby, obrana hradeb, obsazení středu */
@@ -1043,6 +1063,7 @@
 
       // projektily
       for (const p of this.projectiles) {
+        this._abGate = p.gate || null;
         p.t += dt / p.dur;
         if (p.burn && !p.done && Math.random() < 0.6) { const k = Math.min(1, p.t); this.vfx.flame(p.x0 + (p.tx - p.x0) * k, p.y0 + (p.ty - p.y0) * k - p.arc * 4 * k * (1 - k), 14, 0.25); }
         if (p.t >= 1 && !p.done) {
@@ -1070,9 +1091,11 @@
         }
       }
       this.projectiles = this.projectiles.filter(p => !p.done || p.t < 1.25);
+      this._abGate = null;
 
       // meteory
       for (const m of this.meteors) {
+        this._abGate = m.gate || null;
         m.t += dt;
         if (m.t > 0 && !m.done) { const k = Math.min(1, m.t / m.dur); this.vfx.meteor({ x: m.x0 + (m.x1 - m.x0) * k, y: m.y0 + (m.y1 - m.y0) * k, big: m.big }); }
         if (!m.done && m.t >= m.dur) {
@@ -1085,6 +1108,7 @@
         }
       }
       this.meteors = this.meteors.filter(m => !m.done);
+      this._abGate = null;
 
       this._updateFx(dt);
       this._camera(dt);
@@ -1144,26 +1168,32 @@
       const t = this.time;
       // jedovaté mraky
       for (const c of this.clouds) {
+        this._abGate = c.gate || null;
         c.tick -= dt;
         if (c.tick <= 0) { c.tick = 0.5; for (const e of this.units) if (e.team !== (c.team || 'player') && !e.dead && Math.abs(e.x - c.x) < c.r) this._damage(e, c.dps * 0.5, null); }
       }
       this.clouds = this.clouds.filter(c => c.until > this.time);
+      this._abGate = null;
       for (const b of this.bolts) b.t += dt;
       this.bolts = this.bolts.filter(b => b.t < 0.35);
       for (const w of this.walls) {
+        this._abGate = w.gate || null;
         w.tick -= dt;
         if (w.tick <= 0) {
           w.tick = 0.4;
-          for (const e of this.units) if (e.team !== w.team && !e.dead && Math.abs(e.x - w.x) < 46) { this._damage(e, w.dps * 0.4, null, true); e.dot = { until: t + 2, dps: w.dps * 0.25, c: 'rgba(255,120,40,.45)' }; }
+          for (const e of this.units) if (e.team !== w.team && !e.dead && Math.abs(e.x - w.x) < 46) { if (this._damage(e, w.dps * 0.4, null, true) === false) continue; e.dot = { until: t + 2, dps: w.dps * 0.25, c: 'rgba(255,120,40,.45)' }; }
         }
       }
       this.walls = this.walls.filter(w => w.until > t);
+      this._abGate = null;
       for (const o of this.tornados) {
+        this._abGate = o.gate || null;
         o.x += o.vx * dt; o.tick -= dt;
         for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 60 && !e.def.boss && !this._sheltered(e)) { e.x += o.vx * 0.55 * dt; e.slotX = null; }
         if (o.tick <= 0) { o.tick = 0.3; for (const e of this.units) if (e.team !== o.team && !e.dead && Math.abs(e.x - o.x) < 70) this._damage(e, o.dps * 0.3, null); }
       }
       this.tornados = this.tornados.filter(o => o.until > t && o.x > 0 && o.x < this.W);
+      this._abGate = null;
       for (const b of this.beams) b.t += dt;
       for (const b of this.blasts) b.t += dt;
       this.blasts = this.blasts.filter(b => b.t < b.life);
@@ -1341,7 +1371,9 @@
     }
 
     _damage(target, raw, from, fire) {
-      if (!from && this._sheltered(target)) return;
+      if (!from && this._sheltered(target)) return false;
+      const G = this._abGate;
+      if (G && target.team === G.foe) { const k = this._gateK(G, target); if (!k) return false; raw *= k; }
       if (target.gen && from && from.def && from.def.ranged && this._genEvade && this._genEvade(target)) return;   // schovaný za hradbami
       const s = this.side[target.team];
       let dmg = raw * (1 - Math.min(0.8, target.def.armor + (target.armorBonus || 0)));
@@ -1621,9 +1653,9 @@
       else if (p.el === 'voda') { V.explosion(x, y, S * 0.8, 'water'); V.wave(x - (p.team === 'player' ? 1 : -1) * 120, y + 10, p.team === 'player' ? 1 : -1); }
       else if (p.el === 'jed') { V.explosion(x, y, S * 0.7, 'poison'); V.poison(x, y, S * 1.2, p.big ? 5 : 4); }
       if (p.el === 'ohen') {
-        burst(20, '#ff9a3c'); near(95).forEach(e => { this._damage(e, dmg, null, true); e.dot = { until: t + 3, dps: dmg * 0.18, c: 'rgba(255,120,40,.45)' }; });
+        burst(20, '#ff9a3c'); near(95).forEach(e => { if (this._damage(e, dmg, null, true) === false) return; e.dot = { until: t + 3, dps: dmg * 0.18, c: 'rgba(255,120,40,.45)' }; });
       } else if (p.el === 'led') {
-        burst(18, '#cfeeff'); near(p.slow ? 140 : 95).forEach(e => { this._damage(e, dmg * 0.8, null); e.slowUntil = t + (p.slow || 2.5); });
+        burst(18, '#cfeeff'); near(p.slow ? 140 : 95).forEach(e => { if (this._damage(e, dmg * 0.8, null) === false) return; e.slowUntil = t + (p.slow || 2.5); });
       } else if (p.el === 'kamen') {
         burst(18, '#a08a6a'); near(100).forEach(e => this._damage(e, dmg, null));
       } else if (p.el === 'blesk') {
@@ -1643,7 +1675,7 @@
           cur = this._range(foeT, from.x - 169.9, from.x + 169.9).filter(e => !hit.includes(e)).sort((a, b) => Math.abs(a.x - from.x) - Math.abs(b.x - from.x))[0];
         }
       } else if (p.el === 'voda') {
-        burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = p.team === 'player' ? Math.min(C().enemyFront - 20, e.x + 70) : Math.max(C().playerFront + 20, e.x - 70); e.slotX = null; } });
+        burst(24, '#7fc0ff'); near(115).forEach(e => { if (this._damage(e, dmg * 0.7, null) === false) return; if (!e.def.boss) { e.x = p.team === 'player' ? Math.min(C().enemyFront - 20, e.x + 70) : Math.max(C().playerFront + 20, e.x - 70); e.slotX = null; } });
       } else if (p.el === 'jed') {
         burst(10, '#9be07a'); near(90).forEach(e => this._damage(e, dmg * 0.5, null));
         this.clouds.push({ team: p.team, x, y, r: 105, until: t + (p.team === 'player' && !p.from ? 5 : 4), dps: dmg * 0.3, tick: 0.2 });
