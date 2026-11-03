@@ -185,54 +185,74 @@
     }
   }
 
-  /* ---------- napojení na vykreslení hradu ---------- */
+  /* ---------- napojení: drak létá MIMO hrad, v pozadí nad bojištěm před branou ---------- */
+  const HEAD = [92, -34], HS = 0.95;          // kde je hlava v prostoru draka a její měřítko
+  function pose(img, front, groundY, facing, t, heat) {
+    const BX = img.big || { S: 1 }, S = BX.S * 1.05;
+    // vznáší se kousek před branou, vysoko nad bojištěm; krouží a houpe se ve vzduchu
+    const hover = Math.sin(t * 0.55) * 26, bob = Math.sin(t * 1.9) * 7;
+    const x = front + facing * (190 + hover - heat * 30) * BX.S;
+    const y = groundY - img.h * 0.8 + bob * BX.S + heat * 50 * BX.S;
+    const tilt = Math.sin(t * 0.55 + 1.2) * 0.05 + heat * 0.18;   // při chrlení skloní hlavu k zemi
+    return { x, y, S, tilt };
+  }
+  function mouthOf(P, facing) {
+    const mx = HEAD[0] + 48 * HS, my = HEAD[1] + 2 * HS;
+    const c = Math.cos(P.tilt), s = Math.sin(P.tilt);
+    return [P.x + facing * P.S * (mx * c - my * s), P.y + P.S * (mx * s + my * c)];
+  }
+  const origMouth = Art.dragonMouth;
+  Art.dragonMouth = function (img, front, groundY, facing) {
+    if (!img || !img.cfg || !img.cfg.decor || !img.cfg.decor.drak) return origMouth ? origMouth.apply(this, arguments) : null;
+    const t = performance.now() / 1000;
+    return mouthOf(pose(img, front, groundY, facing, t, 1), facing);
+  };
+  function flyer(ctx, t, heat, fire, now) {
+    const fl = Math.sin(now / 1000 * (fire ? 7.5 : 3.2));
+    // vzdálené křídlo
+    ctx.save(); ctx.translate(18, -22); wing(ctx, 0.95, -fl * 1.1 - 1.5, true, heat); ctx.restore();
+    // ocas za tělem, tělo, nohy přitažené k břichu
+    body(ctx, t, heat, 0);
+    // krk dopředu k hlavě
+    const neck = bez([40, -16], [62, -30 - heat * 4], [HEAD[0] - 34, HEAD[1] + 8], [HEAD[0] - 4, HEAD[1] + 4], 12);
+    tube(ctx, neck, 32, 20, C.sc, C.belly);
+    spikes(ctx, neck.map(p => [p[0], p[1], 0.9]), 11, C.dark);
+    magma(ctx, neck.slice(2, 10).map((p, i) => [p[0] + Math.sin(i * 1.9) * 3, p[1] + 2 + Math.cos(i * 2.3) * 2]), t, heat, 5);
+    // přední tlapa s drápy
+    ctx.save(); ctx.translate(34, 18); ctx.rotate(0.5);
+    ctx.beginPath(); ctx.moveTo(-6, -8); ctx.quadraticCurveTo(-2, 8, 8, 14); ctx.lineTo(16, 10); ctx.quadraticCurveTo(8, 2, 6, -8); ctx.closePath(); fs(ctx, C.sc2, 1.5);
+    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(8 + i * 3.5, 12); ctx.quadraticCurveTo(12 + i * 3.5, 20, 8 + i * 3.5, 23); ctx.lineTo(11 + i * 3.5, 12); ctx.closePath(); fs(ctx, C.horn, 0.8); }
+    ctx.restore();
+    // hlava
+    ctx.save(); ctx.translate(HEAD[0], HEAD[1]); ctx.scale(HS, HS);
+    head(ctx, t, fire ? 0.5 : 0.08 + Math.max(0, Math.sin(t * 0.9)) * 0.06, fire, heat);
+    ctx.restore();
+    // blízké křídlo
+    ctx.save(); ctx.translate(-6, -26); wing(ctx, 1, -fl * 1.2 - 1.6, false, heat); ctx.restore();
+  }
   const orig = Art.drawCastle;
   Art.drawCastle = function (ctx, img, front, groundY, facing, t, hpRatio, flagColor) {
     const dec = img && img.cfg && img.cfg.decor;
-    if (!dec || !dec.drak || !img.dragonPt) return orig.apply(this, arguments);
-    const BX = img.big || { S: 1, ox: 0, oy: 0 }, K = BX.S * 1.45, S = K * 0.78;
+    if (!dec || !dec.drak) return orig.apply(this, arguments);
     const now = performance.now(), fire = !!(img._breathUntil && now < img._breathUntil);
-    // plynulé vzepětí a rozžhavení (0..1)
-    img._dragHeat = lerp(img._dragHeat || 0, fire ? 1 : 0, fire ? 0.12 : 0.03);
-    const heat = img._dragHeat;
-    const x0 = facing === 1 ? front - img.w + 2 : front - 2;
-    const [hx, hy] = Art.castleWorldPt ? Art.castleWorldPt(img, front, groundY, facing, img.dragonPt) : [front, groundY - img.h * 0.7];
-    // tělo sedí za hradem, nad vnitřní částí hradeb
-    const bx = facing === 1 ? x0 + img.w * 0.42 : front - 2 + img.w * 0.58, by = groundY - img.h * 0.74 - heat * 14 * S;
-    const sp = 0.42 + heat * 0.58 + Math.sin(t * 0.7) * 0.05;
-    const flap = fire ? Math.sin(now / 1000 * 7) * 0.5 : Math.sin(t * 0.8) * 0.06;
-    ctx.save(); ctx.translate(bx, by); ctx.scale(facing * S, S);
-    // záře za drakem
-    const g = ctx.createRadialGradient(0, -40, 10, 0, -40, 220);
-    g.addColorStop(0, `rgba(255,90,30,${0.1 + heat * 0.25})`); g.addColorStop(1, 'rgba(255,60,20,0)');
-    ctx.fillStyle = g; ctx.fillRect(-240, -280, 480, 380);
-    ctx.save(); ctx.translate(26, -24); wing(ctx, sp, flap, true, heat); ctx.restore();
-    body(ctx, t, heat, heat);
-    // krk: z trupu za věží až k hlavě
-    const hl = [(hx - facing * 6 * K - bx) / (facing * S), (hy + 2 * K - by) / S];
-    const neck = bez([34, -22], [70, -70 - heat * 20], [hl[0] - 60, hl[1] - 40], hl, 14);
-    tube(ctx, neck, 34, 22, C.sc, C.belly);
-    spikes(ctx, neck.map(p => [p[0], p[1], 0.95]), 12, C.dark);
-    magma(ctx, neck.slice(2, 11).map((p, i) => [p[0] + Math.sin(i * 1.9) * 4, p[1] + 3 + Math.cos(i * 2.3) * 3]), t, heat, 5);
-    ctx.save(); ctx.translate(-14, -30); wing(ctx, sp, flap, false, heat); ctx.restore();
-    ctx.restore();
-    // hrad (bez staré kamenné hlavy)
+    img._dragHeat = lerp(img._dragHeat || 0, fire ? 1 : 0, fire ? 0.14 : 0.03);
+    const heat = img._dragHeat, tt = now / 1000;
+    // hrad bez staré kamenné hlavy na zdi
     dec.drak = false;
     try { orig.apply(this, arguments); } finally { dec.drak = true; }
-    // přední tlapa přes cimbuří a hlava
-    ctx.save(); ctx.translate(hx, hy); ctx.scale(facing * K, K);
-    ctx.save(); ctx.translate(-16, 14);
-    ctx.beginPath(); ctx.moveTo(-10, -12); ctx.quadraticCurveTo(-4, 6, 4, 14); ctx.lineTo(16, 12); ctx.quadraticCurveTo(10, 0, 6, -12); ctx.closePath(); fs(ctx, C.sc2, 1.6);
-    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(4 + i * 4.5, 13); ctx.quadraticCurveTo(8 + i * 4.5, 22, 3 + i * 4.5, 26); ctx.lineTo(7 + i * 4.5, 13); ctx.closePath(); fs(ctx, C.horn, 0.9); }
+    const P = pose(img, front, groundY, facing, tt, heat);
+    // stín draka na zemi
+    ctx.save(); ctx.beginPath(); ctx.ellipse(P.x, groundY - 4, 120 * P.S * (0.7 + 0.3 * (1 - (groundY - P.y) / 600)), 12 * P.S, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(P.x, P.y); ctx.scale(facing * P.S, P.S); ctx.rotate(P.tilt);
+    const g = ctx.createRadialGradient(20, -20, 10, 20, -20, 200);
+    g.addColorStop(0, `rgba(255,90,30,${0.08 + heat * 0.25})`); g.addColorStop(1, 'rgba(255,60,20,0)');
+    ctx.fillStyle = g; ctx.fillRect(-220, -240, 440, 400);
+    flyer(ctx, tt, heat, fire, now);
     ctx.restore();
-    const jaw = fire ? 0.5 : 0.06 + Math.max(0, Math.sin(t * 0.9)) * 0.05;
-    ctx.translate(heat * -2, -heat * 3); ctx.rotate(-heat * 0.06);
-    head(ctx, t, jaw, fire, heat);
-    ctx.restore();
-    // žhavé uhlíky stoupající kolem draka
-    for (let i = 0; i < 12; i++) {
-      const ph = (t * (0.22 + (i % 4) * 0.05) + i * 0.137) % 1, ex = bx + facing * S * (-120 + ((i * 53) % 240)) + Math.sin(t * 2 + i) * 6, ey = by + 30 * S - ph * 200 * S;
-      ctx.beginPath(); ctx.arc(ex, ey, (1.4 + (i % 3) * 0.6) * S, 0, TAU); ctx.fillStyle = `rgba(255,${150 + (i % 3) * 40},60,${(0.25 + heat * 0.5) * (1 - ph)})`; ctx.fill();
+    // uhlíky padající z křídel
+    for (let i = 0; i < 10; i++) {
+      const ph = (tt * (0.25 + (i % 4) * 0.05) + i * 0.137) % 1, ex = P.x + facing * P.S * (-120 + ((i * 53) % 220)) + Math.sin(tt * 2 + i) * 6, ey = P.y - 40 * P.S + ph * 160 * P.S;
+      ctx.beginPath(); ctx.arc(ex, ey, (1.4 + (i % 3) * 0.6) * P.S, 0, TAU); ctx.fillStyle = `rgba(255,${150 + (i % 3) * 40},60,${(0.25 + heat * 0.5) * (1 - ph)})`; ctx.fill();
     }
   };
 })();
