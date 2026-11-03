@@ -463,7 +463,7 @@
       UcetUI.bind(App, el);
       el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
       el.querySelector('#passBtn').addEventListener('click', () => App.go('obchod', { tab: 'pas' }));
-      el.querySelector('#petBtn').addEventListener('click', () => Sin.openPets(App));
+      el.querySelector('#petBtn').addEventListener('click', () => App.go('mazlicci'));
       el.querySelector('#hallBtn').addEventListener('click', () => Sin.openHall(App));
       Instalace.bind(App, el);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
@@ -1220,7 +1220,7 @@
           ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 117 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 118 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

@@ -16,7 +16,7 @@
     const g = c.createRadialGradient(w / 2, h / 2, 6, w / 2, h / 2, w * 0.6); g.addColorStop(0, locked ? '#2a2f3a' : '#3a5a8a'); g.addColorStop(1, locked ? '#14161c' : '#16223a');
     c.fillStyle = g; c.fillRect(0, 0, w, h);
     c.save(); c.translate(w / 2, h / 2 + 4); const k = Math.min(w, h) / 70; c.scale(k, k);
-    if (locked) c.filter = 'grayscale(1) brightness(.35)';
+    if (locked) c.filter = 'grayscale(.85) brightness(.6)';
     G.drawPet(c, id, performance.now() / 1000, false);
     c.restore();
   }
@@ -70,6 +70,71 @@
         bind();
       });
     },
+    /* SEKCE MAZLÍČKŮ: velká scéna s vybraným mazlíčkem a mřížka všech 20 */
+    screen(App, opts) {
+      const save = App.save, el = App.screenEl;
+      let sel = (opts && opts.pet) || G.petOf(save).id;
+      const needTxt = p => { const N = G.petNeed(p), have = G.petProgress(save, p);
+        if (N.k === 'gems') return `${ico('gem')} ${N.n}`;
+        const lbl = { wins: L('vítězství', 'victories'), kills: L('zabití', 'kills'), trophies: L('trofejí', 'trophies') }[N.k];
+        return `${Math.min(have, N.n)} / ${N.n} ${lbl}`; };
+      const render = () => {
+        const P = G.pets.find(x => x.id === sel), un = G.petUnlocked(save, P), on = G.petOf(save).id === P.id, N = G.petNeed(P);
+        const nOwn = G.pets.filter(p => G.petUnlocked(save, p)).length;
+        el.innerHTML = `<div class="scr scr-pets">
+          <div class="sec-head"><h1>${L('Mazlíčci', 'Pets')}</h1><span class="muted">${nOwn} / ${G.pets.length} ${L('odemčeno', 'unlocked')}</span></div>
+          <section class="panel pet-hero">
+            <canvas id="petStage"></canvas>
+            <div class="pet-info">
+              <div class="eyebrow">${L('Schopnost každých', 'Ability every')} ${P.cd} s</div>
+              <h2>${esc(L(P.cs, P.en))}</h2>
+              <p>${esc(L(P.d[0], P.d[1]))}</p>
+              <p class="muted" style="font-size:13px">${L('Každý mazlíček navíc sbírá padlé mince: +1 za každé zabití.', 'Every pet also collects fallen coins: +1 per kill.')}</p>
+              <div class="pet-actions">
+                ${on ? `<span class="bp-have">✓ ${L('S tebou v bitvě', 'With you in battle')}</span>`
+                  : un ? `<button class="btn btn-gold btn-big" id="petUse">${L('Vzít do bitvy', 'Take into battle')}</button>`
+                  : N.k === 'gems' ? `<button class="btn btn-green btn-big" id="petBuy" ${save.gems < N.n ? 'disabled' : ''}>${L('Koupit', 'Buy')} ${ico('gem')} ${N.n}</button>`
+                  : `<span class="pet-lock">${ico('lock')} ${L('Odemkne se', 'Unlocks at')}: ${needTxt(P)}</span>`}
+              </div>
+            </div>
+          </section>
+          <div class="pet-grid big">${G.pets.map(p => { const u = G.petUnlocked(save, p);
+            return `<button class="pet-card ${p.id === sel ? 'sel' : ''} ${G.petOf(save).id === p.id ? 'on' : ''} ${u ? '' : 'locked'}" data-psel="${p.id}">
+              <canvas data-petcv="${p.id}"></canvas><b>${esc(L(p.cs, p.en).split(',')[0])}</b>
+              <span class="pet-st">${G.petOf(save).id === p.id ? '✓ ' + L('V bitvě', 'In battle') : u ? L('Odemčeno', 'Unlocked') : needTxt(p)}</span></button>`; }).join('')}</div>
+        </div>`;
+        applyIconsSafe(el);
+        el.querySelectorAll('[data-psel]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.psel; const sc = el.scrollTop; render(); el.scrollTop = sc; }));
+        const use = el.querySelector('#petUse'); if (use) use.addEventListener('click', () => { save.pet = sel; App.persist(); if (window.Zvuk) Zvuk.play('coin', 0.8); render(); });
+        const buy = el.querySelector('#petBuy'); if (buy) buy.addEventListener('click', () => { const p = G.pets.find(x => x.id === sel), n = G.petNeed(p).n; if (save.gems < n) return; save.gems -= n; save.petsOwned = (save.petsOwned || []).concat(p.id); save.pet = p.id; App.persist(); if (window.Zvuk) Zvuk.play('coin', 1); App.refreshTop && App.refreshTop(); render(); });
+      };
+      render();
+      // živá scéna: mazlíček poletuje nad malým bojištěm a jednou za čas použije schopnost
+      let stop = false, last = 0;
+      const anim = now => {
+        if (stop || !el.isConnected || App.current !== 'mazlicci') return;
+        if (now - last > 33) {
+          last = now; const t = now / 1000;
+          const cv = el.querySelector('#petStage');
+          if (cv) {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
+            if (w && h) {
+              if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+              const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+              const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#2a4a7a'); g.addColorStop(0.72, '#8ab8e0'); g.addColorStop(0.72, '#5a8a3a'); g.addColorStop(1, '#3a6a2a'); c.fillStyle = g; c.fillRect(0, 0, w, h);
+              for (let i = 0; i < 4; i++) { const x = ((t * 12 + i * 160) % (w + 200)) - 100, y = 30 + i * 18; c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.arc(x, y, 18, 0, TAU); c.arc(x + 20, y + 4, 14, 0, TAU); c.arc(x - 18, y + 5, 12, 0, TAU); c.fill(); }
+              const act = (t % 4) > 3.1, k = Math.min(w, h) / 90;
+              c.save(); c.translate(w / 2 + Math.sin(t * 0.8) * w * 0.12, h * 0.45 + Math.sin(t * 2) * 8); c.scale(k * (Math.cos(t * 0.8) >= 0 ? 1 : -1), k);
+              c.beginPath(); c.ellipse(0, 40, 18, 4, 0, 0, TAU); c.fillStyle = 'rgba(0,0,0,.15)'; c.fill();
+              G.drawPet(c, sel, t, act); c.restore();
+            }
+          }
+          el.querySelectorAll('canvas[data-petcv]').forEach(cv2 => { const p = G.pets.find(x => x.id === cv2.dataset.petcv); paintPet(cv2, p.id, !G.petUnlocked(save, p)); });
+        }
+        requestAnimationFrame(anim);
+      };
+      requestAnimationFrame(anim);
+    },
     openHall(App) {
       const save = App.save, R = save.relics || {};
       const boss = Object.keys(R).filter(k => k.startsWith('b_')).map(k => Object.assign({ id: k, cs: R[k].name, en: R[k].name, d: [R[k].boss ? 'Trofej z poraženého bosse.' : 'Trofej z poraženého generála.', R[k].boss ? 'Trophy from a defeated boss.' : 'Trophy from a defeated general.'] }, R[k]));
@@ -91,5 +156,6 @@
       ctx.save(); ctx.translate(x, y); ctx.scale(dir * 1.5, 1.5); G.drawPet(ctx, p.id, t, false); ctx.restore();
     }
   };
+  if (window.Screens) Screens.mazlicci = (App, opts) => Sin.screen(App, opts);
   function applyIconsSafe(c) { try { if (window.applyIcons) applyIcons(c); } catch (e) {} }
 })();
