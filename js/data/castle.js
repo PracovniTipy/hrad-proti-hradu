@@ -8,7 +8,7 @@ window.GameData = window.GameData || {};
 GameData.buildings = [
   { id: 'hradby', name: 'Hradby', desc: 'Silnější zdi = více životů hradu.', maxLevel: 10, baseCost: 250, growth: 1.55 },
   { id: 'pokladnice', name: 'Pokladnice', desc: 'Rychlejší příjem mincí během boje.', maxLevel: 10, baseCost: 300, growth: 1.6 },
-  { id: 'kasarna', name: 'Kasárna', desc: '+6 % životů a útoku všech vojáků za úroveň.', maxLevel: 10, baseCost: 350, growth: 1.62 },
+  { id: 'kasarna', name: 'Kasárna', desc: '+3 % životů a útoku všech vojáků za úroveň (nejvýš +30 %).', maxLevel: 10, baseCost: 350, growth: 1.62 },
   { id: 'vez', name: 'Strážní věž', desc: 'Lučištníci na věži střílí na nepřátele u brány.', maxLevel: 10, baseCost: 280, growth: 1.58 },
   { id: 'zbrojnice', name: 'Zbrojnice', desc: 'Víc mincí hned na začátku boje.', maxLevel: 8, baseCost: 220, growth: 1.5 },
   { id: 'olej', name: 'Vroucí olej', desc: 'Obrana na blízko: z hradeb se lije vroucí olej na nepřátele přímo u brány (do 30 m). Zraní a zapálí je.', maxLevel: 5, baseCost: 600, growth: 1.75 }
@@ -20,7 +20,7 @@ GameData.calc = {
   },
   castleHp: (l) => 2000 + l * 350,
   income: (l) => (16 + l * 2.2) * 0.95,   // o 5 % pomalejší příjem mincí
-  unitMult: (l) => 1 + l * 0.06,
+  unitMult: (l) => 1 + Math.min(10, l) * 0.03,   // nejvýš +30 %
   towerDmg: (l) => (l > 0 ? 8 + l * 5 : 0),
   maxCoins: (l) => 600 + l * 100,
   startCoins: (l) => 120 + l * 60,

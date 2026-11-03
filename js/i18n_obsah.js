@@ -134,7 +134,7 @@
     buildings: {
       hradby: { name: 'Walls', desc: 'Stronger walls = more castle health.' },
       pokladnice: { name: 'Treasury', desc: 'Faster coin income during battle.' },
-      kasarna: { name: 'Barracks', desc: '+6% health and attack for all soldiers per level.' },
+      kasarna: { name: 'Barracks', desc: '+3% health and attack for all soldiers per level (max +30%).' },
       vez: { name: 'Watchtower', desc: 'Archers on the tower shoot enemies at the gate.' },
       zbrojnice: { name: 'Armory', desc: 'More coins at the start of every battle.' }
     },
