@@ -1155,7 +1155,7 @@
           ${App.lbTab === 'bots' ? list.slice(0, 10).map(row).join('') + (myRank > 10 ? `<div class="lb-gap">• • •</div>${row(me, myRank - 1)}` : '') : `<div class="lb-load muted">${t('lb_loading')}</div>`}
         </section>
         <div class="notice"><div>${App.lbTab === 'bots' ? t('lb_notice') : Ucet.logged() && !Ucet.guest() ? t('lb_world_note') : t('lb_world_reg')}</div></div>
-        ${App.lbTab !== 'bots' && (!Ucet.logged() || Ucet.guest()) ? `<button class="btn btn-green" data-acc="register">${t('acc_set')}</button>` : ''}
+        ${App.lbTab !== 'bots' && !window.CW_PORTAL && (!Ucet.logged() || Ucet.guest()) ? `<button class="btn btn-green" data-acc="register">${t('acc_set')}</button>` : ''}
       </div>`;
     el.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => { App.lbTab = b.dataset.lbt; App.go('zebricek'); }));
     UcetUI.bind(App, el);

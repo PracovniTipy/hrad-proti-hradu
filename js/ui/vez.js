@@ -198,7 +198,7 @@
       const head = `<div class="tabs vz-lbt">${sorts.map(([k, nm]) => `<button class="tab" data-lbs="${k}" aria-selected="${this.lbSort === k}">${nm}</button>`).join('')}</div>`;
       box.insertAdjacentHTML('beforebegin', head);
       el.querySelectorAll('[data-lbs]').forEach(b => b.addEventListener('click', () => { this.lbSort = b.dataset.lbs; App.go('vez', { keepScroll: true }); }));
-      if (!Ucet.logged() || Ucet.guest()) box.insertAdjacentHTML('afterend', `<div class="notice"><div>${t('vez_lb_reg')}</div></div><button class="btn btn-green" data-acc="register">${t('acc_set')}</button>`);
+      if (!window.CW_PORTAL && (!Ucet.logged() || Ucet.guest())) box.insertAdjacentHTML('afterend', `<div class="notice"><div>${t('vez_lb_reg')}</div></div><button class="btn btn-green" data-acc="register">${t('acc_set')}</button>`);
       UcetUI.bind(App, el);
       const wk = GameData.tower.weekKey();
       Ucet.towerBoard(this.lbSort).then(rows => {

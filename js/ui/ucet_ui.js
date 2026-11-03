@@ -16,6 +16,11 @@
     /* Sekce v profilu */
     profileHtml() {
       const S = Ucet.s || {};
+      // herní portály nedovolují vlastní přihlášení – jen informace o uložení a odkazy na zásady
+      if (window.CW_PORTAL) return `<section class="panel acc-box">
+          <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="acc-state">${ico('crown')} ${t('acc_auto_local')}</p></div></div>
+          <div class="acc-foot">${privLink()}</div>
+        </section>`;
       const state = `<p class="acc-state">${ico('crown')} ${Ucet.logged() ? (Ucet.err ? `<span class="bad">${t('acc_save_err')}</span>` : `${t('acc_auto')} <b>${when(S.savedAt)}</b>`) : t('acc_auto_local')}</p>`;
       if (!Ucet.logged() || Ucet.guest()) return `<section class="panel acc-box">
           <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="muted">${t('acc_why2')}</p></div></div>
