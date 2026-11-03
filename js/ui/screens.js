@@ -290,6 +290,7 @@
       const px = 700 - span / 2 + pos * span;
       Art.drawUnit(ctx, dd(F.roles.pech), pal(F.roles.pech), { x: px, y: 530, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7, t, ring: false, scaleMul: 1.38 });
       Art.drawUnit(ctx, dd(F.roles.strelec), pal(F.roles.strelec), { x: px - (ph < 0.5 ? 48 : -48), y: 524, facing: ph < 0.5 ? 1 : -1, moving: true, walk: t * 7 + 1.5, t, ring: false, scaleMul: 1.38 });
+      if (window.Sin && window.App && App.save) Sin.drawHome(ctx, t, App.save);
       // částice
       const amb = (window.ArtThemes.ambient || {})[theme];
       if (amb) {
@@ -444,6 +445,14 @@
             <span class="daily-lbl">${t('tab_pas')}</span>
             ${window.Pas && Pas.ready(save) ? '<i class="daily-dot">!</i>' : ''}
           </button>
+          <button class="daily-btn pet-btn" id="petBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Mazlíček' : 'Pet'}">
+            <span class="daily-chest"><svg viewBox="0 0 120 100"><ellipse cx="60" cy="58" rx="30" ry="32" fill="#f4f8ff" stroke="#1a1410" stroke-width="4"/><path d="M34 34q26-10 52 0L64 4q-6 18-30 30z" fill="#3a4aa8" stroke="#1a1410" stroke-width="4" stroke-linejoin="round"/><circle cx="48" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="72" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="50" cy="52" r="5" fill="#e8a020"/><circle cx="74" cy="52" r="5" fill="#e8a020"/><path d="M56 62h8l-4 8z" fill="#e8a020" stroke="#1a1410" stroke-width="2"/><path d="M30 60q-20-6-24 14 14-4 24 0zM90 60q20-6 24 14-14-4-24 0z" fill="#e8f0ff" stroke="#1a1410" stroke-width="3"/></svg></span>
+            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Mazlíček' : 'Pet'}</span>
+          </button>
+          <button class="daily-btn hall-btn" id="hallBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Síň slávy' : 'Hall of Fame'}">
+            <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M36 10h48v18a24 24 0 0 1-48 0z" fill="#ffd24a" stroke="#1a0e06" stroke-width="4"/><path d="M36 16H20q0 22 20 24M84 16h16q0 22-20 24" fill="none" stroke="#1a0e06" stroke-width="4"/><path d="M52 52h16v14H52z" fill="#c99a2a" stroke="#1a0e06" stroke-width="4"/><path d="M38 66h44v14H38z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M60 20l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z" fill="#fff6c8"/></svg></span>
+            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Síň slávy' : 'Hall of Fame'}</span>
+          </button>
         </section>
       </div>`;
     if (!sprava) {
@@ -454,6 +463,8 @@
       UcetUI.bind(App, el);
       el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
       el.querySelector('#passBtn').addEventListener('click', () => App.go('obchod', { tab: 'pas' }));
+      el.querySelector('#petBtn').addEventListener('click', () => Sin.openPets(App));
+      el.querySelector('#hallBtn').addEventListener('click', () => Sin.openHall(App));
       Instalace.bind(App, el);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
@@ -1209,7 +1220,7 @@
           ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 116 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 117 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

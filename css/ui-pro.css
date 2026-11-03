@@ -1198,3 +1198,19 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .vz-set.own { box-shadow: 0 0 16px color-mix(in srgb, var(--rc) 45%, transparent); } .vz-set-st { color: #ffd77a; font-size: 13px; }
 .vz-setrw { font-weight: 800; }
 .vz-rew svg { width: 20px !important; height: 20px !important; vertical-align: -4px; }
+/* mazlíček a síň slávy */
+#screen.home-mode .pet-btn, .pet-btn { left: auto; right: 16px; top: calc(240px + env(safe-area-inset-top, 0px)); }
+#screen.home-mode .hall-btn, .hall-btn { left: auto; right: 16px; top: calc(340px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .pet-btn { top: 190px; } #screen.home-mode .hall-btn { top: 268px; } }
+.pet-grid, .troph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 58vh; overflow: auto; padding: 2px; }
+.troph-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.pet-card, .troph { display: grid; gap: 4px; justify-items: center; text-align: center; padding: 10px 8px; border-radius: 14px; border: 2px solid rgba(255,215,122,.18); background: rgba(10,14,22,.55); color: #f4ecd8; font: inherit; cursor: pointer; }
+.pet-card canvas { width: 100%; height: 96px; border-radius: 10px; }
+.pet-card b, .troph b { font-size: 14px; }
+.pet-card small, .troph small { font-size: 11.5px; opacity: .78; line-height: 1.3; }
+.pet-card .pet-st { font-size: 12px; font-weight: 800; color: #ffd77a; }
+.pet-card.on { border-color: #ffd77a; box-shadow: 0 0 0 2px rgba(255,215,122,.35), 0 6px 18px rgba(0,0,0,.4); }
+.pet-card.locked { opacity: .7; cursor: default; }
+.troph { cursor: default; }
+.troph canvas { width: 72px; height: 72px; }
+.troph.on { border-color: rgba(255,215,122,.55); }

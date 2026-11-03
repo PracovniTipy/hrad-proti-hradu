@@ -1426,6 +1426,7 @@
           if (from && from.team === 'player' && from.def && (!this.net || from.owner === this.net.me)) this.st.kills[from.def.id] = (this.st.kills[from.def.id] || 0) + 1;
           this.texts.push({ x: target.x, y: target.y - 100 * US(), txt: '+' + reward, color: '#ffd54f', t: 0, life: 1.1, coin: true });
         }
+        if (this._onKill) this._onKill(target, from, killer);
       }
     }
 
@@ -1960,6 +1961,7 @@
       }
       ctx.globalAlpha = 1;
 
+      if (this._drawWorldFx) this._drawWorldFx(ctx, t);
       this.vfx.drawFront(ctx, t);
       if (this._drawGenUi) this._drawGenUi(ctx, t);
       // texty (zranění, mince)
@@ -1985,6 +1987,7 @@
         if (p.petal) ctx.ellipse(0, 0, p.s * 1.6, p.s * 0.9, 0, 0, Math.PI * 2); else ctx.arc(0, 0, p.s, 0, Math.PI * 2);
         ctx.fill(); ctx.restore();
       }
+      if (this._drawScreenFx) this._drawScreenFx(ctx);
       if (this.flash) {
         const a = 1 - this.flash.t / this.flash.life;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
