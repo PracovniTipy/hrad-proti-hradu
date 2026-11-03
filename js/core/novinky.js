@@ -28,6 +28,7 @@
       return (this.voice = vs.find(x => /^en/i.test(x.lang)) || null);
     },
     say(text, prio) {
+      return;   // hlas vypnutý
       try {
         if (!window.Zvuk || !Zvuk.settings().sfx || !('speechSynthesis' in window)) return;
         const now = performance.now();
@@ -43,7 +44,9 @@
   };
   if ('speechSynthesis' in window) { try { speechSynthesis.onvoiceschanged = () => Ann.pickVoice(); } catch (e) {} }
 
-  function banner(b, txt, sub, color, big, voice, prio) {
+  // hlasatel a velké nápisy jsou vypnuté (rušily a překrývaly je ovládací panely); odměny za série zůstávají
+  function banner() {}
+  function bannerOld(b, txt, sub, color, big, voice, prio) {
     (b._banners = b._banners || []).push({ txt, sub, color: color || '#ffd77a', t: 0, life: big ? 2.6 : 2, big: !!big });
     if (b._banners.length > 3) b._banners.shift();
     if (voice) Ann.say(voice, prio);
