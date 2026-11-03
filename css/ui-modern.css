@@ -1,0 +1,170 @@
+/* =====================================================================
+   MODERNÍ VZHLED (načítá se poslední)
+   Čisté sklo místo kožených textur a zlatých filigránů, moderní čitelné
+   písmo Inter na texty a elegantní Cinzel na nadpisy, jemné stíny,
+   plynulé přechody, jednotné zaoblení a barvy. Rozložení se nemění.
+   ===================================================================== */
+:root {
+  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-body: "Inter", "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --m-bg: #0a0e17;
+  --m-bg2: #101726;
+  --m-glass: rgba(22, 30, 48, .72);
+  --m-glass-hi: rgba(32, 43, 68, .82);
+  --m-line: rgba(255, 255, 255, .08);
+  --m-line-hi: rgba(255, 255, 255, .16);
+  --m-gold: #f5c662;
+  --m-gold-2: #e3a43a;
+  --m-text: #eef2f8;
+  --m-muted: #9aa8c0;
+  --m-accent: #6ea8ff;
+  --m-r: 16px;
+  --m-shadow: 0 18px 40px -18px rgba(0, 0, 0, .7), 0 2px 6px rgba(0, 0, 0, .35);
+  --muted: var(--m-muted);
+  --text: var(--m-text);
+}
+html, body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { background: radial-gradient(1400px 700px at 50% -20%, #1b2a4a 0%, #0a0e17 65%) fixed, var(--m-bg); font-family: var(--font-body); color: var(--m-text); }
+#app {
+  background:
+    radial-gradient(900px 420px at 15% -10%, rgba(110, 168, 255, .16), transparent 70%),
+    radial-gradient(900px 480px at 90% 110%, rgba(245, 198, 98, .08), transparent 70%),
+    linear-gradient(180deg, #0d1322, #0a0e17);
+}
+body, button, input, select, textarea { font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 900; letter-spacing: .03em; text-shadow: none; }
+p, small, .muted { letter-spacing: 0; }
+.muted { color: var(--m-muted); }
+b, strong { font-weight: 800; }
+.num, .pill, .kv, td { font-variant-numeric: tabular-nums; }
+
+/* nadpisy sekcí: zlatý přechod, bez ornamentů */
+.sec-head h1 {
+  font-size: clamp(26px, 3.2vw, 38px);
+  background: linear-gradient(180deg, #fff6dc 0%, var(--m-gold) 55%, #c98a26 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 18px rgba(245, 198, 98, .18));
+}
+.sec-head h2 { font-size: 17px; letter-spacing: .08em; text-transform: uppercase; color: #f4ecd8; }
+.sec-head h2::before { content: ""; width: 4px; height: 18px; margin-right: 10px; border-radius: 4px; vertical-align: -3px; background: linear-gradient(180deg, var(--m-gold), var(--m-gold-2)); box-shadow: 0 0 12px rgba(245, 198, 98, .5); }
+.eyebrow { font-family: var(--font-body); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 11.5px; color: var(--m-gold); }
+
+/* ---------- HORNÍ LIŠTA: sklo ---------- */
+#topbar {
+  background: linear-gradient(180deg, rgba(18, 25, 42, .92), rgba(12, 17, 29, .88));
+  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 1px 0 var(--m-line), 0 12px 30px -12px rgba(0, 0, 0, .7);
+}
+#topbar::before { display: none; }
+.avatar { border-radius: 14px; border: 0; background: linear-gradient(160deg, #2a3a5c, #141c2e); box-shadow: 0 0 0 1.5px rgba(245, 198, 98, .55), 0 6px 16px rgba(0, 0, 0, .45); }
+.profile-chip b { font-family: var(--font-display); font-weight: 900; letter-spacing: .04em; }
+.profile-chip small { font-family: var(--font-body); font-weight: 700; color: var(--m-gold); }
+.pill {
+  border: 0; border-radius: 999px; padding: 5px 14px 5px 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02)), rgba(10, 14, 23, .75);
+  box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .35), 0 6px 14px -6px rgba(0, 0, 0, .6);
+  font-family: var(--font-body); font-weight: 800; letter-spacing: 0;
+}
+#nav::before { display: none; }
+#nav button {
+  font-family: var(--font-body); font-weight: 700; letter-spacing: .01em; border-radius: 14px;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+#nav button:hover { background: rgba(255, 255, 255, .05); }
+#nav button[aria-current="page"] {
+  color: #fff; background: linear-gradient(180deg, rgba(110, 168, 255, .20), rgba(110, 168, 255, .06));
+  box-shadow: inset 0 0 0 1px rgba(110, 168, 255, .35), 0 8px 22px -10px rgba(110, 168, 255, .55);
+}
+#nav button[aria-current="page"]::after { content: ""; position: absolute; left: 26%; right: 26%; bottom: 4px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--m-gold), #ffe7a8); box-shadow: 0 0 10px rgba(245, 198, 98, .7); top: auto; width: auto; transform: none; border: 0; }
+
+/* ---------- PANELY: sklo místo kůže, bez filigránů ---------- */
+.panel {
+  border: 0; border-radius: var(--m-r);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .015)), var(--m-glass);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px var(--m-line), inset 0 1px 0 rgba(255, 255, 255, .07), var(--m-shadow);
+}
+.panel::after { display: none; }
+.panel:where(.skin, .offer, .sk-card, .chest-card, .div-card, .big-offer, .ucard, .stat, .opt) { transition: transform .2s ease, box-shadow .2s ease; }
+.panel:where(.skin, .offer, .sk-card, .chest-card, .div-card, .big-offer, .ucard):hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px var(--m-line-hi), inset 0 1px 0 rgba(255, 255, 255, .09), 0 24px 46px -18px rgba(0, 0, 0, .8); }
+.panel.div-card, .panel.big-offer { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rc, var(--m-gold)) 45%, transparent), 0 0 0 1px rgba(0, 0, 0, .3), 0 24px 50px -20px color-mix(in srgb, var(--rc, var(--m-gold)) 35%, transparent); }
+
+/* ---------- TLAČÍTKA: čisté, plné barvy, jemný lesk ---------- */
+.btn {
+  border: 0; border-radius: 14px; font-family: var(--font-body); font-weight: 800; letter-spacing: .02em; text-transform: none;
+  background: linear-gradient(180deg, #34425f, #222c42); color: #eef2f8; text-shadow: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10), inset 0 1px 0 rgba(255, 255, 255, .14), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  transition: transform .15s ease, filter .15s ease, box-shadow .2s ease;
+}
+.btn::before { top: 0; left: 0; right: 0; height: 50%; border-radius: 14px 14px 0 0; background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0)); }
+.btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn:active { transform: translateY(1px) scale(.99); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), inset 0 2px 6px rgba(0, 0, 0, .35); }
+.btn-gold { color: #2a1804; background: linear-gradient(180deg, #ffe39a 0%, #f5c662 45%, #e0a23a 100%); box-shadow: inset 0 0 0 1px rgba(255, 246, 210, .5), inset 0 -2px 0 rgba(120, 70, 10, .35), 0 12px 26px -12px rgba(245, 180, 70, .65); }
+.btn-green { color: #fff; background: linear-gradient(180deg, #5fd36a, #2f9a45); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), inset 0 -2px 0 rgba(0, 60, 20, .3), 0 12px 26px -12px rgba(70, 200, 110, .6); }
+.btn-blue { color: #fff; background: linear-gradient(180deg, #5a9bff, #2f63d6); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), inset 0 -2px 0 rgba(10, 30, 90, .3), 0 12px 26px -12px rgba(80, 140, 255, .6); }
+.btn-red { color: #fff; background: linear-gradient(180deg, #ff6f63, #cf3a30); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), inset 0 -2px 0 rgba(90, 10, 10, .3), 0 12px 26px -12px rgba(255, 90, 80, .6); }
+.btn[disabled] { filter: saturate(.2) brightness(.7); transform: none; cursor: default; }
+.btn-big { font-size: 18px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* ---------- ZÁLOŽKY: segmentový přepínač ---------- */
+.tab, .act-tab, .sub-tab {
+  border: 0; border-radius: 12px; font-family: var(--font-body); font-weight: 800; letter-spacing: .03em;
+  background: rgba(255, 255, 255, .04); color: var(--m-muted);
+  box-shadow: inset 0 0 0 1px var(--m-line); transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.tab:hover, .act-tab:hover, .sub-tab:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+.tab[aria-selected="true"], .act-tab[aria-selected="true"], .sub-tab[aria-selected="true"] {
+  color: #2a1804; text-shadow: none;
+  background: linear-gradient(180deg, #ffe39a, #f0b84c);
+  box-shadow: inset 0 0 0 1px rgba(255, 246, 210, .55), 0 10px 24px -12px rgba(245, 180, 70, .7);
+}
+.tabs, .sub-tabs, .act-tabs { gap: 8px; }
+
+/* ---------- OZNÁMENÍ: místo pergamenu čistý informační pruh ---------- */
+.notice {
+  border: 0; border-radius: 14px; color: #dfe6f2;
+  background: linear-gradient(90deg, rgba(245, 198, 98, .14), rgba(245, 198, 98, .04) 60%, rgba(255, 255, 255, .02)), rgba(18, 24, 38, .8);
+  box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .22), inset 3px 0 0 var(--m-gold);
+}
+.notice b, .notice .outro { color: var(--m-gold); }
+#toast { color: #eef2f8; font-family: var(--font-body); font-weight: 700; border: 0; border-radius: 14px; background: rgba(18, 24, 38, .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .35), 0 16px 36px -12px rgba(0, 0, 0, .8); }
+
+/* ---------- OKNA ---------- */
+.overlay { background: rgba(5, 8, 14, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.modal-card {
+  border: 0; border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)), rgba(16, 22, 36, .94);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09), inset 0 1px 0 rgba(255, 255, 255, .1), 0 40px 90px -30px rgba(0, 0, 0, .9);
+}
+.modal-card::before, .modal-card::after { display: none; }
+.modal-card h2 { filter: none; background: linear-gradient(180deg, #fff6dc, var(--m-gold) 70%, #c98a26); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.modal-card .result-title { font-size: clamp(38px, 5vw, 54px); letter-spacing: .06em; }
+.modal-card .result-title.win { filter: drop-shadow(0 8px 28px rgba(245, 198, 98, .45)); }
+.kv { border-radius: 14px; background: rgba(255, 255, 255, .035); box-shadow: inset 0 0 0 1px var(--m-line); }
+.kv dt, .kv .k { color: var(--m-muted); }
+
+/* ---------- KARTY, ŠTÍTKY ---------- */
+.rar, .badge, .tag { font-family: var(--font-body); font-weight: 800; letter-spacing: .06em; }
+input, select { border-radius: 12px; border: 0; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px var(--m-line-hi); color: #fff; }
+input:focus { box-shadow: inset 0 0 0 2px var(--m-accent); outline: none; }
+
+/* ---------- BITVA: čistší ovládání ---------- */
+.b-orders, #bSquad { border-radius: 16px; background: rgba(12, 17, 29, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px var(--m-line), 0 14px 30px -14px rgba(0, 0, 0, .8); }
+.obtn { font-family: var(--font-body); font-weight: 800; letter-spacing: .02em; border-radius: 12px; }
+.obtn[aria-pressed="true"] { box-shadow: inset 0 0 0 1px rgba(255, 246, 210, .5), 0 8px 20px -10px rgba(245, 180, 70, .7); }
+#battle .hp { border-radius: 999px; }
+#battle header b, #battle .b-name { font-family: var(--font-display); }
+
+/* jemné animace při načtení obrazovky */
+.scr > * { animation: mIn .35s ease both; }
+.scr > *:nth-child(2) { animation-delay: .03s; } .scr > *:nth-child(3) { animation-delay: .06s; } .scr > *:nth-child(4) { animation-delay: .09s; }
+@keyframes mIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .scr > * { animation: none; } .btn, .panel { transition: none; } }
+
+/* posuvníky */
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .18) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .16); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+.daily-lbl { font-family: var(--font-body); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 11.5px; -webkit-text-stroke: 0; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6); }
+.daily-dot { font-family: var(--font-body); }
+.sk-card h3, .panel.skin h3, .ucard h3, .stat h3 { font-size: 16px; letter-spacing: .03em; }
+.hero-edit { font-family: var(--font-body); }
+#nav button span, #nav .lbl { font-family: var(--font-body); font-weight: 700; }
