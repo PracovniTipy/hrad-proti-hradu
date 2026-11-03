@@ -103,7 +103,9 @@
       mistake: (1 - per.disc) * (1 - skill * 0.7) * 0.35,
       waveN: Math.round(4 + skill * 4 + per.pat * 3 - per.aggr * 2),
       obs: { utokT: 0, totT: 0, early: false, retreats: 0, skills: {}, hero: false, lastSkillAt: -999, lastForm: 'utok' },
-      lastAttack: 0, lastSay: -99, lastTaunt: {}, sayQ: null
+      lastAttack: 0, lastSay: -99, lastTaunt: {}, sayQ: null,
+      // ÚVODNÍ FÁZE: nejdřív staví armádu a zaujímá pozice, útočí až potom
+      openUntil: 45 + per.pat * 40 - per.aggr * 10 + Math.random() * 15
     };
     B.brain = brain;
     B.ai.decide = 0;
@@ -238,6 +240,9 @@
      a vždy jen na omezenou dobu – pak se armáda přeskupí. */
   function decide(B, br, S) {
     const cfg = C(), E = B.side.enemy, front = E.castle.front, per = br.per;
+    br.opening = B.time < br.openUntil;
+    br.allowEarly = S.underTowers >= 2;          // když mu hráč vleze pod hradby, brání se i v úvodu
+    if (br.opening) br.lastAttack = B.time;
     const since = B.time - br.planAt;
     const D = br.planData;
     const mineU = () => B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen);
@@ -267,7 +272,7 @@
         news('regroup', 'Nepřítel se stahuje a přeskupuje', 'The enemy pulls back to regroup');
       }
     }
-    const waveReady = n => !br.wave && S.nMine >= n && B.time > (br.regroupUntil || 0);
+    const waveReady = n => !br.wave && S.nMine >= Math.max(4, n) && B.time > (br.regroupUntil || 0) && (!br.opening || br.allowEarly);
     let hold = 'gather';   // kde stojí hlavní síla: gather | center | walls | creep
     switch (plan) {
       case 'rush':          // časté menší vlny, hlavní síla drží střed
@@ -287,7 +292,7 @@
         break;
       case 'ambush': {      // návnada vyláká hráče pod věže, pak protiúder
         hold = 'walls';
-        if (!D.bait && !br.wave && S.nMine >= 4) {
+        if (!D.bait && !br.wave && S.nMine >= 4 && !br.opening) {
           const cheap = mineU().sort((a, b) => a.def.cost - b.def.cost).slice(0, 2 + Math.round(br.skill));
           cheap.forEach(u => (u.esq = true)); B.esquad = { mode: 'utok', flagX: 0 }; D.bait = B.time;
         }
@@ -336,6 +341,8 @@
     if (!br.wave && !retreat && S.nMine >= 4 && B.time - br.lastAttack > waitMax && B.time > (br.regroupUntil || 0)) launchWave(B, br, 0.8, 30);
     // chyba: občas pošle vlnu předčasně
     if (!br.wave && Math.random() < br.mistake * 0.08 && S.nMine >= 3) launchWave(B, br, 0.5, 15);
+    // v úvodu stojí armáda u svého hradu (nejvýš drží střed, když je ho majitelem)
+    if (br.opening && !br.wave) hold = S.atGate ? 'walls' : 'gather';
     // provedení: hlavní síla drží pozici, vlna (oddíl) útočí
     br.stance = br.wave ? (br.wave.full ? 'strike' : 'wave') : retreat ? 'retreat' : hold;
     if (retreat) { E.formation = 'ustup'; B.esquad = null; }
@@ -349,6 +356,7 @@
   }
   /* vypustí útočnou vlnu: podíl armády (0–1) nebo zadané jednotky; full = všichni včetně nových */
   function launchWave(B, br, share, maxDur, full, list) {
+    if (br.opening && !br.allowEarly) return;
     const units = list || B.units.filter(u => u.team === 'enemy' && !u.dead && !u.gen);
     const pick = list ? units : units.slice().sort((a, b) => (b.hp / b.maxHp) - (a.hp / a.maxHp)).slice(0, Math.max(2, Math.ceil(units.length * share)));
     const all = full || share >= 1;
