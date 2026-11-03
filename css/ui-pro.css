@@ -1189,3 +1189,10 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
   .install-home .inst-ico { width: 65px; height: 55px; font-size: 31px; }
   #nav .nav-medal { margin-top: -6px; margin-bottom: 4px; }
 }
+.vz-sets { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.vz-set { display: grid; grid-template-columns: 150px 1fr; gap: 10px; padding: 10px; border: 1px solid var(--rc); align-items: center; }
+.vz-set canvas { width: 150px; height: 110px; border-radius: 8px; }
+.vz-set h3 { margin: 2px 0; } .vz-set p { margin: 0 0 4px; font-size: 13px; }
+.vz-set.own { box-shadow: 0 0 16px color-mix(in srgb, var(--rc) 45%, transparent); } .vz-set-st { color: #ffd77a; font-size: 13px; }
+.vz-setrw { font-weight: 800; }
+.vz-rew svg { width: 20px !important; height: 20px !important; vertical-align: -4px; }

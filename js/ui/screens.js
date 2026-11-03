@@ -605,8 +605,8 @@
             .sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity) || (b.only ? 1 : 0) - (a.only ? 1 : 0)).map(s => {
             const owned = O.has(save, unitSel, s.id);
             const eq = (save.skins.unit[unitSel] || 'zakladni') === s.id;
-            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''} ${s.only ? 'nat' : ''} ${s.codeOnly && !s.season ? 'divine' : ''} ${s.season ? 'season' : ''}">
-              ${s.only || s.codeOnly ? `<span class="skin-tag">${s.season ? t('skin_season') : s.codeOnly ? t('rar_4') : s.mount ? t('skin_mount') : t('skin_nation')}</span>` : ''}
+            return `<article class="panel skin ${rarClass(s.rarity)} ${eq ? 'equipped' : ''} ${s.only ? 'nat' : ''} ${s.codeOnly && !s.season && !s.tower ? 'divine' : ''} ${s.season || s.tower ? 'season' : ''}">
+              ${s.only || s.codeOnly ? `<span class="skin-tag">${s.season ? t('skin_season') : s.tower ? t('nav_vez') : s.codeOnly ? t('rar_4') : s.mount ? t('skin_mount') : t('skin_nation')}</span>` : ''}
               <canvas data-skinunit="${s.id}"></canvas>
               <h3>${esc(s.name)}</h3>${rarB(s.rarity)}<p>${esc(s.desc)}</p>
               ${s.bonus ? `<p class="gear-bonus">${Shop.bonusText(s.bonus)}</p>` : ''}
@@ -621,7 +621,7 @@
           ${GameData.weaponSkins.filter(w => GameData.weaponSkinFits(w, unitSel) && (!w.codeOnly || O.hasW(save, unitSel, w.id))).sort((a, b) => GameData.rarityRank(a.rarity) - GameData.rarityRank(b.rarity)).map(w => {
             const ownedW = O.hasW(save, unitSel, w.id);
             const eqW = ((save.skins.weapon || {})[unitSel] || 'w_zakladni') === w.id;
-            return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''} ${w.codeOnly && !w.season ? 'divine' : ''} ${w.season ? 'season' : ''}">
+            return `<article class="panel skin ${rarClass(w.rarity)} ${eqW ? 'equipped' : ''} ${w.codeOnly && !w.season && !w.tower ? 'divine' : ''} ${w.season || w.tower ? 'season' : ''}">
               <canvas data-wskin="${w.id}"></canvas>
               <h3>${esc(w.name)}</h3>${rarB(w.rarity)}${w.desc ? `<p>${esc(w.desc)}</p>` : ''}
               ${w.bonus ? `<p class="gear-bonus">${Shop.bonusText(w.bonus)}</p>` : ''}
@@ -1174,7 +1174,7 @@
           ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 100 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 101 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

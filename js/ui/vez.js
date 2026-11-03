@@ -43,6 +43,10 @@
     vez_newach: ['Nový úspěch: {n}', 'New achievement: {n}'],
     vez_gen_slain: ['Generál padl v boji: +{n} drahokamů', 'The general fell in battle: +{n} gems'],
     vez_tier: ['Úroveň', 'Tier'],
+    vez_set: ['Věžová sada', 'Tower set'],
+    vez_sets: ['Věžové sady', 'Tower sets'],
+    vez_sets_d: ['Zbroj a zbraně pro všech 18 vojáků všech národů. Získáš je jen ve věži – nedají se koupit.', 'Armor and weapons for all 18 soldiers of every nation. Only from the Tower – they cannot be bought.'],
+    vez_set_at: ['patro {n}', 'floor {n}'],
     vez_lb_floor: ['Patro', 'Floor'], vez_lb_gens: ['Generálové', 'Generals'], vez_lb_fast: ['Rychlost', 'Speed'], vez_lb_week: ['Týden', 'Week'],
     vez_lb_reg: ['Do žebříčku se dostaneš, až si nastavíš jméno a heslo účtu.', 'Set a name and password for your account to appear on the leaderboard.'],
     vez_major: ['Velký generál', 'Great General'],
@@ -66,7 +70,8 @@
     view: null, lbSort: 'floor', tab: 'patro',
     open(App) { App.go('vez'); },
     rewardHtml(r) {
-      return `${r.gold ? `<span>${ico('coin')} ${fmt(r.gold)}</span>` : ''}${r.gems ? `<span>${ico('gem')} ${fmt(r.gems)}</span>` : ''}${r.random ? `<span>${ico('chest')} ${r.random.count || 1}× ${t('vez_skin')}</span>` : ''}`;
+      const S0 = r.set && GameData.towerSets.find(x => x.id === r.set);
+      return `${r.gold ? `<span>${ico('coin')} ${fmt(r.gold)}</span>` : ''}${r.gems ? `<span>${ico('gem')} ${fmt(r.gems)}</span>` : ''}${r.random ? `<span>${ico('chest')} ${r.random.count || 1}× ${t('vez_skin')}</span>` : ''}${S0 ? `<span class="vz-setrw" style="color:${GameData.rarityColors[S0.rar]}">✦ ${t('vez_set')}: ${esc(L(S0.cs, S0.en))}</span>` : ''}`;
     },
     modsHtml(f) {
       const M = GameData.tower.MODS;
@@ -124,13 +129,16 @@
               </div>
             </div>
           </section>
-`}
+          <div class="sec-head"><h2>${t('vez_sets')}</h2><span class="muted">${t('vez_sets_d')}</span></div>
+          <div class="vz-sets">${GameData.towerSets.map(S0 => { const own = GameData.towerSetOwned(save, S0.id); return `<article class="panel vz-set ${own ? 'own' : ''}" style="--rc:${GameData.rarityColors[S0.rar]}">
+            <canvas data-vzset="${S0.id}"></canvas><div><div class="eyebrow" style="color:var(--rc)">${t('rar_' + GameData.rarityRank(S0.rar))} · ${t('vez_floor', { n: S0.at })}</div><h3>${esc(L(S0.cs, S0.en))}</h3><p class="muted">${esc(L(S0.d[0], S0.d[1]))}</p>
+            <b class="vz-set-st">${own ? '✓ ' + t('pas_owned') : '🔒 ' + t('vez_set_at', { n: S0.at })}</b></div></article>`; }).join('')}</div>`}
           </div>
         </div>`;
       el.querySelectorAll('[data-vt]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.vt; App.go('vez', { keepScroll: true }); }));
       el.querySelectorAll('[data-vf]').forEach(b => b.addEventListener('click', () => { this.view = +b.dataset.vf; App.go('vez', { keepScroll: true }); }));
       const go = el.querySelector('#vzGo'); if (go) go.addEventListener('click', () => App.startTower(n));
-      if (this.tab === 'patro') this.paint(el, f);
+      if (this.tab === 'patro') { this.paint(el, f); el.querySelectorAll('canvas[data-vzset]').forEach(cv => this.paintSet(cv, cv.dataset.vzset)); }
       if (this.tab === 'zebricek') this.loadLb(App, el);
       const st = el.querySelector('.vz-step.sel'); if (st) st.scrollIntoView({ block: 'nearest', inline: 'center' });
     },
@@ -157,6 +165,22 @@
         const uid = f.unit || (GameData.factions[f.faction] || GameData.factions.kralovstvi).roles.velitel || 'velitel';
         Art.renderUnitIcon(gv, uid, 'enemy', f.unitSkin, { zoom: 1 });
       }
+    },
+    paintSet(cv, id) {
+      const S0 = GameData.towerSets.find(x => x.id === id), GH = GameData.gearHelpers;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight; if (!w) return;
+      cv.width = w * dpr; cv.height = h * dpr;
+      const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = ctx.createRadialGradient(w / 2, h * 0.7, 6, w / 2, h * 0.6, w * 0.7); g.addColorStop(0, '#3a2a4a'); g.addColorStop(1, '#0d121c'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      ['velitel', 'taisho', 'jarl'].forEach((u, i) => {
+        const def = GameData.units[u]; if (!def) return;
+        const W = S0.weapons.map(x => GameData.weaponSkins.find(y => y.id === x)).find(x => GameData.weaponSkinFits(x, u));
+        const fake = { skins: { unit: { [u]: 'vz_' + id }, weapon: { [u]: W ? W.id : null }, own: {}, ownW: {} } };
+        const lk = GH.look(fake, u), pal = GH.palette('player', 'vz_' + id, def.faction, lk);
+        const k = h / 125 * (i === 1 ? 1 : 0.88);
+        ctx.save(); ctx.translate(w * (0.2 + i * 0.3), h * 0.94); ctx.scale(k, k);
+        Art.drawUnit(ctx, GH.drawDef(def, lk), pal, { x: 0, y: 0, facing: 1, t: 1 + i, atk: -1 }); ctx.restore();
+      });
     },
     loreHtml(T) {
       return `<div class="vz-lore">${GameData.tower.LORE.map(c => {
@@ -207,7 +231,8 @@
         const firstClear = cfg.weekly ? !T.weekDone[f.week] : f.n >= T.cur;
         if (cfg.weekly) { T.weekDone[f.week] = Math.round(res.time); T.weeks = (T.weeks || 0) + 1; T.weekBest = T.weekBest && T.weekBest.w === f.week ? { w: f.week, t: Math.min(T.weekBest.t, Math.round(res.time)) } : { w: f.week, t: Math.round(res.time) }; }
         else if (f.n >= T.cur) { T.cur = f.n + 1; T.best = Math.max(T.best, f.n); }
-        const give = firstClear ? Object.assign({}, f.reward) : { gold: Math.round(f.reward.gold * 0.25) };
+        const give = firstClear ? Object.assign({}, f.reward) : { gold: Math.round(f.reward.gold * 0.25), gems: 2 };
+        if (give.set) { give.gift = GameData.towerSetGift(give.set); delete give.set; }
         if (genKilled) give.gems = (give.gems || 0) + 10 + Math.floor(f.n / 20);
         const got = Shop.grant(App, give);
         got.forEach(r => {

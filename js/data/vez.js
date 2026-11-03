@@ -113,6 +113,55 @@ window.GameData = window.GameData || {};
   const CSKINS = ['kralovsky', 'pisecna', 'temna', 'ledova', 'mramor'];
   const USKINS = ['zakladni', 'lesni', 'pulnoc', 'stinovy', 'rudy_drak', 'zlaty', 'ledovy', 'smaragd'];
 
+  /* ---------------- VĚŽOVÉ SADY (jen za hraní věže) ----------------
+     Každá sada = zbroj pro všech 18 vojáků + zbraň podle druhu (meč, kopí, luk, hůl). */
+  const RB = { 'Epický': [{ hp: 0.07 }, { dmg: 0.07 }], 'Legendární': [{ hp: 0.1, dmg: 0.1 }, { dmg: 0.1, hp: 0.1 }], 'Božský': [{ hp: 0.2, dmg: 0.2 }, { dmg: 0.2, hp: 0.2 }] };
+  const SETS = [
+    { id: 'kamen', at: 25, rar: 'Epický', cs: 'Kamenná stráž', en: 'Stone Guard', d: ['Šedá ocel a mechový plášť strážců brány věže.', 'Grey steel and the moss cloak of the Tower gate guards.'],
+      pal: { tunic: '#5a6058', tunicDark: '#3a3e38', trim: '#a8c08a', metal: '#b8bcb4', metalDark: '#6a7068', cape: '#4a6a3a', plume: '#a8c08a', hood: '#5a6058', robe: '#5a6058', fur: '#8a9a7a' },
+      feat: { pauldron: 'plate', cape: 'short', capeColor: '#3a5a2a', chest: 'cross', emblemColor: '#a8c08a', collar: 'chain' }, glow: null,
+      w: { melee: { id: 'dlouhy', blade: '#d8dcd4', dark: '#6a7068', guard: '#a8c08a', grip: '#3a3e38' }, pole: { id: 'partyzana', blade: '#d8dcd4', dark: '#6a7068', wood: '#4a3a28', guard: '#a8c08a' }, bow: { id: 'dlouhy', wood: '#6a7068', string: '#e8ecd8' }, staff: { id: 'krystal', glow: '#a8e08a' } } },
+    { id: 'boure', at: 75, rar: 'Epický', cs: 'Pán bouře', en: 'Storm Lord', d: ['Temně modrá zbroj, ve které praskají blesky.', 'Dark blue armor crackling with lightning.'],
+      pal: { tunic: '#1f2f5c', tunicDark: '#121c3a', trim: '#ffe14a', metal: '#9fb0d8', metalDark: '#4a5a8a', cape: '#1a284f', plume: '#ffe14a', hood: '#1f2f5c', robe: '#1f2f5c', fur: '#6a7aa8' },
+      feat: { pauldron: 'plate', cape: 'royal', capeColor: '#1a284f', aura: 'storm', crest: 'feather', plumeColor: '#ffe14a', chest: 'star', emblemColor: '#ffe14a' }, glow: '#fff36a',
+      w: { melee: { id: 'runovy', blade: '#eef2ff', dark: '#4a5a8a', glow: '#fff36a', guard: '#ffe14a', grip: '#1a284f' }, pole: { id: 'hvezdne', blade: '#eef2ff', dark: '#4a5a8a', glow: '#fff36a', wood: '#1a284f', guard: '#ffe14a' }, bow: { id: 'runovy', wood: '#2a3a6a', glow: '#fff36a', string: '#fff6c8' }, staff: { id: 'mesic', glow: '#fff36a' } } },
+    { id: 'obsidian', at: 150, rar: 'Legendární', cs: 'Obsidiánový rytíř', en: 'Obsidian Knight', d: ['Černé sklo sopek, ostny a fialová záře stínů.', 'Black volcanic glass, spikes and a violet shadow glow.'],
+      pal: { tunic: '#1a141f', tunicDark: '#0e0a12', trim: '#b25cff', metal: '#2a2230', metalDark: '#120e16', cape: '#2a0a3a', plume: '#b25cff', eyes: '#d08aff', hood: '#1a141f', robe: '#1a141f', fur: '#2a2230' },
+      feat: { pauldron: 'spiky', cape: 'tattered', capeColor: '#2a0a3a', aura: 'shadow', chest: 'skull', emblemColor: '#b25cff', crest: 'mohawk', plumeColor: '#b25cff' }, glow: '#b25cff',
+      w: { melee: { id: 'plamen', blade: '#3a2a4a', dark: '#120e16', edge: '#d08aff', glow: '#b25cff', guard: '#5a3a7a', grip: '#120e16' }, pole: { id: 'drak', blade: '#3a2a4a', dark: '#120e16', edge: '#d08aff', glow: '#b25cff', wood: '#120e16', guard: '#5a3a7a' }, bow: { id: 'trny', wood: '#1a141f', blade: '#3a2a4a', string: '#d08aff', glow: '#b25cff' }, staff: { id: 'lebka', glow: '#b25cff' } } },
+    { id: 'feniks', at: 300, rar: 'Legendární', cs: 'Fénixova zbroj', en: 'Phoenix Armor', d: ['Zbroj, která hoří a znovu se rodí z popela.', 'Armor that burns and is reborn from the ashes.'],
+      pal: { tunic: '#8a1c14', tunicDark: '#5a0e0a', trim: '#ffd24a', metal: '#e8a04a', metalDark: '#8a4a14', cape: '#c8361c', plume: '#ffb347', hood: '#8a1c14', robe: '#8a1c14', fur: '#e8a04a' },
+      feat: { pauldron: 'gold', cape: 'royal', capeColor: '#c8361c', aura: 'flame', crest: 'royalplume', plumeColor: '#ffb347', chest: 'sun', emblemColor: '#ffd24a', gem: '#ff6a2a' }, glow: '#ff8a3a',
+      w: { melee: { id: 'plamen', blade: '#ffe0d0', dark: '#9a3a20', glow: '#ff6a2a', guard: '#ffd24a', grip: '#5a0a14' }, pole: { id: 'drak', blade: '#ffe0d0', dark: '#9a3a20', glow: '#ff6a2a', wood: '#5a0a14', guard: '#ffd24a' }, bow: { id: 'draci', wood: '#8a1c14', blade: '#ff9a5a', string: '#ffd2a0', glow: '#ff6a2a', arrow: '#ff9a3c', tip: '#ffd27a' }, staff: { id: 'slunce', glow: '#ff8a3a' } } },
+    { id: 'hvezdy', at: 500, rar: 'Legendární', cs: 'Hvězdný vládce', en: 'Star Sovereign', d: ['Bílé stříbro, hermelín a světlo hvězd nad věží.', 'White silver, ermine and the light of stars above the Tower.'],
+      pal: { tunic: '#e9f2ff', tunicDark: '#b8c8e0', trim: '#7fd3ff', metal: '#f4f8ff', metalDark: '#9fb4d0', cape: '#2a3a6a', plume: '#ffffff', hood: '#e9f2ff', robe: '#e9f2ff', fur: '#ffffff' },
+      feat: { pauldron: 'plate', cape: 'ermine', capeColor: '#2a3a6a', collar: 'ermine', aura: 'holy', crest: 'wings', wingColor: '#ffffff', chest: 'star', emblemColor: '#7fd3ff' }, glow: '#bfe8ff',
+      w: { melee: { id: 'hvezda', blade: '#f4f8ff', dark: '#9fb4d0', glow: '#bfe8ff', guard: '#7fd3ff', gem: '#ffe28a', grip: '#2a3a6a' }, pole: { id: 'hvezdne', blade: '#f4f8ff', dark: '#9fb4d0', glow: '#bfe8ff', wood: '#2a3a6a', guard: '#7fd3ff', gem: '#ffe28a' }, bow: { id: 'hvezdny', wood: '#2a3a6a', string: '#cfd8ff', glow: '#bfd0ff', gem: '#ffe28a', arrow: '#cfd8ff', tip: '#ffe28a' }, staff: { id: 'krystal', glow: '#bfe8ff' } } },
+    { id: 'pan', at: 1000, rar: 'Božský', cs: 'Pán věže', en: 'Tower Lord', d: ['Zbroj samotného Pána věže. Rudé zlato a křídla z temnoty.', 'The armor of the Tower Lord himself. Crimson gold and wings of darkness.'],
+      pal: { tunic: '#3a0a0e', tunicDark: '#1a0406', trim: '#ffd24a', metal: '#c9962a', metalDark: '#5a3a0a', cape: '#5a0a14', plume: '#ff3a3a', eyes: '#ff3a3a', hood: '#3a0a0e', hat: '#3a0a0e', robe: '#3a0a0e', fur: '#c9962a', lace: '#ffd24a', mask: '#c9962a', sashi: '#3a0a0e', mon: '#ffd24a', bear: '#3a0a0e', hair: '#1a0406' },
+      feat: { wings: 'fallen', aura: 'fallen', pauldron: 'gold', gem: '#ff2a2a', chest: 'sun', emblemColor: '#ffd24a', cape: 'ermine', capeColor: '#5a0a14', collar: 'ermine', crest: 'wings', wingColor: '#3a0a0e' }, glow: '#ff3a3a',
+      w: { melee: { id: 'bozi', blade: '#ffd24a', dark: '#5a3a0a', edge: '#ffffff', glow: '#ff3a3a', guard: '#3a0a0e', pommel: '#ffd24a', gem: '#ff2a2a', grip: '#1a0406' }, pole: { id: 'bozi', blade: '#ffd24a', dark: '#5a3a0a', edge: '#ffffff', glow: '#ff3a3a', wood: '#1a0406', guard: '#3a0a0e', gem: '#ff2a2a' }, bow: { id: 'bozi', wood: '#c9962a', string: '#ff3a3a', glow: '#ff3a3a', gem: '#ff2a2a', arrow: '#ffd24a', tip: '#ff3a3a' }, staff: { id: 'bozi', glow: '#ff3a3a' } } }
+  ];
+  const CAT_PFX = { melee: 'w', pole: 'k', bow: 'l', staff: 'h' };
+  const CAT_N = { melee: ['meč', 'Sword'], pole: ['kopí', 'Spear'], bow: ['luk', 'Bow'], staff: ['hůl', 'Staff'] };
+  SETS.forEach(S0 => {
+    const B0 = RB[S0.rar];
+    G.unitSkins.push({ id: 'vz_' + S0.id, only: null, name: S0.cs, rarity: S0.rar, palette: S0.pal, feat: S0.feat, desc: S0.d[0] + ' Jen z věže.', en: { name: S0.en, desc: S0.d[1] + ' Tower only.' },
+      codeOnly: true, tower: true, glow: S0.glow || undefined, bonus: Object.assign({}, B0[0]), cost: {}, ornament: S0.rar === 'Božský' ? 'crown' : undefined });
+    S0.weapons = [];
+    Object.keys(S0.w).forEach(cat => {
+      const id = CAT_PFX[cat] + '_vz_' + S0.id;
+      S0.weapons.push(id);
+      G.weaponSkins.push({ id, name: S0.cs + ' – ' + CAT_N[cat][0], rarity: S0.rar, cat, model: Object.assign({ cat }, S0.w[cat]), desc: S0.d[0] + ' Jen z věže.', en: { name: S0.en + ' ' + CAT_N[cat][1], desc: S0.d[1] + ' Tower only.' },
+        codeOnly: true, tower: true, bonus: Object.assign({}, B0[1]), cost: {} });
+    });
+  });
+  const ROLES = ['pech', 'strelec', 'kopi', 'tezka', 'jizda', 'mag', 'velitel'];
+  const setGift = id => { const S0 = SETS.find(x => x.id === id); return ROLES.map(role => ({ role, a: 'vz_' + id, ws: S0.weapons })); };
+  G.towerSets = SETS;
+  G.towerSetGift = setGift;
+  G.towerSetOwned = (save, id) => { const O = G.skinOwn; if (!O) return false; O.ensure(save); return O.units().every(u => O.has(save, u, 'vz_' + id)); };
+
   /* ---------------- PATRO ---------------- */
   const cache = {};
   function floor(n) {
@@ -132,8 +181,8 @@ window.GameData = window.GameData || {};
     const persona = major ? major.persona : pick(r, personaIds);
     // inteligence roste plynule, síla jen mírně
     const skill = Math.min(0.98, 0.12 + 0.86 * (1 - Math.exp(-n / 330)) + (major ? 0.06 : 0));
-    const diff = 0.6 + 1.85 * (1 - Math.exp(-n / 260)) + (n > 1000 ? Math.min(0.5, (n - 1000) / 2000) : 0) + (major ? 0.08 : 0);
-    const power = Math.min(1.6, 0.25 + n / 400 + (major ? 0.35 : 0));
+    const diff = (0.6 + 1.85 * (1 - Math.exp(-n / 260)) + (n > 1000 ? Math.min(0.5, (n - 1000) / 2000) : 0) + (major ? 0.08 : 0)) * 1.15;   // věž o 15 % těžší
+    const power = Math.min(1.85, (0.25 + n / 400 + (major ? 0.35 : 0)) * 1.15);
     // podmínky: 0–2 podle patra (každých 10 pater aspoň jedna)
     const avail = MOD_IDS.filter(id => n >= MODS[id].from);
     const nMods = n < 3 ? 0 : (n % 10 === 0 ? 2 : r() < Math.min(0.85, 0.3 + n / 300) ? (r() < n / 800 ? 2 : 1) : 0);
@@ -148,12 +197,17 @@ window.GameData = window.GameData || {};
     const banners = ['#a8262a', '#6b3fa0', '#2e7d4a', '#2a2a33', '#c9962a', '#2b8a8f', '#d2691e'];
     const big = mods.includes('pevnost') || (major && n >= 100);
     // obránci na hradbách podle síly patra
-    const st = Math.min(1, n / 500);
+    const st = Math.min(1.15, n / 500 * 1.15);
     // odměny
-    const gold = Math.round((180 + n * 22 + (major ? 1500 : 0)) / 10) * 10;
-    const gems = (n % 5 === 0 ? 10 + Math.floor(n / 10) : 0) + (major ? 100 + Math.floor(n / 5) : 0);
-    const reward = { gold: Math.min(60000, gold), gems };
-    if (n % 50 === 0) reward.random = { odds: n >= 300 ? [0, 0, 0.4, 0.6] : [0, 0.2, 0.6, 0.2], count: n >= 500 ? 2 : 1 };
+    // ODMĚNY: zlato a drahokamy za každé patro, truhly se skiny, věžové sady
+    const gold = Math.round((300 + n * 30 + (major ? 2500 : 0)) / 10) * 10;
+    const gems = 5 + Math.floor(n / 25) + (n % 5 === 0 ? 20 + Math.floor(n / 8) : 0) + (major ? 150 + Math.floor(n / 4) : 0);
+    const reward = { gold: Math.min(90000, gold), gems };
+    if (n % 10 === 0) reward.random = { odds: n >= 300 ? [0, 0, 0.35, 0.65] : n >= 100 ? [0, 0, 0.6, 0.4] : [0, 0.25, 0.6, 0.15], count: n % 50 === 0 ? 3 : n % 25 === 0 ? 2 : 1 };
+    else if (n % 5 === 0) reward.random = { odds: n >= 150 ? [0, 0, 0.7, 0.3] : [0, 0.4, 0.5, 0.1], count: n % 25 === 0 ? 2 : 1 };
+    if (n % 25 === 0) reward.gold = Math.min(120000, reward.gold * 2);
+    const setHere = SETS.find(x => x.at === n);
+    if (setHere) reward.set = setHere.id;
     if (n === 1000) reward.gems += 20000;
     const lines = major ? { intro: L(major.story[0], major.story[1]) } : null;
     const f = {
