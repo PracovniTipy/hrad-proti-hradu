@@ -974,6 +974,8 @@ body.paid-off article:has([data-offer], [data-gempack], [data-skinczk], [data-wc
 .onl-card h3 { margin: 0 0 4px; }
 .onl-card p { margin: 0; font-size: 14px; }
 .onl-card .btn { margin-top: auto; width: 100%; }
+.onl-card-btns { margin-top: auto; width: 100%; display: grid; gap: 8px; }
+.onl-card-btns .btn { margin-top: 0; }
 .onl-ic { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: #2a2210; color: var(--gold-hi, #ffd77a); }
 .onl-ic svg { width: 28px; height: 28px; }
 .onl-join h3 { margin: 0 0 10px; }

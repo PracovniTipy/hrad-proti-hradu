@@ -49,8 +49,19 @@
     credits_cries: ['Válečné pokřiky:', 'War cries:'],
     retreat_hint: ['Ústup: vojáci se schovají za hradby, léčí se a nedosáhnou na ně speciální útoky ani nepřátelé.', 'Retreat: troops hide behind the walls, heal up, and special attacks and enemies cannot reach them.'],
     onl_btn: ['Online s přáteli', 'Online with friends'],
-    onl_btn_d: ['1 v 1, 2 v 2 nebo příběh ve dvou', '1 v 1, 2 v 2 or story co-op']
+    onl_btn_d: ['1 v 1, 2 v 2 nebo příběh ve dvou', '1 v 1, 2 v 2 or story co-op'],
+    onl_quick: ['Najít soupeře', 'Find opponent'],
+    onl_qm_title: ['Hledám soupeře…', 'Looking for an opponent…'],
+    onl_qm_left: ['Když do {n} s nikdo nepřijde, zahraješ si proti počítači.', 'If nobody shows up within {n} s, you will play against the computer.'],
+    onl_qm_found: ['Soupeř nalezen ({n}/{m}) – bitva brzy začne…', 'Opponent found ({n}/{m}) – the battle starts soon…'],
+    onl_qm_duo: ['Když do {n} s nepřijdou další hráči, utkáte se 1 v 1.', 'If no more players join within {n} s, you play 1 v 1.'],
+    onl_qm_joining: ['Připojuji se k soupeři…', 'Joining the opponent…'],
+    onl_ai_fallback: ['Soupeř nenalezen – bojuješ proti počítači', 'No opponent found – you\'re fighting the computer'],
+    onl_ai_note: ['Bitva proti počítači: trofeje ani žebříček se nemění, dostáváš zlato.', 'Battle against the computer: trophies and the leaderboard do not change, you get gold.'],
+    onl_ai_name: ['Počítač', 'Computer'],
+    onl_qm_rules: ['Najít soupeře: hra hledá náhodného hráče online. Když do 10 s nikoho nenajde, hraješ proti počítači – bez trofejí, za zlato.', 'Find opponent: the game looks for a random online player. If nobody is found within 10 s, you play against the computer – no trophies, gold only.']
   });
+  let qmTick = null;   // odpočet na obrazovce hledání
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const CAP = { '1v1': 2, '2v2': 4, coop: 2 };
@@ -61,8 +72,9 @@
       <article class="panel onl-card">
         <div class="onl-ic">${ico(icon)}</div>
         <div><h3>${t('onl_' + m)}</h3><p class="muted">${t('onl_' + m + '_d')}</p></div>
-        <button class="btn btn-gold" data-create="${m}">${t('onl_create')}</button>
+        <div class="onl-card-btns">${m !== 'coop' ? `<button class="btn btn-green" data-quick="${m}">${t('onl_quick')}</button>` : ''}<button class="btn btn-gold" data-create="${m}">${t('onl_create')}</button></div>
       </article>`;
+    clearInterval(qmTick);
 
     if (!r) {
       el.innerHTML = `
@@ -75,7 +87,9 @@
             <div class="onl-join-row"><input id="onlCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${t('onl_code_ph')}"><button class="btn btn-green" id="onlJoin">${t('onl_join_btn')}</button></div>
           </article>
           <p class="muted onl-rules">${t('onl_rules')}</p>
+          <p class="muted onl-rules">${t('onl_qm_rules')}</p>
         </div>`;
+      el.querySelectorAll('[data-quick]').forEach(b => b.addEventListener('click', () => O.quick(b.dataset.quick)));
       el.querySelectorAll('[data-create]').forEach(b => b.addEventListener('click', () => {
         const m = b.dataset.create;
         if (m === 'coop' && !O.coopLevels().length) return App.toast(t('t_prev_first'));
@@ -86,6 +100,25 @@
       const doJoin = () => { if (!O.join(inp.value)) App.toast(t('onl_not_found')); };
       el.querySelector('#onlJoin').addEventListener('click', doJoin);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') doJoin(); });
+      return;
+    }
+
+    // rychlý souboj: hledání soupeře s odpočtem do bitvy proti počítači
+    if (r.quick) {
+      const left = () => Math.max(0, Math.ceil((r.qmUntil - Date.now()) / 1000));
+      // odpočet ukazuje jen hostitel (rozhoduje on); když už má soupeře ve 2 v 2, čeká se na další dva
+      const cdKey = !r.host || r.joining ? '' : r.players.length > 1 ? 'onl_qm_duo' : 'onl_qm_left';
+      const sub = r.joining ? t('onl_qm_joining') : r.players.length > 1 ? t('onl_qm_found', { n: r.players.length, m: CAP[r.quick] }) : '';
+      el.innerHTML = `<div class="scr"><div class="panel onl-wait onl-qm"><div class="spin"></div>
+        <h3>${t('onl_qm_title')}</h3><div class="eyebrow">${t('onl_' + r.quick)}</div>
+        ${sub ? `<p>${sub}</p>` : ''}${cdKey ? `<p class="muted" id="onlQmLeft">${t(cdKey, { n: left() })}</p>` : ''}
+        <button class="btn" id="onlLeave">${t('back')}</button></div></div>`;
+      el.querySelector('#onlLeave').addEventListener('click', () => O.leave());
+      qmTick = setInterval(() => {
+        const x = el.querySelector('#onlQmLeft');
+        if (!x || O.room !== r) return clearInterval(qmTick);
+        x.textContent = t(cdKey, { n: left() });
+      }, 250);
       return;
     }
 

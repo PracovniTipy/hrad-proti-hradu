@@ -273,6 +273,24 @@
       }));
     },
 
+    /* Rychlý souboj online: soupeř se do 10 s nenašel → běžná bitva proti počítači
+       (stejná AI jako v Souboji proti botům). Trofeje ani žebříček se nemění. */
+    startOnlineAi(mode) {
+      const save = this.save, G = GameData;
+      const pf = G.campaignHelpers.factionUnlocked(save, save.faction) ? save.faction : 'kralovstvi';
+      const foes = G.factionOrder.filter(f => G.factions[f] && G.factions[f].roles && f !== 'spojenectvi');
+      const ef = foes[Math.floor(Math.random() * foes.length)] || 'kralovstvi';
+      const diff = G.pvpHelpers.basePower({ trophies: save.trophies || 0 });
+      const lvl = Math.max(1, Math.min(14, G.calc.castleLevel(save)));
+      this.toast(t('onl_ai_fallback'));
+      this.startBattle({ playFaction: pf,
+        mode: 'online_ai', online: mode, title: `${save.name} × ${t('onl_ai_name')}`, difficulty: diff,
+        enemyUnits: G.factionUnits(ef), enemyName: t('onl_ai_name'),
+        enemyFaction: ef, theme: G.factions[ef].theme,
+        enemyCastleSkin: 'kralovsky', enemyUnitSkin: 'zakladni', enemyCastleLevel: lvl
+      });
+    },
+
     /* ---------------- BITVA ---------------- */
     startBattle(cfg) {
       const save = this.save;
@@ -289,7 +307,8 @@
       $('#foeName').textContent = cfg.enemyName || t('enemy');
       $('#bBanner').innerHTML = cfg.mode === 'pvp'
         ? `<span class="tag tag-demo">${t('bot')}</span>${esc(cfg.title)} · ${t('diff_' + cfg.attackIndex)}`
-        : cfg.mode === 'online' ? `<span class="tag tag-online">ONLINE</span>${esc(cfg.title || '')}` : esc(cfg.title);
+        : cfg.mode === 'online' ? `<span class="tag tag-online">ONLINE</span>${esc(cfg.title || '')}`
+        : cfg.mode === 'online_ai' ? `<span class="tag tag-demo">${t('bot')}</span>${t('onl_ai_fallback')}` : esc(cfg.title);
       B.classList.toggle('net', !!cfg.net);
       $('#bWait').hidden = true;
       $('#bPauseMenu').hidden = true;
@@ -604,6 +623,11 @@
           save.trophies = Math.max(0, save.trophies - tl); save.gold += 50; save.stats.pvpLosses++;
           rewards.push(`<span class="pill">${ico('trophy')} −${tl}</span>`, `<span class="pill">${ico('coin')} +50</span>`);
         }
+      } else if (cfg.mode === 'online_ai') {
+        // počítač místo živého hráče: odměna jen zlato, žádné trofeje ani PvP výhry (žebříček zůstává poctivý)
+        const g = res.win ? 150 : 30;
+        save.gold += g; rewards.push(`<span class="pill">${ico('coin')} +${g}</span>`);
+        note = t('onl_ai_note');
       } else {
         if (res.win) { save.gold += 100; rewards.push(`<span class="pill">${ico('coin')} +100</span>`); }
         note = t('note_training');
@@ -625,7 +649,7 @@
           ${ids.slice(0, 7).map(id => `<tr><td>${esc(GameData.units[id].name)}</td><td>${ST.sent[id] || 0}</td><td>${fmt(ST.dmg[id] || 0)}</td><td>${ST.kills[id] || 0}</td></tr>`).join('')}</table>
         </div>` : '';
       const reason = res.reason === 'cas' ? t('r_time') : res.reason === 'spojeni' ? t('onl_conn_lost') : res.reason === 'odpojeni' ? t('onl_foe_left') : res.reason === 'vzdal' ? t('onl_you_quit') : (res.win ? t('r_enemy') : t('r_you'));
-      const back = cfg.net ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       this.modal(`
         <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
         ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
@@ -816,6 +840,7 @@
         Online.on('lobby', () => { if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
         Online.on('error', k => { this.toast(t(k)); if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
         Online.on('start', bc => { $('#modal').hidden = true; this.startBattle(bc); });
+        Online.on('ai', d => { if (this.battle) return; $('#modal').hidden = true; this.startOnlineAi(d.mode); });
         Online.on('wait', on => { const w = $('#bWait'); if (w && w.hidden === !!on) w.hidden = !on; });
       }
       const start = location.hash.slice(1);

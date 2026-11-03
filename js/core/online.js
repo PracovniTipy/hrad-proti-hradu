@@ -14,6 +14,7 @@
   const SNAP = 0.125;          // jak často hostitel posílá stav (s)
   const CAP = { '1v1': 2, '2v2': 4, coop: 2 };
   const PER_TEAM = { '1v1': 1, '2v2': 2, coop: 2 };
+  const QM_WAIT = 10000;       // rychlý souboj: jak dlouho hledat živého soupeře, pak počítač (ms)
   const R = (v) => Math.round(v);
 
   /* ---------- kanál (Phoenix protokol Supabase Realtime) ---------- */
@@ -103,19 +104,20 @@
       return code;
     },
 
-    /* připojení kódem */
-    join(code) {
+    /* připojení kódem (quick = { mode, until } u rychlého souboje) */
+    join(code, quick) {
       this.leave();
       code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (code.length !== 4) return false;
       const save = App.save, fac = this._defFac();
       const room = this.room = { code, host: false, mode: null, level: null, players: [], ch: new Kanal('cw-' + code), joining: true, fac };
+      if (quick) { room.quick = quick.mode; room.qmUntil = quick.until; }
       this._wire();
       const hi = () => { if (this.room === room) room.ch.send('hi', { pid: this.pid, name: save.name, tro: save.trophies || 0, fac: room.fac, prep: prepOf(save, room.fac) }); };
       room.ch.on('_open', hi);
       this._hiTimer = setInterval(() => { if (this.room !== room) return clearInterval(this._hiTimer); if (room.joining) hi(); else room.ch.send('png', { p: this.pid }); this._hostSilent(); }, 2000);
       clearTimeout(this._joinTo);
-      this._joinTo = setTimeout(() => { if (this.room === room && room.joining) { this.leave(); this._fire('error', 'onl_not_found'); } }, 9000);
+      this._joinTo = setTimeout(() => { if (this.room === room && room.joining) this._err(room, 'onl_not_found'); }, quick ? Math.max(4000, quick.until - Date.now()) : 9000);
       this._fire('lobby');
       return true;
     },
@@ -123,6 +125,7 @@
     leave() {
       const r = this.room;
       clearInterval(this._lobbyTimer); clearInterval(this._hiTimer); clearTimeout(this._joinTo);
+      this._mmStop();
       if (!r) return;
       try { r.ch.send('bye', { pid: this.pid }); } catch (_) { /* nic */ }
       const ch = r.ch;
@@ -159,6 +162,64 @@
       if (r.mode === 'coop') return !!r.level;
       const a = r.players.filter(p => p.team === 'A').length;
       return a === PER_TEAM[r.mode] && r.players.length - a === PER_TEAM[r.mode];
+    },
+
+    /* ---------- RYCHLÝ SOUBOJ: hledání náhodného soupeře ----------
+       Každý hledající si založí vlastní místnost a ve veřejném kanálu „cw-mm-<režim>“
+       hlásí její kód. Kdo má menší pid (a je sám), přidá se k místnosti toho druhého.
+       Když do 10 s nikdo nepřijde (nebo není spojení), hraje se proti počítači.
+       Fronta na serveru není – kanál jen přeposílá zprávy, takže po odchodu
+       (phx_leave + zavření spojení) po hledajícím nic nezůstane. */
+    quick(mode, until) {
+      if (mode !== '1v1' && mode !== '2v2') return;
+      until = until || Date.now() + QM_WAIT;
+      const code = this.create(mode);
+      const r = this.room;
+      r.quick = mode; r.qmUntil = until;
+      const mm = this._mm = new Kanal('cw-mm-' + mode);
+      const seek = () => { if (this.room === r && !r.inBattle) mm.send('seek', { pid: this.pid, code, n: r.players.length }); };
+      mm.on('_open', seek);
+      this._mmTimer = setInterval(seek, 1500);
+      mm.on('seek', d => {
+        if (!d || !d.pid || d.pid === this.pid || typeof d.code !== 'string' || this.room !== r || r.inBattle) return;
+        if (r.players.length > 1 || (d.n | 0) >= CAP[mode]) return;          // už mám spoluhráče / jeho místnost je plná
+        if ((d.n | 0) > 1 || d.pid > this.pid) this.join(d.code, { mode, until });   // přidám se k němu
+      });
+      clearTimeout(this._qmTo);
+      this._qmTo = setTimeout(() => this._qmTimeout(r), Math.max(0, until - Date.now()));
+      this._fire('lobby');
+      return code;
+    },
+    _mmStop() {
+      clearInterval(this._mmTimer); clearTimeout(this._qmTo);
+      const mm = this._mm; this._mm = null;
+      if (mm) { mm.h = {}; mm.close(); }
+    },
+    /* hostitel rychlého souboje: jakmile je místnost plná, bitva začne sama */
+    _qmCheck() {
+      const r = this.room;
+      if (r && r.quick && r.host && !r.inBattle && this.ready()) { this._mmStop(); this.start(); }
+    },
+    _qmTimeout(r) {
+      if (this.room !== r || r.inBattle) return;
+      if (!r.host) return;                       // čekám na hostitele – rozhodne on
+      if (r.players.length < 2) return this._qmAi(r.quick);
+      // 2 v 2 bez plné sestavy: dva živí hráči se utkají 1 v 1, třetí (pokud je) hraje proti počítači
+      r.players = r.players.slice(0, 2);
+      r.mode = '1v1'; this._rebalance(); this._bcastLobby();
+      this._mmStop(); this.start();
+    },
+    /* soupeř nenalezen → bitva proti počítači (main.js) */
+    _qmAi(mode) {
+      this.leave();
+      this._fire('ai', { mode: mode || '1v1' });
+    },
+    /* chyba v místnosti: u rychlého souboje se zkusí hledat dál, po limitu počítač */
+    _err(r, key) {
+      const q = r && r.quick && !r.inBattle ? { mode: r.quick, until: r.qmUntil } : null;
+      this.leave();
+      if (!q) return this._fire('error', key);
+      if (Date.now() < q.until - 1500) this.quick(q.mode, q.until); else this._qmAi(q.mode);
     },
 
     _defFac() {
@@ -206,12 +267,12 @@
     },
     _hostSilent() {
       const r = this.room; if (!r || r.host || r.joining || r.inBattle) return;
-      if (Date.now() - (r.hostSeen || Date.now()) > 12000) { this.leave(); this._fire('error', 'onl_host_left'); }
+      if (Date.now() - (r.hostSeen || Date.now()) > 12000) this._err(r, 'onl_host_left');
     },
 
     _wire() {
       const r = this.room, ch = r.ch;
-      ch.on('_fail', () => { if (this.room === r) { this.leave(); this._fire('error', 'onl_no_conn'); } });
+      ch.on('_fail', () => { if (this.room === r) this._err(r, 'onl_no_conn'); });
       if (r.host) {
         ch.on('hi', d => {
           if (!d || !d.pid) return;
@@ -227,6 +288,7 @@
           if (d.prep) r.preps[d.pid] = d.prep;
           if (d.fac) p.fac = d.fac;
           this._bcastLobby(); this._fire('lobby');
+          this._qmCheck();
         });
         ch.on('set', d => {
           const p = d && r.players.find(x => x.pid === d.pid); if (!p) return;
@@ -246,15 +308,15 @@
         ch.on('lob', d => {
           if (!d) return;
           r.hostSeen = Date.now();
-          if (!d.players.some(p => p.pid === this.pid)) { if (!r.joining) { this.leave(); this._fire('error', 'onl_kicked'); } return; }
+          if (!d.players.some(p => p.pid === this.pid)) { if (!r.joining) this._err(r, 'onl_kicked'); return; }
           r.joining = false; clearTimeout(this._joinTo);
           r.mode = d.mode; r.level = d.level; r.players = d.players;
           this._fire('lobby');
         });
-        ch.on('full', d => { if (d && d.pid === this.pid && r.joining) { this.leave(); this._fire('error', 'onl_full'); } });
+        ch.on('full', d => { if (d && d.pid === this.pid && r.joining) this._err(r, 'onl_full'); });
         ch.on('bye', d => {
           const hp = r.players.find(p => p.host);
-          if (d && hp && d.pid === hp.pid && !r.net) { this.leave(); this._fire('error', 'onl_host_left'); }
+          if (d && hp && d.pid === hp.pid && !r.net) this._err(r, 'onl_host_left');
         });
         ch.on('go', d => { r.hostSeen = Date.now(); if (d && d.teams && (d.teams.A.includes(this.pid) || d.teams.B.includes(this.pid))) this._begin(d); });
         ch.on('st', d => { r.hostSeen = Date.now(); if (r.net) r.net.onState(d); });
@@ -305,6 +367,8 @@
       const r = this.room;
       if (!r || r.inBattle) return;
       r.inBattle = true;
+      r.joining = false; r.quick = null; clearTimeout(this._joinTo);   // po bitvě je to obyčejná místnost (odveta)
+      this._mmStop();
       const me = this.pid;
       const myTeam = go.teams.A.includes(me) ? 'A' : 'B';
       const other = myTeam === 'A' ? 'B' : 'A';
