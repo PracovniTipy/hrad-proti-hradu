@@ -314,7 +314,7 @@
       else y = o.dy < 0 ? top + img.h * 0.55 + o.dy * img.h * 0.8 : o.dy > 0 ? top - 30 + o.dy * (img.h + 20) : top + ((i * 53) % 100) / 100 * img.h * 0.8;
       if (o.sway) x += Math.sin(now * 1.3 + i) * o.sway;
       ctx.save();
-      if (o.glow) { ctx.shadowColor = o.c; ctx.shadowBlur = 6; }
+      if (o.glow) { ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.arc(x, y, o.s * 3, 0, TAU); ctx.fillStyle = o.c; ctx.fill(); ctx.globalAlpha = 1; }
       ctx.fillStyle = o.c;
       if (o.star) star4(ctx, x, y, o.s, o.c);
       else if (o.rect) { ctx.translate(x, y); ctx.rotate(i + now); ctx.fillRect(-o.s, -o.s * 0.35, o.s * 2, o.s * 0.7); }

@@ -221,7 +221,9 @@
       ctx.restore();
     }
   }
-  function chained(ctx, P, t, heat, fire) {
+  function chained(ctx, P, t, heat, fire, part) {
+    const stake = [-128, -4];
+    if (part !== 'dyn') {
     // spálená zem, kosti a kolík v zemi
     ctx.beginPath(); ctx.ellipse(10, 2, 150, 16, 0, 0, TAU); ctx.fillStyle = 'rgba(40,24,16,.35)'; ctx.fill();
     ctx.beginPath(); ctx.ellipse(10, 2, 105, 10, 0, 0, TAU); ctx.fillStyle = 'rgba(20,12,8,.35)'; ctx.fill();
@@ -229,7 +231,6 @@
     bone(120, 2, 0.3, 22); bone(-118, 4, -0.5, 18); bone(140, 6, -1.2, 14);
     ctx.save(); ctx.translate(150, 4); ctx.beginPath(); ctx.arc(0, -6, 9, Math.PI, 0); ctx.lineTo(9, 0); ctx.lineTo(-9, 0); ctx.closePath(); fs(ctx, '#e8dcbc', 1.2);
     ctx.beginPath(); ctx.arc(-3.5, -6, 2.2, 0, TAU); ctx.arc(3.5, -6, 2.2, 0, TAU); ctx.fillStyle = '#2a1a10'; ctx.fill(); ctx.restore();
-    const stake = [-128, -4];
     ctx.beginPath(); ctx.moveTo(stake[0] - 6, 4); ctx.lineTo(stake[0] - 4, -22); ctx.lineTo(stake[0] + 4, -22); ctx.lineTo(stake[0] + 6, 4); ctx.closePath(); fs(ctx, '#4a4e56', 1.8);
     ctx.beginPath(); ctx.rect(stake[0] - 8, -26, 16, 6); fs(ctx, '#6a6f78', 1.6);
     ctx.beginPath(); ctx.arc(stake[0], -30, 6, 0, TAU); ctx.lineWidth = 4.5; ctx.strokeStyle = OUT; ctx.stroke(); ctx.lineWidth = 2.6; ctx.strokeStyle = '#8a8f98'; ctx.stroke();
@@ -237,8 +238,6 @@
     ctx.save(); ctx.translate(14, -96); wing(ctx, 0.2, -1.2 + Math.sin(t * 0.6) * 0.04, true, heat); ctx.restore();
     // tělo s ocasem a zadní tlapou (sedí na zemi)
     ctx.save(); ctx.translate(0, -70); body(ctx, t, heat, 0); ctx.restore();
-    // blízké složené křídlo přitisknuté k boku (při chrlení se lehce pootevře)
-    ctx.save(); ctx.translate(-4, -98); wing(ctx, 0.18 + heat * 0.25, -1.5 + heat * 0.5 + Math.sin(t * 0.6) * 0.04, false, heat); ctx.restore();
     // pouto na zadní noze a řetěz ke kolíku
     ctx.beginPath(); ctx.rect(-22, -18, 22, 7); fs(ctx, '#6a6f78', 1.6);
     for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.arc(-18 + k * 7, -14.5, 1.3, 0, TAU); ctx.fillStyle = '#c8ccd2'; ctx.fill(); }
@@ -248,6 +247,10 @@
     ctx.beginPath(); ctx.moveTo(-10, -14); ctx.quadraticCurveTo(-12, 14, -4, 34); ctx.lineTo(14, 36); ctx.quadraticCurveTo(10, 10, 12, -14); ctx.closePath(); fs(ctx, C.sc2, 1.8);
     for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(-2 + k * 5, 34); ctx.quadraticCurveTo(4 + k * 5, 38, 2 + k * 5, 42); ctx.lineTo(4 + k * 5, 34); ctx.closePath(); fs(ctx, C.horn, 0.9); }
     ctx.restore();
+    if (part === 'static') return;
+    }
+    // blízké složené křídlo přitisknuté k boku (při chrlení se lehce pootevře)
+    ctx.save(); ctx.translate(-4, -98); wing(ctx, 0.18 + heat * 0.25, -1.5 + heat * 0.5 + Math.sin(t * 0.6) * 0.04, false, heat); ctx.restore();
     // krk od ramen k hlavě
     const base = [38, -78], H = [P.hx - 4, P.hy + 6];
     const neck = bez(base, [62, -96 - heat * 6], [H[0] - 30, H[1] + 14], H, 12);
@@ -283,7 +286,16 @@
     const g = ctx.createRadialGradient(60, -80, 10, 60, -80, 170);
     g.addColorStop(0, `rgba(255,90,30,${0.06 + heat * 0.22})`); g.addColorStop(1, 'rgba(255,60,20,0)');
     ctx.fillStyle = g; ctx.fillRect(-120, -250, 360, 280);
-    chained(ctx, P, tt, heat, fire);
+    // nehybné tělo se kreslí jen jednou do obrázku (plynulost), živý je jen krk, hlava a křídlo
+    if (!img._dragStatic) {
+      const R = 2.2, X0 = -240, Y0 = -280, W = 450, H = 320, cv = document.createElement('canvas');
+      cv.width = Math.round(W * R * P.S); cv.height = Math.round(H * R * P.S);
+      const c2 = cv.getContext('2d'); c2.scale(R * P.S, R * P.S); c2.translate(-X0, -Y0);
+      chained(c2, P, 0, 0, false, 'static');
+      img._dragStatic = { cv, X0, Y0, W, H };
+    }
+    const DS = img._dragStatic; ctx.drawImage(DS.cv, DS.X0, DS.Y0, DS.W, DS.H);
+    chained(ctx, P, tt, heat, fire, 'dyn');
     ctx.restore();
     for (let i = 0; i < 8; i++) {
       const ph = (tt * (0.22 + (i % 4) * 0.05) + i * 0.137) % 1, ex = P.x + facing * P.S * (-60 + ((i * 53) % 180)) + Math.sin(tt * 2 + i) * 4, ey = P.y - 60 * P.S - ph * 120 * P.S;

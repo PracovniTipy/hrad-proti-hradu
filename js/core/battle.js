@@ -143,12 +143,26 @@
       this.theme = opts.theme || 'evropa';
       const dprRes = Math.min(window.devicePixelRatio || 1, 2) > 1.5 ? 1.5 : 1.15;
       this.layers = Art.makeLayers(this.W, this.H, opts.seed || 11, this.theme, dprRes);
+      // obří pozadí rozřežeme na dlaždice: grafické karty neumí textury širší než ~4–8 tisíc px
+      // (jinak Chrome kreslí pozadí každý snímek procesorem a hra se seká)
+      this._tiles = {};
+      ['far', 'near'].forEach(k => {
+        const src = this.layers[k]; if (!src || !src.width) return;
+        const TW = 1024, tiles = [];
+        for (let x = 0; x < src.width; x += TW) {
+          const w = Math.min(TW, src.width - x), cv = document.createElement('canvas'); cv.width = w; cv.height = src.height;
+          cv.getContext('2d').drawImage(src, x, 0, w, src.height, 0, 0, w, src.height);
+          tiles.push({ cv, x, w });
+        }
+        this._tiles[k] = { tiles, k: this.W / src.width, kh: this.H / src.height };
+        this.layers[k] = null;
+      });
       // ambientní částice (sakura, sníh)
       this.ambient = [];
       const amb = (window.ArtThemes && ArtThemes.ambient || {})[this.theme];
       if (amb) for (let i = 0; i < amb.count; i++) this.ambient.push(this._ambientP(amb, true));
 
-      this.sprites = new SpriteCache(300);
+      this.sprites = new SpriteCache(700);
       // kamera
       this.cam = { x: 0, scale: 1, manualUntil: 0, viewW: this.W };
       this._bindInput();
@@ -240,7 +254,9 @@
     resize() {
       const r = this.canvas.parentElement.getBoundingClientRect();
       const cw = Math.max(50, r.width), ch = Math.max(50, r.height);
-      this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // automatická kvalita: na slabším zařízení se sníží rozlišení plátna, aby hra běžela plynule
+      if (this._q == null) { try { this._q = +localStorage.getItem('cw-q') || 1; } catch (e) { this._q = 1; } }
+      this.dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 2) * this._q);
       this.canvas.width = Math.round(cw * this.dpr);
       this.canvas.height = Math.round(ch * this.dpr);
       this.canvas.style.width = cw + 'px';
@@ -262,7 +278,7 @@
       this.cw = cw; this.ch = ch;
       this.cam.x = this._clampCam(this.cam.x);
       this.panEnabled = this.cam.viewW < this.W - 1;
-      if (this.sprites) this.sprites.setRes(scale * this.dpr);
+      if (this.sprites) { const r0 = this.sprites.r; this.sprites.setRes(scale * this.dpr); if (this.sprites.r !== r0) this._warm = null; }
     }
 
     /* ---------------- akce hráče ---------------- */
@@ -745,10 +761,27 @@
       window.removeEventListener('resize', this._onResize);
     }
 
+    /* hlídání plynulosti: když snímky trvají dlouho, sníží se rozlišení (a zase zvýší, když je rezerva) */
+    _perf(raw) {
+      if (!(raw > 0 && raw < 250) || document.hidden) return;
+      const P = this._pf || (this._pf = { n: 0, sum: 0, slow: 0, good: 0 });
+      P.n++; P.sum += raw; if (raw > 26) P.slow++;
+      if (P.n < 90) return;
+      const avg = P.sum / P.n, slowShare = P.slow / P.n;
+      P.n = P.sum = P.slow = 0;
+      let q = this._q || 1;
+      if ((avg > 20 || slowShare > 0.12) && q > 0.5) { q = Math.max(0.5, +(q - 0.15).toFixed(2)); P.good = 0; }
+      else if (avg < 12.5 && slowShare < 0.02 && q < 1) { if (++P.good >= 6) { q = Math.min(1, +(q + 0.1).toFixed(2)); P.good = 0; } }
+      else P.good = 0;
+      if (q !== this._q) { this._q = q; try { localStorage.setItem('cw-q', q); } catch (e) {} this.resize(); }
+    }
+
     /* ---------------- smyčka ---------------- */
     _loop(now) {
-      let dt = Math.min(0.05, (now - this._last) / 1000);
+      const raw = now - this._last;
+      let dt = Math.min(0.05, raw / 1000);
       this._last = now;
+      this._perf(raw);
       this._rt = (this._rt || 0) + dt;
       if (!this.paused && !this.over) {
         const steps = this.speed;
@@ -757,6 +790,7 @@
         this._updateFx(dt);
       }
       this.render();
+      this._warmStep();
       if (this.o.onUpdateHud) this.o.onUpdateHud(this);
       if (!this.destroyed) this.raf = requestAnimationFrame(this._loop);
     }
@@ -1667,6 +1701,16 @@
     }
 
     /* ---------------- vykreslení ---------------- */
+    _drawTiles(ctx, k, x0, vw) {
+      const L = this._tiles && this._tiles[k];
+      if (!L) { if (this.layers[k]) ctx.drawImage(this.layers[k], 0, 0, this.W, this.H); return; }
+      const a = x0 - 40, b = x0 + vw + 40;
+      for (const t of L.tiles) {
+        const dx = t.x * L.k, dw = t.w * L.k;
+        if (dx + dw < a || dx > b) continue;
+        ctx.drawImage(t.cv, dx, 0, dw + 0.6, this.H);   // +0.6 px proti švům mezi dlaždicemi
+      }
+    }
     render() {
       const ctx = this.ctx, cfg = C();
       const sc = this.cam.scale * this.dpr;
@@ -1677,11 +1721,11 @@
       // vzdálená vrstva se posouvá pomaleji (hloubka), mraky plují
       const par = this.cam.x * 0.45;
       ctx.setTransform(sc, 0, 0, sc, -(this.cam.x - par) * sc, -viewTop * sc);
-      ctx.drawImage(this.layers.far, 0, 0, this.W, this.H);
+      this._drawTiles(ctx, 'far', this.cam.x - par, this.cam.viewW);
       Art.drawClouds(ctx, this.layers.clouds, (this._rt || 0), this.W);
       const shk = this.shake > 0 ? (Math.random() - 0.5) * 14 * this.shake : 0;
       ctx.setTransform(sc, 0, 0, sc, (-this.cam.x + shk) * sc, (-viewTop + shk * 0.6) * sc);
-      ctx.drawImage(this.layers.near, 0, 0, this.W, this.H);
+      this._drawTiles(ctx, 'near', this.cam.x - shk, this.cam.viewW);
 
       const t = this.time;
       const P = this.side.player, E = this.side.enemy;
@@ -1907,6 +1951,7 @@
       else { frame = 'i'; st = {}; }
       const palKey = u.team + (u.pal.__k || (u.pal.__k = Math.random().toString(36).slice(2)));
       const e = this.sprites.get(u.drawDef || u.def, u.pal, palKey, frame, st, US());
+      this._warmQueue(u.drawDef || u.def, u.pal, palKey);
       const stunned = !u.dead && u.stunUntil > this.time;
       if (!u.dead && (u.slowUntil > this.time || stunned || (u.dot && this.time < u.dot.until))) {
         const icy = u.slowUntil > this.time || (stunned && u.frozen);
@@ -1926,6 +1971,21 @@
       ctx.translate(u.x, u.y); ctx.scale(sx, pop);
       ctx.drawImage(e.cv, e.bx0, e.by0, e.bw, e.bh);
       ctx.scale(1 / sx, 1 / pop); ctx.translate(-u.x, -u.y);
+    }
+
+    /* předkreslení všech snímků nového druhu vojáka po kouscích (žádné záseky, když se dá do útoku celá armáda) */
+    _warmQueue(def, pal, palKey) {
+      const W = this._warm || (this._warm = { seen: new Set(), q: [] }), k = def.id + '|' + palKey;
+      if (W.seen.has(k)) return; W.seen.add(k);
+      const F = [['i', {}], ['b', { block: true }]];
+      for (let q = 0; q < 10; q++) F.push(['w' + q, { moving: true, walk: q / 10 * Math.PI * 2 }], ['a' + q, { atk: (q + 0.5) / 10 }]);
+      for (let q = 0; q < 8; q++) F.push(['d' + q, { dead: (q + 0.5) / 8 * 1.2 }]);
+      F.forEach(([fr, st]) => W.q.push([def, pal, palKey, fr, st]));
+    }
+    _warmStep() {
+      const W = this._warm; if (!W || !W.q.length) return;
+      const t0 = performance.now();
+      while (W.q.length && performance.now() - t0 < 3) { const [d, p, k, fr, st] = W.q.shift(); this.sprites.get(d, p, k, fr, st, US()); }
     }
 
     _heroMarkBelow(ctx, u, t) {
