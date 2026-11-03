@@ -770,7 +770,9 @@
       const avg = P.sum / P.n, slowShare = P.slow / P.n;
       P.n = P.sum = P.slow = 0;
       let q = this._q || 1;
-      if ((avg > 20 || slowShare > 0.12) && q > 0.5) { q = Math.max(0.5, +(q - 0.15).toFixed(2)); P.good = 0; }
+      const crowdy = this.units.length > 600;
+      if ((avg > 20 || slowShare > 0.12) && crowdy && (this._drawCap || 900) > 250) { this._drawCap = Math.max(250, Math.round((this._drawCap || 900) * 0.75)); P.good = 0; }
+      else if ((avg > 20 || slowShare > 0.12) && q > 0.5) { q = Math.max(0.5, +(q - 0.15).toFixed(2)); P.good = 0; }
       else if (avg < 12.5 && slowShare < 0.02 && q < 1) { if (++P.good >= 6) { q = Math.min(1, +(q + 0.1).toFixed(2)); P.good = 0; } }
       else P.good = 0;
       if (q !== this._q) { this._q = q; try { localStorage.setItem('cw-q', q); } catch (e) {} this.resize(); }
@@ -793,6 +795,43 @@
       this._warmStep();
       if (this.o.onUpdateHud) this.o.onUpdateHud(this);
       if (!this.destroyed) this.raf = requestAnimationFrame(this._loop);
+    }
+
+    /* PROSTOROVÝ INDEX: živí vojáci každého týmu seřazení podle x.
+       Díky němu hledání cílů a plošné útoky nejsou O(n²) – hra zvládne tisíce vojáků. */
+    _buildIndex() {
+      const ix = this._ix || (this._ix = { player: { a: [], xs: new Float64Array(64) }, enemy: { a: [], xs: new Float64Array(64) } });
+      // pořadí z minula zůstává skoro seřazené → řazení je rychlé; noví vojáci se přidají na konec
+      const stamp = (this._ixStamp = (this._ixStamp || 0) + 1);
+      for (const k of ['player', 'enemy']) { const I = ix[k], keep = []; for (const u of I.a) if (!u.dead && u._ixs !== stamp && this.units.length) { u._ixs = stamp; keep.push(u); } I.a = keep; }
+      for (const u of this.units) { if (u.dead) continue; u._sh = this._sheltered(u); if (u._ixs !== stamp) { u._ixs = stamp; ix[u.team === 'player' ? 'player' : 'enemy'].a.push(u); } }
+      for (const k of ['player', 'enemy']) {
+        const I = ix[k]; I.a.sort((p, q) => p.x - q.x);
+        if (I.xs.length < I.a.length) I.xs = new Float64Array(Math.max(64, I.a.length * 2));
+        for (let i = 0; i < I.a.length; i++) I.xs[i] = I.a[i].x;
+      }
+    }
+    _lb(xs, n, x) { let lo = 0, hi = n; while (lo < hi) { const m = (lo + hi) >> 1; if (xs[m] < x) lo = m + 1; else hi = m; } return lo; }
+    /* živí vojáci týmu s x v intervalu [x0, x1] */
+    _range(team, x0, x1) {
+      const I = this._ix && this._ix[team];
+      if (!I) return this.units.filter(e => e.team === team && !e.dead && e.x >= x0 && e.x <= x1);
+      const n = I.a.length, out = [];
+      for (let i = this._lb(I.xs, n, x0 - 40); i < n && I.xs[i] <= x1 + 40; i++) { const e = I.a[i]; if (!e.dead && e.x >= x0 && e.x <= x1) out.push(e); }
+      return out;
+    }
+    /* nejbližší (podle x) voják týmu do vzdálenosti maxD, který projde testem */
+    _scan(team, x, maxD, test) {
+      const I = this._ix && this._ix[team]; if (!I) return null;
+      const xs = I.xs, a = I.a, n = a.length;
+      let hi = this._lb(xs, n, x), lo = hi - 1;
+      const lim = maxD + 40;
+      for (;;) {
+        const dl = lo >= 0 ? x - xs[lo] : Infinity, dr = hi < n ? xs[hi] - x : Infinity;
+        if (dl > lim && dr > lim) return null;
+        const e = dl <= dr ? a[lo--] : a[hi++];
+        if (!e.dead && Math.abs(e.x - x) <= maxD && test(e)) return e;
+      }
     }
 
     /* Herní logika – jeden krok simulace */
@@ -831,12 +870,24 @@
       this.vfx.update(dt);
       // hořící vojáci: plameny na těle
       this._burnT = (this._burnT || 0) - dt;
-      if (this._burnT <= 0) { this._burnT = 0.08; for (const u of this.units) if (!u.dead && u.dot && this.time < u.dot.until && /255,120/.test(u.dot.c || '')) this.vfx.flame(u.x + (Math.random() - 0.5) * 20, u.y - 20 - Math.random() * 60, 18 + Math.random() * 14, 0.4); }
+      if (this._burnT <= 0) { this._burnT = 0.08; let nf = 0; const fx0 = this.cam.x - 60, fx1 = this.cam.x + this.cam.viewW + 60; for (const u of this.units) if (nf < 60 && !u.dead && u.x > fx0 && u.x < fx1 && u.dot && this.time < u.dot.until && /255,120/.test(u.dot.c || '') && ++nf) this.vfx.flame(u.x + (Math.random() - 0.5) * 20, u.y - 20 - Math.random() * 60, 18 + Math.random() * 14, 0.4); }
       // aura velení: vojáci v okolí velitele mají vyšší útok
       this._auraT = (this._auraT || 0) - dt;
       if (this._auraT <= 0) {
         this._auraT = 0.4;
-        for (const c of this.units) if (!c.dead && c.def.aura) for (const u of this.units) if (u.team === c.team && !u.dead && Math.abs(u.x - c.x) < 200) { u.inspired = this.time + 0.6; u.inspiredBy = c.def.aura; }
+        // každý voják si najde nejbližšího velitele svého týmu (rychlé i pro tisíce velitelů)
+        const caps = { player: [], enemy: [] };
+        for (const c of this.units) if (!c.dead && c.def.aura) caps[c.team === 'player' ? 'player' : 'enemy'].push(c);
+        for (const k in caps) {
+          const C0 = caps[k]; if (!C0.length) continue;
+          C0.sort((p, q) => p.x - q.x); const xs = C0.map(c => c.x);
+          for (const u of this.units) {
+            if (u.dead || u.team !== k) continue;
+            const i = this._lb(xs, xs.length, u.x);
+            const c = [C0[i], C0[i - 1]].filter(Boolean).find(c => Math.abs(c.x - u.x) < 200);
+            if (c) { u.inspired = this.time + 0.6; u.inspiredBy = c.def.aura; }
+          }
+        }
       }
       if (!this.net || (this.net.role === 'host' && this.net.ai)) this._ai(dt);
       this._autoPlayer(dt);
@@ -853,6 +904,7 @@
       }
 
       // jednotky
+      this._buildIndex();
       for (const u of this.units) {
         if (u.dead) { u.dead += dt; continue; }
         if (u.hurt > 0) u.hurt -= dt;
@@ -873,13 +925,13 @@
         const foeTeam = u.team === 'player' ? 'enemy' : 'player';
         const reach = u.def.range * (C().rangeScale || 1) + 18;
         // najdi nejbližšího nepřítele před sebou
-        let best = null, bestD = 1e9;
-        for (const e of this.units) {
-          if (e.team === u.team || e.dead || this._sheltered(e)) continue;
-          const d = (e.x - u.x) * u.dir;
-          if (d < -30) continue;
-          const ad = Math.abs(e.x - u.x);
-          if (ad <= reach && ad < bestD) { best = e; bestD = ad; }
+        // cíl se přehledává jen několikrát za sekundu (rozloženo mezi vojáky); mezitím platí ten minulý
+        let best = u._best;
+        u._bt = (u._bt || 0) - dt;
+        if (best && (best.dead || best._sh || Math.abs(best.x - u.x) > reach || (best.x - u.x) * u.dir < -30)) best = null;
+        if (u._bt <= 0 || (!best && u._best)) {
+          best = this._scan(foeTeam, u.x, reach, e => !e._sh && (e.x - u.x) * u.dir >= -30);
+          u._best = best; u._bt = (best ? 0.22 : 0.07) + (u.id % 7) * 0.012;
         }
         const mode0 = this.modeOf(u);
         const calm = mode0 !== 'utok' && (this.side[u.team].calmUntil || 0) > this.time;
@@ -890,12 +942,9 @@
         let chase = null;
         if (!target && !calm && mode0 !== 'utok' && mode0 !== 'ustup' && !this._sheltered(u)) {
           const eng = Math.max(430, reach + 160), home = u.slotX != null ? u.slotX : u.x;
-          let cd = 1e9;
-          for (const e of this.units) {
-            if (e.team === u.team || e.dead || this._sheltered(e)) continue;
-            const ad = Math.abs(e.x - u.x);
-            if (ad < eng && ad < cd && (e.x - u.x) * u.dir > -40 && Math.abs(e.x - home) < 680) { chase = e; cd = ad; }
-          }
+          u._ct = (u._ct || 0) - dt;
+          chase = u._chase && !u._chase.dead && !u._chase._sh && Math.abs(u._chase.x - u.x) < eng && Math.abs(u._chase.x - home) < 680 ? u._chase : null;
+          if (u._ct <= 0 || (!chase && u._chase)) { chase = this._scan(foeTeam, u.x, eng - 0.001, e => !e._sh && (e.x - u.x) * u.dir > -40 && Math.abs(e.x - home) < 680); u._chase = chase; u._ct = 0.25 + (u.id % 5) * 0.02; }
         }
         if (!target && !calm) {
           const front = this.side[foeTeam].castle.front;
@@ -1004,7 +1053,7 @@
             this._sparks(p.tx, p.ty, mc, 10);
             this.particles.push({ x: p.tx, y: p.ty, vx: 0, vy: 0, g: 0, t: 0, life: 0.35, r: 10, ring: true, color: mc });
             const sp = p.from && p.from.def.splash;
-            if (sp && p.target) for (const e of this.units) if (e.team !== p.team && !e.dead && e !== p.target && Math.abs(e.x - p.target.x) < 60) this._damage(e, p.dmg * sp, null);
+            if (sp && p.target) for (const e of this._range(p.team === 'player' ? 'enemy' : 'player', p.target.x - 59.9, p.target.x + 59.9)) if (e !== p.target) this._damage(e, p.dmg * sp, null);
           }
           if (p.kind === 'cat') { this._catImpact(p); continue; }
           if (p.pierce && p.target) {
@@ -1030,8 +1079,7 @@
           m.done = true;
           this.vfx.explosion(m.x1, m.y1, m.big ? 190 : 90, 'fire');
           this.shake = Math.max(this.shake, m.big ? 1.2 : 0.35);
-          for (const e of this.units) {
-            if (e.team === m.team || e.dead) continue;
+          for (const e of this._range(m.team === 'player' ? 'enemy' : 'player', m.x1 - m.radius, m.x1 + m.radius)) {
             if (Math.hypot(e.x - m.x1, (e.y - m.y1) * 1.6) < m.radius) this._damage(e, m.dmg, null, true);
           }
         }
@@ -1263,7 +1311,7 @@
       } else {
         if (u.target && !u.target.dead && u.def.cleave) {
           const reach = u.def.range * (C().rangeScale || 1) + 26;
-          const foes = this.units.filter(e => e.team !== u.team && !e.dead && Math.abs(e.x - u.x) <= reach && (e.x - u.x) * u.dir > -20)
+          const foes = this._range(foeTeam, u.x - reach, u.x + reach).filter(e => (e.x - u.x) * u.dir > -20)
             .sort((a, b) => Math.abs(a.x - u.x) - Math.abs(b.x - u.x)).slice(0, u.def.cleave);
           foes.forEach(e => this._damage(e, u.dmg * this._bonus(u, e), u));
           this._sparks(u.x + u.dir * 50, u.y - 30, '#ff9a3c', 10);
@@ -1559,7 +1607,8 @@
     }
     _catImpact(p) {
       const t = this.time, x = p.tx, y = p.ty, dmg = p.dmg;
-      const near = r => this.units.filter(e => e.team !== p.team && !e.dead && Math.hypot(e.x - x, (e.y - y) * 1.5) < r);
+      const foeT = p.team === 'player' ? 'enemy' : 'player';
+      const near = r => this._range(foeT, x - r, x + r).filter(e => Math.hypot(e.x - x, (e.y - y) * 1.5) < r);
       const E = GameData.catapultEl(p.el);
       const burst = (n, col) => { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 180; this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 80, g: 300, t: 0, life: 0.6, r: 2 + Math.random() * 3, color: col }); } };
       const S = p.big ? 140 : 62;
@@ -1591,7 +1640,7 @@
           this._damage(cur, dmg * (n ? 0.75 : 1), null);
           px = cur.x; py = cur.y - 40;
           const from = cur;
-          cur = this.units.filter(e => e.team !== p.team && !e.dead && !hit.includes(e) && Math.abs(e.x - from.x) < 170).sort((a, b) => Math.abs(a.x - from.x) - Math.abs(b.x - from.x))[0];
+          cur = this._range(foeT, from.x - 169.9, from.x + 169.9).filter(e => !hit.includes(e)).sort((a, b) => Math.abs(a.x - from.x) - Math.abs(b.x - from.x))[0];
         }
       } else if (p.el === 'voda') {
         burst(24, '#7fc0ff'); near(115).forEach(e => { this._damage(e, dmg * 0.7, null); if (!e.def.boss) { e.x = p.team === 'player' ? Math.min(C().enemyFront - 20, e.x + 70) : Math.max(C().playerFront + 20, e.x - 70); e.slotX = null; } });
@@ -1782,11 +1831,23 @@
       // jednotky seřazené podle hloubky
       // kreslí se jen vojáci na obrazovce (s rezervou) – při stovkách vojáků to hodně šetří výkon
       const vx0 = this.cam.x - 180, vx1 = this.cam.x + this.cam.viewW + 180;
-      const list = this.units.filter(u => u.x > vx0 && u.x < vx1).sort((a, b) => a.y - b.y);
+      let list = this.units.filter(u => u.x > vx0 && u.x < vx1);
+      // OBŘÍ BITVY (tisíce vojáků): v hustém davu se stejně překrývají, kreslí se jen část –
+      // celá přední linie, speciální vojáci a rovnoměrný vzorek ostatních. Simulace běží pro všechny.
+      const CAP = this._drawCap || (this._drawCap = (navigator.hardwareConcurrency || 4) >= 8 ? 900 : 600);
+      const crowd = list.length > CAP;
+      if (crowd) {
+        let pf = -1e9, ef = 1e9;
+        for (const u of list) if (!u.dead) { if (u.team === 'player') { if (u.x > pf) pf = u.x; } else if (u.x < ef) ef = u.x; }
+        const step = Math.ceil(list.length / (CAP * 0.7));
+        list = list.filter(u => u === this.hero || u.gen || u.def.boss || u.controlled || u.squad && this.squad ||
+          (u.team === 'player' ? pf - u.x < 110 : u.x - ef < 110) || (u.id % step) === 0);
+      }
+      list.sort((a, b) => a.y - b.y);
       for (const u of list) {
         const shield = this.side[u.team].shieldUntil > t;
         if (u === this.hero) this._heroMarkBelow(ctx, u, t);
-        if (u.def.aura && !u.dead) { ctx.save(); ctx.globalAlpha = 0.18 + Math.sin(t * 3) * 0.05; ctx.beginPath(); ctx.ellipse(u.x, u.y, 190, 26, 0, 0, Math.PI * 2); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd77a'; ctx.stroke(); ctx.restore(); }
+        if (u.def.aura && !u.dead && !crowd) { ctx.save(); ctx.globalAlpha = 0.18 + Math.sin(t * 3) * 0.05; ctx.beginPath(); ctx.ellipse(u.x, u.y, 190, 26, 0, 0, Math.PI * 2); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd77a'; ctx.stroke(); ctx.restore(); }
         if (u.fx && !u.dead) this._gearAura(ctx, u, t);
         const age = t - (u.born || 0);
         const pop = age < 0.25 ? 0.6 + 0.4 * Art.ease(age / 0.25) : 1;
@@ -1797,7 +1858,7 @@
         ctx.globalAlpha = 1;
         if (deep > 20 && age > 0.6) continue;
         if (u === this.hero) this._heroMarkAbove(ctx, u, t);
-        else if (!u.dead && u.hp < u.maxHp) this._hpBar(ctx, u);
+        else if (!u.dead && u.hp < u.maxHp && (!crowd || u.id % 3 === 0)) this._hpBar(ctx, u);
       }
 
       // blesky
@@ -1921,8 +1982,9 @@
       c.fillRect(0, 4, P.front * sx, (h - 8) * (1 - P.hp / P.maxHp));
       c.fillRect(E.front * sx, 4, w - E.front * sx, (h - 8) * (1 - E.hp / E.maxHp));
       const cfg = C();
+      const mstep = this.units.length > 1500 ? Math.ceil(this.units.length / 1500) : 1;
       for (const u of this.units) {
-        if (u.dead) continue;
+        if (u.dead || (mstep > 1 && u.id % mstep && !u.def.boss)) continue;
         c.fillStyle = u.team === 'player' ? '#9fd0ff' : '#ff9e9e';
         const y = h * 0.42 + (u.y - cfg.laneTop) / (cfg.laneBottom - cfg.laneTop) * h * 0.32;
         c.beginPath(); c.arc(u.x * sx, y, u.def.boss ? 6 : (u.def.roleKey === 'tezka' ? 3.6 : 2.6), 0, Math.PI * 2); c.fill();
