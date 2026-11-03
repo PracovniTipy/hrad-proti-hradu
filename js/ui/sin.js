@@ -86,7 +86,7 @@
           <section class="panel pet-hero">
             <canvas id="petStage"></canvas>
             <div class="pet-info">
-              <div class="eyebrow">${L('Schopnost každých', 'Ability every')} ${P.cd} s</div>
+              <div class="eyebrow"><span class="pet-rtag" style="--rc:${G.petRarities[P.rar][2]}">${L(G.petRarities[P.rar][0], G.petRarities[P.rar][1])}</span> · ${L('Schopnost každých', 'Ability every')} ${P.cd} s</div>
               <h2>${esc(L(P.cs, P.en))}</h2>
               <p>${esc(L(P.d[0], P.d[1]))}</p>
               <p class="muted" style="font-size:13px">${L('Každý mazlíček navíc sbírá padlé mince: +1 za každé zabití.', 'Every pet also collects fallen coins: +1 per kill.')}</p>
@@ -98,10 +98,12 @@
               </div>
             </div>
           </section>
-          <div class="pet-grid big">${G.pets.map(p => { const u = G.petUnlocked(save, p);
-            return `<button class="pet-card ${p.id === sel ? 'sel' : ''} ${G.petOf(save).id === p.id ? 'on' : ''} ${u ? '' : 'locked'}" data-psel="${p.id}">
+          ${['legendary', 'epic', 'rare', 'common'].map(rk => { const R = G.petRarities[rk], list = G.pets.filter(p => p.rar === rk);
+            return `<div class="sec-head pet-rar" style="--rc:${R[2]}"><h2>${L(R[0], R[1])}</h2><span class="muted">${list.filter(p => G.petUnlocked(save, p)).length} / ${list.length}</span></div>
+            <div class="pet-grid big">${list.map(p => { const u = G.petUnlocked(save, p);
+            return `<button class="pet-card r-${p.rar} ${p.id === sel ? 'sel' : ''} ${G.petOf(save).id === p.id ? 'on' : ''} ${u ? '' : 'locked'}" data-psel="${p.id}" style="--rc:${R[2]}">
               <canvas data-petcv="${p.id}"></canvas><b>${esc(L(p.cs, p.en).split(',')[0])}</b>
-              <span class="pet-st">${G.petOf(save).id === p.id ? '✓ ' + L('V bitvě', 'In battle') : u ? L('Odemčeno', 'Unlocked') : needTxt(p)}</span></button>`; }).join('')}</div>
+              <span class="pet-st">${G.petOf(save).id === p.id ? '✓ ' + L('V bitvě', 'In battle') : u ? L('Odemčeno', 'Unlocked') : needTxt(p)}</span></button>`; }).join('')}</div>`; }).join('')}
         </div>`;
         applyIconsSafe(el);
         el.querySelectorAll('[data-psel]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.psel; const sc = el.scrollTop; render(); el.scrollTop = sc; }));

@@ -1224,3 +1224,10 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .pet-grid.big .pet-card canvas { height: 84px; }
 .pet-card.sel { border-color: #9fd0ff; box-shadow: 0 0 0 2px rgba(159,208,255,.4); }
 @media (max-width: 640px) { .pet-hero { grid-template-columns: 1fr; } .pet-hero canvas { height: 190px; } }
+.pet-rar h2 { color: var(--rc); text-shadow: 0 0 14px color-mix(in srgb, var(--rc) 45%, transparent); }
+.pet-card.r-rare, .pet-card.r-epic, .pet-card.r-legendary { border-color: color-mix(in srgb, var(--rc) 55%, transparent); }
+.pet-card.r-legendary { background: linear-gradient(180deg, rgba(242,180,64,.16), rgba(10,14,22,.6)); }
+.pet-card.r-epic { background: linear-gradient(180deg, rgba(178,124,255,.14), rgba(10,14,22,.6)); }
+.pet-card.r-legendary:not(.locked) { animation: petGlow 2.4s ease-in-out infinite; }
+@keyframes petGlow { 50% { box-shadow: 0 0 16px rgba(242,180,64,.45); } }
+.pet-rtag { color: var(--rc); font-weight: 900; }
