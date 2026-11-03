@@ -122,6 +122,17 @@
       const key = k + ':' + id; (items[key] = items[key] || { kind: k === 'a' ? 'skinA' : 'skinW', id, units: [] }).units.push(uid);
       return true;
     };
+    // ÚPLNĚ VŠECHNO: každá zbroj a zbraň pro každého vojáka, všechny útoky, dekorace, velký hrad, prémiový pas, neomezené zlato
+    if (give.all) {
+      give = Object.assign({}, give, { unlimited: true, skills: 'all', allDecor: true, bigCastle: true });
+      let nA = 0, nW = 0;
+      O.units().forEach(uid => {
+        GameData.unitSkins.forEach(sk => { if (GameData.skinFits(sk, uid) && O.add(save, uid, sk.id)) nA++; });
+        GameData.weaponSkins.forEach(w => { if (GameData.weaponSkinFits(w, uid) && O.addW(save, uid, w.id)) nW++; });
+      });
+      if (save.pass) save.pass.prem = true; else save.passPremAll = true;
+      got.push({ kind: 'all', a: nA, w: nW });
+    }
     if (give.unlimited) { save.unlimited = true; got.push({ kind: 'gold', n: 9999999 }, { kind: 'gems', n: 9999999 }); App._unl && App._unl(); }
     if (give.gold) { save.gold += give.gold; got.push({ kind: 'gold', n: give.gold }); }
     if (give.gems) { save.gems += give.gems; got.push({ kind: 'gems', n: give.gems }); }
@@ -192,6 +203,7 @@
       }
       if (r.kind === 'skill') { const k = GameData.skillById(r.id); return `<div class="rw"><span class="rw-ico">${GameData.skillIcon ? GameData.skillIcon(k) : '⚡'}</span><b>${esc(k.name)}</b><small>${t('rw_skill')}</small></div>`; }
       if (r.kind === 'skills') return `<div class="rw"><span class="rw-ico">⚡</span><b>${t('rw_all_skills', { n: r.n })}</b><small>${t('rw_skill')}</small></div>`;
+      if (r.kind === 'all') return `<div class="rw"><span class="rw-ico">👑</span><b>${(window.I18N && I18N.lang !== 'cs') ? 'Everything in the game' : 'Úplně všechno ze hry'}</b><small>${r.a} ${(window.I18N && I18N.lang !== 'cs') ? 'armors' : 'zbrojí'} · ${r.w} ${(window.I18N && I18N.lang !== 'cs') ? 'weapons' : 'zbraní'}</small></div>`;
       if (r.kind === 'big') return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${t('big_name')}</b><small>${t('big_short')}</small></div>`;
       if (r.kind === 'decor') { const d = GameData.castleCustom.decorations.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${esc(d.name)}</b><small>${t('decor_word')}</small></div>`; }
       return '';

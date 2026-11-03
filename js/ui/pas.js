@@ -108,7 +108,7 @@
   /* ---------------- STAV ---------------- */
   const Pas = {
     state(save) {
-      if (!save.pass || save.pass.s !== S.id) save.pass = { s: S.id, xp: 0, prem: false, cf: {}, cp: {} };
+      if (!save.pass || save.pass.s !== S.id) save.pass = { s: S.id, xp: 0, prem: !!save.passPremAll, cf: {}, cp: {} };
       const P = save.pass; P.cf = P.cf || {}; P.cp = P.cp || {};
       return P;
     },
