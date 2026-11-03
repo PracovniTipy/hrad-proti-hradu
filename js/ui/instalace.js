@@ -18,7 +18,7 @@
 
   const Instalace = {
     /* ukázat tlačítko? (ne v nainstalované aplikaci) */
-    available() { return !installed() && (!!deferred || isIOS() || inFrame() || /Android|Windows|Macintosh|Linux/.test(navigator.userAgent)); },
+    available() { return !window.CW_PORTAL && !installed() && (!!deferred || isIOS() || inFrame() || /Android|Windows|Macintosh|Linux/.test(navigator.userAgent)); },
     async run(App) {
       if (deferred) {
         deferred.prompt();

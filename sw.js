@@ -1,7 +1,7 @@
 /* Service worker: hra funguje i bez internetu (PWA). Při změně souborů zvyš VERZE. */
-const VERZE = 'hrad-v111';
+const VERZE = 'hrad-v112';
 const SOUBORY = ['./', './index.html', './css/fonts.css', './css/style.css', './css/ui-pro.css', './manifest.webmanifest',
-  './js/i18n.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/jednotky_plus.js', './js/data/demoni.js', './js/data/castle.js',
+  './js/core/portal.js', './js/i18n.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/jednotky_plus.js', './js/data/demoni.js', './js/data/castle.js',
   './js/data/campaign.js', './js/data/pvp.js', './js/data/obchod.js', './js/data/vybava.js', './js/data/skiny_plus.js', './js/data/skiny_vic.js', './js/data/skiny_nove.js', './js/data/skills.js', './js/data/vez.js', './js/i18n_obsah.js', './js/core/save.js', './js/core/ucet.js', './js/core/zvuk.js', './js/core/art.js',
   './js/core/art_narody.js', './js/core/art_svet.js', './js/core/art_peklo.js', './js/core/art_zbrane.js', './js/core/art_skiny.js', './js/core/art_skiny2.js', './js/core/art_vez.js', './js/core/kovarna_zbrane.js', './js/core/kovarna_zbroj.js', './js/core/kovarna_data.js', './js/core/art_drak.js', './js/core/art_hrady.js', './js/core/obrana.js', './js/core/vfx.js', './js/core/battle.js', './js/core/general.js', './js/core/platby.js', './js/core/stat.js', './js/core/online.js', './js/ui/online_ui.js', './js/ui/shop.js', './js/ui/ucet_ui.js', './js/ui/ukoly.js', './js/ui/pas.js', './js/ui/vez.js', './js/ui/instalace.js', './js/ui/hodnoceni.js', './js/ui/denni.js', './js/ui/icons.js',
   './js/ui/screens.js', './js/ui/tutorial.js', './js/ui/scene.js', './js/main.js', './icons/icon-192.png', './icons/icon-512.png'];

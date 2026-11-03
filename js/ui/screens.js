@@ -713,11 +713,11 @@
             <button class="btn btn-sm btn-gold" data-ex="${x.id}" ${save.gold < x.gold ? 'disabled' : ''}>${ico('coin')} ${fmt(x.gold)}</button>
           </article>`).join('')}
         </div>
-        <div class="sec-head"><h2>${t('packs')}</h2></div>
+        ${Platby.on() ? `<div class="sec-head"><h2>${t('packs')}</h2></div>
         <div class="skin-grid">
           ${GameData.gemPacks.map(x => `<article class="panel skin r3">${x.badge ? `<span class="offer-badge">${x.badge}</span>` : ''}<div class="gem-art">${ico('gem')}<b>${x.gems}</b></div><h3>${t('gems_n', { n: x.gems })}</h3><button class="btn btn-sm btn-green" data-gempack="${x.id}">${Platby.price(x.czk)}</button></article>`).join('')}
         </div>
-        ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_launch')}</div></div>`}`;
+        ${Platby.available() ? '' : `<div class="notice"><div>${t('pay_launch')}</div></div>`}` : ''}`;
     }
     const el = App.screenEl;
     el.innerHTML = `

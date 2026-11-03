@@ -14,6 +14,7 @@
     state(save) { save.rate = save.rate || { done: false, asked: 0, nextWin: 3 }; return save.rate; },
     url() { return window.Platby && Platby.msStore ? 'ms-windows-store://review/?ProductId=' + MS_ID : ITCH; },
     check(App) {
+      if (window.CW_PORTAL) return;
       const s = this.state(App.save);
       if (!s.done && s.asked < 2 && App.save.stats.wins >= s.nextWin) pending = true;
     },

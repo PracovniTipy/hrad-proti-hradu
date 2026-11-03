@@ -37,8 +37,9 @@
   const Platby = {
     get msStore() { return MS; },
     msId,
+    get portal() { return !!window.CW_PORTAL; },
     available() { return true; },
-    on() { return !MS || (msOk() && this._msItems !== false); },
+    on() { if (window.CW_PORTAL) return false; return !MS || (msOk() && this._msItems !== false); },
     usd(czk) { return USD[czk] || Math.round(czk / 20) - 0.01; },
     price(czk) { return '$' + this.usd(czk).toFixed(2); },
     terms: TERMS,
