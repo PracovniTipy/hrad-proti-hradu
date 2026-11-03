@@ -1,12 +1,11 @@
 /* =========================================================================
    BATTLE PAS – SEZÓNA „VLČÍ ZIMA“ (listopad 2026 – duben 2027, půl roku)
    - 20 úrovní, zkušenosti (XP) za každou bitvu a za denní úkoly.
-   - Zdarma: zlato a drahokamy na každé úrovni.
-   - Prémiový pas (za skutečné peníze): hned celý Vlčí set pro pěšáky všech
-     národů, na úrovních 5/10/15/20 Vlčí set pro lučištníky a kopiníky
-     a víc zlata a drahokamů.
-   - Vlčí sady pro ostatní (těžká jednotka, jízda, mágové, velitelé)
-     se kupují v obchodě za skutečné peníze.
+   - Zdarma: zlato, drahokamy a celá epická Vlčí sada (zbroj + zbraň) pro všech
+     6 druhů vojáků všech národů – stačí hrát.
+   - Prémiový pas (za skutečné peníze): hned legendární sada Polární záře pro
+     pěšáky, na dalších úrovních pro všechny ostatní druhy vojáků, a víc zlata
+     a drahokamů.
    - Skiny se nikdy neberou zpět – po konci sezóny zůstávají hráči.
    ========================================================================= */
 (function () {
@@ -34,6 +33,42 @@
   );
   const WOLF_W = ['w_vlk', 'k_vlk', 'l_vlk', 'h_vlk'];
 
+  /* ---------------- PRÉMIOVÁ SADA „POLÁRNÍ ZÁŘE“ (legendární, jen v prémiovém pasu) ----------------
+     Strážce severního nebe: korunka z ledových krystalů se zářícím hledím, krystalová křídla na zádech,
+     hvězdný amulet, krystalové nárameníky, aura padajících hvězd a zbraně z polárního ledu,
+     kterými prosvítá zelenofialová polární záře. */
+  const AUR = { ice: '#e8fbff', teal: '#3af0c8', vio: '#a45cff', deep: '#14204a', mid: '#2a3a7a', star: '#fff6c8' };
+  const AUR_PAL = { tunic: AUR.deep, tunicDark: '#0c1430', trim: AUR.teal, metal: '#dff6ff', metalDark: '#6a8ac8', cape: AUR.mid, plume: AUR.teal,
+    hood: AUR.deep, hat: AUR.deep, robe: AUR.deep, lace: AUR.teal, mask: '#dff6ff', sashi: AUR.mid, mon: AUR.teal, crest: AUR.teal, fur: '#e8fbff', bear: '#c8d8f0' };
+  if (window.ArmorForge && ArmorForge.helmet) {
+    ArmorForge.helmet('zare_h', { shell: 'circlet', crest: 'halo', colors: { metal: '#dff6ff', trim: AUR.teal, glow: AUR.teal, plume: AUR.teal } });
+    ArmorForge.shield('zare_s', { shape: 'crescent', emblem: 'star', pattern: 'rays', colors: { field: AUR.deep, field2: AUR.mid, emblem: AUR.teal, rim: '#dff6ff' } });
+  }
+  if (window.Forge && Forge.melee) {
+    Forge.melee('zare', { blade: 'crystal', guard: 'wings', pommel: 'gem', deco: ['starfield', 'frost'] });
+    Forge.pole('zare', { head: 'crystal', collar: 'feathers' });
+    Forge.bow('zare', { style: 'shards' });
+    Forge.staff('zare', { head: 'galaxy' });
+    if (G.SAM_OK) { G.SAM_OK.melee.push('zare'); G.SAM_OK.pole.push('zare'); }
+  }
+  G.unitSkins.push({
+    id: 'zare', only: null, name: 'Strážce polární záře', rarity: 'Legendární', palette: AUR_PAL,
+    look: { helmet: 'zare_h', shield: 'zare_s' },
+    feat: { emblemColor: AUR.teal, af: { back: 'wing_crystal', chest: 'amulet', aura: 'stars', glow: AUR.teal, accent: AUR.vio, wing: '#bff4ff' } },
+    desc: 'Ledová korunka se svatozáří polární záře, krystalová křídla, hvězdný amulet a aura padajících hvězd. Jen v prémiovém battle pasu.',
+    en: { name: 'Aurora Warden', desc: 'An ice circlet with an aurora halo, crystal wings, a star amulet and an aura of falling stars. Premium Battle Pass only.' },
+    codeOnly: true, season: 's1', glow: AUR.teal, bonus: { hp: 0.1, dmg: 0.1 }, cost: {}
+  });
+  const AW = (id, name, cat, model, desc, en) => ({ id, name, rarity: 'Legendární', cat, model: Object.assign({ cat, id: 'zare' }, model), desc, en, codeOnly: true, season: 's1', bonus: { dmg: 0.1, hp: 0.1 }, cost: {} });
+  const AC = { blade: AUR.ice, dark: '#4a6ab0', edge: '#ffffff', glow: AUR.teal, guard: AUR.teal, grip: AUR.deep, pommel: AUR.vio, gem: AUR.vio, wood: AUR.mid, string: '#e8fbff' };
+  G.weaponSkins.push(
+    AW('w_zare', 'Čepel polární záře', 'melee', AC, 'Krystalová čepel s hvězdným nebem uvnitř a ledovými křídly v záštitě.', { name: 'Aurora Blade', desc: 'A crystal blade with a starry sky inside and ice wings in the guard.' }),
+    AW('k_zare', 'Kopí polární záře', 'pole', AC, 'Krystalový hrot s pery sněžné sovy.', { name: 'Aurora Spear', desc: 'A crystal head with snowy owl feathers.' }),
+    AW('l_zare', 'Luk polární záře', 'bow', Object.assign({ arrow: AUR.ice, tip: AUR.teal }, AC), 'Luk z ledových střepů, šípy září jako polární záře.', { name: 'Aurora Bow', desc: 'A bow of ice shards, its arrows shine like the aurora.' }),
+    AW('h_zare', 'Hůl polární záře', 'staff', AC, 'Hůl s kroužící galaxií v koruně.', { name: 'Aurora Staff', desc: 'A staff with a swirling galaxy in its crown.' })
+  );
+  const AUR_W = ['w_zare', 'k_zare', 'l_zare', 'h_zare'];
+
   /* ---------------- SEZÓNA ---------------- */
   const S = G.season = {
     id: 's1', name: 'Vlčí zima', en: 'Wolf Winter',
@@ -41,38 +76,38 @@
     levels: 20, xpLevel: 150, czk: 99,
     xp: { win: 40, loss: 15, train: 20, quest: 25 }
   };
-  /* sady za skutečné peníze v obchodě */
-  G.wolfSets = [
-    { role: 'tezka', czk: 29 }, { role: 'jizda', czk: 29 }, { role: 'mag', czk: 29 }, { role: 'velitel', czk: 29 }
-  ];
+  /* Vlčí sady jsou teď pro všechny zdarma v battle pasu – v obchodě se už neprodávají */
+  G.wolfSets = [];
   const giftSet = role => ({ role, a: 'vlk', ws: WOLF_W });
+  const auroraSet = role => ({ role, a: 'zare', ws: AUR_W });
   /* odměny úrovní: f = zdarma, p = prémiový pas */
+  /* odměny úrovní: f = zdarma (celá Vlčí sada pro všech 7 druhů vojáků), p = prémiový pas (Polární záře) */
   S.rewards = [
     { f: { gold: 500 }, p: { gems: 100 } },
-    { f: { gems: 30 }, p: { gold: 2000 } },
-    { f: { gold: 600 }, p: { gems: 150 } },
+    { f: { gems: 30, gift: [giftSet('pech')] }, p: { gold: 2000 } },
+    { f: { gold: 600 }, p: { gift: [auroraSet('strelec')] } },
     { f: { gems: 40 }, p: { gold: 3000 } },
-    { f: { gold: 800 }, p: { gift: [{ role: 'strelec', a: 'vlk' }] } },
-    { f: { gems: 50 }, p: { gems: 200 } },
+    { f: { gold: 800, gift: [giftSet('strelec')] }, p: { gems: 200 } },
+    { f: { gems: 50 }, p: { gift: [auroraSet('kopi')] } },
     { f: { gold: 1000 }, p: { gold: 4000 } },
-    { f: { gems: 60 }, p: { gems: 250 } },
-    { f: { gold: 1200 }, p: { gold: 5000 } },
-    { f: { gems: 80 }, p: { gift: [{ role: 'strelec', ws: WOLF_W }] } },
-    { f: { gold: 1500 }, p: { gems: 300 } },
-    { f: { gems: 90 }, p: { gold: 6000 } },
-    { f: { gold: 1800 }, p: { gems: 350 } },
-    { f: { gems: 100 }, p: { gold: 7000 } },
-    { f: { gold: 2000 }, p: { gift: [{ role: 'kopi', a: 'vlk' }] } },
-    { f: { gems: 120 }, p: { gems: 400 } },
-    { f: { gold: 2500 }, p: { gold: 8000 } },
-    { f: { gems: 150 }, p: { gems: 500 } },
+    { f: { gems: 60, gift: [giftSet('kopi')] }, p: { gems: 250 } },
+    { f: { gold: 1200 }, p: { gift: [auroraSet('jizda')] } },
+    { f: { gems: 80 }, p: { gold: 5000 } },
+    { f: { gold: 1500, gift: [giftSet('jizda')] }, p: { gems: 300 } },
+    { f: { gems: 90 }, p: { gift: [auroraSet('mag')] } },
+    { f: { gold: 1800 }, p: { gold: 6000 } },
+    { f: { gems: 100, gift: [giftSet('mag')] }, p: { gems: 350 } },
+    { f: { gold: 2000 }, p: { gift: [auroraSet('velitel')] } },
+    { f: { gems: 120 }, p: { gold: 8000 } },
+    { f: { gold: 2500, gift: [giftSet('velitel')] }, p: { gems: 400 } },
+    { f: { gems: 150 }, p: { gold: 9000 } },
     { f: { gold: 3000 }, p: { gold: 10000 } },
-    { f: { gems: 200 }, p: { gems: 1000, gift: [{ role: 'kopi', ws: WOLF_W }] } }
+    { f: { gems: 250 }, p: { gems: 1000 } }
   ];
 
   Object.assign(I18N.D, {
     tab_pas: ['Battle pas', 'Battle Pass'],
-    shop_hint_pas: ['Hraj bitvy a plň denní úkoly – dostaneš zkušenosti a odměny na 20 úrovních. Prémiový pas přidá celé epické sety.', 'Play battles and complete daily quests to earn XP and rewards across 20 levels. The premium pass adds full epic sets.'],
+    shop_hint_pas: ['Hraj bitvy a plň denní úkoly – na 20 úrovních dostaneš zdarma celou Vlčí sadu pro všechny druhy vojáků. Prémiový pas přidá legendární sadu Polární záře.', 'Play battles and complete daily quests – across 20 levels you get the full Wolf set for all soldiers for free. The premium pass adds the legendary Aurora set.'],
     pas_title: ['Battle pas · Vlčí zima', 'Battle Pass · Wolf Winter'],
     pas_ends: ['Sezóna končí za {n} dní', 'Season ends in {n} days'],
     pas_over: ['Sezóna skončila – brzy začne nová', 'The season has ended – a new one starts soon'],
@@ -83,7 +118,7 @@
     pas_prem: ['Prémiový', 'Premium'],
     pas_buy: ['Koupit prémiový pas', 'Buy the premium pass'],
     pas_have: ['Prémiový pas aktivní', 'Premium pass active'],
-    pas_buy_note: ['Hned dostaneš celý epický Vlčí set (zbroj + zbraň) pro pěšáky všech tří národů. Na úrovních 5, 10, 15 a 20 Vlčí set pro lučištníky a kopiníky a k tomu přes 20 000 zlata a 3 000 drahokamů navíc.', 'Get the full epic Wolf set (armor + weapon) for the infantry of all three nations right away. Levels 5, 10, 15 and 20 unlock the Wolf set for archers and spearmen, plus 20,000+ gold and 3,000 gems extra.'],
+    pas_buy_note: ['Hned dostaneš legendární sadu Polární záře (zbroj s krystalovými křídly + zbraň) pro pěšáky všech tří národů. Na dalších úrovních ji získáš pro lučištníky, kopiníky, jízdu, mágy i velitele (+10 % životy, +10 % útok) a k tomu přes 35 000 zlata a 2 600 drahokamů navíc.', 'Get the legendary Aurora set (armor with crystal wings + weapon) for the infantry of all three nations right away. Further levels unlock it for archers, spearmen, cavalry, mages and commanders (+10% health, +10% attack), plus 35,000+ gold and 2,600 gems extra.'],
     pas_claim_all: ['Vyzvednout vše', 'Claim all'],
     pas_claim: ['Vyzvednout', 'Claim'],
     pas_got: ['Odměny z battle pasu', 'Battle Pass rewards'],
@@ -97,6 +132,7 @@
     pas_armor_for: ['Vlčí zbroj · {r}', 'Wolf armor · {r}'],
     pas_weapon_for: ['Vlčí zbraň · {r}', 'Wolf weapon · {r}'],
     pas_set_for: ['Vlčí set · {r}', 'Wolf set · {r}'],
+    pas_aset_for: ['Polární záře · {r}', 'Aurora · {r}'],
     skin_season: ['Sezóna', 'Season'],
     buy_real: ['Koupit', 'Buy']
   });
@@ -109,7 +145,7 @@
   const Pas = {
     state(save) {
       if (!save.pass || save.pass.s !== S.id) save.pass = { s: S.id, xp: 0, prem: !!save.passPremAll, cf: {}, cp: {} };
-      const P = save.pass; P.cf = P.cf || {}; P.cp = P.cp || {};
+      const P = save.pass; P.cf = P.cf || {}; P.cp = P.cp || {}; P.gf = P.gf || {}; P.gp = P.gp || {};
       return P;
     },
     level(save) { return Math.min(S.levels, Math.floor(this.state(save).xp / S.xpLevel)); },
@@ -118,7 +154,7 @@
     ready(save) {
       const P = this.state(save), lv = this.level(save);
       let n = 0;
-      for (let i = 1; i <= lv; i++) { if (!P.cf[i]) n++; if (P.prem && !P.cp[i]) n++; }
+      for (let i = 1; i <= lv; i++) { const R = S.rewards[i - 1]; if (!P.cf[i] || (R.f.gift && !P.gf[i])) n++; if (P.prem && (!P.cp[i] || (R.p.gift && !P.gp[i]))) n++; }
       return n;
     },
     addXp(save, n) {
@@ -141,7 +177,7 @@
       const save = App.save;
       if (pid === 'pass') {
         const P = this.state(save); P.prem = true;
-        return { title: L('Prémiový battle pas', 'Premium Battle Pass'), got: Shop.grant(App, { gift: [giftSet('pech')] }) };
+        return { title: L('Prémiový battle pas', 'Premium Battle Pass'), got: Shop.grant(App, { gift: [auroraSet('pech')] }) };
       }
       if (pid.startsWith('sada_')) {
         const role = pid.slice(5); if (!ROLE_N[role]) return null;
@@ -170,7 +206,7 @@
       const out = [];
       if (r.gold) out.push(`${ico('coin')} ${fmt(r.gold)}`);
       if (r.gems) out.push(`${ico('gem')} ${fmt(r.gems)}`);
-      (r.gift || []).forEach(g => out.push(`<b>${esc(t(g.a && g.ws ? 'pas_set_for' : g.a ? 'pas_armor_for' : 'pas_weapon_for', { r: rn(g.role) }))}</b>`));
+      (r.gift || []).forEach(g => out.push(`<b>${esc(t(g.a === 'zare' ? 'pas_aset_for' : g.a && g.ws ? 'pas_set_for' : g.a ? 'pas_armor_for' : 'pas_weapon_for', { r: rn(g.role) }))}</b>`));
       return out.join('<br>');
     },
     claim(App, which) {
@@ -179,8 +215,11 @@
       const add = r => { give.gold += r.gold || 0; give.gems += r.gems || 0; (r.gift || []).forEach(g => give.gift.push(g)); };
       for (let i = 1; i <= lv; i++) {
         const R = S.rewards[i - 1];
-        if ((which === 'all' || which === 'f' + i) && !P.cf[i]) { P.cf[i] = 1; add(R.f); }
-        if (P.prem && (which === 'all' || which === 'p' + i) && !P.cp[i]) { P.cp[i] = 1; add(R.p); }
+        if ((which === 'all' || which === 'f' + i) && !P.cf[i]) { P.cf[i] = 1; P.gf[i] = 1; add(R.f); }
+        if (P.prem && (which === 'all' || which === 'p' + i) && !P.cp[i]) { P.cp[i] = 1; P.gp[i] = 1; add(R.p); }
+        // úrovně vybrané ještě před přidáním sad: sada se doručí dodatečně
+        if (P.cf[i] && R.f.gift && !P.gf[i]) { P.gf[i] = 1; R.f.gift.forEach(g => give.gift.push(g)); }
+        if (P.cp[i] && R.p.gift && !P.gp[i]) { P.gp[i] = 1; R.p.gift.forEach(g => give.gift.push(g)); }
       }
       if (!give.gold) delete give.gold; if (!give.gems) delete give.gems;
       const got = Shop.grant(App, give);
@@ -194,12 +233,12 @@
       const into = P.xp - lv * S.xpLevel, maxed = lv >= S.levels;
       const X = S.xp;
       const cell = (i, kind) => {
-        const R = S.rewards[i - 1][kind], done = kind === 'f' ? P.cf[i] : P.cp[i];
+        const R = S.rewards[i - 1][kind], done = kind === 'f' ? P.cf[i] && (!R.gift || P.gf[i]) : P.cp[i] && (!R.gift || P.gp[i]);
         const lock = kind === 'p' && !P.prem;
         const can = !done && !lock && i <= lv;
         const skin = (R.gift || [])[0];
         return `<div class="bp-cell ${kind} ${done ? 'done' : ''} ${can ? 'can' : ''} ${lock ? 'lock' : ''} ${skin ? 'skin' : ''}">
-          ${skin ? `<canvas data-bpskin="${skin.role}|${skin.a ? 'a' : 'w'}"></canvas>` : ''}
+          ${skin ? `<canvas data-bpskin="${skin.role}|${skin.a ? 'a' : 'w'}|${skin.a || 'vlk'}"></canvas>` : ''}
           <div class="bp-rw">${this.rewardText(R)}</div>
           ${done ? '<span class="bp-ok">✓</span>' : lock ? `<span class="bp-lock">${ico('lock')}</span>` : can ? `<button class="btn btn-sm btn-gold" data-bpc="${kind}${i}">${t('pas_claim')}</button>` : ''}
         </div>`;
@@ -235,22 +274,22 @@
         </section>
         <div class="bp-track-wrap"><div class="bp-legend"><span class="f">${t('pas_free')}</span><span class="p">★ ${t('pas_prem')}</span></div>
           <div class="bp-track">${cols}</div></div>
-        ${Platby.on() ? `<div class="sec-head"><h2>${t('pas_sets')}</h2><span class="muted">${t('pas_sets_sub')}</span></div><div class="bp-sets">${sets}</div>` : ''}`;
+        ${Platby.on() && G.wolfSets.length ? `<div class="sec-head"><h2>${t('pas_sets')}</h2><span class="muted">${t('pas_sets_sub')}</span></div><div class="bp-sets">${sets}</div>` : ''}`;
     },
     /* vykreslení vojáka ve vlčím setu */
     drawUnit(cv, uid, armor, weapon, opts) {
-      const GH = G.gearHelpers, def = G.units[uid];
-      const W = weapon ? WOLF_W.map(x => G.weaponSkins.find(y => y.id === x)).find(x => G.weaponSkinFits(x, uid)) : null;
-      const fake = { skins: { unit: { [uid]: armor ? 'vlk' : 'zakladni' }, weapon: { [uid]: W ? W.id : null }, own: {}, ownW: {} } };
+      const GH = G.gearHelpers, def = G.units[uid], SET = (opts && opts.set) || 'vlk', SW = SET === 'zare' ? AUR_W : WOLF_W;
+      const W = weapon ? SW.map(x => G.weaponSkins.find(y => y.id === x)).find(x => G.weaponSkinFits(x, uid)) : null;
+      const fake = { skins: { unit: { [uid]: armor ? SET : 'zakladni' }, weapon: { [uid]: W ? W.id : null }, own: {}, ownW: {} } };
       const lk = GH.look(fake, uid);
       if (opts && opts.icon) {
-        if (armor) Art.renderUnitIcon(cv, uid, 'player', 'vlk', { zoom: 0.95, def: GH.drawDef(def, lk) });
+        if (armor) Art.renderUnitIcon(cv, uid, 'player', SET, { zoom: 0.95, def: GH.drawDef(def, lk) });
         else { const pal = Art.unitPalette('player', 'zakladni', def.faction); pal.wmodel = W.model; Art.renderWeaponIcon(cv, uid, pal); }
         return;
       }
-      return { def: GH.drawDef(def, lk), pal: GH.palette('player', 'vlk', def.faction, lk) };
+      return { def: GH.drawDef(def, lk), pal: GH.palette('player', SET, def.faction, lk) };
     },
-    paintScene(cv, units) {
+    paintScene(cv, units, set) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
       if (!w || !h) return;
       cv.width = w * dpr; cv.height = h * dpr;
@@ -262,7 +301,7 @@
       ctx.fillStyle = 'rgba(230,242,255,.9)'; ctx.beginPath(); ctx.arc(w * 0.82, h * 0.2, h * 0.09, 0, Math.PI * 2); ctx.fill();
       for (let i = 0; i < 40; i++) { const x = (i * 97.3) % w, y = (i * 53.7) % (h * 0.7); ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(x, y, 2, 2); }
       units.forEach((u, i) => {
-        const d = this.drawUnit(null, u, true, true);
+        const d = this.drawUnit(null, u, true, true, { set });
         const k = h / 120 * (i === Math.floor(units.length / 2) ? 1.02 : 0.9);
         ctx.save(); ctx.translate(w * ((i + 0.5) / units.length) - 6, h * 0.92); ctx.scale(k, k);
         if (d.pal.mount) ctx.scale(0.78, 0.78);
@@ -273,12 +312,12 @@
     bind(App, el) {
       const save = App.save;
       const hero = el.querySelector('#bpHero');
-      if (hero) this.paintScene(hero, ['pesak', 'asigaru', 'valecnik']);
+      if (hero) this.paintScene(hero, ['pesak', 'asigaru', 'valecnik'], this.state(save).prem ? 'zare' : 'zare');
       el.querySelectorAll('canvas[data-bpset]').forEach(cv => this.paintScene(cv, G.skinOwn.unitsOfRole(cv.dataset.bpset)));
       el.querySelectorAll('canvas[data-bpskin]').forEach(cv => {
-        const [role, k] = cv.dataset.bpskin.split('|');
+        const [role, k, set] = cv.dataset.bpskin.split('|');
         const uid = G.skinOwn.unitsOfRole(role)[0];
-        this.drawUnit(cv, uid, k === 'a', k === 'w', { icon: true });
+        this.drawUnit(cv, uid, k === 'a', k === 'w', { icon: true, set });
       });
       const after = got => { App.go('obchod', { tab: 'pas', keepScroll: true }); if (got.length) Shop.rewardsModal(App, t('pas_got'), got); App.refreshTop && App.refreshTop(); };
       el.querySelectorAll('[data-bpc]').forEach(b => b.addEventListener('click', () => after(this.claim(App, b.dataset.bpc))));
