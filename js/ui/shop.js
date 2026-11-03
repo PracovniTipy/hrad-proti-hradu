@@ -131,6 +131,8 @@
         GameData.weaponSkins.forEach(w => { if (GameData.weaponSkinFits(w, uid) && O.addW(save, uid, w.id)) nW++; });
       });
       if (save.pass) save.pass.prem = true; else save.passPremAll = true;
+      save.skins.ownedCastle = save.skins.ownedCastle || [];
+      GameData.castleSkins.forEach(c => { if (!save.skins.ownedCastle.includes(c.id)) save.skins.ownedCastle.push(c.id); });
       got.push({ kind: 'all', a: nA, w: nW });
     }
     if (give.unlimited) { save.unlimited = true; got.push({ kind: 'gold', n: 9999999 }, { kind: 'gems', n: 9999999 }); App._unl && App._unl(); }
