@@ -21,14 +21,14 @@
   const Ann = window.Hlasatel = {
     voice: null, last: 0,
     pickVoice() {
+      // jen MUŽSKÝ anglický hlas; když žádný není, hlasatel mlčí (žádné ženské hlasy)
       if (!('speechSynthesis' in window)) return null;
-      const vs = speechSynthesis.getVoices() || [];
-      const pref = [/Daniel/i, /Google UK English Male/i, /Arthur/i, /Fred/i, /Alex/i, /Microsoft (George|Ryan|Guy|David)/i, /en-GB/i, /en-US/i, /^en/i];
-      for (const re of pref) { const v = vs.find(x => re.test(x.name) || re.test(x.lang)); if (v && /^en/i.test(v.lang)) return (this.voice = v); }
-      return (this.voice = vs.find(x => /^en/i.test(x.lang)) || null);
+      const vs = (speechSynthesis.getVoices() || []).filter(v => /^en/i.test(v.lang));
+      const male = [/Daniel/i, /Arthur/i, /Oliver/i, /Gordon/i, /Rishi/i, /Aaron/i, /Fred/i, /Alex\b/i, /\bTom\b/i, /Ralph/i, /Albert/i, /Bruce/i, /Junior/i, /Google UK English Male/i, /Microsoft (George|Ryan|Guy|David|Mark|James|Richard|Thomas|Andrew|Brian|Christopher|Eric|Roger|Steffan)/i, /\bmale\b/i];
+      for (const re of male) { const v = vs.find(x => re.test(x.name) && !/female/i.test(x.name)); if (v) return (this.voice = v); }
+      return (this.voice = null);
     },
     say(text, prio) {
-      return;   // hlas vypnutý
       try {
         if (!window.Zvuk || !Zvuk.settings().sfx || !('speechSynthesis' in window)) return;
         const now = performance.now();
@@ -36,7 +36,8 @@
         if (prio) speechSynthesis.cancel();
         this.last = now;
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-GB'; const v = this.voice || this.pickVoice(); if (v) u.voice = v;
+        const v = this.voice || this.pickVoice(); if (!v) return;   // bez mužského hlasu raději ticho
+        u.lang = v.lang; u.voice = v;
         u.rate = 0.95; u.pitch = 0.7; u.volume = Math.min(1, (Zvuk.settings().sfxVol || 100) / 100);
         speechSynthesis.speak(u);
       } catch (e) { /* bez hlasu */ }
@@ -45,7 +46,7 @@
   if ('speechSynthesis' in window) { try { speechSynthesis.onvoiceschanged = () => Ann.pickVoice(); } catch (e) {} }
 
   // hlasatel a velké nápisy jsou vypnuté (rušily a překrývaly je ovládací panely); odměny za série zůstávají
-  function banner() {}
+  function banner(b, txt, sub, color, big, voice, prio) { if (voice) Ann.say(voice, prio); }   // bez nápisů, jen mužský hlas
   function bannerOld(b, txt, sub, color, big, voice, prio) {
     (b._banners = b._banners || []).push({ txt, sub, color: color || '#ffd77a', t: 0, life: big ? 2.6 : 2, big: !!big });
     if (b._banners.length > 3) b._banners.shift();
