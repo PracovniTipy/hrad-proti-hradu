@@ -41,7 +41,7 @@
   // i staré vzhledy dostanou vlastní tvar
   const OLD = {
     pisecna: { back: 'palms', front: 'dunes', tex: 'sand', edge: 'none', top: 'onion', fx: 'dust' },
-    temna: { back: 'batwings', front: 'thorns', tex: 'cracks', edge: 'spikes', edgeCol: '#2c2a33', top: 'orb', topCol: '#b25cff', fx: 'wisps', fxCol: '#b25cff' },
+    temna: { front: 'thorns', tex: 'cracks', edge: 'spikes', edgeCol: '#2c2a33', top: 'orb', topCol: '#b25cff', fx: 'wisps', fxCol: '#b25cff' },
     ledova: { back: 'icespires', front: 'snowdrift', tex: 'facets', edge: 'icicles', edgeCol: '#e6f6ff', top: 'crystal', topCol: '#bfe8ff', fx: 'snow' },
     mramor: { back: 'sundisc', front: 'statues', tex: 'gold', edge: 'none', top: 'orb', topCol: '#ffd24a', fx: 'sparkles' }
   };
