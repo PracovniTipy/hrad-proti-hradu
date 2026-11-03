@@ -180,7 +180,7 @@
       const chests = nat === 'samurajove' ? Lz.chests.filter(c => !['cross', 'lionplate', 'furstraps'].includes(c)) : Lz.chests.filter(c => c !== 'shimenawa');
       const shoulders = nat === 'samurajove' ? Lz.shoulders.filter(c => c !== 'lion') : Lz.shoulders.filter(c => c !== 'sode');
       const visors = nat === 'samurajove' ? Lz.visors : Lz.visors.filter(v => v !== 'mempo' && v !== 'oni');
-      const crests = nat === 'samurajove' ? Lz.crests : Lz.crests.filter(c => c !== 'maedate' && c !== 'kuwagata');
+      const crests = (nat === 'samurajove' ? Lz.crests : Lz.crests.filter(c => c !== 'maedate' && c !== 'kuwagata')).filter(c => c !== 'halo');   // žádné zlaté kroužky nad hlavou
       const shapes = nat === 'samurajove' ? ['tate', 'tate', 'round', 'hex', 'oval', 'buckler', 'crescent'] : nat === 'vikingove' ? ['viking', 'viking', 'round', 'buckler', 'spiked', 'oval', 'kite'] : Lz.shieldShapes.filter(x => x !== 'tate');
       const helmet = { shell: pick(r, shells), crest: (rank >= 1 || r() < 0.5) ? pick(r, crests) : null, visor: (rank >= 2 || r() < 0.4) ? pick(r, visors) : null };
       const shield = { shape: pick(r, shapes), emblem: pick(r, nat === 'samurajove' ? ['mon', 'mon', 'sun', 'moon', 'flame', 'star', 'dragon', 'tree'] : Lz.emblems), pattern: (rank >= 1 && r() < 0.6) ? pick(r, Lz.patterns) : undefined };

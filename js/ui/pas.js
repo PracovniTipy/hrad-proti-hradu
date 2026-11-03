@@ -41,7 +41,7 @@
   const AUR_PAL = { tunic: AUR.deep, tunicDark: '#0c1430', trim: AUR.teal, metal: '#dff6ff', metalDark: '#6a8ac8', cape: AUR.mid, plume: AUR.teal,
     hood: AUR.deep, hat: AUR.deep, robe: AUR.deep, lace: AUR.teal, mask: '#dff6ff', sashi: AUR.mid, mon: AUR.teal, crest: AUR.teal, fur: '#e8fbff', bear: '#c8d8f0' };
   if (window.ArmorForge && ArmorForge.helmet) {
-    ArmorForge.helmet('zare_h', { shell: 'circlet', crest: 'halo', colors: { metal: '#dff6ff', trim: AUR.teal, glow: AUR.teal, plume: AUR.teal } });
+    ArmorForge.helmet('zare_h', { shell: 'circlet', crest: 'crystal', colors: { metal: '#dff6ff', trim: AUR.teal, glow: AUR.teal, plume: AUR.teal } });
     ArmorForge.shield('zare_s', { shape: 'crescent', emblem: 'star', pattern: 'rays', colors: { field: AUR.deep, field2: AUR.mid, emblem: AUR.teal, rim: '#dff6ff' } });
   }
   if (window.Forge && Forge.melee) {
@@ -55,8 +55,8 @@
     id: 'zare', only: null, name: 'Strážce polární záře', rarity: 'Legendární', palette: AUR_PAL,
     look: { helmet: 'zare_h', shield: 'zare_s' },
     feat: { emblemColor: AUR.teal, af: { back: 'wing_crystal', chest: 'amulet', aura: 'stars', glow: AUR.teal, accent: AUR.vio, wing: '#bff4ff' } },
-    desc: 'Ledová korunka se svatozáří polární záře, krystalová křídla, hvězdný amulet a aura padajících hvězd. Jen v prémiovém battle pasu.',
-    en: { name: 'Aurora Warden', desc: 'An ice circlet with an aurora halo, crystal wings, a star amulet and an aura of falling stars. Premium Battle Pass only.' },
+    desc: 'Ledová korunka s krystaly polární záře, krystalová křídla, hvězdný amulet a aura padajících hvězd. Jen v prémiovém battle pasu.',
+    en: { name: 'Aurora Warden', desc: 'An ice circlet with aurora crystals, crystal wings, a star amulet and an aura of falling stars. Premium Battle Pass only.' },
     codeOnly: true, season: 's1', glow: AUR.teal, bonus: { hp: 0.1, dmg: 0.1 }, cost: {}
   });
   const AW = (id, name, cat, model, desc, en) => ({ id, name, rarity: 'Legendární', cat, model: Object.assign({ cat, id: 'zare' }, model), desc, en, codeOnly: true, season: 's1', bonus: { dmg: 0.1, hp: 0.1 }, cost: {} });

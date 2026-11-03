@@ -173,6 +173,37 @@
   /* ŽIVÁ SCÉNA – hrad v krajině národa: parallax, mraky, vlajky, stráže,
      hlídka na cestě a částice (lístky / sníh). Používá ji hlavní stránka
      i úprava hradu. Vrací funkci, která animaci zastaví. */
+  /* CACHE POSTAV PRO ŽIVÉ SCÉNY: vojáci na hlavní stránce a obránci na hradbách se kreslí
+     jednou do obrázku (podle pózy) a pak se jen vkládají – vektorové kreslení s efekty
+     legendární výbavy každý snímek hlavní stránku hodně zpomalovalo. */
+  const UC = new Map(), palIds = new WeakMap(), palStr = new Map(); let ucOn = false, palN = 0;
+  const rawDrawUnit = Art.drawUnit;
+  Art.drawUnit = function (ctx, def, pal, st) {
+    st = st || {};
+    if (!ucOn || !def || !pal || st.dead || st.dying) return rawDrawUnit.apply(this, arguments);
+    const tr = ctx.getTransform(), R = Math.max(0.5, Math.round(Math.hypot(tr.a, tr.b) * 4) / 4);
+    let fr;
+    if (st.atk >= 0) fr = 'a' + Math.min(9, Math.floor(st.atk * 10));
+    else if (st.moving) fr = 'w' + Math.floor((((st.walk || 0) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2) * 10);
+    else fr = 'i' + Math.floor(((st.t || 0) * 2.5) % 6);
+    if (!palIds.has(pal)) { let j; try { j = JSON.stringify(pal); } catch (e) { j = String(++palN); } if (!palStr.has(j)) palStr.set(j, ++palN); palIds.set(pal, palStr.get(j)); }
+    const sm = st.scaleMul || 1;
+    const key = def.id + '|' + palIds.get(pal) + '|' + fr + '|' + R + '|' + sm + '|' + (st.ring ? 1 : 0) + (st.noShadow ? 1 : 0) + (st.noWeapon ? 1 : 0) + (st.block ? 1 : 0);
+    let e = UC.get(key);
+    if (!e) {
+      const s = ((def.look && def.look.scale) || 1) * sm, M = !!(pal.mount || (def.look && def.look.mount));
+      const bx0 = (M ? -70 : -56) * s, by0 = (M ? -180 : -150) * s, bw = (M ? 212 : 176) * s, bh = (M ? 200 : 168) * s;
+      const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.ceil(bw * R)); cv.height = Math.max(1, Math.ceil(bh * R));
+      const c = cv.getContext('2d'); c.scale(R, R); c.translate(-bx0, -by0);
+      const st2 = Object.assign({}, st, { x: 0, y: 0, facing: 1 });
+      if (fr[0] === 'i') st2.t = (parseInt(fr.slice(1), 10) + 0.5) / 2.5;
+      rawDrawUnit.call(this, c, def, pal, st2);
+      e = { cv, bx0, by0, bw, bh }; UC.set(key, e);
+      if (UC.size > 500) UC.delete(UC.keys().next().value);
+    }
+    ctx.save(); ctx.translate(st.x || 0, st.y || 0); ctx.scale(st.facing === -1 ? -1 : 1, 1);
+    ctx.drawImage(e.cv, e.bx0, e.by0, e.bw, e.bh); ctx.restore();
+  };
   const sceneLayers = {};
   function liveScene(cv, getState) {
     let raf = 0, t0 = performance.now(), stopped = false;
@@ -185,6 +216,11 @@
       const modalOpen = !document.getElementById('modal').hidden;
       if (document.hidden || (modalOpen && lastDraw) || now - lastDraw < 32) { raf = requestAnimationFrame(frame); return; }
       lastDraw = now;
+      ucOn = true;
+      try { drawFrame(now); } finally { ucOn = false; }
+      raf = requestAnimationFrame(frame);
+    };
+    const drawFrame = now => {
       const st = getState();
       const F = GameData.factions[st.faction];
       const theme = F.theme;
@@ -192,7 +228,7 @@
       const L = sceneLayers[theme];
       const t = (now - t0) / 1000;
       const w = cv.clientWidth, h = cv.clientHeight;
-      if (!w || !h) { raf = requestAnimationFrame(frame); return; }
+      if (!w || !h) return;
       // velké ostré displeje (Mac): plátno nejvýš ~1,6 milionu pixelů, jinak se hra zadrhává
       const dpr = Math.max(0.75, Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(1.6e6 / (w * h))));
       if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
@@ -271,7 +307,6 @@
       const vg = ctx.createLinearGradient(0, cv.height * 0.6, 0, cv.height);
       vg.addColorStop(0, 'rgba(13,18,28,0)'); vg.addColorStop(1, 'rgba(13,18,28,.55)');
       ctx.fillStyle = vg; ctx.fillRect(0, 0, cv.width, cv.height);
-      raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => { stopped = true; cancelAnimationFrame(raf); };
@@ -1174,7 +1209,7 @@
           ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 114 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 115 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
