@@ -822,6 +822,13 @@
     }
   };
   // ve světě (pod texty): tma a světla v noci, mazlíček
+  const GLOW = {};
+  function glowSprite(col) {
+    if (GLOW[col]) return GLOW[col];
+    const cv = document.createElement('canvas'); cv.width = cv.height = 128; const c = cv.getContext('2d');
+    const g = c.createRadialGradient(64, 64, 2, 64, 64, 64); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128);
+    return (GLOW[col] = cv);
+  }
   B._drawWorldFx = function (ctx, t) {
     if (!this._nvInit) return;
     const w = this.wx, W = this.canvas.width, H = this.canvas.height;
@@ -831,17 +838,17 @@
       if (w === 'noc') { ctx.fillStyle = 'rgba(6,12,40,.48)'; ctx.fillRect(0, 0, W, H); }
       else if (w === 'bourka') { ctx.fillStyle = 'rgba(14,18,34,.38)'; ctx.fillRect(0, 0, W, H); }
       else if (w === 'dest') { ctx.fillStyle = 'rgba(30,40,60,.18)'; ctx.fillRect(0, 0, W, H); }
-      else if (w === 'zapad') { const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(255,120,60,.26)'); g.addColorStop(0.6, 'rgba(255,90,80,.12)'); g.addColorStop(1, 'rgba(80,20,60,.22)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+      else if (w === 'zapad') { if (!this._zg || this._zgH !== H) { this._zgH = H; this._zg = ctx.createLinearGradient(0, 0, 0, H); this._zg.addColorStop(0, 'rgba(255,120,60,.26)'); this._zg.addColorStop(0.6, 'rgba(255,90,80,.12)'); this._zg.addColorStop(1, 'rgba(80,20,60,.22)'); } ctx.fillStyle = this._zg; ctx.fillRect(0, 0, W, H); }
       else if (w === 'mlha') { ctx.fillStyle = 'rgba(220,228,236,.16)'; ctx.fillRect(0, 0, W, H); }
       ctx.restore();
       if (w === 'noc' || w === 'bourka') {
         // světla: brány hradů, hořící vojáci a mágové
         ctx.save(); ctx.globalCompositeOperation = 'lighter';
-        const glow = (x, y, r, col) => { const g = ctx.createRadialGradient(x, y, 2, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); };
+        const glow = (x, y, r, col) => ctx.drawImage(glowSprite(col), x - r, y - r, r * 2, r * 2);
         const gy = C().groundY;
         [this.side.player.castle.front, this.side.enemy.castle.front].forEach(x => { glow(x, gy - 120, 230, 'rgba(255,160,70,.30)'); glow(x, gy - 220, 120, 'rgba(255,190,90,.25)'); });
         let n = 0; const x0 = this.cam.x - 50, x1 = this.cam.x + this.cam.viewW + 50;
-        for (const u of this.units) { if (n > 40 || u.dead || u.x < x0 || u.x > x1) continue; if (u.dot && this.time < u.dot.until) { glow(u.x, u.y - 40, 70, 'rgba(255,140,50,.28)'); n++; } else if (u.def.roleKey === 'mag') { glow(u.x, u.y - 60, 46, 'rgba(140,180,255,.2)'); n++; } }
+        for (const u of this.units) { if (n > 12 || u.dead || u.x < x0 || u.x > x1) continue; if (u.dot && this.time < u.dot.until) { glow(u.x, u.y - 40, 70, 'rgba(255,140,50,.28)'); n++; } else if (u.def.roleKey === 'mag') { glow(u.x, u.y - 60, 46, 'rgba(140,180,255,.2)'); n++; } }
         ctx.restore();
       }
       ctx.setTransform(tr);
@@ -867,7 +874,7 @@
       } else if (w === 'snih') {
         ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); for (const p of P) { const x = p.x * W, y = p.y * H, r = 1.6 * d * p.s; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, TAU); } ctx.fill();
       } else if (w === 'mlha') {
-        for (const p of P) { const x = p.x * W, y = H * (0.45 + p.y * 0.5); const g = ctx.createRadialGradient(x, y, 10, x, y, 260 * d * p.s); g.addColorStop(0, 'rgba(235,240,245,.32)'); g.addColorStop(1, 'rgba(235,240,245,0)'); ctx.fillStyle = g; ctx.fillRect(x - 260 * d * p.s, y - 260 * d * p.s, 520 * d * p.s, 520 * d * p.s); }
+        const fg = glowSprite('rgba(235,240,245,.32)'); for (const p of P) { const x = p.x * W, y = H * (0.45 + p.y * 0.5), r = 260 * d * p.s; ctx.drawImage(fg, x - r, y - r, r * 2, r * 2); }
       }
     }
     // nápisy hlasatele

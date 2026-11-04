@@ -9,7 +9,7 @@
   --font-body: "Inter", "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
   --m-bg: #0a0e17;
   --m-bg2: #101726;
-  --m-glass: rgba(22, 30, 48, .72);
+  --m-glass: #161e30;
   --m-glass-hi: rgba(32, 43, 68, .82);
   --m-line: rgba(255, 255, 255, .08);
   --m-line-hi: rgba(255, 255, 255, .16);
@@ -50,8 +50,7 @@ b, strong { font-weight: 800; }
 
 /* ---------- HORNÍ LIŠTA: sklo ---------- */
 #topbar {
-  background: linear-gradient(180deg, rgba(18, 25, 42, .92), rgba(12, 17, 29, .88));
-  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+  background: linear-gradient(180deg, #141c2e, #0e1422); 
   box-shadow: 0 1px 0 var(--m-line), 0 12px 30px -12px rgba(0, 0, 0, .7);
 }
 #topbar::before { display: none; }
@@ -79,8 +78,7 @@ b, strong { font-weight: 800; }
 /* ---------- PANELY: sklo místo kůže, bez filigránů ---------- */
 .panel {
   border: 0; border-radius: var(--m-r);
-  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .015)), var(--m-glass);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .015)), var(--m-glass); 
   box-shadow: inset 0 0 0 1px var(--m-line), inset 0 1px 0 rgba(255, 255, 255, .07), var(--m-shadow);
 }
 .panel::after { display: none; }
@@ -126,10 +124,10 @@ b, strong { font-weight: 800; }
   box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .22), inset 3px 0 0 var(--m-gold);
 }
 .notice b, .notice .outro { color: var(--m-gold); }
-#toast { color: #eef2f8; font-family: var(--font-body); font-weight: 700; border: 0; border-radius: 14px; background: rgba(18, 24, 38, .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .35), 0 16px 36px -12px rgba(0, 0, 0, .8); }
+#toast { color: #eef2f8; font-family: var(--font-body); font-weight: 700; border: 0; border-radius: 14px; background: rgba(18, 24, 38, .92);  box-shadow: inset 0 0 0 1px rgba(245, 198, 98, .35), 0 16px 36px -12px rgba(0, 0, 0, .8); }
 
 /* ---------- OKNA ---------- */
-.overlay { background: rgba(5, 8, 14, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.overlay { background: rgba(5, 8, 14, .62);  }
 .modal-card {
   border: 0; border-radius: 22px;
   background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)), rgba(16, 22, 36, .94);
@@ -148,7 +146,7 @@ input, select { border-radius: 12px; border: 0; background: rgba(255, 255, 255, 
 input:focus { box-shadow: inset 0 0 0 2px var(--m-accent); outline: none; }
 
 /* ---------- BITVA: čistší ovládání ---------- */
-.b-orders, #bSquad { border-radius: 16px; background: rgba(12, 17, 29, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px var(--m-line), 0 14px 30px -14px rgba(0, 0, 0, .8); }
+.b-orders, #bSquad { border-radius: 16px; background: rgba(12, 17, 29, .9);  box-shadow: inset 0 0 0 1px var(--m-line), 0 14px 30px -14px rgba(0, 0, 0, .8); }
 .obtn { font-family: var(--font-body); font-weight: 800; letter-spacing: .02em; border-radius: 12px; }
 .obtn[aria-pressed="true"] { box-shadow: inset 0 0 0 1px rgba(255, 246, 210, .5), 0 8px 20px -10px rgba(245, 180, 70, .7); }
 #battle .hp { border-radius: 999px; }
@@ -168,3 +166,6 @@ input:focus { box-shadow: inset 0 0 0 2px var(--m-accent); outline: none; }
 .sk-card h3, .panel.skin h3, .ucard h3, .stat h3 { font-size: 16px; letter-spacing: .03em; }
 .hero-edit { font-family: var(--font-body); }
 #nav button span, #nav .lbl { font-family: var(--font-body); font-weight: 700; }
+
+/* výkon: žádné rozostření pozadí (backdrop-filter) – nad živou scénou a bitvou se přepočítávalo každý snímek */
+*, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }

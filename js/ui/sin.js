@@ -131,7 +131,7 @@
               G.drawPet(c, sel, t, act); c.restore();
             }
           }
-          el.querySelectorAll('canvas[data-petcv]').forEach(cv2 => { const p = G.pets.find(x => x.id === cv2.dataset.petcv); paintPet(cv2, p.id, !G.petUnlocked(save, p)); });
+          el.querySelectorAll('canvas[data-petcv]:not([data-done])').forEach(cv2 => { const p = G.pets.find(x => x.id === cv2.dataset.petcv); paintPet(cv2, p.id, !G.petUnlocked(save, p)); cv2.dataset.done = 1; });
         }
         requestAnimationFrame(anim);
       };

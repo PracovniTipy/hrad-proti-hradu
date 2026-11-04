@@ -1228,6 +1228,6 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .pet-card.r-rare, .pet-card.r-epic, .pet-card.r-legendary { border-color: color-mix(in srgb, var(--rc) 55%, transparent); }
 .pet-card.r-legendary { background: linear-gradient(180deg, rgba(242,180,64,.16), rgba(10,14,22,.6)); }
 .pet-card.r-epic { background: linear-gradient(180deg, rgba(178,124,255,.14), rgba(10,14,22,.6)); }
-.pet-card.r-legendary:not(.locked) { animation: petGlow 2.4s ease-in-out infinite; }
+.pet-card.r-legendary:not(.locked) { box-shadow: 0 0 14px rgba(242,180,64,.35); }
 @keyframes petGlow { 50% { box-shadow: 0 0 16px rgba(242,180,64,.45); } }
 .pet-rtag { color: var(--rc); font-weight: 900; }
