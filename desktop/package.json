@@ -13,7 +13,7 @@
     "electron-builder": "^26.18.0"
   },
   "build": {
-    "appId": "cz.hradprotihradu.hra",
+    "appId": "cz.broswars.castlewars",
     "productName": "Castle WARS",
     "files": [
       "main.js",

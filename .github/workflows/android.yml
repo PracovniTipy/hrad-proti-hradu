@@ -66,7 +66,6 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease bundleRelease
           cp app/build/outputs/apk/release/app-release.apk ../CastleWARS.apk
-          cp app/build/outputs/apk/release/app-release.apk ../HradProtiHradu.apk
           cp app/build/outputs/bundle/release/app-release.aab ../CastleWARS.aab
 
       - name: Zveřejnit ke stažení
@@ -79,6 +78,5 @@ jobs:
             (Soubor .aab je pro nahrání do Google Play.)
           files: |
             CastleWARS.apk
-            HradProtiHradu.apk
             CastleWARS.aab
           make_latest: true

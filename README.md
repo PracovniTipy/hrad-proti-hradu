@@ -1,4 +1,4 @@
-# Hrad proti hradu – hratelný prototyp
+# Castle WARS – hratelný prototyp
 
 2D mobilní strategie „hrad proti hradu“ ve fantasy středověkém stylu. Prototyp je napsaný v čistém HTML, CSS a JavaScriptu bez knihoven a bez sestavování. Běží v každém moderním prohlížeči na telefonu (Android i iPhone), tabletu i počítači.
 

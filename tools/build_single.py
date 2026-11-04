@@ -1,4 +1,4 @@
-"""Sloučí hru do jednoho HTML souboru (dist/hrad-proti-hradu.html).
+"""Sloučí hru do jednoho HTML souboru (dist/castle-wars.html).
 Spuštění ze složky projektu:  python3 tools/build_single.py
 Volba --fragment vytvoří verzi bez <html>/<head>/<body> (pro publikování jako artifact)."""
 import re, sys, pathlib
@@ -28,7 +28,7 @@ html = re.sub(r'<script>\s*// Offline režim.*?</script>', '', html, flags=re.S)
 
 out = root / 'dist'
 out.mkdir(exist_ok=True)
-(out / 'hrad-proti-hradu.html').write_text(html, encoding='utf-8')
+(out / 'castle-wars.html').write_text(html, encoding='utf-8')
 
 if '--fragment' in sys.argv:
     head = re.search(r'<head>(.*?)</head>', html, re.S).group(1)
