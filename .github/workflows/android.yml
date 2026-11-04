@@ -46,9 +46,10 @@ jobs:
           KS_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           if [ -n "$KS_B64" ]; then
-            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            printf '%s' "$KS_B64" | tr -d '\r\n\t ' | base64 -d > "$RUNNER_TEMP/upload.jks"
             echo "KS_PATH=$RUNNER_TEMP/upload.jks" >> $GITHUB_ENV
-            echo "KS_PASS=$KS_PW" >> $GITHUB_ENV
+            # heslo bez mezer a konců řádků (vložené z textového souboru je často má navíc)
+            echo "KS_PASS=$(printf '%s' "$KS_PW" | tr -d '\r\n\t ')" >> $GITHUB_ENV
           else
             # testovací klíč z repozitáře – jen pro instalaci z webu, NE pro Google Play
             echo "KS_PATH=$GITHUB_WORKSPACE/android-klic/testovaci.keystore" >> $GITHUB_ENV
