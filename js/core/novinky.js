@@ -91,7 +91,7 @@
   G.petNeed = p => p.need || { k: 'wins', n: p.wins || 0 };
   G.petProgress = (save, p) => { const N = G.petNeed(p); return N.k === 'wins' ? petWins(save) : N.k === 'kills' ? ((save.stats && save.stats.kills) || 0) : N.k === 'trophies' ? Object.keys(save.relics || {}).length : ((save.petsOwned || []).includes(p.id) ? 1 : 0); };
   G.petUnlocked = (save, p) => { const N = G.petNeed(p); return N.k === 'gems' ? (save.petsOwned || []).includes(p.id) : G.petProgress(save, p) >= N.n; };
-  G.petOf = save => { const id = save.pet || 'sova'; const p = PETS.find(x => x.id === id) || PETS[0]; return G.petUnlocked(save, p) ? p : PETS[0]; };
+  G.petOf = save => { const st = PETS.find(x => x.id === 'slepice') || PETS[0]; const p = PETS.find(x => x.id === (save.pet || 'slepice')) || st; return G.petUnlocked(save, p) ? p : st; };
 
   /* --- kreslení mazlíčků (místní souřadnice, hledí doprava, velikost ~ 50 px) --- */
   const OUT = '#1a1410';
@@ -394,6 +394,9 @@
   PETS.forEach(p => { p.rar = R0[p.id] || 'common'; });
   // pořadí: běžní → legendární
   const RO = { common: 0, rare: 1, epic: 2, legendary: 3 };
+  // sova a jednorožec vyřazeni; startovní (zdarma) je slepice
+  ['sova', 'duha'].forEach(id => { const i = PETS.findIndex(x => x.id === id); if (i >= 0) PETS.splice(i, 1); });
+  { const h = PETS.find(x => x.id === 'slepice'); if (h) h.need = { k: 'wins', n: 0 }; }
   PETS.sort((a, b) => RO[a.rar] - RO[b.rar]);
 
   const shine = (c, x, y, r, col) => { const g = c.createRadialGradient(x, y, 1, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, r * 2, r * 2); };
