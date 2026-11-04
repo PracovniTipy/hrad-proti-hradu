@@ -15,4 +15,10 @@
     p = q ? q[1].toLowerCase() : (m ? m[0].replace(/\..*/, '') : '');
   } catch (e) {}
   window.CW_PORTAL = p;
+  /* Belgie: placené truhly s náhodným obsahem jsou tam brané jako hazard → vypnout */
+  try {
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+    const langs = (navigator.languages || [navigator.language || '']).join(',');
+    window.CW_BE = tz === 'Europe/Brussels' || /-BE\b/i.test(langs);
+  } catch (e) { window.CW_BE = false; }
 })();

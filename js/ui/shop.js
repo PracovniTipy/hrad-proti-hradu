@@ -250,7 +250,7 @@
           <p class="muted">${ico('coin')} ${fmt(ch.gold[0])}–${fmt(ch.gold[1])}<br>${ch.gearChance >= 1 ? t('chest_gear_sure', { n: ch.gearCount || 1 }) : t('chest_gear_chance', { n: Math.round(ch.gearChance * 100) })}</p>
           <button class="link-btn" data-odds="${ch.id}">${t('odds')}</button>
         </div>
-        <button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ico('gem')} ${fmt(ch.gemsPrice)}`}</button>
+        ${window.CW_BE ? `<button class="btn buy-czk" disabled>${I18N.lang === 'cs' ? 'Nedostupné v Belgii' : 'Not available in Belgium'}</button>` : `<button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ico('gem')} ${fmt(ch.gemsPrice)}`}</button>`}
       </article>`;
     };
     const offers = GameData.offers.map(o => {
@@ -329,6 +329,7 @@
       });
     }));
     el.querySelectorAll('[data-chest]').forEach(b => b.addEventListener('click', () => {
+      if (window.CW_BE) return;
       const ch = GameData.chests[b.dataset.chest];
       const key = ch.period === 'day' ? dayKey() : weekKey();
       if (save.chests[ch.id] === key) return;
