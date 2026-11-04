@@ -31,17 +31,22 @@
     } catch (e) { return /[?&]store=ms\b/.test(location.search); }
   })();
   const MS_BILLING = 'https://store.microsoft.com/billing';
+  /* verze z Google Play (Android aplikace): platí se jen přes Google Play Billing,
+     itch.io se tam podle pravidel Google Play nesmí nabízet */
+  const GP = (() => { try { const C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform() && C.getPlatform && C.getPlatform() === 'android'); } catch (e) { return false; } })();
+  const gpPlug = () => (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativePurchases) || null;
   const msOk = () => typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
   /* id doplňku v Partner Center: cw + id bez podtržítek (gems_g1 → cwgemsg1) */
   const msId = pid => 'cw' + String(pid).replace(/[^a-z0-9]/gi, '').toLowerCase();
   const Platby = {
     get msStore() { return MS; },
+    get gpStore() { return GP; },
     msId,
     get portal() { return !!window.CW_PORTAL; },
     available() { return true; },
-    on() { if (window.CW_PORTAL) return false; return !MS || (msOk() && this._msItems !== false); },
+    on() { if (window.CW_PORTAL) return false; if (GP) return this._gpItems === true; return !MS || (msOk() && this._msItems !== false); },
     usd(czk) { return USD[czk] || Math.round(czk / 20) - 0.01; },
-    price(czk) { return '$' + this.usd(czk).toFixed(2); },
+    price(czk) { if (GP && this._gpPrice && this._gpPrice[czk]) return this._gpPrice[czk]; return '$' + this.usd(czk).toFixed(2); },
     terms: TERMS,
     url(id) { return STORE + 'castle-wars-' + String(id).replace(/_/g, '-') + '/purchase'; },
     open(url) {
@@ -54,6 +59,7 @@
     soon: /^(pass|sada_|skin_)/,
     buy(App, product) {
       if (this.soon && this.soon.test(product.id)) { App.toast(t('pay_soon')); return; }
+      if (GP) { this.buyGp(App, product); return; }
       if (MS) { this.buyMs(App, product); return; }
       if (window.HraPlatby && window.HraPlatby.buy) {
         window.HraPlatby.buy(product).then(ok => { if (ok) this.showGot(App, this.deliver(App, product.id)); }).catch(() => App.toast(t('pay_failed')));
@@ -96,6 +102,60 @@
         const err = { not_configured: 'itch_soon', itch_used: 'itch_used', itch_invalid: 'itch_invalid', acc_e_session: 'acc_e_session' }[body.error] || 'acc_e_net';
         return { ok: false, err };
       } catch (e) { return { ok: false, err: 'acc_e_net' }; }
+    },
+    /* ---- Google Play ---- */
+    _allIds() {
+      return GameData.offers.map(o => o.id).concat(GameData.gemPacks.map(g => 'gems_' + g.id), Object.keys(GameData.divineSets || {}).map(k => 'set_' + k), ['skill_drak']);
+    },
+    async buyGp(App, product) {
+      const P = gpPlug();
+      if (!P) { App.toast(t('pay_failed')); return; }
+      if (this._busy) return;
+      this._busy = true;
+      try {
+        const r = await P.purchaseProduct({ productIdentifier: msId(product.id), productType: 'inapp', quantity: 1 });
+        if (r && r.purchaseState && !/^(PURCHASED|1)$/i.test(String(r.purchaseState))) { App.toast(t('pay_failed')); return; }
+        const d = this.deliver(App, product.id);
+        if (r && r.purchaseToken) { try { await P.consumePurchase({ purchaseToken: r.purchaseToken }); } catch (e) {} }
+        if (App.current === 'obchod') App.go('obchod', { keepScroll: true });
+        this.showGot(App, d);
+      } catch (e) {
+        const m = String(e && (e.code || e.message) || '');
+        if (!/cancel/i.test(m)) App.toast(t('pay_failed'));
+      } finally { this._busy = false; }
+    },
+    /* zaplacené, ale nedoručené nákupy (pád aplikace) – doručí se při startu */
+    async gpRestore(App) {
+      const P = gpPlug(); if (!P) return;
+      try {
+        const res = await P.getPurchases({ productType: 'inapp' });
+        const ids = this._allIds();
+        for (const p of (res && res.purchases) || []) {
+          if (!/^(PURCHASED|1)$/i.test(String(p.purchaseState))) continue;
+          const pid = ids.find(x => msId(x) === p.productIdentifier);
+          if (!pid) continue;
+          const d = this.deliver(App, pid);
+          try { await P.consumePurchase({ purchaseToken: p.purchaseToken }); } catch (e) {}
+          this.showGot(App, d);
+        }
+      } catch (e) {}
+    },
+    gpInit(App) {
+      const P = gpPlug();
+      this._gpItems = false;
+      if (!P) { document.body.classList.add('paid-off'); return; }
+      const all = this._allIds();
+      const czkOf = pid => { const o = GameData.offers.find(x => x.id === pid); if (o) return o.czk; const g = GameData.gemPacks.find(x => 'gems_' + x.id === pid); if (g) return g.czk; const D = (GameData.divineSets || {})[pid.slice(4)]; if (pid.startsWith('set_') && D) return D.czk || (D.price && D.price.czk); const k = pid.startsWith('skill_') && GameData.skillById && GameData.skillById(pid.slice(6)); return k && k.price && k.price.czk; };
+      P.getProducts({ productIdentifiers: all.map(msId), productType: 'inapp' })
+        .then(r => {
+          const list = (r && r.products) || [];
+          this._gpPrice = {};
+          list.forEach(pr => { const pid = all.find(x => msId(x) === pr.identifier); const c = pid && czkOf(pid); if (c && pr.priceString) this._gpPrice[c] = pr.priceString; });
+          this._gpItems = list.length > 0;
+        })
+        .catch(() => { this._gpItems = false; })
+        .finally(() => { document.body.classList.toggle('paid-off', !this.on()); if (App.current === 'obchod') App.go('obchod', { keepScroll: true }); });
+      setTimeout(() => this.gpRestore(App), 1500);
     },
     /* ---- Microsoft Store ---- */
     async msSvc() {
@@ -158,6 +218,7 @@
       return { title, got };
     },
     init(App) {
+      if (GP) { this.gpInit(App); return; }
       /* záchrana: služba plateb Microsoft Storu funguje jen v aplikaci nainstalované z Microsoft Storu */
       if (!MS && msOk()) {
         window.getDigitalGoodsService(MS_BILLING).then(svc => {
