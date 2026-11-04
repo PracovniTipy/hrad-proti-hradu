@@ -633,6 +633,7 @@
   const baseDraw = (ctx, id, t, act) => { const f = DRAW[id] || DRAW.sova; f(ctx, t, act); };
   G.petDrawFns = DRAW;   // art_mazlicci.js přepisuje kresby
   G.drawPet = (ctx, id, t, act) => {
+    ctx.save(); ctx.translate(0, 26); ctx.scale(0.85, 0.85); ctx.translate(0, -26);   // všichni mazlíčci o 15 % menší (nohy zůstávají na stínu)
     const P = PETS.find(x => x.id === id), r = P && P.rar;
     if (r === 'legendary' || r === 'epic') {
       const col = (P.col || '#ffd24a');
@@ -642,6 +643,7 @@
       for (let i = 0; i < n; i++) { const a = t * (r === 'legendary' ? 1.4 : 1) + i / n * TAU, rx = 34, ry = 14; ctx.beginPath(); ctx.arc(Math.cos(a) * rx, Math.sin(a) * ry + 4, r === 'legendary' ? 2.2 : 1.6, 0, TAU); ctx.fillStyle = col; ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1; }
     }
     baseDraw(ctx, id, t, act);
+    ctx.restore();
   };
 
   /* ======================= TROFEJE ======================= */
@@ -1064,7 +1066,7 @@
     for (const c of p.coins) { const x = c.x + (p.x - c.x) * c.t, y = c.y + (p.y - c.y) * c.t - Math.sin(c.t * Math.PI) * 40; ctx.beginPath(); ctx.ellipse(x, y, 5, 5 * Math.abs(Math.cos(t * 8 + c.x)), 0, 0, TAU); ctx.fillStyle = '#ffd24a'; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = '#8a5a10'; ctx.stroke(); }
     const S = 1.25 * US();
     ctx.save(); ctx.translate(p.x, p.y); ctx.scale(S, S);
-    ctx.beginPath(); ctx.ellipse(0, 26, 16, 4, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 26, 13.6, 3.4, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fill();
     G.drawPet(ctx, p.def.id, t, p.act > 0);
     ctx.restore();
   };
