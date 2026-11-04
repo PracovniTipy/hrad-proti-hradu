@@ -628,6 +628,7 @@
   function star(c, x, y, r, col) { c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fillStyle = col; c.fill(); }
   // legendární mazlíčci mají kolem sebe zářivou auru, epičtí jemné jiskry
   const baseDraw = (ctx, id, t, act) => { const f = DRAW[id] || DRAW.sova; f(ctx, t, act); };
+  G.petDrawFns = DRAW;   // art_mazlicci.js přepisuje kresby
   G.drawPet = (ctx, id, t, act) => {
     const P = PETS.find(x => x.id === id), r = P && P.rar;
     if (r === 'legendary' || r === 'epic') {
