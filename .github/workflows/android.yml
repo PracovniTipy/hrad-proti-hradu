@@ -48,7 +48,6 @@ jobs:
           if [ -n "$KS_B64" ]; then
             printf '%s' "$KS_B64" | tr -d '\r\n\t ' | base64 -d > "$RUNNER_TEMP/upload.jks"
             echo "KS_PATH=$RUNNER_TEMP/upload.jks" >> $GITHUB_ENV
-            echo "Kontrola: delka hesla $(printf '%s' "$KS_PW" | tr -d '\r\n\t ' | wc -c), otisk hesla $(printf '%s' "$KS_PW" | tr -d '\r\n\t ' | sha256sum | cut -c1-8), otisk klice $(sha256sum "$RUNNER_TEMP/upload.jks" | cut -c1-8)"
             # heslo bez mezer a konců řádků (vložené z textového souboru je často má navíc)
             echo "KS_PASS=$(printf '%s' "$KS_PW" | tr -d '\r\n\t ')" >> $GITHUB_ENV
           else
