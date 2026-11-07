@@ -18,7 +18,7 @@ GameData.calc = {
   buildingCost(b, level) {
     return Math.round(b.baseCost * Math.pow(b.growth, level) / 10) * 10;
   },
-  castleHp: (l) => 2000 + l * 350,
+  castleHp: (l) => (2000 + l * 350) * 2,   // hrady mají 2× víc životů
   income: (l) => (16 + l * 2.2) * 0.95,   // o 5 % pomalejší příjem mincí
   unitMult: (l) => 1 + Math.min(10, l) * 0.03,   // nejvýš +30 %
   towerDmg: (l) => (l > 0 ? 8 + l * 5 : 0),
@@ -66,7 +66,7 @@ GameData.calc = {
      jeho vln, životy hradu a věž – rozhoduje strategie. */
   enemyStats(diff) {
     return {
-      castleHp: Math.round(2000 * (0.75 + 0.25 * diff) / 50) * 50,
+      castleHp: Math.round(2000 * (0.75 + 0.25 * diff) / 50) * 50 * 2,
       // o něco lehčí začátek: nepřítel má o 10 % menší příjem (u lehkých úrovní až o 18 %)
       income: 16 * 0.95 * (0.8 + 0.2 * diff) * (diff < 1 ? 0.82 : diff < 1.5 ? 0.88 : 0.92),
       hpMult: 1,
