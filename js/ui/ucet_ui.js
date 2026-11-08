@@ -15,19 +15,21 @@
   const REG_BONUS = 100;   // drahokamy za registraci (jednou na postup)
   const App0 = () => window.App || {};
   const UcetUI = {
-    /* Jednorázová výzva k registraci po 2. vítězství (ne na herních portálech) */
+    /* Výzva k registraci po každé 3. bitvě, dokud hráč neklikne „Znovu nezobrazovat“ (ne na herních portálech) */
     nudge(App) {
-      const sv = App.save;
-      if (window.CW_PORTAL || !sv || sv.regAsked || (sv.stats && sv.stats.wins || 0) < 2) return;
+      const sv = App.save; if (!sv) return;
+      const n = ((sv.stats && sv.stats.wins) || 0) + ((sv.stats && sv.stats.losses) || 0);
+      if (window.CW_PORTAL || sv.regNever || n < 3 || n % 3 !== 0 || sv.regAskedAt === n) return;
       if (Ucet.logged() && !Ucet.guest()) return;
       if (window.Tutorial && Tutorial.active) return;
-      sv.regAsked = 1; Save.save();
+      sv.regAskedAt = n; Save.save();
       setTimeout(() => {
         if (App.current !== 'hrad' || App.battle) return;
         App.modal(`<div class="eyebrow">${t('acc_title')}</div><h2>${t('acc_nudge_t')}</h2><p>${t('acc_nudge_p')}</p>
           <p class="acc-state">${ico('gem')} <b>${t('acc_bonus', { n: REG_BONUS })}</b></p>
-          <div class="modal-actions"><button class="btn btn-green" id="nudgeGo">${t('acc_set')}</button><button class="btn" data-close>${t('acc_later')}</button></div>`, (c, close) => {
+          <div class="modal-actions"><button class="btn btn-green" id="nudgeGo">${t('acc_set')}</button><button class="btn" data-close>${t('acc_later')}</button><button class="btn" id="nudgeNever">${t('acc_never')}</button></div>`, (c, close) => {
           c.querySelector('#nudgeGo').addEventListener('click', () => { close(); this.open(App, 'register'); });
+          c.querySelector('#nudgeNever').addEventListener('click', () => { sv.regNever = 1; Save.save(); close(); });
         });
       }, 900);
     },

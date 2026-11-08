@@ -555,6 +555,7 @@
     acc_nudge_t: ['Ulož si postup', 'Save your progress'],
     acc_nudge_p: ['Vedeš si skvěle! Nastav si jméno, e-mail a heslo – o postup nepřijdeš ani při ztrátě telefonu a můžeš hrát na více zařízeních.', 'You are doing great! Set a name, e-mail and password – you will not lose your progress even if you lose your phone, and you can play on more devices.'],
     acc_later: ['Teď ne', 'Not now'],
+    acc_never: ['Znovu nezobrazovat', 'Don\'t show again'],
     acc_logged_out: ['Odhlášeno. Postup zůstává i v tomto zařízení.', 'Logged out. Progress stays on this device too.'],
     acc_loaded: ['Postup načten.', 'Progress loaded.'],
     acc_levels: ['{n} úrovní', '{n} levels'],
