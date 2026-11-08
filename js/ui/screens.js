@@ -466,6 +466,7 @@
       el.querySelector('#petBtn').addEventListener('click', () => App.go('mazlicci'));
       el.querySelector('#hallBtn').addEventListener('click', () => Sin.openHall(App));
       Instalace.bind(App, el);
+      Instalace.testBanner(App, el);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
     }

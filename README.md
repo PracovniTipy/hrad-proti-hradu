@@ -164,6 +164,14 @@ Do `GameData.unitSkins` nebo `GameData.castleSkins` v `js/data/skins.js` přidej
 
 Projekt je připravený pro **Capacitor** (`npm install`, `npx cap add android`, `npm run android`). Celý postup včetně podpisu, poplatků, testování a dalších obchodů (itch.io, CrazyGames, Poki, Microsoft Store, Steam) je v **`STORE_NAVOD.md`**.
 
+### Testování na Androidu (uzavřený test Google Play)
+
+Hraj Castle WARS na Androidu jako první – stačí 2 kroky:
+1. Přidej se do skupiny testerů: https://groups.google.com/g/castlewars-testers (klikni na „Připojit se ke skupině“, použij Google účet z telefonu s Androidem).
+2. Otevři https://play.google.com/apps/testing/cz.broswars.castlewars, klikni na „Stát se testerem“ a nainstaluj hru z Google Play. Nech ji nainstalovanou aspoň 14 dní.
+
+Ve webové verzi (a na itch.io, v Microsoft Storu a na počítači) to samé ukazuje zavíratelná karta na domovské obrazovce (`Instalace.testBanner` v `js/ui/instalace.js`); v aplikaci pro Android, na iPhonu a na herních portálech se nezobrazuje.
+
 Dlouhodobě se dá hra přepsat do **Godot 4**: data jednotek, skinů a kampaně jsou oddělená a logika boje (`battle.js`, metoda `update`) je oddělená od kreslení.
 
 ## Novinky (verze 21)

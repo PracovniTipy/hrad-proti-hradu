@@ -41,7 +41,49 @@
         <div class="modal-actions"><button class="btn" data-close>${t('back')}</button></div>`);
     },
     button(cls) { return `<button class="${cls || 'install-btn'}" data-install ${this.available() ? '' : 'hidden'}><span class="inst-ico">⬇</span><span>${L('Nainstalovat', 'Install')}</span></button>`; },
-    bind(App, el) { el.querySelectorAll('[data-install]').forEach(b => b.addEventListener('click', () => this.run(App))); }
+    bind(App, el) { el.querySelectorAll('[data-install]').forEach(b => b.addEventListener('click', () => this.run(App))); },
+
+    /* KARTA „Hraj na Androidu jako první“ – nábor testerů uzavřeného testu Google Play.
+       Jen mimo nativní aplikaci pro Android (web, itch.io, Microsoft Store, počítač), ne na iPhonu
+       a ne na herních portálech. Po zavření (×) se už neukáže. */
+    testBanner(App, el) {
+      const KEY = 'cw-gp-test-skryto';
+      let hidden = false;
+      try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) { hidden = false; }
+      const nativeAndroid = (() => { try { const C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform() && C.getPlatform && C.getPlatform() === 'android'); } catch (e) { return false; } })();
+      if (hidden || nativeAndroid || window.CW_PORTAL || isIOS()) return;
+      const host = el.querySelector('.hero-live');
+      if (!host) return;
+      const GROUP = 'https://groups.google.com/g/castlewars-testers';
+      const PLAY = 'https://play.google.com/apps/testing/cz.broswars.castlewars';
+      const card = document.createElement('aside');
+      card.className = 'gp-test';
+      card.setAttribute('aria-label', L('Testování na Androidu', 'Android testing'));
+      card.innerHTML = `<button class="gp-x" aria-label="${L('Zavřít', 'Close')}">×</button>
+        <div class="gp-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5v17l9-8.5z" fill="#34a853"/><path d="M4 3.5l12.2 6.9L13 12.5z" fill="#4285f4"/><path d="M4 20.5l12.2-6.9L13 11.5z" fill="#ea4335"/><path d="M16.2 10.4L20 12.5l-3.8 2.1L13 12z" fill="#fbbc04"/></svg>
+          <div><b>${L('Hraj Castle WARS na Androidu jako první', 'Play Castle WARS on Android first')}</b>
+          <small>${L('Hledáme testery z Google Play – 2 kroky:', 'Become a Google Play tester in 2 steps:')}</small></div></div>
+        <ol class="gp-steps">
+          <li><a href="${GROUP}" target="_blank" rel="noopener">${L('Přidej se do skupiny testerů', 'Join the testers group')}</a>
+            <small>${L('Klikni na „Připojit se ke skupině“ – s Google účtem z telefonu s Androidem.', 'Click "Join group" – use the Google account from your Android phone.')}</small></li>
+          <li><a href="${PLAY}" target="_blank" rel="noopener">${L('Nainstaluj z Google Play', 'Install from Google Play')}</a>
+            <small>${L('Klikni na „Stát se testerem“, nainstaluj hru a nech ji v telefonu aspoň 14 dní.', 'Tap "Become a tester", install the game and keep it installed for at least 14 days.')}</small></li>
+        </ol>`;
+      card.querySelector('.gp-x').addEventListener('click', () => {
+        try { localStorage.setItem(KEY, '1'); } catch (e) { /* prohlížeč ukládání nepovolil */ }
+        card.remove();
+      });
+      card.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { if (window.Stat) try { Stat.ev('gp_test', {}); } catch (e) {} }));
+      host.appendChild(card);
+      /* karta vždy nad spodní lištou (na telefonu je dole, na počítači nahoře) */
+      const fit = () => {
+        if (!card.isConnected) { window.removeEventListener('resize', fit); return; }
+        const n = document.getElementById('nav'), r = n && n.getBoundingClientRect(), hr = host.getBoundingClientRect();
+        const low = r && r.height && r.top > hr.top + hr.height / 2;
+        card.style.setProperty('--gp-bottom', (low ? Math.max(8, Math.round(hr.bottom - r.top + 12)) : 16) + 'px');
+      };
+      fit(); window.addEventListener('resize', fit);
+    }
   };
   window.Instalace = Instalace;
 })();
