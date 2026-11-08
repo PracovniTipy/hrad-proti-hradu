@@ -12,7 +12,25 @@
 
   const PRIV = 'https://pracovnitipy.github.io/hrad-proti-hradu/soukromi.html';
   const privLink = () => `<a href="${PRIV}" target="_blank" rel="noopener">${t('priv_link')}</a> · <a href="https://pracovnitipy.github.io/hrad-proti-hradu/obchodni-podminky.html" target="_blank" rel="noopener">${t('terms_link')}</a>`;
+  const REG_BONUS = 100;   // drahokamy za registraci (jednou na postup)
+  const App0 = () => window.App || {};
   const UcetUI = {
+    /* Jednorázová výzva k registraci po 2. vítězství (ne na herních portálech) */
+    nudge(App) {
+      const sv = App.save;
+      if (window.CW_PORTAL || !sv || sv.regAsked || (sv.stats && sv.stats.wins || 0) < 2) return;
+      if (Ucet.logged() && !Ucet.guest()) return;
+      if (window.Tutorial && Tutorial.active) return;
+      sv.regAsked = 1; Save.save();
+      setTimeout(() => {
+        if (App.current !== 'hrad' || App.battle) return;
+        App.modal(`<div class="eyebrow">${t('acc_title')}</div><h2>${t('acc_nudge_t')}</h2><p>${t('acc_nudge_p')}</p>
+          <p class="acc-state">${ico('gem')} <b>${t('acc_bonus', { n: REG_BONUS })}</b></p>
+          <div class="modal-actions"><button class="btn btn-green" id="nudgeGo">${t('acc_set')}</button><button class="btn" data-close>${t('acc_later')}</button></div>`, (c, close) => {
+          c.querySelector('#nudgeGo').addEventListener('click', () => { close(); this.open(App, 'register'); });
+        });
+      }, 900);
+    },
     /* Sekce v profilu */
     profileHtml() {
       const S = Ucet.s || {};
@@ -24,7 +42,7 @@
       const state = `<p class="acc-state">${ico('crown')} ${Ucet.logged() ? (Ucet.err ? `<span class="bad">${t('acc_save_err')}</span>` : `${t('acc_auto')} <b>${when(S.savedAt)}</b>`) : t('acc_auto_local')}</p>`;
       if (!Ucet.logged() || Ucet.guest()) return `<section class="panel acc-box">
           <div class="acc-head"><span class="acc-ico">${ico('shield')}</span><div><b>${t('acc_title')}</b><p class="muted">${t('acc_why2')}</p></div></div>
-          ${state}
+          ${state}${(window.GameData && App0().save && !App0().save.regBonus) ? `<p class="acc-state">${ico('gem')} <b>${t('acc_bonus', { n: REG_BONUS })}</b></p>` : ''}
           <div class="modal-actions"><button class="btn btn-green" data-acc="register">${t('acc_set')}</button><button class="btn" data-acc="login">${t('acc_login_other')}</button></div>
           ${Ucet.logged() ? `<div class="acc-foot">${privLink()} · <button class="link-btn" data-acc="delete">${t('acc_delete')}</button></div>` : `<div class="acc-foot">${privLink()}</div>`}
         </section>`;
@@ -101,7 +119,9 @@
             if (reg) {
               if (!App.save.name || App.save.name === 'Velitel') App.save.name = u.slice(0, 16);
               await Ucet.register(u, m, p);
-              close(); App.persist(); App.toast(t('acc_welcome', { name: u })); App.go(App.current || 'profil', { keepScroll: true });
+              let bonus = '';
+              if (!App.save.regBonus) { App.save.regBonus = 1; App.save.gems = (App.save.gems || 0) + REG_BONUS; bonus = ' ' + t('acc_bonus_got', { n: REG_BONUS }); }
+              close(); App.persist(); App.toast(t('acc_welcome', { name: u }) + bonus); App.go(App.current || 'profil', { keepScroll: true });
             } else {
               const r = await Ucet.login(u, p);
               close(); this.afterLogin(App, r);

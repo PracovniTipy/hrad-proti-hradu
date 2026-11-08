@@ -50,6 +50,7 @@
         if (name === 'hrad' && !tut.home) { tut.home = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.HOME), 600); }
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
+      if (name === 'hrad' && window.UcetUI && UcetUI.nudge) try { UcetUI.nudge(this); } catch (e) { /* nic */ }
       this.screenEl.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
       this.screenEl.scrollTop = opts.keepScroll ? scroll : 0;
       if (location.hash.slice(1) !== name) { try { history.replaceState(null, '', '#' + name); } catch (e) { /* nic */ } }
