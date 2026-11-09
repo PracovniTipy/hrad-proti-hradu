@@ -1556,7 +1556,7 @@
       // na vyšší obtížnost používá i ohnivý déšť
       if (this.o.difficulty >= 1.25 && s.coins > 420) {
         const near = this.units.filter(u => u.team === 'player' && !u.dead && u.x > C().enemyFront - 500).length;
-        if (near >= 4) this.useAbility('enemy', 'ohen');
+        if (near >= 4 && this.time >= 60 && this.time - (this._eSkillAt || -1e9) >= 30 && this.useAbility('enemy', 'ohen')) this._eSkillAt = this.time;
       }
     }
     /* ---------------- AUTOMATICKÉ VYSÍLÁNÍ (přepínač AUTO) ---------------- */

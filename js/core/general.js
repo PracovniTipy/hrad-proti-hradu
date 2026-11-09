@@ -383,6 +383,8 @@
   /* kouzla nepřítele: stejná pravidla jako hráč (mince, obnova 2,5 min) */
   function useSkills(B, br, S) {
     if (!br.skills.length || B.o.noSkills) return;
+    // delší prodlevy: první kouzlo nejdřív po 60 s, mezi kouzly nepřítele aspoň 30 s
+    if (B.time < 60 || B.time - (B._eSkillAt || -1e9) < 30) return;
     if (Math.random() > 0.35 + br.per.magic * 0.5) return;
     const E = B.side.enemy, cfg = C(), front = E.castle.front;
     const foes = S.foes.filter(u => !B._sheltered(u));
@@ -409,7 +411,7 @@
         case 'gold': use = true; break;
         default: use = cluster() >= need;
       }
-      if (use && B.useAbility('enemy', id)) { br.saving = 0; return; }
+      if (use && B.useAbility('enemy', id)) { br.saving = 0; B._eSkillAt = B.time; return; }
     }
   }
 
