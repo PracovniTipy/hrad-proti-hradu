@@ -212,7 +212,7 @@
       const o = GameData.offers.find(x => x.id === pid);
       if (o) { title = o.name; got = Shop.grant(App, o.give); }
       else if (pid.startsWith('gems_')) { const x = GameData.gemPacks.find(g => 'gems_' + g.id === pid); if (x) { title = t('gems_n', { n: x.gems }); got = Shop.grant(App, { gems: x.gems }); } }
-      else if (pid.startsWith('set_')) { const id = pid.slice(4), D = GameData.divineSets[id]; if (D) { title = I18N.lang === 'cs' ? D.name : D.en; got = Shop.grant(App, { set: id }); } }
+      else if (pid.startsWith('set_')) { const id = pid.slice(4), D = GameData.divineSets[id]; if (D) { title = I18N.L(D.name, D.en); got = Shop.grant(App, { set: id }); } }
       else if (window.Pas && /^(pass|sada_|skin_)/.test(pid)) { const r = Pas.deliver(App, pid); if (r) { title = r.title; got = r.got; } }
       else if (pid.startsWith('skill_')) { const k = GameData.skillById(pid.slice(6)); if (k) { title = k.name; got = Shop.grant(App, { skills: [k.id] }); } }
       if (window.Stat) Stat.ev('purchase', { p: pid });

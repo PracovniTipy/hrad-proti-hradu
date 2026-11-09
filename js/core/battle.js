@@ -190,7 +190,7 @@
           if (!drag || drag.moved || this.over) return;
           drag.sel = true;
           const w = toWorld(drag.x, drag.y); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] };
-          if (navigator.vibrate) try { navigator.vibrate(15); } catch (_) {}
+          if (navigator.vibrate && (window.Volby ? Volby.on('vibrate') : true)) try { navigator.vibrate(15); } catch (_) {}
         }, 380);
       };
       this._onMove = e => {
@@ -257,7 +257,7 @@
       const cw = Math.max(50, r.width), ch = Math.max(50, r.height);
       // automatická kvalita: na slabším zařízení se sníží rozlišení plátna, aby hra běžela plynule
       if (this._q == null) { try { this._q = +localStorage.getItem('cw-q') || 1; } catch (e) { this._q = 1; } }
-      this.dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 2) * this._q);
+      this.dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 2) * (window.Volby && Volby.on('saver') ? Math.min(this._q, 0.6) : this._q));
       this.canvas.width = Math.round(cw * this.dpr);
       this.canvas.height = Math.round(ch * this.dpr);
       this.canvas.style.width = cw + 'px';
@@ -570,7 +570,7 @@
         } else if (a.kind === 'breath' || a.kind === 'tornado') this.shake = Math.max(this.shake, 0.6);
         this.flash = { color: col, t: 0, life: 0.45 };
       }
-      this.later(0.05, () => this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.5, txt: a.name, color: '#fff1c4', t: 0, life: 1.8, big: true, huge: true }));
+      if ((window.Volby ? Volby.on('skillTxt') : true)) this.later(0.05, () => this.texts.push({ x: this.cam.x + this.cam.viewW / 2, y: (this.H - this.cam.viewH) + this.cam.viewH * 0.5, txt: a.name, color: '#fff1c4', t: 0, life: 1.8, big: true, huge: true }));
       if (own && this.o.onSkill) this.o.onSkill(a);
       return true;
     }
@@ -1811,7 +1811,7 @@
       ctx.setTransform(sc, 0, 0, sc, -(this.cam.x - par) * sc, -viewTop * sc);
       this._drawTiles(ctx, 'far', this.cam.x - par, this.cam.viewW);
       Art.drawClouds(ctx, this.layers.clouds, (this._rt || 0), this.W);
-      const shk = this.shake > 0 ? (Math.random() - 0.5) * 14 * this.shake : 0;
+      const shk = this.shake > 0 && (window.Volby ? Volby.on('shake') : true) ? (Math.random() - 0.5) * 14 * this.shake : 0;
       ctx.setTransform(sc, 0, 0, sc, (-this.cam.x + shk) * sc, (-viewTop + shk * 0.6) * sc);
       this._drawTiles(ctx, 'near', this.cam.x - shk, this.cam.viewW);
 

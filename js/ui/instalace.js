@@ -5,7 +5,7 @@
    ========================================================================= */
 (function () {
   let deferred = null;
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const installed = () => matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches
     || navigator.standalone === true || !!window.Capacitor || /Electron/i.test(navigator.userAgent);
   const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

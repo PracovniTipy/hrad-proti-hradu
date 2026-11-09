@@ -13,7 +13,7 @@
 (function () {
   if (!window.Battle) return;
   const G = GameData, B = Battle.prototype, TAU = Math.PI * 2;
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const C = () => G.battleConfig;
   const US = () => (C().unitScale || 1);
 
@@ -28,25 +28,12 @@
       for (const re of male) { const v = vs.find(x => re.test(x.name) && !/female/i.test(x.name)); if (v) return (this.voice = v); }
       return (this.voice = null);
     },
-    say(text, prio) {
-      try {
-        if (!window.Zvuk || !Zvuk.settings().sfx || !('speechSynthesis' in window)) return;
-        const now = performance.now();
-        if (!prio && now - this.last < 1200) return;          // ať hlasatel nemluví přes sebe
-        if (prio) speechSynthesis.cancel();
-        this.last = now;
-        const u = new SpeechSynthesisUtterance(text);
-        const v = this.voice || this.pickVoice(); if (!v) return;   // bez mužského hlasu raději ticho
-        u.lang = v.lang; u.voice = v;
-        u.rate = 0.95; u.pitch = 0.7; u.volume = Math.min(1, (Zvuk.settings().sfxVol || 100) / 100);
-        speechSynthesis.speak(u);
-      } catch (e) { /* bez hlasu */ }
-    }
+    say() { /* hlasatel úplně odstraněn – žádná mluvená slova */ }
   };
-  if ('speechSynthesis' in window) { try { speechSynthesis.onvoiceschanged = () => Ann.pickVoice(); } catch (e) {} }
+  try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
 
   // hlasatel a velké nápisy jsou vypnuté (rušily a překrývaly je ovládací panely); odměny za série zůstávají
-  function banner(b, txt, sub, color, big, voice, prio) { if (voice) Ann.say(voice, prio); }   // bez nápisů, jen mužský hlas
+  function banner() {}   // bez nápisů i hlasu
   function bannerOld(b, txt, sub, color, big, voice, prio) {
     (b._banners = b._banners || []).push({ txt, sub, color: color || '#ffd77a', t: 0, life: big ? 2.6 : 2, big: !!big });
     if (b._banners.length > 3) b._banners.shift();
@@ -686,7 +673,7 @@
   B._nvInit2 = function () {
     this._nvInit = true;
     const mode = (this.o && this.o.mode) || this.mode;
-    this.wx = this.o && this.o.weather ? this.o.weather : pickWeather(this);
+    this.wx = this.o && this.o.weather ? this.o.weather : (!this.net && window.Volby && !Volby.on('weather') ? 'den' : pickWeather(this));
     const W = WX[this.wx];
     this._wxParts = [];
     this._streak = { n: 0, last: -9, said: 0 }; this._enStreak = { n: 0, last: -9, said: false };
@@ -696,7 +683,7 @@
     // mazlíček (jen pro hráče, ne v online bitvách proti lidem)
     if (save && !this.net) {
       const p = G.petOf(save);
-      this.pet = { def: p, x: this.side.player.castle.front + 120, y: C().laneTop - 120, cd: p.cd * 0.6, act: 0, uses: 0, tx: null, ty: null, coins: [] };
+      if (window.Volby ? Volby.on('pet') : true) this.pet = { def: p, x: this.side.player.castle.front + 120, y: C().laneTop - 120, cd: p.cd * 0.6, act: 0, uses: 0, tx: null, ty: null, coins: [] };
       // bonus trofejí: víc mincí
       const k = 1 + G.trophyBonus(save);
       if (k > 1) { const s = this.side.player; s.income *= k; s.baseIncome = (s.baseIncome || s.income / k) * k; }

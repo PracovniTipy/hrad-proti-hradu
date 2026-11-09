@@ -12,7 +12,7 @@
    uložený klan (save.klan) a vlajka i bonus fungují dál.
    ========================================================================= */
 (function () {
-  const L = (cs, en) => (window.I18N && I18N.lang === 'cs') ? cs : en;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
   const portal = () => !!window.CW_PORTAL;

@@ -445,21 +445,21 @@
             <span class="daily-lbl">${t('tab_pas')}</span>
             ${window.Pas && Pas.ready(save) ? '<i class="daily-dot">!</i>' : ''}
           </button>
-          <button class="daily-btn pet-btn" id="petBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Mazlíček' : 'Pet'}">
+          <button class="daily-btn pet-btn" id="petBtn" aria-label="${I18N.L('Mazlíček', 'Pet')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><ellipse cx="60" cy="58" rx="30" ry="32" fill="#f4f8ff" stroke="#1a1410" stroke-width="4"/><path d="M34 34q26-10 52 0L64 4q-6 18-30 30z" fill="#3a4aa8" stroke="#1a1410" stroke-width="4" stroke-linejoin="round"/><circle cx="48" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="72" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="50" cy="52" r="5" fill="#e8a020"/><circle cx="74" cy="52" r="5" fill="#e8a020"/><path d="M56 62h8l-4 8z" fill="#e8a020" stroke="#1a1410" stroke-width="2"/><path d="M30 60q-20-6-24 14 14-4 24 0zM90 60q20-6 24 14-14-4-24 0z" fill="#e8f0ff" stroke="#1a1410" stroke-width="3"/></svg></span>
-            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Mazlíček' : 'Pet'}</span>
+            <span class="daily-lbl">${I18N.L('Mazlíček', 'Pet')}</span>
           </button>
-          <button class="daily-btn hall-btn" id="hallBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Síň slávy' : 'Hall of Fame'}">
+          <button class="daily-btn hall-btn" id="hallBtn" aria-label="${I18N.L('Síň slávy', 'Hall of Fame')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M36 10h48v18a24 24 0 0 1-48 0z" fill="#ffd24a" stroke="#1a0e06" stroke-width="4"/><path d="M36 16H20q0 22 20 24M84 16h16q0 22-20 24" fill="none" stroke="#1a0e06" stroke-width="4"/><path d="M52 52h16v14H52z" fill="#c99a2a" stroke="#1a0e06" stroke-width="4"/><path d="M38 66h44v14H38z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M60 20l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z" fill="#fff6c8"/></svg></span>
-            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Síň slávy' : 'Hall of Fame'}</span>
+            <span class="daily-lbl">${I18N.L('Síň slávy', 'Hall of Fame')}</span>
           </button>
-          ${window.CW_PORTAL ? '' : `<button class="daily-btn friends-btn" id="friendsBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Přátelé' : 'Friends'}">
+          ${window.CW_PORTAL ? '' : `<button class="daily-btn friends-btn" id="friendsBtn" aria-label="${I18N.L('Přátelé', 'Friends')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><circle cx="42" cy="34" r="16" fill="#ffd9b0" stroke="#1a0e06" stroke-width="4"/><path d="M14 92c0-22 12-34 28-34s28 12 28 34z" fill="#3d7fe0" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><circle cx="80" cy="38" r="14" fill="#ffd9b0" stroke="#1a0e06" stroke-width="4"/><path d="M58 92c0-20 10-30 22-30s24 10 24 30z" fill="#d6453c" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M92 6l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#ffd24a" stroke="#1a0e06" stroke-width="2.5"/></svg></span>
-            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Přátelé' : 'Friends'}</span>
+            <span class="daily-lbl">${I18N.L('Přátelé', 'Friends')}</span>
           </button>
-          <button class="daily-btn turnaj-btn" id="turnajBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Turnaj' : 'Tournament'}">
+          <button class="daily-btn turnaj-btn" id="turnajBtn" aria-label="${I18N.L('Turnaj', 'Tournament')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M30 92V40h60v52z" fill="#7a4a1c" stroke="#1a0e06" stroke-width="4"/><path d="M24 40l36-30 36 30z" fill="#d6453c" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M60 50l6 12 13 2-9 9 2 13-12-6-12 6 2-13-9-9 13-2z" fill="#ffd24a" stroke="#1a0e06" stroke-width="3" stroke-linejoin="round"/></svg></span>
-            <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Turnaj' : 'Tournament'}</span>
+            <span class="daily-lbl">${I18N.L('Turnaj', 'Tournament')}</span>
           </button>`}
         </section>
       </div>`;
@@ -584,7 +584,7 @@
               return `<div class="dec-row">
                 <div><b>${esc(d.name)}</b><small>${esc(d.desc)}</small></div>
                 ${owned ? `<button class="toggle ${on ? 'on' : ''}" data-decor="${d.id}" aria-pressed="${!!on}"><i></i>${on ? t('on') : t('off')}</button>`
-                  : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.lang === 'cs' ? 'Získat s útokem' : 'Get with attack'}</button>`
+                  : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.L('Získat s útokem', 'Get with attack')}</button>`
                   : `<button class="btn btn-sm btn-gold" data-buydecor="${d.id}" ${save.gold < d.price ? 'disabled' : ''}>${ico('coin')} ${fmt(d.price)}</button>`}
               </div>`;
             }).join('')}</div>
@@ -753,7 +753,7 @@
               <canvas data-deccv="${d.id}"></canvas>
               <h3>${esc(d.name)}</h3><p>${esc(d.desc)}</p>
               ${owned ? `<button class="btn btn-sm btn-blue" data-go="stavitel">${t('set_in_editor')}</button>`
-                : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.lang === 'cs' ? 'Získat s útokem Dračí dech' : 'Get with Dragon Breath'}</button>`
+                : d.skill ? `<button class="btn btn-sm btn-green" data-goskill="${d.skill}">${I18N.L('Získat s útokem Dračí dech', 'Get with Dragon Breath')}</button>`
                 : `<button class="btn btn-sm btn-gold" data-dbuy="${d.id}" ${save.gold < d.price ? 'disabled' : ''}>${t('buy')} ${ico('coin')} ${fmt(d.price)}</button>`}
             </article>`;
           }).join('')}
@@ -1234,10 +1234,11 @@
             <button class="btn" data-snd="music">${Zvuk.settings().music ? '🎵' : '🔇'} ${t('snd_music')}: ${Zvuk.settings().music ? t('snd_on') : t('snd_off')}</button>
           </div>
           ${Zvuk.volHtml ? Zvuk.volHtml() : ''}
+          ${window.Volby ? Volby.html() : ''}
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 147 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 148 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -1258,6 +1259,7 @@
     }));
     UcetUI.bind(App, el); UcetUI.bindBackup(App, el);
     if (window.Pozvi) Pozvi.bindProfile(App, el);
+    if (window.Volby) Volby.bind(el);
     el.querySelectorAll('[data-snd]').forEach(b => b.addEventListener('click', () => { Zvuk.toggle(b.dataset.snd); App.go('profil', { keepScroll: true }); }));
     if (Zvuk.bindVol) Zvuk.bindVol(el);
     el.querySelector('#langSel').addEventListener('change', e => App.setLang(e.target.value));

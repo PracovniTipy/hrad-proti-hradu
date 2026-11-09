@@ -29,7 +29,7 @@
   const P = Battle.prototype;
   const C = () => GameData.battleConfig;
   const US = () => C().unitScale || 1;
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const MEM_KEY = 'cw-ai-mem-v1';
 
@@ -478,7 +478,8 @@
     br.lastSay = B.time; br.lastTaunt[key] = B.time;
     const arr = LINES[key][(window.I18N && I18N.lang === 'cs') ? 'cs' : 'en'];
     const custom = B.o.general && B.o.general.lines && B.o.general.lines[key];
-    const txt = custom && Math.random() < 0.7 ? custom : arr[Math.floor(Math.random() * arr.length)];
+    const txt0 = custom && Math.random() < 0.7 ? custom : arr[Math.floor(Math.random() * arr.length)];
+    const txt = (window.I18N && I18N.tr && I18N.lang !== 'cs') ? I18N.tr(txt0) : txt0;
     br.sayQ = { txt, t: B.time, life: 3.2 };
   }
 

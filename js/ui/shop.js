@@ -205,7 +205,7 @@
       }
       if (r.kind === 'skill') { const k = GameData.skillById(r.id); return `<div class="rw"><span class="rw-ico">${GameData.skillIcon ? GameData.skillIcon(k) : '⚡'}</span><b>${esc(k.name)}</b><small>${t('rw_skill')}</small></div>`; }
       if (r.kind === 'skills') return `<div class="rw"><span class="rw-ico">⚡</span><b>${t('rw_all_skills', { n: r.n })}</b><small>${t('rw_skill')}</small></div>`;
-      if (r.kind === 'all') return `<div class="rw"><span class="rw-ico">👑</span><b>${(window.I18N && I18N.lang !== 'cs') ? 'Everything in the game' : 'Úplně všechno ze hry'}</b><small>${r.a} ${(window.I18N && I18N.lang !== 'cs') ? 'armors' : 'zbrojí'} · ${r.w} ${(window.I18N && I18N.lang !== 'cs') ? 'weapons' : 'zbraní'}</small></div>`;
+      if (r.kind === 'all') return `<div class="rw"><span class="rw-ico">👑</span><b>${I18N.L('Úplně všechno ze hry', 'Everything in the game')}</b><small>${r.a} ${I18N.L('zbrojí', 'armors')} · ${r.w} ${I18N.L('zbraní', 'weapons')}</small></div>`;
       if (r.kind === 'big') return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${t('big_name')}</b><small>${t('big_short')}</small></div>`;
       if (r.kind === 'decor') { const d = GameData.castleCustom.decorations.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${esc(d.name)}</b><small>${t('decor_word')}</small></div>`; }
       return '';
@@ -250,7 +250,7 @@
           <p class="muted">${ico('coin')} ${fmt(ch.gold[0])}–${fmt(ch.gold[1])}<br>${ch.gearChance >= 1 ? t('chest_gear_sure', { n: ch.gearCount || 1 }) : t('chest_gear_chance', { n: Math.round(ch.gearChance * 100) })}</p>
           <button class="link-btn" data-odds="${ch.id}">${t('odds')}</button>
         </div>
-        ${window.CW_BE ? `<button class="btn buy-czk" disabled>${I18N.lang === 'cs' ? 'Nedostupné v Belgii' : 'Not available in Belgium'}</button>` : `<button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ico('gem')} ${fmt(ch.gemsPrice)}`}</button>`}
+        ${window.CW_BE ? `<button class="btn buy-czk" disabled>${I18N.L('Nedostupné v Belgii', 'Not available in Belgium')}</button>` : `<button class="btn ${used ? '' : 'btn-gold'} buy-czk" data-chest="${ch.id}" ${used ? 'disabled' : ''}>${used ? t('chest_again') : `${ico('gem')} ${fmt(ch.gemsPrice)}`}</button>`}
       </article>`;
     };
     const offers = GameData.offers.map(o => {
@@ -272,7 +272,7 @@
       return `<article class="panel div-card div-${id}">
         <canvas data-divcv="${id}"></canvas>
         <div class="div-body"><div class="eyebrow" style="color:${GameData.rarityColors['Božský']}">${t('rar_4')}</div>
-          <h3>${esc(I18N.lang === 'cs' ? D.name : D.en)}</h3><p class="muted">${t('div_' + id + '_d')}</p>
+          <h3>${esc(I18N.L(D.name, D.en))}</h3><p class="muted">${t('div_' + id + '_d')}</p>
           <p class="gear-bonus">+20 % ${t('b_dmg')} · +20 % ${t('b_hp')}</p>
           <button class="btn ${own ? '' : 'btn-green'} btn-big buy-czk" data-divbuy="${id}" ${own ? 'disabled' : ''}>${own ? '✓ ' + t('div_owned') : Platby.price(D.price.czk)}</button></div>
       </article>`;
@@ -311,7 +311,7 @@
     if (window.Reklamy) Reklamy.shopBind(App, el);
     el.querySelectorAll('canvas[data-divcv]').forEach(cv => paintDivine(cv, cv.dataset.divcv));
     el.querySelectorAll('[data-divbuy]').forEach(b => b.addEventListener('click', () => {
-      const id = b.dataset.divbuy, D = GameData.divineSets[id], nm = I18N.lang === 'cs' ? D.name : D.en;
+      const id = b.dataset.divbuy, D = GameData.divineSets[id], nm = I18N.L(D.name, D.en);
       if (GameData.divineOwned(save, id)) return;
       Platby.buy(App, { id: 'set_' + id, name: nm, czk: D.price.czk }, () => {
         save.purchases[ 'set_' + id] = (save.purchases['set_' + id] || 0) + 1;

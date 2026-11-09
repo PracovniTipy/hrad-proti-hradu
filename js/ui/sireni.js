@@ -13,7 +13,7 @@
 (function () {
   const G = window.GameData;
   const SITE = 'https://pracovnitipy.github.io/hrad-proti-hradu/';
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
   const REF_PET = 5;

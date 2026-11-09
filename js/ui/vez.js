@@ -8,7 +8,7 @@
 (function () {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n).toLocaleString('cs-CZ');
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   Object.assign(I18N.D, {
     nav_vez: ['Věž', 'Tower'],
     vez_title: ['Castle Tower', 'Castle Tower'],

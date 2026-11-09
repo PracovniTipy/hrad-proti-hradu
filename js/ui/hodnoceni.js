@@ -7,7 +7,7 @@
 (function () {
   const MS_ID = '9PNWTZCM0MLW';
   const ITCH = 'https://battlecastle.itch.io/castle-wars';
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   let pending = false;
 
   const Hodnoceni = {

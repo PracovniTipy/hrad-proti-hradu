@@ -1,0 +1,8163 @@
+[
+ {
+  "en": "Berserker",
+  "cs": "Zuřivec",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Strategist",
+  "cs": "Stratég",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The Fox",
+  "cs": "Liška",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Stone Wall",
+  "cs": "Kamenná zeď",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Weakness Hunter",
+  "cs": "Lovec slabin",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Stormcaller",
+  "cs": "Bouřlivák",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Cavalry Baron",
+  "cs": "Jezdecký baron",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Marksman",
+  "cs": "Ostřelovač",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The enemy attacks with everything!",
+  "cs": "Nepřítel útočí všemi silami!",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Enemy attack wave!",
+  "cs": "Útočná vlna nepřítele!",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "en",
+  "cs": "cs",
+  "tpl": false,
+  "files": [
+   "core/general.js",
+   "core/novinky.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Dodged!",
+  "cs": "Uhnul!",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The general has fallen!",
+  "cs": "Generál padl!",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Charge!",
+  "cs": "Výpad!",
+  "tpl": false,
+  "files": [
+   "core/general.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "of Flame",
+  "cs": "plamene",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Ice",
+  "cs": "ledu",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Storm",
+  "cs": "bouře",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Shadows",
+  "cs": "stínů",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Blood",
+  "cs": "krve",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Sun",
+  "cs": "slunce",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Moon",
+  "cs": "měsíce",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js",
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Venom",
+  "cs": "jedu",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Lava",
+  "cs": "lávy",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Seas",
+  "cs": "moří",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Wildwood",
+  "cs": "hvozdu",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Dunes",
+  "cs": "pouště",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Crystal",
+  "cs": "krystalu",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Bones",
+  "cs": "kostí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Dragon",
+  "cs": "draka",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Wolf",
+  "cs": "vlka",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of the Raven",
+  "cs": "havrana",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Dawn",
+  "cs": "jitra",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Runes",
+  "cs": "run",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "of Gold",
+  "cs": "zlata",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Sword",
+  "cs": "Meč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js",
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Leaf Blade",
+  "cs": "Listová čepel",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Falchion",
+  "cs": "Tesák",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Scimitar",
+  "cs": "Šavle",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Flame Blade",
+  "cs": "Plamenná čepel",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Saw Blade",
+  "cs": "Pilová čepel",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shattered Blade",
+  "cs": "Rozbitá čepel",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Khopesh",
+  "cs": "Chopeš",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Cleaver",
+  "cs": "Sekáč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rapier",
+  "cs": "Rapír",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Forked Sword",
+  "cs": "Rozeklaný meč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Pierced Sword",
+  "cs": "Prolamovaný meč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rune Blade",
+  "cs": "Runová čepel",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crystal Sword",
+  "cs": "Krystalový meč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Greatsword",
+  "cs": "Obouruční meč",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Moon Axe",
+  "cs": "Měsíční sekera",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fan Axe",
+  "cs": "Vějířová sekera",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Headsman’s Axe",
+  "cs": "Katovská sekera",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Dragon Axe",
+  "cs": "Dračí sekera",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "War Pick",
+  "cs": "Čakan",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Flanged Mace",
+  "cs": "Palcát",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Morning Star",
+  "cs": "Řemdih",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Warhammer",
+  "cs": "Válečné kladivo",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Star Mace",
+  "cs": "Hvězdice",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Skull Mace",
+  "cs": "Lebkový palcát",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Spear",
+  "cs": "Kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js",
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Partisan",
+  "cs": "Partyzána",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Winged Spear",
+  "cs": "Okřídlené kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bardiche",
+  "cs": "Bardiš",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Lance",
+  "cs": "Píka",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "War Scythe",
+  "cs": "Válečná kosa",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Moon Spear",
+  "cs": "Měsíční kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Spiral Lance",
+  "cs": "Vrtné kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crystal Spear",
+  "cs": "Krystalové kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wave Spear",
+  "cs": "Vlnité kopí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Recurve Bow",
+  "cs": "Reflexní luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Horn Bow",
+  "cs": "Rohový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Feathered Bow",
+  "cs": "Opeřený luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Spiked Bow",
+  "cs": "Ostnatý luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rune Bow",
+  "cs": "Runový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Vine Bow",
+  "cs": "Popínavý luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Chain Bow",
+  "cs": "Řetězový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Jeweled Bow",
+  "cs": "Klenotnický luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Skull Bow",
+  "cs": "Lebkový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Flame Bow",
+  "cs": "Plamenný luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shard Bow",
+  "cs": "Střepový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Dragon Bow",
+  "cs": "Dračí luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Winged Bow",
+  "cs": "Křídlový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crescent Bow",
+  "cs": "Srpkový luk",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Caged Orb Staff",
+  "cs": "Hůl s klecí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crescent Staff",
+  "cs": "Srpková hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Living Wood Staff",
+  "cs": "Hůl živého dřeva",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crystal Staff",
+  "cs": "Krystalová hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Skull Staff",
+  "cs": "Lebková hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "All-Seeing Staff",
+  "cs": "Hůl vševidoucí",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Brazier Staff",
+  "cs": "Hůl s ohněm",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Hourglass Staff",
+  "cs": "Hůl času",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Star Staff",
+  "cs": "Hvězdná hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Serpent Staff",
+  "cs": "Hadí hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bell Staff",
+  "cs": "Zvonková hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rune Ring Staff",
+  "cs": "Runová hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Horned Staff",
+  "cs": "Rohatá hůl",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Galaxy Staff",
+  "cs": "Hůl galaxie",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Order",
+  "cs": "Řád",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Warden",
+  "cs": "Strážce",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Watch",
+  "cs": "Hlídka",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Knight",
+  "cs": "Rytíř",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js",
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Lord",
+  "cs": "Vládce",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Newly forged armor from the Forge.",
+  "cs": "Nově vykovaná zbroj z Kovárny.",
+  "tpl": false,
+  "files": [
+   "core/kovarna_data.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clear day",
+  "cs": "Jasný den",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Sunset",
+  "cs": "Západ slunce",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Golden hour: +15% coins per kill",
+  "cs": "Zlatá hodinka: +15 % mincí za zabití",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Night",
+  "cs": "Noc",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Archers see less (−10% attack), melee sneaks in (+5% attack)",
+  "cs": "Lučištníci vidí hůř (−10 % útok), pěchota se plíží (+5 % útok)",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rain",
+  "cs": "Déšť",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Fire burns half as long, bowstrings are wet (−10% ranged)",
+  "cs": "Oheň hoří o polovinu kratší dobu, tětivy vlhnou (−10 % střelci)",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Snowfall",
+  "cs": "Sněžení",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Frost: everyone 5% weaker, mages 10% stronger",
+  "cs": "Mráz: všichni o 5 % slabší, mágové o 10 % silnější",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fog",
+  "cs": "Mlha",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Archers miss in the fog (−15% attack)",
+  "cs": "Střelci v mlze míjí (−15 % útok)",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Thunderstorm",
+  "cs": "Bouřka",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Lightning strikes the battlefield! Fire dies down",
+  "cs": "Blesky bijí do bojiště! Oheň zhasíná",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Luna the Snowy Owl",
+  "cs": "Luna, sněžná sova",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A wise owl in a little wizard hat. Every 14 s she heals your 3 most wounded soldiers.",
+  "cs": "Moudrá sova s čarodějným kloboučkem. Každých 14 s vyléčí 3 nejzraněnější vojáky.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sharpbeak the Griffin Cub",
+  "cs": "Ostrozob, mládě gryfa",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Half eagle, half lion. Every 18 s it dives onto the strongest enemy.",
+  "cs": "Napůl orel, napůl lev. Každých 18 s se střemhlav vrhne na nejsilnějšího nepřítele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Ember the Baby Dragon",
+  "cs": "Žhavík, dráček",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A small dragon with a big flame. Every 20 s it scorches the enemy front row.",
+  "cs": "Malý drak, velký oheň. Každých 20 s spálí přední řadu nepřátel.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Goldie the Coin Goblin",
+  "cs": "Zlatoušek, mincovní skřítek",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Rides a cloud of coins. Every 10 s he brings 25 coins and grabs 3 extra coins per kill.",
+  "cs": "Sedí na obláčku z mincí. Každých 10 s přinese 25 mincí a za každé zabití sebere 3 mince navíc.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Grumble the Storm Cloud",
+  "cs": "Bouřňáček, mrzutý mráček",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Always frowning and drizzling. Every 16 s he strikes an enemy with lightning and stuns it.",
+  "cs": "Pořád se mračí a prší z něj. Každých 16 s udeří bleskem do nepřítele a omráčí ho.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Blaze the Phoenix Chick",
+  "cs": "Plamínek, mládě fénixe",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Reborn from the ashes. Every 24 s it bursts into flame: heals nearby soldiers and burns enemies.",
+  "cs": "Rodí se z popela. Každých 24 s vzplane: vyléčí vojáky kolem sebe a popálí nepřátele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Boo the Ghost Knight",
+  "cs": "Bubu, duch rytíře",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A kind ghost in an old helmet. Every 15 s he spooks enemies – they back off and tremble for a moment.",
+  "cs": "Hodný duch ve staré helmě. Každých 15 s vybafne na nepřátele – couvnou a chvíli se třesou strachy.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rainbow the Flying Unicorn",
+  "cs": "Duhovka, létající jednorožec",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Leaves a rainbow trail. Every 22 s she shields your whole army with a rainbow barrier.",
+  "cs": "Za sebou nechává duhu. Každých 22 s ochrání celou tvou armádu duhovým štítem.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Inky the Sky Octopus",
+  "cs": "Inkoustka, vzduchoplavecká chobotnice",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A pirate in a bubble with a hat. Every 15 s she sprays enemies with ink – for 4 s they hit at half strength.",
+  "cs": "Pirátka v bublině s kloboukem. Každých 15 s postříká nepřátele inkoustem – 4 s útočí jen poloviční silou.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Prickles the Balloon Cactus",
+  "cs": "Pichlík, kaktus na balónku",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Hangs from a balloon and smiles. Every 12 s he rains needles on 10 enemies.",
+  "cs": "Visí na balónku a usmívá se. Každých 12 s spustí déšť bodlin na 10 nepřátel.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shelly the Rocket Turtle",
+  "cs": "Krunýřka, želva s raketou",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Slow on the ground, fast in the air. Every 18 s she repairs your walls by 4% health.",
+  "cs": "Pomalá na zemi, rychlá ve vzduchu. Každých 18 s opraví hradby o 4 % životů.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Count Batula",
+  "cs": "Hrabě Vampík, netopýr",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A bat in a tailcoat and cape. Every 14 s he drains an enemy’s life and gives it to your most wounded soldier.",
+  "cs": "Netopýr ve fraku s pláštěm. Každých 14 s vysaje nepříteli život a dá ho tvému nejzraněnějšímu vojákovi.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Cogsworth the Clockwork Bot",
+  "cs": "Šroubek, hodinový robot",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A wind-up robot with a propeller cap. Every 13 s he fires three cannonballs.",
+  "cs": "Natahovací robot s vrtulkou na hlavě. Každých 13 s vystřelí tři dělové koule.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Glimmer the Sky Jelly",
+  "cs": "Svítilka, nebeská medúza",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Glows like a lantern. Every 17 s she sends an electric pulse that stuns enemies below.",
+  "cs": "Svítí jako lampion. Každých 17 s vyšle elektrický puls, který omráčí nepřátele pod ní.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Kitsune the Nine-Tailed Fox",
+  "cs": "Ohnivka, devítiocasá liška",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A fox spirit from ancient legends. Every 16 s she releases three foxfire wisps.",
+  "cs": "Liščí duch z dávných legend. Každých 16 s vypustí tři bludičky lišího ohně.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Crowbones the Skeleton Raven",
+  "cs": "Krákor, kostěný havran",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A raven of bones with red eyes. Every 25 s he raises a fallen soldier who fights on for you.",
+  "cs": "Havran z kostí s rudýma očima. Každých 25 s probudí padlého vojáka, který bojuje dál za tebe.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bubbles the Fishbowl Fish",
+  "cs": "Bublinka, rybka v akváriu",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A goldfish in a flying fishbowl. Every 14 s she splashes a wave that pushes enemies back.",
+  "cs": "Zlatá rybka v létajícím akváriu. Každých 14 s vyšplíchne vlnu, která odhodí nepřátele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Toadstool the Mushroom Sprite",
+  "cs": "Muchomůrka, houbový skřítek",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Has a spotted cap that puffs spores. Every 15 s he releases a poisonous spore cloud.",
+  "cs": "Má puntíkovaný klobouk a práší z něj. Každých 15 s vypustí jedovatý oblak výtrusů.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Gemmy the Crystal Golem",
+  "cs": "Gemík, krystalový golem",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A tiny golem made of gems. Every 16 s he shoots crystal shards and brings 15 coins.",
+  "cs": "Malý golem z drahokamů. Každých 16 s vystřelí krystalové střepy a přinese 15 mincí.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Whiskers the Witch Cat",
+  "cs": "Mňauka, čarodějná kočka",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A black cat on a broomstick. Every 18 s she curses the enemies – for 3 s they take 50% more damage.",
+  "cs": "Černá kočka na koštěti. Každých 18 s prokleje nepřátele – 3 s dostávají o polovinu víc zranění.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Henrietta the Golden Hen",
+  "cs": "Kvočna, slepice se zlatými vejci",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Clucks and lays golden eggs. Every 9 s she brings 12 coins.",
+  "cs": "Kdáká a snáší zlatá vejce. Každých 9 s přinese 12 mincí.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sir Squeaks the Mouse Knight",
+  "cs": "Sir Pípal, myší rytíř",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A tiny knight with a needle for a sword. Every 8 s he stabs an enemy.",
+  "cs": "Malinký rytíř s jehlou místo meče. Každých 8 s bodne nepřítele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shimmer the Rainbow Butterfly",
+  "cs": "Třpytka, duhový motýl",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Healing pollen falls from her wings. Every 10 s she heals one soldier by 20%.",
+  "cs": "Z křídel jí padá pyl, který hojí rány. Každých 10 s vyléčí jednoho vojáka o 20 %.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Pebble the Living Rock",
+  "cs": "Oblázek, živý kamínek",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A stubborn little rock with a mossy tuft. Every 9 s it hurls itself at an enemy.",
+  "cs": "Tvrdohlavý kamínek s mechovou čupřinou. Každých 9 s se vrhne na nepřítele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sparky the Firefly",
+  "cs": "Jiskřička, světluška",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Glows like a tiny sun. Every 8 s she sets an enemy alight with a spark.",
+  "cs": "Svítí jako malé slunce. Každých 8 s zapálí nepřítele jiskrou.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Spike the Umbrella Hedgehog",
+  "cs": "Bodlinka, ježek na deštníku",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Floats down on an umbrella like a paratrooper. Every 11 s he shoots quills at 4 enemies.",
+  "cs": "Snáší se na deštníku jako parašutista. Každých 11 s vystřelí bodliny na 4 nepřátele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Admiral Flippers the Penguin",
+  "cs": "Admirál Ploutvička, tučňák",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A penguin with an admiral’s hat and spyglass. Every 12 s he throws 3 snowballs that slow.",
+  "cs": "Tučňák s admirálským kloboukem a dalekohledem. Každých 12 s hodí 3 sněhové koule, které zpomalí.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Acorn Ace the Flying Squirrel",
+  "cs": "Žaludka, veverka letkyně",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Flying goggles, scarf in the wind. Every 11 s she drops 4 acorn bombs.",
+  "cs": "Pilotní brýle, šála ve větru. Každých 11 s shodí 4 žaludové bomby.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Prince Croak the Frog",
+  "cs": "Žabí princ Kvak",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A crowned frog awaiting a kiss. Every 12 s he snatches an enemy with his tongue and steals 10 coins.",
+  "cs": "Žabák s korunkou, co čeká na polibek. Každých 12 s chytí nepřítele jazykem a sebere mu 10 mincí.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Lumen the Living Lantern",
+  "cs": "Lucerníček, živá lucerna",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "An old lantern with a flame for a soul. Every 14 s it lights up the field: heals soldiers and burns enemies.",
+  "cs": "Starodávná lucerna s plamínkem místo duše. Každých 14 s rozzáří bojiště: léčí vojáky a pálí nepřátele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Zip the Hummingbird",
+  "cs": "Blesk, kolibřík",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The fastest bird in the world. Every 10 s it pecks one enemy five times in a row.",
+  "cs": "Nejrychlejší pták světa. Každých 10 s klovne pětkrát za sebou do jednoho nepřítele.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Thunderhoof the Storm Pegasus",
+  "cs": "Hromovec, bouřný pegas",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A white horse with wings of storm clouds. Every 15 s it charges through a line of enemies like lightning.",
+  "cs": "Bílý kůň s křídly z bouřkových mraků. Každých 15 s se prožene řadou nepřátel jako blesk.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Magmo the Lava Golem",
+  "cs": "Magmík, lávový golem",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A walking volcano the size of a teapot. Every 16 s he pours a lava pool under the enemies.",
+  "cs": "Chodící sopka velká jako konvice. Každých 16 s vylije pod nepřátele lávové jezírko.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Quetzal the Feathered Serpent",
+  "cs": "Quetzal, opeřený had",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A wind god from ancient temples. Every 14 s it bites 4 enemies with a slowing venom.",
+  "cs": "Bůh větru z dávných chrámů. Každých 14 s uštkne 4 nepřátele jedem, který zpomaluje.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Nightmare the Shadow Steed",
+  "cs": "Noční můra, stínový oř",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A horse of smoke with a fiery mane. Every 16 s it terrifies enemies so they flee and tremble.",
+  "cs": "Kůň z kouře s plamennou hřívou. Každých 16 s vyděsí nepřátele, že prchají a třesou se.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Ignis the Dragon King",
+  "cs": "Ignis, král draků",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A gold-crowned dragon in a blaze of fire. Every 18 s he calls down a fiery meteor.",
+  "cs": "Zlatě korunovaný drak v plamenné záři. Každých 18 s sešle z nebe ohnivý meteor.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Astralion the Star Lion",
+  "cs": "Astralion, hvězdný lev",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A lion woven from the night sky with a mane of constellations. Every 16 s five stars fall on the enemies.",
+  "cs": "Lev utkaný z noční oblohy s hřívou ze souhvězdí. Každých 16 s na nepřátele spadne 5 hvězd.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Leviathan the Kraken Hatchling",
+  "cs": "Leviatan, mládě krakena",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Ruler of the deep with a coral crown. Every 17 s it slams its tentacles and stuns a whole row.",
+  "cs": "Vládce hlubin s korálovou korunou. Každých 17 s udeří chapadly o zem a omráčí celou řadu.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Seraphina the Guardian Fairy",
+  "cs": "Serafína, strážná víla",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A fairy with six wings of light. Every 20 s she heals your whole army by 12%.",
+  "cs": "Víla se šesti křídly ze světla. Každých 20 s vyléčí celou tvou armádu o 12 %.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Frostwyrm the Ice Dragon",
+  "cs": "Mrazodrak, ledový drak",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A dragon of eternal ice trailing snowfall. Every 17 s it freezes the enemy front row.",
+  "cs": "Drak z věčného ledu, za ním padá sníh. Každých 17 s zmrazí přední řadu nepřátel.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "First Blood",
+  "cs": "První krev",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "First kill of a battle.",
+  "cs": "První zabití v bitvě.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Godlike",
+  "cs": "Božský řezník",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A streak of 25 kills without a pause.",
+  "cs": "Série 25 zabití bez přestávky.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bloody Banner",
+  "cs": "Krvavý prapor",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "A streak of 10 kills without a pause.",
+  "cs": "Série 10 zabití bez přestávky.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Lord of a Hundred",
+  "cs": "Pán stovky",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "100 kills in one battle.",
+  "cs": "100 zabití v jedné bitvě.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Night Hunter",
+  "cs": "Noční lovec",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Thunder Lord",
+  "cs": "Pán hromu",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a battle in a thunderstorm.",
+  "cs": "Vyhraj bitvu v bouřce.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Phantom of the Fog",
+  "cs": "Přízrak z mlhy",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Heart of Ice",
+  "cs": "Ledové srdce",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a battle in snowfall.",
+  "cs": "Vyhraj bitvu ve sněžení.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Unbreakable",
+  "cs": "Nedobytný",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a battle without your castle losing any health.",
+  "cs": "Vyhraj bitvu, aniž by tvůj hrad ztratil život.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Last Stand",
+  "cs": "Na poslední chvíli",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win with your castle under 10% health.",
+  "cs": "Vyhraj s hradem pod 10 % životů.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Loyal Friend",
+  "cs": "Věrný přítel",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Your pet uses its ability 8 times in one battle.",
+  "cs": "Mazlíček použije schopnost 8× v jedné bitvě.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Blitz",
+  "cs": "Bleskový útok",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a battle in under 3 minutes.",
+  "cs": "Vyhraj bitvu za méně než 3 minuty.",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "New trophy!",
+  "cs": "Nová trofej!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Castle under attack!",
+  "cs": "Hrad je pod útokem!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The walls are crumbling!",
+  "cs": "Hradby se hroutí!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Defend the castle!",
+  "cs": "Braň hrad!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Enemy walls are cracking!",
+  "cs": "Nepřátelské hradby praskají!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Final push!",
+  "cs": "Poslední útok!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Bring it down!",
+  "cs": "Dobij jejich hrad!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "coins",
+  "cs": "mincí",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The enemy is on a rampage!",
+  "cs": "Nepřítel řádí!",
+  "tpl": false,
+  "files": [
+   "core/novinky.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Loading ad…",
+  "cs": "Načítám reklamu…",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Cancel",
+  "cs": "Zrušit",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "All used today – back tomorrow",
+  "cs": "Dnes už vyčerpáno – zítra znovu",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Next in {0}s",
+  "cs": "Další za {0} s",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "FREE",
+  "cs": "ZDARMA",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Ads are not available here.",
+  "cs": "Reklamy tu nejsou dostupné.",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Daily limit reached. Come back tomorrow!",
+  "cs": "Dnešní limit je vyčerpaný. Zítra znovu!",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Next ad in {0}s.",
+  "cs": "Další reklama za {0} s.",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Ads need an internet connection.",
+  "cs": "Reklama potřebuje internet.",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The ad cannot play without consent. Please try again.",
+  "cs": "Bez souhlasu se nedá reklama přehrát. Zkus to znovu.",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "No ad available right now. Please try again later.",
+  "cs": "Reklama teď není k dispozici. Zkus to za chvíli.",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The ad was not finished – no reward.",
+  "cs": "Reklama nebyla dokoukaná – odměna nepřipsána.",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Double your reward",
+  "cs": "Zdvojnásob odměnu",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "watch a short ad",
+  "cs": "zhlédni krátkou reklamu",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Second chance",
+  "cs": "Druhá šance",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "even for a loss",
+  "cs": "i za prohru",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "added",
+  "cs": "připsáno",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Reward doubled! +{0} gold",
+  "cs": "Odměna zdvojnásobena! +{0} zlata",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Second chance: +{0} gold",
+  "cs": "Druhá šance: +{0} zlata",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Free for an ad",
+  "cs": "Zdarma za reklamu",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Optional · short video · instant reward",
+  "cs": "Dobrovolné · krátké video · odměna hned",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Free gems",
+  "cs": "Drahokamy zdarma",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "today {0}/{1}",
+  "cs": "dnes {0}/{1}",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "+{0} gems!",
+  "cs": "+{0} drahokamů!",
+  "tpl": true,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "skin chance",
+  "cs": "šance na skin",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Free bag of gold",
+  "cs": "Pytel zlata zdarma",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Free daily chest",
+  "cs": "Denní truhla zdarma",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Bag of gold",
+  "cs": "Pytel zlata",
+  "tpl": false,
+  "files": [
+   "core/reklamy.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Rudolph the Reindeer",
+  "cs": "Sobík Rudolf",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Exclusive Christmas pet – only until 25 December for 12 advent doors. Every 15 s his nose lights up: he dazzles the enemies in front of him (stuns them for 1.5 s) and drops a present worth 20 coins.",
+  "cs": "Exkluzivní vánoční mazlíček – získáš ho jen do 25. prosince za 12 adventních okének. Každých 15 s rozzáří nos: oslní nepřátele před sebou (omráčí je na 1,5 s) a shodí dárek za 20 mincí.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "infantry",
+  "cs": "pěšáky",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "archers",
+  "cs": "lučištníky",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "spearmen",
+  "cs": "kopiníky",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "cavalry",
+  "cs": "jízdu",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "mages",
+  "cs": "mágy",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Nutcracker",
+  "cs": "Louskáček",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Christmas Elf",
+  "cs": "Vánoční skřítek",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Gingerbread Man",
+  "cs": "Perníkový panáček",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Reindeer Rider",
+  "cs": "Sobí jezdec",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Snowman Wizard",
+  "cs": "Sněhulák kouzelník",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Advent calendar",
+  "cs": "Adventní kalendář",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas in {0} {1}",
+  "cs": "Vánoce za {0} {1}",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Coming soon",
+  "cs": "Už brzy",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas in Castle WARS",
+  "cs": "Vánoce v Castle WARS",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "in {0} {1}",
+  "cs": "za {0} {1}",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "24 doors with gifts – one every day from 1 December.",
+  "cs": "24 okének s dárky – od 1. prosince každý den jedno.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas skins",
+  "cs": "Vánoční skiny",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Santa, elves, nutcrackers, gingerbread men, reindeer riders and snowmen.",
+  "cs": "Santa, skřítci, louskáčci, perníčci, sobí jezdci a sněhuláci.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Exclusive pet only until 25 December.",
+  "cs": "Exkluzivní mazlíček jen do 25. prosince.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Can’t wait!",
+  "cs": "Těším se!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Rudolph is yours!",
+  "cs": "Rudolf je tvůj!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Doors",
+  "cs": "Okénka",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "until 25 Dec · {0} {1} left",
+  "cs": "jen do 25. 12. · zbývá {0} {1}",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Rudolph has flown away – he’ll be back next Christmas.",
+  "cs": "Rudolf už odletěl – příští Vánoce se vrátí.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas event · {0} December",
+  "cs": "Vánoční událost · {0}. prosince",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Advent Calendar",
+  "cs": "Adventní kalendář",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Snowflakes",
+  "cs": "Vločky",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Legendary",
+  "cs": "Legendární",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Calendar",
+  "cs": "Kalendář",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Snowball Fight",
+  "cs": "Koulovačka",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Santa’s Shop",
+  "cs": "Santův obchůdek",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Close",
+  "cs": "Zavřít",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/instalace.js",
+   "ui/klany.js",
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Open!",
+  "cs": "Otevři!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Door",
+  "cs": "Okénko",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Open one door free every day. Catch up on missed doors for",
+  "cs": "Každý den otevřeš jedno okénko zdarma. Zmeškaná okénka doženeš za",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "or",
+  "cs": "nebo",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Open all 24 to get an extra",
+  "cs": "Otevři všech 24 a dostaneš navíc",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Door {0} opens on {1} December.",
+  "cs": "Okénko {0} se otevře {1}. prosince.",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Missed door",
+  "cs": "Zmeškané okénko",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Door {0}",
+  "cs": "Okénko {0}",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You missed this door. Open it now:",
+  "cs": "Tohle okénko jsi zmeškal. Otevři ho teď:",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "snowflakes",
+  "cs": "vloček",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Back",
+  "cs": "Zpět",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Earn snowflakes from presents dropped by Santa’s sleigh in battles, from wins and in the daily snowball fight.",
+  "cs": "Vločky získáš za dárky ze Santových saní v bitvách, za výhry a v denní koulovačce.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "All 24 doors!",
+  "cs": "Všech 24 okének!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Castle look",
+  "cs": "Vzhled hradu",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Legendary pet!",
+  "cs": "Legendární mazlíček!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Equip",
+  "cs": "Obléknout",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Equipped",
+  "cs": "Oblečeno",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas Snowball Fight",
+  "cs": "Vánoční koulovačka",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The Krampus gang attacks! Santa’s elves pelt the enemies with snowballs from the walls, slowing them down, and the sleigh drops presents twice as often.",
+  "cs": "Krampusova banda útočí! Santovi skřítci z hradeb zasypávají nepřátele sněhovými koulemi, které je zpomalí, a saně shazují dárky dvakrát častěji.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Today’s reward is claimed – keep playing for presents.",
+  "cs": "Dnešní odměna je vybraná – hrát můžeš dál pro dárky.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Today’s reward:",
+  "cs": "Dnešní odměna:",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "for a win",
+  "cs": "za výhru",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "for a loss",
+  "cs": "za prohru",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Start the fight!",
+  "cs": "Do koulovačky!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Presents from the sleigh in every battle – tap them",
+  "cs": "Dárky ze saní v každé bitvě – klepni na ně",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Win +3, loss +1",
+  "cs": "Výhra +3, prohra +1",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Krampus Gang",
+  "cs": "Krampusova banda",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The Krampus gang flees! Santa thanks you for helping with the presents. 🎄",
+  "cs": "Krampusova banda prchá! Santa děkuje za pomoc s dárky. 🎄",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Krampus won this time. Try again – the sleigh presents still count!",
+  "cs": "Krampus tentokrát vyhrál. Zkus to znovu – dárky ze saní se počítají i tak!",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You collected presents from Santa’s sleigh: +{0} snowflakes.",
+  "cs": "Sebral jsi dárky ze Santových saní: +{0} vloček.",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Armor and weapon for {0} of all nations",
+  "cs": "Zbroj a zbraň pro {0} všech národů",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "A castle wrapped like a present",
+  "cs": "Hrad zabalený jako dárek",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Wreath, garlands and trees",
+  "cs": "Věnec, girlandy a stromky",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Grand Christmas Bundle",
+  "cs": "Velký vánoční balík",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "All 6 sets + Christmas Palace + decorations · 30% off",
+  "cs": "Všech 6 sad + Vánoční palác + výzdoba · sleva 30 %",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Christmas goods are only available until 31 December. Whatever you buy is yours forever.",
+  "cs": "Vánoční zboží je k mání jen do 31. prosince. Co koupíš, zůstane ti navždy.",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Owned",
+  "cs": "Máš",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js",
+   "ui/pas.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🎄 Today’s advent door is ready",
+  "cs": "🎄 Dnešní adventní okénko je připravené",
+  "tpl": false,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Open door no. {0} and claim your Christmas gift.",
+  "cs": "Otevři okénko č. {0} a vyzvedni si vánoční dárek.",
+  "tpl": true,
+  "files": [
+   "core/vanoce.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "damage",
+  "cs": "zranění",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Castle defence – close range",
+  "cs": "Obrana hradu – na blízko",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Anywhere on the field",
+  "cs": "Kdekoli na bojišti",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Whole battlefield",
+  "cs": "Celé bojiště",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "all your soldiers",
+  "cs": "všichni tvoji vojáci",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your soldiers",
+  "cs": "Tvoji vojáci",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "7 balls",
+  "cs": "7 koulí",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + burning",
+  "cs": " + hoření",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " to everyone in the area",
+  "cs": " každému v oblasti",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + slow ",
+  "cs": " + zpomalení ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": ", then 4 more × ",
+  "cs": ", pak 4 další × ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "nearest enemy + 4 more nearby",
+  "cs": "nejbližší nepřítel + 4 další v okolí",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + poison ",
+  "cs": " + jed ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "/s for 5 s",
+  "cs": "/s po 5 s",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + knockback 7 m",
+  "cs": " + odhození o 7 m",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "24 arrows",
+  "cs": "24 šípů",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + poison 4 s",
+  "cs": " + jed 4 s",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "5 balls",
+  "cs": "5 koulí",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " to each + burning 3 s",
+  "cs": " každému + hoření 3 s",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Forward from the castle",
+  "cs": "Od hradu dopředu",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "/s + throws enemies back",
+  "cs": "/s + odhazuje nepřátele",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "6 bolts at the strongest enemies",
+  "cs": "6 blesků do nejsilnějších nepřátel",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "all enemies on the ground",
+  "cs": "všichni nepřátelé na zemi",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + stun ",
+  "cs": " + omráčení ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "all enemies",
+  "cs": "všichni nepřátelé",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "% damage taken for ",
+  "cs": " % zranění na ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " + stop ",
+  "cs": " + zastavení ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": ", heals your soldiers 30%",
+  "cs": ", tvoje vojáky léčí 30 %",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "In front of your soldiers",
+  "cs": "Před tvými vojáky",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "wall 9 m wide for ",
+  "cs": "zeď 9 m široká na ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "/s + burning",
+  "cs": "/s + hoření",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "% health",
+  "cs": " % životů",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "% attack, +30% speed for ",
+  "cs": " % útok, +30 % rychlost na ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your archers",
+  "cs": "Tvoji střelci",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "all your archers",
+  "cs": "všichni tvoji střelci",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "arrows set enemies on fire for ",
+  "cs": "šípy zapalují na ",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "At your gate",
+  "cs": "U tvé brány",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "run out of the gate",
+  "cs": "vyběhnou z brány",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "heavy unit",
+  "cs": "těžká jednotka",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "infantryman",
+  "cs": "pěšák",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " for free",
+  "cs": " zdarma",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your castle",
+  "cs": "Tvůj hrad",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "walls",
+  "cs": "hradby",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "% castle health",
+  "cs": " % životů hradu",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Treasury",
+  "cs": "Pokladna",
+  "tpl": false,
+  "files": [
+   "data/skills.js",
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": " coins",
+  "cs": " mincí",
+  "tpl": false,
+  "files": [
+   "data/skills.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Basic Generals",
+  "cs": "Základní generálové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Seasoned Commanders",
+  "cs": "Zkušení velitelé",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Elite Strategists",
+  "cs": "Elitní stratégové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Legendary Generals",
+  "cs": "Legendární generálové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Masters of War",
+  "cs": "Mistři války",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The Deadliest Foes",
+  "cs": "Nejnebezpečnější protivníci",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Absolute Challenges",
+  "cs": "Absolutní výzvy",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Count",
+  "cs": "Hrabě",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Duke",
+  "cs": "Vévoda",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Marshal",
+  "cs": "Maršál",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sir",
+  "cs": "Rytíř",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Castellan",
+  "cs": "Kastelán",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Iron",
+  "cs": "Železný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Black",
+  "cs": "Černý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Unyielding",
+  "cs": "Neústupný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Cunning",
+  "cs": "Lstivý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Bloody",
+  "cs": "Krvavý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Wise",
+  "cs": "Moudrý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Lionheart",
+  "cs": "Lví srdce",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Grey",
+  "cs": "Šedý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Stone",
+  "cs": "Kamenné",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Silver",
+  "cs": "Stříbrné",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Red",
+  "cs": "Rudé",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Hawk",
+  "cs": "Jestřábí",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Misty",
+  "cs": "Mlžné",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Golden",
+  "cs": "Zlaté",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Oaken",
+  "cs": "Dubové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Raven",
+  "cs": "Vraní",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Daimyō",
+  "cs": "Daimjó",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shōgun",
+  "cs": "Šógun",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Taishō",
+  "cs": "Taišó",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rōnin",
+  "cs": "Rónin",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Silent",
+  "cs": "Tichý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Storm",
+  "cs": "Bouřlivý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Red Dragon",
+  "cs": "Rudý drak",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Unbroken",
+  "cs": "Nezlomný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Shadow",
+  "cs": "Stínový",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sakura",
+  "cs": "Sakurové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bamboo",
+  "cs": "Bambusové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Thunder",
+  "cs": "Hromové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Moon",
+  "cs": "Měsíční",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fire",
+  "cs": "Ohnivé",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Jade",
+  "cs": "Jadeitové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Chieftain",
+  "cs": "Náčelník",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Bloodaxe",
+  "cs": "Krvavá sekera",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Boneless",
+  "cs": "Bezkostý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolftooth",
+  "cs": "Vlčí zub",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Frozen",
+  "cs": "Ledový",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Thunderlord",
+  "cs": "Hromovládce",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "One-Eye",
+  "cs": "Jednooký",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fjord",
+  "cs": "Fjordové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Frost",
+  "cs": "Ledové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf",
+  "cs": "Vlčí",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Storm",
+  "cs": "Bouřné",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rune",
+  "cs": "Runové",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Hell Lord",
+  "cs": "Pán pekel",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Archdemon",
+  "cs": "Arcidémon",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Ash Prince",
+  "cs": "Kníže popela",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Undying",
+  "cs": "Nesmrtelný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Devourer",
+  "cs": "Požírač",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "the Faceless",
+  "cs": "Bez tváře",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Ash",
+  "cs": "Popelavé",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Brimstone",
+  "cs": "Sirné",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Burning",
+  "cs": "Ohnivé",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He swore to the Tower Lord that no intruder would climb higher.",
+  "cs": "Přísahal Pánu věže, že žádný vetřelec nepostoupí výš.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He guards his floor because the graves of his ancestors lie beneath it.",
+  "cs": "Brání své patro, protože pod ním leží hroby jeho předků.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The Tower promised him freedom if he stops a hundred challengers.",
+  "cs": "Věž mu slíbila svobodu, pokud zastaví sto vyzyvatelů.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Once he climbed the Tower himself. He lost, and has served ever since.",
+  "cs": "Kdysi sám šplhal věží. Prohrál a od té doby slouží.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He seeks the rival who will finally defeat him – and he waits for you.",
+  "cs": "Hledá soupeře, který ho konečně porazí – a čeká na tebe.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "His people live in the Tower’s shadow. Defeat would doom them.",
+  "cs": "Jeho lid žije ve stínu věže. Prohra by je odsoudila.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He believes the Tower Lord is a god, and you are a heretic.",
+  "cs": "Věří, že Pán věže je bůh, a ty jsi kacíř.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He hates the king who sent you. It is personal.",
+  "cs": "Nenávidí krále, který tě poslal. Je to osobní.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He collects the banners of the defeated. Yours is missing.",
+  "cs": "Sbírá prapory poražených. Tvůj mu chybí.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He was the finest strategist of his land. The Tower stole him, castle and all.",
+  "cs": "Byl to nejlepší stratég své země. Věž ho ukradla i s hradem.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "His castle once stood on the border of two empires and never fell.",
+  "cs": "Jeho hrad stál kdysi na hranici dvou říší a nikdy nepadl.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He grew up an orphan in the barracks and won his title by the sword.",
+  "cs": "Vyrostl jako sirotek v kasárnách a dobyl svůj titul mečem.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He lost a single battle in his youth – and has studied every foe since.",
+  "cs": "V mládí prohrál jedinou bitvu – a od té doby studuje každého soupeře.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He leads an army that follows him into hell. Literally.",
+  "cs": "Vede vojsko, které ho následuje i do pekla. Doslova.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "They say he reads minds. In truth he just listens well.",
+  "cs": "Říká se, že čte myšlenky. Ve skutečnosti jen dobře poslouchá.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "His ancestors built this floor of the Tower stone by stone.",
+  "cs": "Jeho předkové postavili tohle patro věže kámen po kameni.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Castellan Borek the Grey",
+  "cs": "Kastelán Bořek Šedý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Keeper of the Tower gate. The first to take you seriously.",
+  "cs": "Strážce brány věže. První, kdo tě vezme vážně.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Morgana the Fox",
+  "cs": "Liška Morgana",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "No battle with her is what it seems.",
+  "cs": "Žádná bitva s ní není taková, jak vypadá.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Jarl Ulfr Bloodaxe",
+  "cs": "Jarl Ulfr Krvavá sekera",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He came from the frozen floors and never retreats.",
+  "cs": "Přišel z ledových pater a nikdy necouvá.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shōgun Kagetora",
+  "cs": "Šógun Kagetora",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "For a hundred floors he has led the Tower’s armies. He knows every trick.",
+  "cs": "Sto pater vede armády věže. Zná každý trik.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Baroness Hedvika of Hawkmoor",
+  "cs": "Baronka Hedvika z Jestřábí",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Her cavalry is faster than the news of it.",
+  "cs": "Její jízda je rychlejší než zprávy o ní.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Hanzō the Shadow",
+  "cs": "Hanzō Stín",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "No one saw him come. No one saw him leave.",
+  "cs": "Nikdo ho neviděl přicházet. Nikdo ho neviděl odejít.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The Tower’s first demon. Warden of the halfway mark.",
+  "cs": "První démon věže. Strážce poloviny cesty.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Duke Leopold the Unyielding",
+  "cs": "Vévoda Leopold Neústupný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "His walls have survived a thousand sieges.",
+  "cs": "Jeho hradby přežily tisíc obléhání.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sigurd Thunderlord",
+  "cs": "Sigurd Hromovládce",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The storm obeys his commands.",
+  "cs": "Bouře poslouchá jeho rozkazy.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Musashi of Two Swords",
+  "cs": "Musashi Dvou mečů",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He hunts for your weakness. And he will find it.",
+  "cs": "Hledá tvou slabinu. A najde ji.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Princess Ludmila of Ravens",
+  "cs": "Kněžna Ludmila Vraní",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Her archers blot out the sun.",
+  "cs": "Její lučištníci zakryjí slunce.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Azrakel the Undying",
+  "cs": "Azrakel Nesmrtelný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Halfway up the Tower. Whoever defeats him will see the truth.",
+  "cs": "Polovina věže. Kdo ho porazí, uvidí pravdu.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "King Ragnar the Boneless",
+  "cs": "Konung Ragnar Bezkostý",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He ruled seven fjords before the Tower swallowed him.",
+  "cs": "Vládl sedmi fjordům, než ho věž pohltila.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shōgun Masamune One-Eye",
+  "cs": "Šógun Masamune Jednooký",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "With one eye he sees more than others with two.",
+  "cs": "Jedním okem vidí víc než jiní dvěma.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Belzar the Devourer",
+  "cs": "Belzar Požírač",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He remembers everyone who ever entered the Tower.",
+  "cs": "Pamatuje si každého, kdo kdy vstoupil do věže.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Once a hero of your land. Now a guard of the Tower.",
+  "cs": "Kdysi hrdina tvé země. Teď stráž věže.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Xul the Faceless",
+  "cs": "Xul Bez tváře",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "He wears the face of everyone he defeated.",
+  "cs": "Má tvář každého, koho porazil.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Shadow of the Tower Lord",
+  "cs": "Stín Pána věže",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The last guard before the summit.",
+  "cs": "Poslední stráž před vrcholem.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The Tower Lord",
+  "cs": "Pán věže",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The one who built the Tower from stolen kingdoms. He has waited at the summit since the dawn of time.",
+  "cs": "Ten, kdo postavil věž z ukradených království. Čeká na vrcholu od počátku věků.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Strong walls",
+  "cs": "Silné hradby",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The enemy castle has 50% more health.",
+  "cs": "Nepřátelský hrad má o 50 % víc životů.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Watchtowers",
+  "cs": "Strážní věže",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Two extra defenders stand on the walls.",
+  "cs": "Na hradbách stojí o 2 obránce víc.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Boiling oil",
+  "cs": "Vroucí olej",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Anyone who nears the gate is scalded by oil.",
+  "cs": "Kdo se přiblíží k bráně, toho opaří olej.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Horse lords",
+  "cs": "Jízdní země",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The enemy sends mostly cavalry.",
+  "cs": "Nepřítel posílá hlavně jízdu.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Nation of archers",
+  "cs": "Lučištnický národ",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The enemy sends mostly archers.",
+  "cs": "Nepřítel posílá hlavně střelce.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "No magic",
+  "cs": "Bez magie",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "No one may use special attacks.",
+  "cs": "Nikdo nesmí použít speciální útoky.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rich lands",
+  "cs": "Bohatá země",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Both sides earn 30% more coins.",
+  "cs": "Obě strany mají o 30 % víc mincí.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Famine",
+  "cs": "Hladomor",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Both sides earn 25% fewer coins.",
+  "cs": "Obě strany mají o 25 % méně mincí.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Duel of generals",
+  "cs": "Souboj generálů",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The general leaves the tower right at the start.",
+  "cs": "Generál vyjde z věže hned na začátku.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sacred center",
+  "cs": "Posvátný střed",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Holding the center gives a double bonus.",
+  "cs": "Obsazení středu dává dvojnásobný bonus.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fortress",
+  "cs": "Pevnost",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The enemy defends a great fortress with 10 defenders.",
+  "cs": "Nepřítel brání velkou pevnost s 10 obránci.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Hardened",
+  "cs": "Zocelení",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Enemy soldiers have 15% more health.",
+  "cs": "Nepřátelští vojáci mají o 15 % víc životů.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Stone Guard",
+  "cs": "Kamenná stráž",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Grey steel and the moss cloak of the Tower gate guards.",
+  "cs": "Šedá ocel a mechový plášť strážců brány věže.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Storm Lord",
+  "cs": "Pán bouře",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Dark blue armor crackling with lightning.",
+  "cs": "Temně modrá zbroj, ve které praskají blesky.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Obsidian Knight",
+  "cs": "Obsidiánový rytíř",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Black volcanic glass, spikes and a violet shadow glow.",
+  "cs": "Černé sklo sopek, ostny a fialová záře stínů.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Phoenix Armor",
+  "cs": "Fénixova zbroj",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Armor that burns and is reborn from the ashes.",
+  "cs": "Zbroj, která hoří a znovu se rodí z popela.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Star Sovereign",
+  "cs": "Hvězdný vládce",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "White silver, ermine and the light of stars above the Tower.",
+  "cs": "Bílé stříbro, hermelín a světlo hvězd nad věží.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tower Lord",
+  "cs": "Pán věže",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "The armor of the Tower Lord himself. Crimson gold and wings of darkness.",
+  "cs": "Zbroj samotného Pána věže. Rudé zlato a křídla z temnoty.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Staff",
+  "cs": "hůl",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Beyond the summit lies infinity. These wardens have no name.",
+  "cs": "Za vrcholem věže začíná nekonečno. Tihle strážci nemají jméno.",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "{0} Kingdom",
+  "cs": "{0} království",
+  "tpl": true,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Squire",
+  "cs": "Panoš",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Man-at-arms",
+  "cs": "Zbrojnoš",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Captain",
+  "cs": "Kapitán",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Commander",
+  "cs": "Velitel",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "King",
+  "cs": "Král",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Emperor",
+  "cs": "Císař",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Eternal",
+  "cs": "Věčný",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Zdolej 1. patro.",
+  "cs": "První krok",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Zdolej 10. patro.",
+  "cs": "Strážce brány",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Zdolej 50. patro.",
+  "cs": "Ledová cesta",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Zdolej 250. patro.",
+  "cs": "Démonobijce",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Zdolej 500. patro.",
+  "cs": "Polovina věže",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Floor ",
+  "cs": "Patro ",
+  "tpl": false,
+  "files": [
+   "data/vez.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "To your first battle!",
+  "cs": "Do první bitvy!",
+  "tpl": false,
+  "files": [
+   "main.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Send rematch",
+  "cs": "Poslat odvetu",
+  "tpl": false,
+  "files": [
+   "main.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Share battle",
+  "cs": "Sdílet bitvu",
+  "tpl": false,
+  "files": [
+   "main.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Enjoying Castle WARS?",
+  "cs": "Baví tě Castle WARS?",
+  "tpl": false,
+  "files": [
+   "ui/hodnoceni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Rate the game, it takes 10 seconds. It really helps other players find it.",
+  "cs": "Ohodnoť hru, zabere to 10 vteřin. Hodně nám to pomůže, aby hru našli další hráči.",
+  "tpl": false,
+  "files": [
+   "ui/hodnoceni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Rate now",
+  "cs": "Ohodnotit",
+  "tpl": false,
+  "files": [
+   "ui/hodnoceni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Later",
+  "cs": "Později",
+  "tpl": false,
+  "files": [
+   "ui/hodnoceni.js",
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Installed – you will find it on your desktop / home screen.",
+  "cs": "Hra je nainstalovaná – najdeš ji na ploše.",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Install on your home screen",
+  "cs": "Nainstalovat na plochu",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tap",
+  "cs": "Dole klepni na",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Share",
+  "cs": "Sdílet",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Choose",
+  "cs": "Zvol",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js",
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Add to Home Screen",
+  "cs": "Přidat na plochu",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "and confirm",
+  "cs": "a potvrď",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Add",
+  "cs": "Přidat",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Works in Safari. The game then starts from its icon in full screen like an app.",
+  "cs": "Funguje v Safari. Hra se pak spouští z ikony přes celou obrazovku jako aplikace.",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "In the browser address bar click the install icon",
+  "cs": "V adresním řádku prohlížeče klikni na ikonu instalace",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "(or in the ⋮ menu choose",
+  "cs": "(nebo v menu ⋮ zvol",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Install app / Add to Home screen",
+  "cs": "Nainstalovat aplikaci / Přidat na plochu",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Works best in Chrome or Edge. On Windows, install it safely from the Microsoft Store.",
+  "cs": "Nejlépe funguje v Chromu nebo Edge. Na Windows hru nainstaluješ bezpečně z Microsoft Storu.",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Install",
+  "cs": "Nainstalovat",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Android testing",
+  "cs": "Testování na Androidu",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Play Castle WARS on Android first",
+  "cs": "Hraj Castle WARS na Androidu jako první",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Become a Google Play tester in 2 steps:",
+  "cs": "Hledáme testery z Google Play – 2 kroky:",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Join the testers group",
+  "cs": "Přidej se do skupiny testerů",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Click \"Join group\" – use the Google account from your Android phone.",
+  "cs": "Klikni na „Připojit se ke skupině“ – s Google účtem z telefonu s Androidem.",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Install from Google Play",
+  "cs": "Nainstaluj z Google Play",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tap \"Become a tester\", install the game and keep it installed for at least 14 days.",
+  "cs": "Klikni na „Stát se testerem“, nainstaluj hru a nech ji v telefonu aspoň 14 dní.",
+  "tpl": false,
+  "files": [
+   "ui/instalace.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Hi everyone! 👋",
+  "cs": "Ahoj všichni! 👋",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Good game!",
+  "cs": "Dobrá bitva!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Good luck!",
+  "cs": "Hodně štěstí!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Thanks!",
+  "cs": "Díky!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Great job!",
+  "cs": "Skvělá práce!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Attack! ⚔️",
+  "cs": "Do útoku! ⚔️",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "A few more wins for the chest!",
+  "cs": "Ještě pár výher do truhly!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The chest is ours! 🎁",
+  "cs": "Truhla je naše! 🎁",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Welcome to the clan!",
+  "cs": "Vítej v klanu!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wow!",
+  "cs": "Páni!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Who can chip in to the treasury?",
+  "cs": "Kdo přispěje do pokladny?",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Ready for battle!",
+  "cs": "Jsem připraven!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "I donated to the treasury!",
+  "cs": "Přispěl jsem do pokladny!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Sorry!",
+  "cs": "Promiň!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Clans are for registered players only.",
+  "cs": "Klany jsou jen pro registrované hráče.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "You are already in a clan.",
+  "cs": "Už jsi v klanu.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Clan name must be 3–20 characters (letters, digits, space, - _ .).",
+  "cs": "Jméno klanu musí mít 3–20 znaků (písmena, čísla, mezera, - _ .).",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The tag must be 2–4 letters or digits.",
+  "cs": "Zkratka musí mít 2–4 písmena nebo číslice.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The description can be at most 120 characters.",
+  "cs": "Popis může mít nejvýš 120 znaků.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "This name cannot be used. Try another one.",
+  "cs": "Tohle jméno nejde použít. Zkus jiné.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The description contains inappropriate words.",
+  "cs": "Popis obsahuje nevhodná slova.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "A clan with this name already exists.",
+  "cs": "Klan s tímto jménem už existuje.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "This tag is already taken.",
+  "cs": "Tahle zkratka je už obsazená.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "After leaving a clan, wait 30 minutes before joining another.",
+  "cs": "Po odchodu z klanu počkej 30 minut, než vstoupíš do dalšího.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "This clan no longer exists.",
+  "cs": "Klan už neexistuje.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The clan is full (30/30).",
+  "cs": "Klan je plný (30/30).",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "You can have at most 5 pending requests.",
+  "cs": "Najednou můžeš mít nejvýš 5 žádostí.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "You do not have permission for that.",
+  "cs": "Na to nemáš oprávnění.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "A clan can have at most 6 officers.",
+  "cs": "Klan může mít nejvýš 6 důstojníků.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Donate 100 to 5,000 gold.",
+  "cs": "Daruj 100 až 5 000 zlata.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "You have reached today’s donation limit (5,000 gold).",
+  "cs": "Dnes už jsi daroval maximum (5 000 zlata).",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Please log in again.",
+  "cs": "Přihlas se prosím znovu.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "You are offline – try again when online.",
+  "cs": "Jsi offline – zkus to, až budeš online.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "long ago",
+  "cs": "dávno",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} min ago",
+  "cs": "před {0} min",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} h ago",
+  "cs": "před {0} h",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} d ago",
+  "cs": "před {0} d",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leader",
+  "cs": "Vůdce",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Officer",
+  "cs": "Důstojník",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Member",
+  "cs": "Člen",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Clan",
+  "cs": "Klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "clan",
+  "cs": "klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "for clan",
+  "cs": "pro klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clans",
+  "cs": "Klany",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan Hall",
+  "cs": "Síň klanů",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "My clan",
+  "cs": "Můj klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Search",
+  "cs": "Hledat",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leaderboard",
+  "cs": "Žebříček",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Loading…",
+  "cs": "Načítám…",
+  "tpl": false,
+  "files": [
+   "ui/klany.js",
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You are offline. Your clan loads when you are back online. Your banner and clan bonus keep working.",
+  "cs": "Jsi offline. Klan se načte, až budeš zase online. Vlajka i bonus klanu fungují dál.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Try again",
+  "cs": "Zkusit znovu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan chests",
+  "cs": "Klanové truhly",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "50 / 150 / 300 team wins per week",
+  "cs": "Společně 50 / 150 / 300 výher za týden",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan tournament",
+  "cs": "Klanový turnaj",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Up to 500 gems for every member",
+  "cs": "Až 500 drahokamů každému členovi",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Gold bonus",
+  "cs": "Bonus zlata",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Up to +10% gold from every battle",
+  "cs": "Až +10 % zlata z každé bitvy",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Banner on your castle",
+  "cs": "Vlajka na hradu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your clan crest flies in every battle",
+  "cs": "Erb klanu vlaje v každé bitvě",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Join forces with other commanders",
+  "cs": "Spoj síly s dalšími veliteli",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clans are for registered players. Registration is free and takes a moment – and your progress stays safe on the server.",
+  "cs": "Klany jsou pro registrované hráče. Registrace je zdarma, zabere chvilku – a tvůj postup bude v bezpečí na serveru.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Register for free",
+  "cs": "Zaregistrovat se zdarma",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Browse clans",
+  "cs": "Prohlédnout klany",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Level",
+  "cs": "Úroveň",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🔓 Open",
+  "cs": "🔓 Otevřený",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🔒 By request",
+  "cs": "🔒 Na žádost",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Edit",
+  "cs": "Upravit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan tournament reward!",
+  "cs": "Odměna za klanový turnaj!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your clan chest is ready!",
+  "cs": "Klanová truhla je připravená!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "#{0} last week",
+  "cs": "{0}. místo minulý týden",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Chest {0} ({1} wins)",
+  "cs": "Truhla {0} ({1} výher)",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Claim",
+  "cs": "Vyzvednout",
+  "tpl": false,
+  "files": [
+   "ui/klany.js",
+   "ui/ukoly.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan week",
+  "cs": "Klanový týden",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "wins",
+  "cs": "výher",
+  "tpl": false,
+  "files": [
+   "ui/klany.js",
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "ranking",
+  "cs": "v žebříčku",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "All chests unlocked – amazing work!",
+  "cs": "Všechny truhly odemčené – skvělá práce!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "<b>{0}</b> wins to the next chest. Every win counts!",
+  "cs": "Do další truhly chybí <b>{0}</b> výher. Každá tvoje výhra se počítá!",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "gold",
+  "cs": "zlata",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "level {0} = +{1}% battle gold",
+  "cs": "úroveň {0} = +{1} % zlata z bitev",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "max level!",
+  "cs": "maximální úroveň!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You can donate {0} more gold today.",
+  "cs": "Dnes můžeš darovat ještě {0} zlata.",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Members",
+  "cs": "Členové",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "wins this week",
+  "cs": "výhry tento týden",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Join requests",
+  "cs": "Žádosti o vstup",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "you",
+  "cs": "ty",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan chat",
+  "cs": "Klanový pokřik",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "quick messages",
+  "cs": "rychlé zprávy",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Say hi to your clan!",
+  "cs": "Pozdrav svůj klan!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leave clan",
+  "cs": "Opustit klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} founded the clan 🏰",
+  "cs": "{0} založil klan 🏰",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} joined the clan 👋",
+  "cs": "{0} se přidal ke klanu 👋",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} left the clan",
+  "cs": "{0} opustil klan",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} was removed from the clan",
+  "cs": "{0} byl z klanu vyloučen",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} is a new officer ★",
+  "cs": "{0} je nový důstojník ★",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} is the new leader ♛",
+  "cs": "{0} je nový vůdce ♛",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "<b>{0}</b> donated {1} gold 💰",
+  "cs": "<b>{0}</b> daroval {1} zlata do pokladny 💰",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The clan reached level {0}! Gold bonus +{1}% ✨",
+  "cs": "Klan dosáhl úrovně {0}! Bonus zlata +{1} % ✨",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan chest {0} unlocked! ({1} wins) 🎁",
+  "cs": "Klanová truhla {0} odemčena! ({1} výher) 🎁",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Not enough gold.",
+  "cs": "Nemáš dost zlata.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Thanks! You donated {0} gold.",
+  "cs": "Díky! Daroval jsi {0} zlata do pokladny.",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your clan reached level {0}! 🎉",
+  "cs": "Klan dosáhl úrovně {0}! 🎉",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leave the clan?",
+  "cs": "Opustit klan?",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leadership passes to the most senior officer or member. You can join another clan in 30 minutes.",
+  "cs": "Vedení převezme nejstarší důstojník nebo člen. Do dalšího klanu můžeš vstoupit za 30 minut.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You can join another clan in 30 minutes. This week’s rewards stay yours.",
+  "cs": "Do dalšího klanu můžeš vstoupit za 30 minut. Odměny za tento týden ti zůstanou.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Leave",
+  "cs": "Opustit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "★ Promote to officer",
+  "cs": "★ Povýšit na důstojníka",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Demote to member",
+  "cs": "Sesadit na člena",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "♛ Make clan leader",
+  "cs": "♛ Předat vedení klanu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Remove from clan",
+  "cs": "Vyloučit z klanu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Remove {0}?",
+  "cs": "Vyloučit hráče {0}?",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The player can ask to join again.",
+  "cs": "Hráč bude moct požádat o vstup znovu.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Remove",
+  "cs": "Vyloučit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Make {0} the leader?",
+  "cs": "Předat vedení hráči {0}?",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You will become an officer.",
+  "cs": "Ty se staneš důstojníkem.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Confirm",
+  "cs": "Předat",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan reward!",
+  "cs": "Odměna klanu!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Great!",
+  "cs": "Super!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js",
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You are not in a clan yet",
+  "cs": "Zatím nejsi v žádném klanu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Join other commanders, or found your own clan and invite friends.",
+  "cs": "Přidej se k ostatním velitelům, nebo založ vlastní klan a pozvi kamarády.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You can join another clan in {0} min.",
+  "cs": "Do dalšího klanu můžeš vstoupit za {0} min.",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Waiting for approval ({0} request{1}).",
+  "cs": "Čekáš na schválení žádosti ({0}).",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Unclaimed clan reward: {0}{1}",
+  "cs": "Máš nevyzvednutou odměnu z klanu: {0}{1}",
+  "tpl": true,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Find a clan",
+  "cs": "Najít klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Found a clan",
+  "cs": "Založit klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your clan",
+  "cs": "Tvůj klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "This banner will fly on your castle.",
+  "cs": "Takhle bude vlajka vlát na tvém hradu.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Edit clan",
+  "cs": "Upravit klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan name",
+  "cs": "Jméno klanu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "e.g. Knights of the North",
+  "cs": "např. Rytíři Severu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tag",
+  "cs": "Zkratka",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Emblem",
+  "cs": "Znak",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Colour",
+  "cs": "Barva",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Description (optional)",
+  "cs": "Popis (nepovinné)",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "e.g. We play daily, join us!",
+  "cs": "např. Hrajeme každý den, přidej se!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Open – anyone can join",
+  "cs": "Otevřený – kdokoli vstoupí",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "By request – you approve",
+  "cs": "Na žádost – schvaluješ ty",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Save",
+  "cs": "Uložit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Found clan",
+  "cs": "Založit klan",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Name and tag must be decent and unique. Inappropriate names are rejected.",
+  "cs": "Jméno a zkratka musí být slušné a jedinečné. Nevhodná jména odmítneme.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan founded! Invite your friends ⚔️",
+  "cs": "Klan založen! Pozvi kamarády ⚔️",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clan name or tag",
+  "cs": "Jméno nebo zkratka klanu",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Found",
+  "cs": "Založit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Search works only online.",
+  "cs": "Hledání funguje jen online.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Searching…",
+  "cs": "Hledám…",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "No clan found.",
+  "cs": "Žádný klan nenalezen.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "No clans yet – be the first!",
+  "cs": "Zatím tu žádné klany nejsou – buď první!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Full",
+  "cs": "Plný",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Cancel request",
+  "cs": "Zrušit žádost",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Join",
+  "cs": "Vstoupit",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Request",
+  "cs": "Požádat",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Lv",
+  "cs": "Úr.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Welcome to the clan! ⚔️",
+  "cs": "Vítej v klanu! ⚔️",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Request sent. The clan leader will review it soon.",
+  "cs": "Žádost odeslána. Vůdce klanu ji brzy schválí.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Clans need an account",
+  "cs": "Klany jsou pro registrované",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Register for free – it takes a moment, your progress is saved on the server and you can join a clan.",
+  "cs": "Zaregistruj se zdarma – zabere to chvilku, postup se ti uloží na server a můžeš vstoupit do klanu.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Register",
+  "cs": "Zaregistrovat",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "for every member who contributed",
+  "cs": "každému členovi, který přispěl",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The leaderboard loads when you are online.",
+  "cs": "Žebříček se načte, až budeš online.",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Week ends in",
+  "cs": "Do konce týdne",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "score = members’ wins this week",
+  "cs": "skóre = výhry členů za týden",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "No clan has fought this week yet – be the first!",
+  "cs": "Tento týden zatím žádný klan nebojoval – buďte první!",
+  "tpl": false,
+  "files": [
+   "ui/klany.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Play battles and complete daily quests – across 20 levels you get the full Wolf set for all soldiers for free. The premium pass adds the legendary Aurora set.",
+  "cs": "Hraj bitvy a plň denní úkoly – na 20 úrovních dostaneš zdarma celou Vlčí sadu pro všechny druhy vojáků. Prémiový pas přidá legendární sadu Polární záře.",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Battle Pass · Wolf Winter",
+  "cs": "Battle pas · Vlčí zima",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Season ends in {n} days",
+  "cs": "Sezóna končí za {n} dní",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The season has ended – a new one starts soon",
+  "cs": "Sezóna skončila – brzy začne nová",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Level {n}",
+  "cs": "Úroveň {n}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Max level!",
+  "cs": "Maximální úroveň!",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Win +{w} XP · loss +{l} XP · training +{t} XP · daily quest +{q} XP",
+  "cs": "Výhra +{w} XP · prohra +{l} XP · trénink +{t} XP · denní úkol +{q} XP",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Premium",
+  "cs": "Prémiový",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Buy the premium pass",
+  "cs": "Koupit prémiový pas",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Premium pass active",
+  "cs": "Prémiový pas aktivní",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Get the legendary Aurora set (armor with crystal wings + weapon) for the infantry of all three nations right away. Further levels unlock it for archers, spearmen, cavalry, mages and commanders (+10% health, +10% attack), plus 35,000+ gold and 2,600 gems extra.",
+  "cs": "Hned dostaneš legendární sadu Polární záře (zbroj s krystalovými křídly + zbraň) pro pěšáky všech tří národů. Na dalších úrovních ji získáš pro lučištníky, kopiníky, jízdu, mágy i velitele (+10 % životy, +10 % útok) a k tomu přes 35 000 zlata a 2 600 drahokamů navíc.",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Claim all",
+  "cs": "Vyzvednout vše",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Battle Pass rewards",
+  "cs": "Odměny z battle pasu",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf sets for other soldiers",
+  "cs": "Vlčí sady pro další vojáky",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Epic Wolf Winter armor and weapon for all three nations. Infantry, archers and spearmen get it from the Battle Pass.",
+  "cs": "Epická zbroj i zbraň Vlčí zima pro všechny tři národy. Pěšáci, lučištníci a kopiníci ji mají v battle pasu.",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf set: {r}",
+  "cs": "Vlčí sada: {r}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Epic Wolf Winter armor and wolf weapon for {r} of all three nations (+7% health, +7% attack).",
+  "cs": "Epická zbroj Vlčí zima a vlčí zbraň pro {r} všech tří národů (+7 % životy, +7 % útok).",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Battle Pass: level {n}!",
+  "cs": "Battle pas: úroveň {n}!",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf armor · {r}",
+  "cs": "Vlčí zbroj · {r}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf weapon · {r}",
+  "cs": "Vlčí zbraň · {r}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Wolf set · {r}",
+  "cs": "Vlčí set · {r}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Aurora · {r}",
+  "cs": "Polární záře · {r}",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Season",
+  "cs": "Sezóna",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "heavy units",
+  "cs": "těžké jednotky",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Infantry",
+  "cs": "Pěšáci",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Archers",
+  "cs": "Lučištníci",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Spearmen",
+  "cs": "Kopiníci",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Heavy units",
+  "cs": "Těžká jednotka",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Cavalry",
+  "cs": "Jízda",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Mages",
+  "cs": "Mágové",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Commanders",
+  "cs": "Velitelé",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Premium Battle Pass",
+  "cs": "Prémiový battle pas",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "✦ Battle effect: glow and sparks",
+  "cs": "✦ Efekt v bitvě: záře a jiskry",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "✦ Divine effect: aura and light pillar",
+  "cs": "✦ Božský efekt: aura a sloup světla",
+  "tpl": false,
+  "files": [
+   "ui/pas.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Pet",
+  "cs": "Mazlíček",
+  "tpl": false,
+  "files": [
+   "ui/screens.js",
+   "ui/sin.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Hall of Fame",
+  "cs": "Síň slávy",
+  "tpl": false,
+  "files": [
+   "ui/screens.js",
+   "ui/sin.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Friends",
+  "cs": "Přátelé",
+  "tpl": false,
+  "files": [
+   "ui/screens.js",
+   "ui/sireni.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Tournament",
+  "cs": "Turnaj",
+  "tpl": false,
+  "files": [
+   "ui/screens.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Get with attack",
+  "cs": "Získat s útokem",
+  "tpl": false,
+  "files": [
+   "ui/screens.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Get with Dragon Breath",
+  "cs": "Získat s útokem Dračí dech",
+  "tpl": false,
+  "files": [
+   "ui/screens.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Everything in the game",
+  "cs": "Úplně všechno ze hry",
+  "tpl": false,
+  "files": [
+   "ui/shop.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "armors",
+  "cs": "zbrojí",
+  "tpl": false,
+  "files": [
+   "ui/shop.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "weapons",
+  "cs": "zbraní",
+  "tpl": false,
+  "files": [
+   "ui/shop.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Not available in Belgium",
+  "cs": "Nedostupné v Belgii",
+  "tpl": false,
+  "files": [
+   "ui/shop.js"
+  ],
+  "kind": "tern"
+ },
+ {
+  "en": "Your loyal battle companion",
+  "cs": "Tvůj věrný pomocník v bitvě",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your pet flies above your army, collects fallen coins (+1 per kill) and uses its own ability. New pets unlock with victories.",
+  "cs": "Mazlíček létá nad tvou armádou, sbírá padlé mince (+1 za zabití) a sám používá svou schopnost. Noví se odemykají vítězstvími.",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Victories",
+  "cs": "Vítězství",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "With you in battle",
+  "cs": "S tebou v bitvě",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{n} victories",
+  "cs": "{n} vítězství",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "victories",
+  "cs": "vítězství",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "kills",
+  "cs": "zabití",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "trophies",
+  "cs": "trofejí",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "invited friends",
+  "cs": "pozvaných přátel",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "advent doors",
+  "cs": "adventních okének",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Pets",
+  "cs": "Mazlíčci",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "unlocked",
+  "cs": "odemčeno",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Ability every",
+  "cs": "Schopnost každých",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Every pet also collects fallen coins: +1 per kill.",
+  "cs": "Každý mazlíček navíc sbírá padlé mince: +1 za každé zabití.",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Take into battle",
+  "cs": "Vzít do bitvy",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Buy",
+  "cs": "Koupit",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Unlocks at",
+  "cs": "Odemkne se",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "In battle",
+  "cs": "V bitvě",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Unlocked",
+  "cs": "Odemčeno",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your greatest deeds",
+  "cs": "Tvoje největší činy",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Trophies drop from bosses and generals and are earned for great deeds in battle. Each trophy gives +1% coins in battle (up to +20%).",
+  "cs": "Trofeje padají z bossů a generálů a dostaneš je za velké činy v bitvě. Každá trofej dává +1 % mincí v bitvě (nejvýš +20 %).",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Trophies",
+  "cs": "Trofeje",
+  "tpl": false,
+  "files": [
+   "ui/sin.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Herald the Carrier Pigeon",
+  "cs": "Posel, poštovní holub",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Exclusive pet only for inviting friends. Carries messages in a tube on its leg. Every 10 s it brings 30 coins and grabs 3 extra coins per kill.",
+  "cs": "Exkluzivní mazlíček jen za pozvané přátele. Nosí zprávy v pouzdře na noze. Každých 10 s přinese 30 mincí a za každé zabití 3 mince navíc.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Link copied – paste it to your friends.",
+  "cs": "Odkaz je zkopírovaný – vlož ho kamarádům.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Battle of Castles",
+  "cs": "Bitva hradů",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "VICTORY!",
+  "cs": "VÍTĚZSTVÍ!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "DEFEAT",
+  "cs": "PROHRA",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0} kills · castle {1} %",
+  "cs": "{0} zabitých · hrad {1} %",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "I beat {0}'s castle!",
+  "cs": "Porazil jsem hrad hráče {0}!",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Can you do better? Play free!",
+  "cs": "Dokážeš to líp? Hraj zdarma!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "I won a battle in Castle WARS – {0} kills! 🏰⚔️ Can you beat that?",
+  "cs": "Vyhrál jsem bitvu v Castle WARS – {0} zabitých! 🏰⚔️ Dokážeš to líp?",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Playing Castle WARS – battle of castles. Come beat me! 🏰",
+  "cs": "Hraju Castle WARS – bitvu hradů. Pojď mě porazit! 🏰",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "⚔️ I challenge you in Castle WARS! Can you beat my castle? (level {0})",
+  "cs": "⚔️ Vyzývám tě v Castle WARS! Porazíš můj hrad? (úroveň {0})",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Challenge: {0}",
+  "cs": "Výzva: {0}",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Challenge",
+  "cs": "Výzva",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "challenges you!",
+  "cs": "tě vyzývá na souboj!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Can you beat their level {0} castle? If you win, send them a rematch.",
+  "cs": "Porazíš jeho hrad úrovně {0}? Když vyhraješ, pošli mu odvetu.",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Accept",
+  "cs": "Přijmout výzvu",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Friend invite gift: +{0} gems!",
+  "cs": "Dárek za pozvánku od kamaráda: +{0} drahokamů!",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You beat <b>{0}</b>'s castle! Send them the result and challenge them back.",
+  "cs": "Porazil jsi hrad hráče <b>{0}</b>! Pošli mu výsledek a vyzvi ho na odvetu.",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "<b>{0}</b> won this time. Try again or challenge them yourself.",
+  "cs": "<b>{0}</b> tě tentokrát porazil. Zkus to znovu, nebo ho vyzvi ty.",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your friends are playing! Invite reward: +{0} gems",
+  "cs": "Tví přátelé hrají! Odměna za pozvánky: +{0} drahokamů",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Weekly tournament",
+  "cs": "Týdenní turnaj",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Place #{0}!",
+  "cs": "{0}. místo!",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Last week you won {0} battles and finished #{1}.",
+  "cs": "Minulý týden jsi vyhrál {0} bitev a skončil na {1}. místě.",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Play with friends",
+  "cs": "Hraj s přáteli",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Challenge a friend",
+  "cs": "Vyzvi kamaráda",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Your friend gets a link and fights against your castle. The winner sends a rematch.",
+  "cs": "Kamarád dostane odkaz a bude bojovat proti tvému hradu. Kdo vyhraje, pošle odvetu.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Send challenge",
+  "cs": "Poslat výzvu",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Record a video",
+  "cs": "Natoč video",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Huge battles with no UI and a cinematic camera – perfect for TikTok and Instagram. Start screen recording and launch a battle. No rewards are given in these.",
+  "cs": "Obří bitvy bez ovládání a s filmovou kamerou – ideální na TikTok a Instagram. Zapni nahrávání obrazovky a spusť bitvu. Odměny se v nich nedávají.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Giant battle",
+  "cs": "Obří bitva",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Nation vs nation",
+  "cs": "Národ proti národu",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Castle vs horde",
+  "cs": "Hrad proti hordě",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tip: in any battle, turn on cinematic mode in the pause menu with \"Recording mode\".",
+  "cs": "Tip: v každé bitvě zapneš filmový režim v pauze tlačítkem „Režim natáčení“.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tournament of the week",
+  "cs": "Turnaj týdne",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Every battle victory = 1 point. The tournament ends Sunday at midnight and the best get gems.",
+  "cs": "Každé vítězství v bitvě = 1 bod. V neděli o půlnoci turnaj skončí a nejlepší dostanou drahokamy.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Only registered players get rewards and a leaderboard spot. Registration is free and gives you gems.",
+  "cs": "Odměny a místo v žebříčku mají jen registrovaní hráči. Registrace je zdarma a dostaneš za ni drahokamy.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "{0}d {1}h left",
+  "cs": "Do konce zbývá {0} d {1} h",
+  "tpl": true,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "You",
+  "cs": "Ty",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "place",
+  "cs": "místo",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Win a battle to join!",
+  "cs": "Vyhraj bitvu a jsi v turnaji!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Nobody yet – be the first!",
+  "cs": "Zatím nikdo – buď první!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The tournament loads when you are online.",
+  "cs": "Turnaj se načte, až budeš online.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Exit recording mode",
+  "cs": "Ukončit režim natáčení",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🎁 Daily reward is ready!",
+  "cs": "🎁 Denní odměna čeká!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Collect your gold and gems.",
+  "cs": "Vyzvedni si zlato a drahokamy, než propadnou.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "⚔️ Your castle needs you!",
+  "cs": "⚔️ Tvůj hrad tě potřebuje!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "The enemy is gathering an army at your walls.",
+  "cs": "Nepřítel shromažďuje armádu u tvých hradeb.",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🏆 Weekly tournament ends soon",
+  "cs": "🏆 Turnaj týdne finišuje",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Every win is another point. You can still climb!",
+  "cs": "Každá výhra je bod navíc. Ještě můžeš postoupit!",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "🎬 Recording mode",
+  "cs": "🎬 Režim natáčení",
+  "tpl": false,
+  "files": [
+   "ui/sireni.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Send {g} soldiers into battle",
+  "cs": "Vyšli do boje {g} vojáků",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Defeat {g} enemies",
+  "cs": "Poraz {g} nepřátel",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win {g} battles",
+  "cs": "Vyhraj {g} bitvy",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Use a special attack {g} times",
+  "cs": "Použij {g}× speciální útok",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a story level",
+  "cs": "Vyhraj úroveň v příběhu",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Capture the centre {g} times",
+  "cs": "Obsaď {g}× střed bojiště",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Win a duel",
+  "cs": "Vyhraj souboj",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Get 3 stars in a story level",
+  "cs": "Získej 3 hvězdy v úrovni příběhu",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "Send {g} archers",
+  "cs": "Vyšli {g} střelců",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "obj"
+ },
+ {
+  "en": "New every day",
+  "cs": "Každý den nové",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Daily quests",
+  "cs": "Denní úkoly",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Bonus for all three quests",
+  "cs": "Bonus za všechny tři úkoly",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Quests progress in story, duels and training. New ones arrive at midnight.",
+  "cs": "Úkoly se plní v příběhu, soubojích i tréninku. Nové přijdou o půlnoci.",
+  "tpl": false,
+  "files": [
+   "ui/ukoly.js"
+  ],
+  "kind": "L"
+ },
+ {
+  "en": "Tower",
+  "cs": "Věž",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The endless tower – over 1000 floors, each a different kingdom with its own general.",
+  "cs": "Nekonečná věž – přes 1000 pater, každé je jiné království s vlastním generálem.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "General",
+  "cs": "Generál",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Why he defends",
+  "cs": "Proč brání patro",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Floor conditions",
+  "cs": "Podmínky patra",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "No special conditions.",
+  "cs": "Žádné zvláštní podmínky.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Victory reward",
+  "cs": "Odměna za vítězství",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Highest floor",
+  "cs": "Nejvyšší patro",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Generals defeated",
+  "cs": "Poražení generálové",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Generals slain in battle",
+  "cs": "Generálové zabití v boji",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Win rate",
+  "cs": "Úspěšnost",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fastest floor",
+  "cs": "Nejrychlejší patro",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tower Chronicle",
+  "cs": "Kronika věže",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Unlocks at floor {n}",
+  "cs": "Odemkne se na patře {n}",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Achievements",
+  "cs": "Úspěchy",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tower leaderboard",
+  "cs": "Žebříček věže",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Weekly challenge",
+  "cs": "Výzva týdne",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "A special floor with extra conditions. The fastest winners of the week make the leaderboard.",
+  "cs": "Zvláštní patro s extra podmínkami. Nejrychlejší vítězové týdne jsou v žebříčku.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Done this week",
+  "cs": "Splněno tento týden",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Rival: beat you {n}×",
+  "cs": "Rival: porazil tě {n}×",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The general held the floor.",
+  "cs": "Generál ubránil patro.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "A new chapter of the Tower Chronicle!",
+  "cs": "Nová kapitola Kroniky věže!",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "New achievement: {n}",
+  "cs": "Nový úspěch: {n}",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "The general fell in battle: +{n} gems",
+  "cs": "Generál padl v boji: +{n} drahokamů",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tier",
+  "cs": "Úroveň",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tower set",
+  "cs": "Věžová sada",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Tower sets",
+  "cs": "Věžové sady",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Armor and weapons for all 18 soldiers of every nation. Only from the Tower – they cannot be bought.",
+  "cs": "Zbroj a zbraně pro všech 18 vojáků všech národů. Získáš je jen ve věži – nedají se koupit.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Generals",
+  "cs": "Generálové",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Week",
+  "cs": "Týden",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Set a name and password for your account to appear on the leaderboard.",
+  "cs": "Do žebříčku se dostaneš, až si nastavíš jméno a heslo účtu.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Great General",
+  "cs": "Velký generál",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "‹ Previous",
+  "cs": "‹ Předchozí",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Next ›",
+  "cs": "Další ›",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Conquer floor {n} first.",
+  "cs": "Nejdřív dobyj patro {n}.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Attacks relentlessly and never retreats. Leads every charge in person.",
+  "cs": "Útočí neustále a nikdy necouvá. Osobně vede každý útok.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Balanced and patient. Waits for your mistakes, then punishes hard.",
+  "cs": "Vyvážený a trpělivý. Čeká na tvé chyby a pak tvrdě trestá.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Master of ambushes and lures. Nothing is what it seems.",
+  "cs": "Mistr léček a návnad. Nic není takové, jak vypadá.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Defends the walls under his towers and waits to counter.",
+  "cs": "Brání hradby pod věžemi a čeká na protiúder.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Learns your style and strikes the weaknesses of your army.",
+  "cs": "Učí se tvůj styl a útočí na slabiny tvé armády.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Relies on mages and devastating spells.",
+  "cs": "Spoléhá na mágy a ničivá kouzla.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Fast cavalry, raids on your castle when you leave it.",
+  "cs": "Rychlá jízda, nájezdy na tvůj hrad, když odejdeš.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ },
+ {
+  "en": "Archers and a slow advance behind a shield of infantry.",
+  "cs": "Lučištníci a pomalý postup za štítem pěchoty.",
+  "tpl": false,
+  "files": [
+   "ui/vez.js"
+  ],
+  "kind": "arr"
+ }
+]

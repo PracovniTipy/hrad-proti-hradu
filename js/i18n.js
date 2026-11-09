@@ -4,6 +4,8 @@
    Texty rozhraní a tutoriálů jsou přeložené do všech jazyků.
    Delší obsah (příběhy, popisy jednotek) je česky a anglicky; ostatní
    jazyky pro něj používají angličtinu (viz I18N.d a i18n_obsah.js).
+   Polština (pl) a úplné překlady de/pl/es/pt (rozhraní, L-texty i obsah):
+   js/i18n_l.js + js/i18n_de.js, i18n_pl.js, i18n_es.js, i18n_pt.js.
    ========================================================================= */
 (function () {
   const order = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko'];
@@ -224,7 +226,7 @@
       if (this.lang === 'cs') return fallback;
       const src = (window.I18N_EN || {})[kind];
       const v = src && src[id] && src[id][field];
-      return v != null ? v : fallback;
+      return v != null ? (this.tr ? this.tr(v) : v) : fallback;
     },
     /* Doplní data-i18n atributy v HTML */
     apply(root = document) {

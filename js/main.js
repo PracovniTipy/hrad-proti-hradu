@@ -61,7 +61,7 @@
         if ((st.wins || 0) + (st.losses || 0) === 0 && !document.getElementById('firstFight')) {
           const lv = GameData.campaignHelpers.currentLevel(this.save), host = document.getElementById('screen');
           if (lv && host) { const b = document.createElement('button'); b.id = 'firstFight'; b.className = 'btn btn-gold btn-big first-fight';
-            b.innerHTML = '⚔️ ' + ((window.I18N && I18N.lang === 'cs') ? 'Do první bitvy!' : 'To your first battle!');
+            b.innerHTML = '⚔️ ' + (I18N.L('Do první bitvy!', 'To your first battle!'));
             b.addEventListener('click', () => this.openLevel(lv.id)); host.appendChild(b); }
         }
       }
@@ -118,6 +118,7 @@
 
     modal(html, onMount) {
       const m = $('#modal'), c = $('#modalCard');
+      c.classList.remove('res-simple');
       c.innerHTML = html;
       applyIcons(c);
       m.hidden = false;
@@ -664,45 +665,27 @@
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
       if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
       if (bp && bp.up) note += (note ? '<br>' : '') + `★ ${t('pas_lvl_up', { n: Pas.level(save) })}`;
-      if (qDone) note += (note ? '<br>' : '') + `${ico('crown')} ${t('quests_ready', { n: qDone })}`;
+      if (qDone) note += (note ? '<br>' : '') + `📜 ${t('quests_ready', { n: qDone })}`;
       this.persist();
-      // nejlepší jednotka bitvy (MVP) a přehled podle druhu vojáka
-      const ST = res.st || { dmg: {}, kills: {}, sent: {} };
-      const ids = Object.keys(Object.assign({}, ST.sent, ST.dmg)).filter(id => GameData.units[id]);
-      ids.sort((a, b) => (ST.dmg[b] || 0) - (ST.dmg[a] || 0));
-      const mvp = ids[0] && (ST.dmg[ids[0]] || 0) > 0 ? ids[0] : null;
-      const statsHtml = ids.length ? `<div class="bstats">
-          ${mvp ? `<div class="mvp"><canvas data-mvp="${mvp}"></canvas><div><small>${t('mvp')}</small><b>${esc(GameData.units[mvp].name)}</b><span>${fmt(ST.dmg[mvp] || 0)} ${t('dmg_word')} · ${ST.kills[mvp] || 0} ${t('kills_word')}</span></div></div>` : ''}
-          <table class="bst"><tr><th></th><th>${t('sent')}</th><th>${t('dmg_word')}</th><th>${t('kills_word')}</th></tr>
-          ${ids.slice(0, 7).map(id => `<tr><td>${esc(GameData.units[id].name)}</td><td>${ST.sent[id] || 0}</td><td>${fmt(ST.dmg[id] || 0)}</td><td>${ST.kills[id] || 0}</td></tr>`).join('')}</table>
-        </div>` : '';
-      const reason = res.reason === 'cas' ? t('r_time') : res.reason === 'spojeni' ? t('onl_conn_lost') : res.reason === 'odpojeni' ? t('onl_foe_left') : res.reason === 'vzdal' ? t('onl_you_quit') : (res.win ? t('r_enemy') : t('r_you'));
       const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      const mm = Math.floor(res.time / 60) + ':' + String(Math.floor(res.time % 60)).padStart(2, '0');
       this.modal(`
-        <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
-        ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
-        <p style="text-align:center;margin:0" class="muted">${reason}</p>
-        ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
-        ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
-        <dl class="kv">
-          <dt>${t('battle_lbl')}</dt><dd>${esc(cfg.title)}</dd>
-          <dt>${t('duration')}</dt><dd>${Math.floor(res.time / 60)}:${String(Math.floor(res.time % 60)).padStart(2, '0')}</dd>
-          <dt>${t('kills')}</dt><dd>${res.kills}</dd>
-          <dt>${t('sent')}</dt><dd>${res.sent}</dd>
-          <dt>${t('your_castle')}</dt><dd>${Math.round(res.playerHp * 100)} %</dd>
-        </dl>
-        ${statsHtml}
-        ${note ? `<div class="notice"><div>${note}</div></div>` : ''}
-        ${window.Sireni && Sireni.victoryCardHtml ? Sireni.victoryCardHtml(this, cfg, res, stars) : ''}
-        <div class="modal-actions">
-          ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn btn-green" id="resShare">${cfg.mode === 'vyzva' ? (I18N.lang === 'cs' ? 'Poslat odvetu' : 'Send rematch') : (I18N.lang === 'cs' ? 'Sdílet bitvu' : 'Share battle')}</button>` : ''}
-          <button class="btn btn-gold" id="resBack">${t('continue')}</button>
+        <div class="rs ${res.win ? 'win' : 'loss'}">
+          <div class="rs-emb" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4l24 8v18c0 16-11 26-24 30C19 56 8 46 8 30V12z" fill="${res.win ? '#c8902a' : '#7a2a24'}" stroke="#1a0e06" stroke-width="3"/><path d="M32 9l19 6v15c0 13-9 21-19 25-10-4-19-12-19-25V15z" fill="${res.win ? '#ffd77a' : '#c0564a'}" opacity=".35"/>${res.win ? '<path d="M18 18l26 26M46 18L20 44" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M16 42l6 6M48 42l-6 6" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>' : '<path d="M22 20l10 12M36 38l8 9" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M42 18L22 46" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>'}</svg></div>
+          <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
+          ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.2}s">★</i>`).join('')}</div>` : ''}
+          ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
+          <p class="rs-line">⏱ ${mm} · ⚔️ ${res.kills} · 🏰 ${Math.round(res.playerHp * 100)} %</p>
+          ${note ? `<p class="rs-note">${note}</p>` : ''}
+          ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
+          <div class="modal-actions">
+            ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn rs-share" id="resShare" aria-label="${I18N.L('Sdílet bitvu', 'Share battle')}">📤</button>` : ''}
+            <button class="btn btn-gold" id="resBack">${t('continue')}</button>
+          </div>
         </div>`, (c, close) => {
+        c.classList.add('res-simple');
         const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
         if (window.Reklamy) Reklamy.battleBind(this, c);
-        if (window.Sireni && Sireni.bindVictoryCard) Sireni.bindVictoryCard(this, c, cfg, stars);
-        const mc = c.querySelector('canvas[data-mvp]');
-        if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
         c.querySelector('#resBack').addEventListener('click', () => {
           close(); this._closeBattle(); if (cfg.net && window.Online) Online.afterBattle(); this.go(back);
           if (cfg.afterScene && !cfg.net) this.playScene(cfg.afterScene, null, true);
@@ -882,7 +865,7 @@
       if ((!this.save.lang || !this.save.langAsked2) && window.CW_PORTAL) {
         // herní portály: bez úvodního výběru jazyka – jazyk prohlížeče, jinak angličtina
         const nav = String(navigator.language || 'en').slice(0, 2).toLowerCase();
-        const ok = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko'];
+        const ok = I18N.LANGS.map(l => l.id);
         this.save.langAsked2 = 1; this.setLang(ok.includes(nav) ? nav : 'en');
         this.go('hrad');
       } else if (!this.save.lang) {

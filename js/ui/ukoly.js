@@ -19,7 +19,7 @@
     { id: 'archer', m: 'ranged', goal: 15, gold: 600, cs: 'Vyšli {g} střelců', en: 'Send {g} archers' }
   ];
   const BONUS = { gems: 40, gold: 1000 };
-  const L = (c, e) => I18N.lang === 'cs' ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
 
   const Ukoly = {
     state(save) {

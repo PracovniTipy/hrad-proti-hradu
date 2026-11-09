@@ -1,0 +1,256 @@
+core/general.js | Moje hradby padly jen jednou. Nikdy znovu.
+core/general.js | Vlezl jsi do pasti!
+core/general.js | Dnes padne jejich hrad!
+core/general.js | The enemy moves to take the center
+core/general.js | The enemy digs in at its walls
+core/general.js | The enemy advances step by step
+core/general.js | The enemy is massing its army
+core/general.js | The enemy pulls back to regroup
+core/general.js | Ambush! The enemy strikes from cover
+core/general.js | The enemy launches a counterattack
+core/novinky.js | A new trophy for your hall of fame!
+core/novinky.js | Your castle is under attack!
+core/novinky.js | The walls are crumbling! Defend the castle!
+core/novinky.js | The enemy walls are cracking!
+core/novinky.js | Final push! Bring it down!
+data/campaign.js | Belzarova tvrz
+data/skiny_plus.js | Katana mistra
+data/skiny_vic.js | Mistr jin-jang
+data/vez.js | Hradby bez konce
+data/vez.js | Lov na slabiny
+data/vez.js | Polovina cesty
+data/vez.js | Bez kouzel
+ui/online_ui.js | Online with friends
+ui/online_ui.js | Play against or together with friends – just share the room code.
+ui/online_ui.js | You against a friend. Each controls their own castle and army.
+ui/online_ui.js | Two teams of two. Teammates share a castle, each has their own coins and troops.
+ui/online_ui.js | Story co-op
+ui/online_ui.js | Together against a story army. The enemy is stronger, both get the reward.
+ui/online_ui.js | Create room
+ui/online_ui.js | Send this code to your friend. They enter it in Duel → Online with friends → Join.
+ui/online_ui.js | Copy code
+ui/online_ui.js | Code copied
+ui/online_ui.js | Blue team
+ui/online_ui.js | Red team
+ui/online_ui.js | Together against the story army
+ui/online_ui.js | Free slot…
+ui/online_ui.js | Your army
+ui/online_ui.js | Switch team
+ui/online_ui.js | Story level
+ui/online_ui.js | Teams must be equal
+ui/online_ui.js | The host starts the battle
+ui/online_ui.js | Leave room
+ui/online_ui.js | Room not found. Check the code and that your friend has the game open.
+ui/online_ui.js | The room is full.
+ui/online_ui.js | The host left the room.
+ui/online_ui.js | You are no longer in the room.
+ui/online_ui.js | Could not connect to the server. Check your internet.
+ui/online_ui.js | Connection to the host was lost. Trophies unchanged.
+ui/online_ui.js | Your opponent left the battle – victory!
+ui/online_ui.js | You have not unlocked this level in your own story yet – you get gold, progress counts once you reach it.
+ui/online_ui.js | Waiting for the host…
+ui/online_ui.js | War cries:
+ui/online_ui.js | Retreat: troops hide behind the walls, heal up, and special attacks and enemies cannot reach them.
+ui/online_ui.js | Find opponent
+ui/online_ui.js | Looking for an opponent…
+ui/online_ui.js | Joining the opponent…
+ui/online_ui.js | No opponent found – you're fighting the computer
+ui/online_ui.js | Battle against the computer: trophies and the leaderboard do not change, you get gold.
+ui/online_ui.js | Find opponent: the game looks for a random online player. If nobody is found within 10 s, you play against the computer – no trophies, gold only.
+ui/online_ui.js | Buscar rival
+ui/online_ui.js | Trouver un adversaire
+ui/online_ui.js | Cari lawan
+ui/online_ui.js | Gegner finden
+ui/online_ui.js | Rakip bul
+ui/online_ui.js | Buscando rival…
+ui/online_ui.js | Recherche d’un adversaire…
+ui/online_ui.js | Mencari lawan…
+ui/online_ui.js | Rakip aranıyor…
+ui/online_ui.js | If nobody joins before the countdown ends, we will offer you an AI opponent.
+ui/online_ui.js | Si personne ne rejoint avant la fin du compte à rebours, on te proposera un adversaire IA.
+ui/online_ui.js | Jika tidak ada yang bergabung sebelum hitung mundur selesai, kami akan menawarkan lawan AI.
+ui/online_ui.js | Wenn bis zum Ende des Countdowns niemand beitritt, bieten wir dir einen KI-Gegner an.
+ui/online_ui.js | Geri sayım bitmeden kimse katılmazsa sana bir yapay zekâ rakibi önereceğiz.
+ui/online_ui.js | Bergabung dengan lawan…
+ui/online_ui.js | Verbinde mit dem Gegner…
+ui/online_ui.js | Rakibe bağlanılıyor…
+ui/online_ui.js | No live player has joined yet
+ui/online_ui.js | Nenhum jogador real entrou ainda
+ui/online_ui.js | Belum ada pemain sungguhan yang bergabung
+ui/online_ui.js | Noch kein echter Spieler beigetreten
+ui/online_ui.js | Henüz gerçek bir oyuncu katılmadı
+ui/online_ui.js | Yapay zekâ rakibi
+ui/online_ui.js | Meanwhile you can play against an AI opponent:
+ui/online_ui.js | Mientras tanto, puedes jugar contra un rival de IA:
+ui/online_ui.js | En attendant, tu peux jouer contre un adversaire IA :
+ui/online_ui.js | Sementara itu kamu bisa melawan lawan AI:
+ui/online_ui.js | Solange kannst du gegen einen KI-Gegner spielen:
+ui/online_ui.js | Bu arada bir yapay zekâ rakibine karşı oynayabilirsin:
+ui/online_ui.js | We keep looking for a live player – if someone joins, they take priority.
+ui/online_ui.js | Seguimos buscando un jugador real: si alguien se une, tiene prioridad.
+ui/online_ui.js | Kami terus mencari pemain sungguhan – jika ada yang bergabung, dia diutamakan.
+ui/online_ui.js | Wir suchen weiter nach einem echten Spieler – wer beitritt, hat Vorrang.
+ui/online_ui.js | Gerçek oyuncu aramaya devam ediyoruz – biri katılırsa öncelik onun.
+ui/online_ui.js | Play now
+ui/online_ui.js | Jugar ya
+ui/online_ui.js | Jouer maintenant
+ui/online_ui.js | Jogar agora
+ui/online_ui.js | Main sekarang
+ui/online_ui.js | Jetzt spielen
+ui/online_ui.js | Hemen oyna
+ui/online_ui.js | Keep searching
+ui/online_ui.js | Seguir buscando
+ui/online_ui.js | Continuar procurando
+ui/online_ui.js | Terus cari
+ui/online_ui.js | Weiter suchen
+ui/online_ui.js | Aramaya devam et
+ui/online_ui.js | Battle against an AI opponent: trophies and the leaderboard do not change, you get gold.
+ui/online_ui.js | Batalla contra un rival de IA: los trofeos y el ranking no cambian, recibes oro.
+ui/online_ui.js | Pertempuran melawan lawan AI: trofi dan peringkat tidak berubah, kamu dapat emas.
+ui/online_ui.js | Kampf gegen einen KI-Gegner: Trophäen und Rangliste bleiben gleich, du bekommst Gold.
+ui/online_ui.js | Yapay zekâ rakibine karşı savaş: kupalar ve sıralama değişmez, altın kazanırsın.
+ui/pozvi.js | Invita a un amigo
+ui/pozvi.js | Invite un ami
+ui/pozvi.js | Convide um amigo
+ui/pozvi.js | Ajak teman
+ui/pozvi.js | Lade einen Freund ein
+ui/pozvi.js | Arkadaşını davet et
+ui/pozvi.js | Your friend gets
+ui/pozvi.js | Tu amigo recibe
+ui/pozvi.js | Ton ami reçoit
+ui/pozvi.js | Seu amigo ganha
+ui/pozvi.js | Temanmu dapat
+ui/pozvi.js | Dein Freund bekommt
+ui/pozvi.js | You, per friend
+ui/pozvi.js | Toi, par ami
+ui/pozvi.js | Você, por amigo
+ui/pozvi.js | Kamu, per teman
+ui/pozvi.js | Share link
+ui/pozvi.js | Compartir enlace
+ui/pozvi.js | Partager le lien
+ui/pozvi.js | Compartilhar link
+ui/pozvi.js | Bagikan tautan
+ui/pozvi.js | Link teilen
+ui/pozvi.js | Link copied
+ui/pozvi.js | Enlace copiado
+ui/pozvi.js | Link copiado
+ui/pozvi.js | Tautan disalin
+ui/pozvi.js | Link kopiert
+ui/pozvi.js | Claim reward
+ui/pozvi.js | Reclamar recompensa
+ui/pozvi.js | Resgatar recompensa
+ui/pozvi.js | Ambil hadiah
+ui/pozvi.js | Belohnung abholen
+ui/pozvi.js | Your friend is really playing – a reward is waiting!
+ui/pozvi.js | Temanmu benar-benar bermain – hadiah menunggu!
+ui/pozvi.js | Dein Freund spielt wirklich – eine Belohnung wartet!
+ui/pozvi.js | Arkadaşın gerçekten oynuyor – ödül seni bekliyor!
+ui/pozvi.js | Play Castle WARS with me – castle vs castle! Use my link to get a starter gift.
+ui/pozvi.js | Jogue Castle WARS comigo – castelo contra castelo! Pelo meu link você ganha um presente inicial.
+ui/pozvi.js | Main Castle WARS bersamaku – kastil lawan kastil! Pakai tautanku untuk dapat hadiah awal.
+ui/pozvi.js | Spiel mit mir Castle WARS – Burg gegen Burg! Über meinen Link bekommst du ein Startgeschenk.
+ui/pozvi.js | Benimle Castle WARS oyna – kaleye karşı kale! Bağlantımla başlangıç hediyesi al.
+ui/pozvi.js | A gift from your friend
+ui/pozvi.js | Un regalo de tu amigo
+ui/pozvi.js | Un cadeau de ton ami
+ui/pozvi.js | Um presente do seu amigo
+ui/pozvi.js | Hadiah dari temanmu
+ui/pozvi.js | Ein Geschenk von deinem Freund
+ui/pozvi.js | Arkadaşından hediye
+ui/pozvi.js | This invite link is not valid.
+ui/pozvi.js | Cette invitation n’est pas valide.
+ui/pozvi.js | Undangan ini tidak berlaku.
+ui/pozvi.js | Diese Einladung ist ungültig.
+ui/pozvi.js | Bu davet geçerli değil.
+ui/pozvi.js | You can't use your own invite – send it to a friend.
+ui/pozvi.js | Tu ne peux pas utiliser ta propre invitation – envoie-la à un ami.
+ui/pozvi.js | Kamu tidak bisa memakai undanganmu sendiri – kirim ke teman.
+ui/pozvi.js | Deine eigene Einladung kannst du nicht nutzen – schick sie einem Freund.
+ui/pozvi.js | Kendi davetini kullanamazsın – bir arkadaşına gönder.
+ui/pozvi.js | The invite gift is only for new players.
+ui/pozvi.js | Hadiah undangan hanya untuk pemain baru.
+ui/pozvi.js | Das Einladungsgeschenk gibt es nur für neue Spieler.
+ui/pozvi.js | Davet hediyesi yalnızca yeni oyuncular için.
+ui/pozvi.js | The exclusive pet is yours!
+ui/pozvi.js | Le familier exclusif est à toi !
+ui/pozvi.js | Peliharaan eksklusif jadi milikmu!
+ui/pozvi.js | Das exklusive Haustier gehört dir!
+ui/pozvi.js | Creator code
+ui/pozvi.js | Kode kreator
+ui/pozvi.js | Found the game through a YouTuber or streamer? Enter their code to support them. It costs you nothing.
+ui/pozvi.js | Tahu game ini dari YouTuber atau streamer? Masukkan kodenya untuk mendukung mereka. Gratis untukmu.
+ui/pozvi.js | Spiel über einen YouTuber oder Streamer entdeckt? Gib seinen Code ein und unterstütze ihn. Dich kostet das nichts.
+ui/pozvi.js | Oyunu bir YouTuber veya yayıncı sayesinde mi buldun? Kodunu girerek onu destekle. Sana hiçbir maliyeti yok.
+ui/pozvi.js | Apoyas a un creador
+ui/pozvi.js | Você apoia um criador
+ui/pozvi.js | Kamu mendukung kreator
+ui/pozvi.js | Du unterstützt einen Creator
+ui/pozvi.js | Bir üreticiyi destekliyorsun
+ui/pozvi.js | We don't know this creator code. Please check it.
+ui/pozvi.js | Kode kreator ini tidak dikenal. Periksa lagi.
+ui/pozvi.js | Diesen Creator-Code kennen wir nicht. Bitte prüfen.
+ui/pozvi.js | Bu üretici kodunu tanımıyoruz. Lütfen kontrol et.
+ui/shop.js | Got a code? Enter it to get a reward. Each code works once per account.
+ui/shop.js | Enter code
+ui/shop.js | Used codes
+ui/shop.js | Codes come from the game’s creator, their channels and events.
+ui/shop.js | This code does not exist or has expired.
+ui/shop.js | You have already used this code.
+ui/shop.js | This code has been used up by other players.
+ui/shop.js | Too many attempts. Try again in a few minutes.
+ui/shop.js | Microsoft Store purchases are not available right now. Update Windows and Microsoft Edge and try again.
+ui/shop.js | Opening the secure payment page…
+ui/shop.js | Payment done – your purchase is on its way.
+ui/shop.js | Your purchases
+ui/shop.js | Recovery code
+ui/shop.js | A recovery code gets your account back if you forget your password. Create one and keep it safe.
+ui/shop.js | We will create a new recovery code. Your old code (if any) will stop working.
+ui/shop.js | Create code
+ui/shop.js | Write it down or take a photo and keep it safe. We show it only now. With it and your name you can set a new password.
+ui/shop.js | Saved it
+ui/shop.js | Forgot your password?
+ui/shop.js | Enter your name or e-mail, your recovery code and a new password.
+ui/shop.js | Password changed – you are signed in.
+ui/shop.js | New password
+ui/shop.js | The name or recovery code is wrong.
+ui/shop.js | terms of sale
+ui/shop.js | Please tick the consent box first.
+ui/shop.js | Terms of sale
+ui/shop.js | Download page link
+ui/shop.js | We could not find this link or key on itch.io. Copy the full address of your download page.
+ui/shop.js | This purchase has already been redeemed.
+ui/shop.js | itch.io purchases are just being switched on – please try again shortly.
+ui/shop.js | You pay securely through itch.io. The purchase is saved to your game account.
+ui/shop.js | Real-money payments are launching. You will be able to complete this purchase as soon as they are connected.
+ui/shop.js | Divine sets
+ui/shop.js | Full armor and weapon for all 18 soldiers of all three nations. +20% attack and +20% health for armor and for weapon – twice a legendary.
+ui/shop.js | Black-gold armor, huge black wings, a crimson halo and aura. The fallen angel’s sword, spear, bow and staff.
+ui/shop.js | White-gold armor with a crown, golden wings and a sun halo. The God-King’s sword, spear, bow and scepter.
+ui/shop.js | The enemy retreats behind the walls!
+ui/shop.js | Enemy: rush attack!
+ui/shop.js | Enemy: attack in waves!
+ui/shop.js | Enemy: take the center!
+ui/shop.js | Enemy: trap at the walls!
+ui/shop.js | Enemy: slow advance!
+ui/shop.js | Special attack
+ui/shop.js | The Great Fortress is yours! Your castle has grown.
+ui/shop.js | Defend the walls: the army forms up in front of the gate, covered by the wall defenders.
+ui/shop.js | Hold the center: the army holds the middle of the field (+35% coins and +10% attack once captured).
+ui/shop.js | Tap the battlefield and the army goes there – even while you control a soldier.
+ui/sireni.js | Reta a un amigo
+ui/sireni.js | Desafie um amigo
+ui/sireni.js | Tantang teman
+ui/sireni.js | Fordere einen Freund heraus
+ui/sireni.js | Arkadaşına meydan oku
+ui/sireni.js | Enviar reto
+ui/sireni.js | Enviar desafio
+ui/sireni.js | Kirim tantangan
+ui/sireni.js | Herausforderung senden
+ui/sireni.js | Meydan okuma gönder
+ui/sireni.js | Accept challenge
+ui/sireni.js | Aceptar reto
+ui/sireni.js | Aceitar desafio
+ui/sireni.js | Terima tantangan
+ui/sireni.js | Herausforderung annehmen
+ui/sireni.js | Meydan okumayı kabul et
+ui/sireni.js | Plus tard

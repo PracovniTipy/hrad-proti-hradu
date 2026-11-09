@@ -12,7 +12,7 @@
   const G = GameData;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n).toLocaleString('cs-CZ');
-  const L = (c, e) => (window.I18N && I18N.lang === 'en') ? e : c;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
 
   /* ---------------- VLČÍ SET (epický, mění tvar: vlčí límec, kožešinový plášť, nárameníky, mrazivá aura) ---------------- */
   const WOLF_PAL = { tunic: '#2a3a52', tunicDark: '#18243a', trim: '#bfe6ff', metal: '#dfe9f5', metalDark: '#7a8aa8', cape: '#e8eef6', plume: '#bfe6ff',

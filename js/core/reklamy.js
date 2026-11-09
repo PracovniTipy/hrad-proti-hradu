@@ -45,7 +45,7 @@
   const MAX_WIN_BONUS = 5000;   // strop zlata za jedno zdvojnásobení
   const MIN_LOSS_TIME = 30;     // prohra musí trvat aspoň 30 s (žádné „vzdám se hned a koukám na reklamy“)
 
-  const L = (cs, en) => (window.I18N && I18N.lang === 'cs') ? cs : en;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   const fmt = n => Math.round(n).toLocaleString('cs-CZ');
   const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
   const stat = (ev, p) => { try { if (window.Stat) Stat.ev(ev, { p }); } catch (e) { /* nic */ } };

@@ -9,7 +9,7 @@
 window.GameData = window.GameData || {};
 (function () {
   const G = GameData;
-  const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
 
   /* deterministický generátor náhody pro patro */
   function rng(seed) {
@@ -212,7 +212,7 @@ window.GameData = window.GameData || {};
     const lines = major ? { intro: L(major.story[0], major.story[1]) } : null;
     const f = {
       n, tier, tierName: L(T.cs, T.en), tierColor: T.color, major: !!major,
-      name: L(name[0], name[1]), realm: L(realmName[0], realmName[1]), faction, theme: THEME[faction],
+      name: major ? L(name[0], name[1]) : `${L(ti[0], ti[1])} ${first} ${L(ep[0], ep[1])}`, realm: L(realmName[0], realmName[1]), faction, theme: THEME[faction],
       persona, personaName: L((G.generalPersonaNames || {})[persona] ? G.generalPersonaNames[persona][0] : persona, (G.generalPersonaNames || {})[persona] ? G.generalPersonaNames[persona][1] : persona),
       skill, diff, power, mods,
       story: major ? L(major.story[0], major.story[1]) : L(pick(r, HISTORY)[0], pick(r, HISTORY)[1]),
@@ -326,7 +326,7 @@ window.GameData = window.GameData || {};
       const es = G.calc.enemyStats(f.diff);
       if (f.mods.includes('zocelení')) es.hpMult = 1.15;
       return {
-        mode: 'tower', title: (window.I18N && I18N.lang === 'cs' ? 'Patro ' : 'Floor ') + f.n + ' · ' + f.realm, difficulty: f.diff,
+        mode: 'tower', title: L('Patro ', 'Floor ') + f.n + ' · ' + f.realm, difficulty: f.diff,
         enemyUnits: units, enemyName: f.name, enemyFaction: f.faction, theme: f.theme,
         enemyCastleSkin: f.castleSkin, enemyUnitSkin: f.unitSkin, enemyCastleLevel: f.castleLevel, enemyCastleCfg: f.castleCfg,
         enemyCastleHpMult: f.mods.includes('hradby') ? 1.5 : 1, enemyDefense: f.defense, enemyOil: f.mods.includes('olej') ? 40 + f.n * 0.4 : 0,

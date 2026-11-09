@@ -56,7 +56,7 @@ GameData.skills = [
 /* Jasný popis síly a dosahu útoku (obchod i bitva).
    1 jednotka světa = 10 cm, bojiště má 700 m. */
 GameData.skillInfo = k => {
-  const cs = !window.I18N || I18N.lang === 'cs', L = (c, e) => cs ? c : e;
+  const cs = !window.I18N || I18N.lang === 'cs', L = (c, e) => cs ? c : (I18N.L ? I18N.L(c, e) : e);
   const m = v => Math.round(v / 10) + ' m', W = (GameData.battleConfig || {}).worldW || 7000;
   const P = k.power, R = k.radius, dmgW = L('zranění', 'damage');
   const I = { zone: 'cil', zoneName: '', range: '', dmg: '', from: 0, to: 0 };

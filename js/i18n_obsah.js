@@ -207,18 +207,18 @@
   /* Přepne obsah hry (jména, popisy, příběhy) mezi češtinou a angličtinou */
   I18N.localizeData = function () {
     const EN = window.I18N_EN, cs = this.lang === 'cs';
-    const apply = (obj, fields, en) => {
+    const apply = (obj, fields, en, ctx) => {
       if (!obj) return;
       if (!obj.__cs) Object.defineProperty(obj, '__cs', { value: {}, enumerable: false });
       fields.forEach(f => { if (!(f in obj.__cs)) obj.__cs[f] = obj[f]; });
-      fields.forEach(f => { if (obj.__cs[f] === undefined) return; obj[f] = (cs || !en || en[f] == null) ? obj.__cs[f] : en[f]; });
+      fields.forEach(f => { if (obj.__cs[f] === undefined) return; obj[f] = (cs || !en || en[f] == null) ? obj.__cs[f] : (I18N.tr ? I18N.tr(en[f], ctx) : en[f]); });
     };
     Object.values(GameData.units).forEach(u => {
       apply(u, ['name', 'role', 'desc'], EN.units[u.id] || u.en);
       if (u.unlock) apply(u.unlock, ['text'], { text: 'Unlocks after level 1-3 of Act ' + ({ s: 'II', v: 'III' }[u.unlock.campaign[0]] || 'I') + '.' });
     });
     Object.values(GameData.factions).forEach(F => {
-      apply(F, ['name', 'people', 'desc', 'strengths', 'prologue'], EN.factions[F.id]);
+      apply(F, ['name', 'people', 'desc', 'strengths', 'prologue'], EN.factions[F.id], 'faction');
       F.organization.forEach((n, i) => {
         apply(n, ['title', 'sub', 'desc'], EN.org[F.id + ':' + i]);
         (n.children || []).forEach((c, ci) => apply(c, ['title', 'sub', 'desc'], EN.org[F.id + ':' + i + ':' + ci]));
