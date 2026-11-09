@@ -14,7 +14,8 @@
   const SNAP = 0.125;          // jak často hostitel posílá stav (s)
   const CAP = { '1v1': 2, '2v2': 4, coop: 2 };
   const PER_TEAM = { '1v1': 1, '2v2': 2, coop: 2 };
-  const QM_WAIT = 10000;       // rychlý souboj: jak dlouho hledat živého soupeře, pak počítač (ms)
+  const QM_WAIT = 35000;       // rychlý souboj: jak dlouho hledat živého soupeře, pak nabídka AI soupeře (ms)
+  const QM_OFFER = 8000;       // nabídka AI soupeře: odpočet do automatického startu (hledání člověka běží dál)
   const R = (v) => Math.round(v);
 
   /* ---------- kanál (Phoenix protokol Supabase Realtime) ---------- */
@@ -87,6 +88,7 @@
     _fire(ev, d) { const f = this.listeners[ev]; if (f) try { f(d); } catch (e) { console.error(e); } },
 
     canOnline() { return typeof WebSocket !== 'undefined'; },
+    qmWait: QM_WAIT, qmOffer: QM_OFFER,
 
     /* založení místnosti */
     create(mode) {
@@ -172,6 +174,7 @@
        (phx_leave + zavření spojení) po hledajícím nic nezůstane. */
     quick(mode, until) {
       if (mode !== '1v1' && mode !== '2v2') return;
+      if (!until) this._qmOpp = null;            // nové hledání = nový AI soupeř v nabídce
       until = until || Date.now() + QM_WAIT;
       const code = this.create(mode);
       const r = this.room;
@@ -191,35 +194,75 @@
       return code;
     },
     _mmStop() {
-      clearInterval(this._mmTimer); clearTimeout(this._qmTo);
+      clearInterval(this._mmTimer); clearTimeout(this._qmTo); clearTimeout(this._offerTo);
       const mm = this._mm; this._mm = null;
       if (mm) { mm.h = {}; mm.close(); }
     },
     /* hostitel rychlého souboje: jakmile je místnost plná, bitva začne sama */
     _qmCheck() {
       const r = this.room;
-      if (r && r.quick && r.host && !r.inBattle && this.ready()) { this._mmStop(); this.start(); }
+      if (!r || !r.quick || !r.host || r.inBattle) return;
+      if (this.ready()) { if (r.aiOffer && window.Stat) Stat.ev('qm_human', { p: 'offer' }); r.aiOffer = null; this._mmStop(); this.start(); return; }
+      // během nabídky AI se připojil živý hráč (2 v 2 bez plné sestavy) → člověk má přednost, hraje se 1 v 1
+      if (r.aiOffer && r.players.length > 1) { r.aiOffer = null; if (window.Stat) Stat.ev('qm_human', { p: 'offer' }); this._qmTimeout(r); }
     },
     _qmTimeout(r) {
       if (this.room !== r || r.inBattle) return;
       if (!r.host) return;                       // čekám na hostitele – rozhodne on
-      if (r.players.length < 2) return this._qmAi(r.quick);
+      if (r.players.length < 2) return this._qmOffer(r);
       // 2 v 2 bez plné sestavy: dva živí hráči se utkají 1 v 1, třetí (pokud je) hraje proti počítači
       r.players = r.players.slice(0, 2);
       r.mode = '1v1'; this._rebalance(); this._bcastLobby();
       this._mmStop(); this.start();
     },
-    /* soupeř nenalezen → bitva proti počítači (main.js) */
-    _qmAi(mode) {
+    /* nikdo nepřišel → nabídka AI soupeře s odpočtem. Hledání člověka mezitím běží dál
+       (kanál cw-mm-* i místnost zůstávají), takže když se někdo připojí, dostane přednost. */
+    _qmOffer(r) {
+      if (this.room !== r || r.inBattle || r.aiOffer) return;
+      this._qmOpp = this._qmOpp || this._aiOpp();
+      r.aiOffer = Object.assign({}, this._qmOpp, { until: Date.now() + QM_OFFER });
+      if (window.Stat) Stat.ev('qm_offer', { p: r.quick });
+      clearTimeout(this._offerTo);
+      this._offerTo = setTimeout(() => {
+        if (this.room === r && r.aiOffer && !r.inBattle && r.players.length < 2) this._qmAi(r.quick, r.aiOffer, 'auto');
+      }, QM_OFFER);
+      this._fire('lobby');
+    },
+    /* tlačítka v nabídce: hrát hned proti AI / hledat člověka dál */
+    aiNow() { const r = this.room; if (r && r.aiOffer && !r.inBattle) this._qmAi(r.quick, r.aiOffer, 'now'); },
+    searchMore() {
+      const r = this.room; if (!r || !r.aiOffer || r.inBattle) return;
+      r.aiOffer = null; r.qmUntil = Date.now() + QM_WAIT;
+      clearTimeout(this._offerTo); clearTimeout(this._qmTo);
+      this._qmTo = setTimeout(() => this._qmTimeout(r), QM_WAIT);
+      if (window.Stat) Stat.ev('qm_more', {});
+      this._fire('lobby');
+    },
+    /* věrohodný AI soupeř: vygenerované jméno a trofeje blízko hráčovým (v rozhraní je vždy označený jako AI) */
+    _aiOpp() {
+      const A = ['Bran', 'Kael', 'Vlk', 'Drak', 'Storm', 'Iron', 'Ash', 'Rook', 'Mira', 'Tor', 'Nox', 'Luka', 'Sven', 'Rada', 'Yuki', 'Kenji', 'Ragnar', 'Ivo', 'Zora', 'Max', 'Leo', 'Nia', 'Oto', 'Thor', 'Ren', 'Kira', 'Jarl', 'Duke'];
+      const B = ['wolf', 'bane', 'heart', 'fang', 'blade', 'shield', 'storm', 'crow', 'fire', 'stone', 'hawk', 'king', 'rider', 'axe'];
+      const pick = a => a[Math.floor(Math.random() * a.length)];
+      const k = Math.random();
+      const name = k < 0.35 ? pick(A) + pick(B) : k < 0.7 ? pick(A) + '_' + (10 + Math.floor(Math.random() * 990)) : pick(A) + pick(B) + (1 + Math.floor(Math.random() * 99));
+      const my = (App.save && App.save.trophies) || 0;
+      const tro = Math.max(0, Math.round(my + (Math.random() * 2 - 1) * Math.max(25, Math.min(120, my * 0.08))));
+      const G = GameData, foes = G.factionOrder.filter(f => G.factions[f] && G.factions[f].roles && f !== 'spojenectvi');
+      return { name: name.charAt(0).toUpperCase() + name.slice(1), tro, fac: pick(foes) || 'kralovstvi' };
+    },
+    /* bitva proti AI soupeři (main.js) */
+    _qmAi(mode, opp, how) {
       this.leave();
-      this._fire('ai', { mode: mode || '1v1' });
+      if (window.Stat) Stat.ev('qm_ai', { p: how || 'err' });
+      this._fire('ai', { mode: mode || '1v1', opp: opp || this._aiOpp() });
     },
     /* chyba v místnosti: u rychlého souboje se zkusí hledat dál, po limitu počítač */
     _err(r, key) {
       const q = r && r.quick && !r.inBattle ? { mode: r.quick, until: r.qmUntil } : null;
       this.leave();
       if (!q) return this._fire('error', key);
-      if (Date.now() < q.until - 1500) this.quick(q.mode, q.until); else this._qmAi(q.mode);
+      // po limitu: znovu hledat s okamžitou nabídkou AI (bez spojení rovnou AI soupeř)
+      if (Date.now() < q.until - 1500 || key !== 'onl_no_conn') this.quick(q.mode, q.until); else this._qmAi(q.mode);
     },
 
     _defFac() {

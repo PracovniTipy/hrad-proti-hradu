@@ -275,21 +275,25 @@
       }));
     },
 
-    /* Rychlý souboj online: soupeř se do 10 s nenašel → běžná bitva proti počítači
-       (stejná AI jako v Souboji proti botům). Trofeje ani žebříček se nemění. */
-    startOnlineAi(mode) {
+    /* Rychlý souboj online: živý soupeř se nenašel → bitva proti AI soupeři (stejná AI jako
+       v Souboji proti botům). Soupeř má vygenerované jméno a trofeje blízko hráčovým, v rozhraní
+       je ale vždy označený „AI soupeř“. Trofeje ani žebříček se nemění. */
+    startOnlineAi(mode, opp) {
       const save = this.save, G = GameData;
       const pf = G.campaignHelpers.factionUnlocked(save, save.faction) ? save.faction : 'kralovstvi';
       const foes = G.factionOrder.filter(f => G.factions[f] && G.factions[f].roles && f !== 'spojenectvi');
-      const ef = foes[Math.floor(Math.random() * foes.length)] || 'kralovstvi';
-      const diff = G.pvpHelpers.basePower({ trophies: save.trophies || 0 });
+      const ef = opp && G.factions[opp.fac] && G.factions[opp.fac].roles ? opp.fac : (foes[Math.floor(Math.random() * foes.length)] || 'kralovstvi');
+      const name = (opp && opp.name) || t('onl_ai_opp');
+      const tro = opp ? opp.tro | 0 : save.trophies || 0;
+      const diff = G.pvpHelpers.basePower({ trophies: tro });
       const lvl = Math.max(1, Math.min(14, G.calc.castleLevel(save)));
-      this.toast(t('onl_ai_fallback'));
+      const skins = (G.castleSkins || []).filter(s => !s.excl).map(s => s.id);
+      this.toast(`${t('onl_ai_opp')}: ${name}`);
       this.startBattle({ playFaction: pf,
-        mode: 'online_ai', online: mode, title: `${save.name} × ${t('onl_ai_name')}`, difficulty: diff,
-        enemyUnits: G.factionUnits(ef), enemyName: t('onl_ai_name'),
+        mode: 'online_ai', online: mode, title: `${save.name} × ${name} (AI)`, difficulty: diff,
+        enemyUnits: G.factionUnits(ef), enemyName: name, aiOpp: { name, tro },
         enemyFaction: ef, theme: G.factions[ef].theme,
-        enemyCastleSkin: 'kralovsky', enemyUnitSkin: 'zakladni', enemyCastleLevel: lvl
+        enemyCastleSkin: skins.length && Math.random() < 0.5 ? skins[Math.floor(Math.random() * Math.min(6, skins.length))] : 'kralovsky', enemyUnitSkin: 'zakladni', enemyCastleLevel: lvl
       });
     },
 
@@ -307,10 +311,11 @@
       const B = $('#battle');
       B.hidden = false;
       $('#foeName').textContent = cfg.enemyName || t('enemy');
+      if (cfg.mode === 'online_ai') $('#foeName').insertAdjacentHTML('beforeend', ` <span class="tag tag-ai">AI</span>`);
       $('#bBanner').innerHTML = cfg.mode === 'pvp'
         ? `<span class="tag tag-demo">${t('bot')}</span>${esc(cfg.title)} · ${t('diff_' + cfg.attackIndex)}`
         : cfg.mode === 'online' ? `<span class="tag tag-online">ONLINE</span>${esc(cfg.title || '')}`
-        : cfg.mode === 'online_ai' ? `<span class="tag tag-demo">${t('bot')}</span>${t('onl_ai_fallback')}` : esc(cfg.title);
+        : cfg.mode === 'online_ai' ? `<span class="tag tag-ai">${t('onl_ai_opp')}</span>${esc(cfg.enemyName || '')}${cfg.aiOpp ? ` · ${ico('trophy')} ${cfg.aiOpp.tro | 0}` : ''}` : esc(cfg.title);
       B.classList.toggle('net', !!cfg.net);
       $('#bWait').hidden = true;
       $('#bPauseMenu').hidden = true;
@@ -569,6 +574,7 @@
         if (res.win) {
           // hvězdy podle toho, kolik zůstalo z tvého hradu: 80 % a víc = 3, 50 % a víc = 2, jinak 1
           stars = res.playerHp >= 0.8 ? 3 : res.playerHp >= 0.5 ? 2 : 1;
+          if (!cfg.coop) save.vyLast = lv.id;   // pro kartu „Vyzvi kamaráda“ na domovské obrazovce
           save.campaign.stars = save.campaign.stars || {};
           const prevStars = save.campaign.stars[lv.id] || (first ? 0 : 1);
           if (stars > prevStars) {
@@ -669,11 +675,13 @@
         </dl>
         ${statsHtml}
         ${note ? `<div class="notice"><div>${note}</div></div>` : ''}
+        ${window.Sireni && Sireni.victoryCardHtml ? Sireni.victoryCardHtml(this, cfg, res, stars) : ''}
         <div class="modal-actions">
           ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn btn-green" id="resShare">${cfg.mode === 'vyzva' ? (I18N.lang === 'cs' ? 'Poslat odvetu' : 'Send rematch') : (I18N.lang === 'cs' ? 'Sdílet bitvu' : 'Share battle')}</button>` : ''}
           <button class="btn btn-gold" id="resBack">${t('continue')}</button>
         </div>`, (c, close) => {
         const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
+        if (window.Sireni && Sireni.bindVictoryCard) Sireni.bindVictoryCard(this, c, cfg, stars);
         const mc = c.querySelector('canvas[data-mvp]');
         if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
         c.querySelector('#resBack').addEventListener('click', () => {
@@ -847,7 +855,7 @@
         Online.on('lobby', () => { if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
         Online.on('error', k => { this.toast(t(k)); if (this.current === 'online' && !this.battle) this.go('online', { keepScroll: true }); });
         Online.on('start', bc => { $('#modal').hidden = true; this.startBattle(bc); });
-        Online.on('ai', d => { if (this.battle) return; $('#modal').hidden = true; this.startOnlineAi(d.mode); });
+        Online.on('ai', d => { if (this.battle) return; $('#modal').hidden = true; this.startOnlineAi(d.mode, d.opp); });
         Online.on('wait', on => { const w = $('#bWait'); if (w && w.hidden === !!on) w.hidden = !on; });
       }
       const start = location.hash.slice(1);

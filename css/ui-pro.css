@@ -1333,3 +1333,62 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 @media (max-width: 380px) { .pozvi-rw { grid-template-columns: 1fr; } }
 .cc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .cc-on { color: #c8f5c0; font-size: 13px; }
+
+/* ---------- v141: rychlý souboj s odpočtem a AI soupeř ---------- */
+.tag-ai { background: linear-gradient(180deg, #7b5cff, #4a2fc0); color: #fff; border: 0; letter-spacing: .06em; margin-right: 6px; }
+#foeName .tag-ai { margin: 0 0 0 4px; font-size: 10px; padding: 1px 5px; vertical-align: middle; }
+.onl-qm { max-width: 460px; margin: 0 auto; }
+.qm-ring { position: relative; width: 108px; height: 108px; display: grid; place-items: center; }
+.qm-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.qm-ring-bg { fill: rgba(8,11,18,.55); stroke: rgba(255,255,255,.12); stroke-width: 7; }
+.qm-ring-fg { fill: none; stroke: #e8b84a; stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .2s linear; filter: drop-shadow(0 0 6px rgba(232,184,74,.45)); }
+.qm-ring b { position: relative; font-family: var(--font-display); font-size: 36px; line-height: 1; color: #ffe9a8; text-shadow: 0 2px 0 #000; }
+.qm-ring small { position: absolute; bottom: 24px; font-size: 11px; color: #cbbd98; }
+.qm-small { margin: 0; font-size: 12.5px; line-height: 1.4; }
+.qm-small .spin.sm { width: 12px; height: 12px; border-width: 2px; margin-right: 6px; }
+.onl-ai-offer { display: grid; gap: 10px; padding: 18px 18px 16px; text-align: center; }
+.onl-ai-offer h3 { margin: 0; }
+.qm-offer-lead { margin: 0; }
+.qm-opp { display: flex; align-items: center; gap: 12px; text-align: start; padding: 10px 12px; border-radius: 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 28%, transparent), rgba(8,11,18,.55)); border: 1px solid rgba(123,92,255,.55); box-shadow: 0 0 16px rgba(123,92,255,.18); }
+.qm-opp canvas { width: 54px; height: 54px; flex: none; border-radius: 50%; background: rgba(0,0,0,.35); border: 2px solid var(--c); }
+.qm-opp > div { display: grid; gap: 3px; min-width: 0; }
+.qm-opp b { font-size: 17px; color: #fff; overflow-wrap: anywhere; }
+.qm-opp .tag-ai { justify-self: start; font-size: 11px; padding: 2px 7px; }
+.qm-opp small { color: #cbbd98; font-size: 12.5px; display: inline-flex; align-items: center; gap: 4px; }
+.qm-opp small svg { width: 16px !important; height: 16px !important; }
+.qm-auto p { margin: 0 0 6px; font-weight: 800; color: #ffd77a; }
+.qm-bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,.1); overflow: hidden; }
+.qm-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #7b5cff, #e8b84a); border-radius: 6px; transition: width .1s linear; }
+.qm-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.qm-actions .btn-big { flex: 1 1 100%; }
+@media (max-height: 460px) and (orientation: landscape) {
+  .onl-ai-offer { gap: 6px; padding: 10px 14px; max-width: 620px; }
+  .onl-ai-offer .qm-actions .btn-big { flex: 1 1 auto; }
+  .onl-ai-offer h3 { font-size: 17px; } .qm-offer-lead, .qm-note { display: none; }
+  .qm-opp { padding: 6px 10px; } .qm-opp canvas { width: 40px; height: 40px; } .qm-opp > div { grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 8px; } .qm-opp small { grid-column: 1 / -1; }
+  .qm-auto p { margin-bottom: 4px; } .qm-actions .btn { min-height: 0; padding-top: 8px; padding-bottom: 8px; }
+  .qm-ring { width: 84px; height: 84px; } .qm-ring b { font-size: 28px; } .qm-ring small { bottom: 16px; }
+  .onl-qm.onl-wait { gap: 8px; padding: 14px; }
+}
+
+/* ---------- v141: Vyzvi kamaráda (po vítězství v příběhu / domovská obrazovka) ---------- */
+.vy-card { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; margin: 4px 0; padding: 12px 14px; border-radius: 16px; color: #f3e2b6;
+  background: radial-gradient(120% 140% at 0% 0%, rgba(214,69,60,.35), transparent 55%), linear-gradient(180deg, #23304a, #141b2b) padding-box, var(--gold-rim) border-box; border: 2px solid transparent; box-shadow: 0 8px 22px rgba(0,0,0,.45); }
+.vy-badge { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(255,210,74,.35), rgba(255,210,74,0) 70%); animation: pozviBob 2.4s ease-in-out infinite; }
+.vy-badge svg { width: 48px; height: 48px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+.vy-body { display: grid; gap: 7px; min-width: 0; }
+.vy-body h3 { margin: 0; font-family: var(--font-display); color: #ffe9a8; text-shadow: 0 2px 0 #000; font-size: 19px; }
+.vy-lead { margin: 0; font-size: 13.5px; line-height: 1.4; color: #e6d7ae; }
+.vy-lead b { color: #fff; }
+.vy-stars { color: #ffd24a; letter-spacing: 1px; white-space: nowrap; }
+.vy-gift { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 13px; font-weight: 700; color: #c8f5c0; padding: 5px 9px; border-radius: 10px; background: rgba(47,138,58,.2); border: 1px solid rgba(120,220,120,.4); }
+.vy-gift[hidden] { display: none; }
+.vy-gift span { display: inline-flex; align-items: center; gap: 4px; color: #ffd77a; }
+.vy-gift svg { width: 18px !important; height: 18px !important; }
+.vy-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.vy-row .vy-share { flex: 1 1 160px; }
+.vy-row .vy-copy { flex: 0 0 auto; }
+.vy-url { width: 100%; min-width: 0; padding: 7px 10px; font-size: 12px !important; border-radius: 9px; border: 1px solid #3a4560; background: #0d121c; color: #a99d80; text-overflow: ellipsis; }
+.modal-card .vy-card { margin: 6px 0 2px; }
+@media (max-width: 380px) { .vy-card { grid-template-columns: 1fr; } .vy-badge { display: none; } }
+@media (max-height: 460px) and (orientation: landscape) { .vy-card { padding: 9px 12px; gap: 10px; } .vy-badge { width: 44px; height: 44px; } .vy-badge svg { width: 38px; height: 38px; } .vy-url { display: none; } }

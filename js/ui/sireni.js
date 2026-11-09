@@ -21,6 +21,22 @@
   const net = () => window.Ucet && navigator.onLine !== false;
   const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* nic */ } } };
 
+  // [cs, en, zh, hi, es, fr, ar, bn, pt, ru, ur, id, de, ja, tr, ko] – Vyzvi kamaráda na úroveň (v141)
+  if (window.I18N) Object.assign(I18N.D, {
+    vy_title: ["Vyzvi kamaráda", "Challenge a friend", "挑战好友", "दोस्त को चुनौती दें", "Reta a un amigo", "Défie un ami", "تحدَّ صديقًا", "বন্ধুকে চ্যালেঞ্জ করো", "Desafie um amigo", "Брось вызов другу", "دوست کو چیلنج کریں", "Tantang teman", "Fordere einen Freund heraus", "友達に挑戦状", "Arkadaşına meydan oku", "친구에게 도전장"],
+    vy_lead: ["Porazil jsi úroveň {lv}. Zvládne ji tvůj kamarád taky?", "You beat level {lv}. Can your friend do it too?", "你通关了 {lv}。你的好友也能做到吗？", "आपने स्तर {lv} जीत लिया। क्या आपका दोस्त भी कर पाएगा?", "Has superado el nivel {lv}. ¿Podrá tu amigo también?", "Tu as battu le niveau {lv}. Ton ami y arrivera-t-il aussi ?", "لقد تغلبت على المرحلة {lv}. هل يستطيع صديقك فعلها أيضًا؟", "তুমি স্তর {lv} জিতেছ। তোমার বন্ধুও কি পারবে?", "Você venceu o nível {lv}. Seu amigo consegue também?", "Ты прошёл уровень {lv}. А твой друг сможет?", "آپ نے درجہ {lv} جیت لیا۔ کیا آپ کا دوست بھی کر پائے گا؟", "Kamu menaklukkan level {lv}. Apakah temanmu juga bisa?", "Du hast Level {lv} geschafft. Schafft es dein Freund auch?", "レベル {lv} をクリアしました。友達もクリアできるかな？", "{lv} seviyesini geçtin. Arkadaşın da başarabilir mi?", "{lv} 레벨을 깼어요. 친구도 할 수 있을까요?"],
+    vy_lead_home: ["Pošli kamarádovi výzvu na úroveň {lv}, kterou jsi porazil. Zvládne ji taky?", "Send a friend a challenge for level {lv}, which you beat. Can they do it too?", "把你通关的 {lv} 发给好友挑战。他也能通关吗？", "दोस्त को स्तर {lv} की चुनौती भेजें, जिसे आपने जीता है। क्या वह भी कर पाएगा?", "Envía a un amigo un reto del nivel {lv}, que ya superaste. ¿Podrá él también?", "Envoie à un ami un défi sur le niveau {lv}, que tu as battu. Y arrivera-t-il aussi ?", "أرسل لصديقك تحديًا في المرحلة {lv} التي تغلبت عليها. هل يستطيع فعلها أيضًا؟", "বন্ধুকে স্তর {lv}-এর চ্যালেঞ্জ পাঠাও, যেটা তুমি জিতেছ। সে-ও কি পারবে?", "Envie a um amigo um desafio do nível {lv}, que você venceu. Ele consegue também?", "Отправь другу вызов на уровень {lv}, который ты прошёл. Сможет ли он?", "دوست کو درجہ {lv} کا چیلنج بھیجیں جو آپ جیت چکے ہیں۔ کیا وہ بھی کر پائے گا؟", "Kirim tantangan level {lv} yang sudah kamu taklukkan ke teman. Bisakah dia juga?", "Schick einem Freund eine Herausforderung für Level {lv}, das du geschafft hast. Schafft er es auch?", "クリアしたレベル {lv} の挑戦状を友達に送ろう。友達もクリアできるかな？", "Geçtiğin {lv} seviyesi için arkadaşına meydan okuma gönder. O da başarabilir mi?", "깬 {lv} 레벨 도전장을 친구에게 보내 보세요. 친구도 할 수 있을까요?"],
+    vy_send: ["Poslat výzvu", "Send challenge", "发送挑战", "चुनौती भेजें", "Enviar reto", "Envoyer le défi", "أرسل التحدي", "চ্যালেঞ্জ পাঠাও", "Enviar desafio", "Отправить вызов", "چیلنج بھیجیں", "Kirim tantangan", "Herausforderung senden", "挑戦状を送る", "Meydan okuma gönder", "도전장 보내기"],
+    vy_share_text: ["⚔️ Porazil jsem úroveň {lv} v Castle WARS{s}! Zvládneš to taky?", "⚔️ I beat level {lv} in Castle WARS{s}! Can you do it too?", "⚔️ 我在 Castle WARS 中通关了 {lv}{s}！你也能做到吗？", "⚔️ मैंने Castle WARS में स्तर {lv} जीता{s}! क्या आप भी कर पाएँगे?", "⚔️ ¡He superado el nivel {lv} en Castle WARS{s}! ¿Puedes tú también?", "⚔️ J’ai battu le niveau {lv} dans Castle WARS{s} ! Tu peux en faire autant ?", "⚔️ تغلبت على المرحلة {lv} في Castle WARS{s}! هل تستطيع أنت أيضًا؟", "⚔️ আমি Castle WARS-এ স্তর {lv} জিতেছি{s}! তুমিও পারবে?", "⚔️ Venci o nível {lv} no Castle WARS{s}! Você consegue também?", "⚔️ Я прошёл уровень {lv} в Castle WARS{s}! А ты сможешь?", "⚔️ میں نے Castle WARS میں درجہ {lv} جیتا{s}! کیا آپ بھی کر سکتے ہیں؟", "⚔️ Aku menaklukkan level {lv} di Castle WARS{s}! Kamu bisa juga?", "⚔️ Ich habe Level {lv} in Castle WARS geschafft{s}! Schaffst du das auch?", "⚔️ Castle WARSでレベル {lv} をクリアしたよ{s}！君もできる？", "⚔️ Castle WARS'ta {lv} seviyesini geçtim{s}! Sen de yapabilir misin?", "⚔️ Castle WARS에서 {lv} 레벨을 깼어{s}! 너도 할 수 있어?"],
+    vy_gift_text: ["Přes můj odkaz dostaneš dárek na začátek: {g}.", "Use my link to get a starter gift: {g}.", "通过我的链接可获得新手礼物：{g}。", "मेरे लिंक से शुरुआती उपहार पाएँ: {g}।", "Con mi enlace recibes un regalo inicial: {g}.", "Avec mon lien, tu reçois un cadeau de départ : {g}.", "عبر رابطي تحصل على هدية بداية: {g}.", "আমার লিংকে শুরুর উপহার পাবে: {g}।", "Pelo meu link você ganha um presente inicial: {g}.", "По моей ссылке получишь стартовый подарок: {g}.", "میرے لنک سے شروعاتی تحفہ پائیں: {g}۔", "Lewat tautanku kamu dapat hadiah awal: {g}.", "Über meinen Link bekommst du ein Startgeschenk: {g}.", "私のリンクからスタートギフトがもらえるよ：{g}。", "Bağlantımla başlangıç hediyesi alırsın: {g}.", "내 링크로 시작 선물을 받아: {g}."],
+    vy_recv: ["{name} tě vyzývá!", "{name} challenges you!", "{name} 向你发起挑战！", "{name} ने आपको चुनौती दी है!", "¡{name} te reta!", "{name} te défie !", "{name} يتحداك!", "{name} তোমাকে চ্যালেঞ্জ করেছে!", "{name} desafiou você!", "{name} бросает тебе вызов!", "{name} نے آپ کو چیلنج کیا ہے!", "{name} menantangmu!", "{name} fordert dich heraus!", "{name}から挑戦状が届きました！", "{name} sana meydan okuyor!", "{name}님이 도전장을 보냈어요!"],
+    vy_recv_lv: ["{name} porazil úroveň {lv}{s}. Zvládneš ji taky?", "{name} beat level {lv}{s}. Can you do it too?", "{name} 通关了 {lv}{s}。你也能做到吗？", "{name} ने स्तर {lv}{s} जीता। क्या आप भी कर पाएँगे?", "{name} superó el nivel {lv}{s}. ¿Puedes tú también?", "{name} a battu le niveau {lv}{s}. Tu peux en faire autant ?", "تغلب {name} على المرحلة {lv}{s}. هل تستطيع أنت أيضًا؟", "{name} স্তর {lv}{s} জিতেছে। তুমিও পারবে?", "{name} venceu o nível {lv}{s}. Você consegue também?", "{name} прошёл уровень {lv}{s}. А ты сможешь?", "{name} نے درجہ {lv}{s} جیتا۔ کیا آپ بھی کر سکتے ہیں؟", "{name} menaklukkan level {lv}{s}. Kamu bisa juga?", "{name} hat Level {lv}{s} geschafft. Schaffst du das auch?", "{name}はレベル {lv}{s} をクリアしました。君もできる？", "{name}, {lv}{s} seviyesini geçti. Sen de yapabilir misin?", "{name}님이 {lv}{s} 레벨을 깼어요. 당신도 할 수 있나요?"],
+    vy_accept: ["Přijmout výzvu", "Accept challenge", "接受挑战", "चुनौती स्वीकारें", "Aceptar reto", "Relever le défi", "اقبل التحدي", "চ্যালেঞ্জ গ্রহণ করো", "Aceitar desafio", "Принять вызов", "چیلنج قبول کریں", "Terima tantangan", "Herausforderung annehmen", "挑戦を受ける", "Meydan okumayı kabul et", "도전 수락"],
+    vy_later: ["Později", "Later", "稍后", "बाद में", "Más tarde", "Plus tard", "لاحقًا", "পরে", "Depois", "Позже", "بعد میں", "Nanti", "Später", "あとで", "Sonra", "나중에"],
+    vy_won: ["Zvládl jsi úroveň {lv} z výzvy od {name}! Pošli mu odvetu.", "You beat level {lv} from {name}'s challenge! Send them a rematch.", "你完成了 {name} 发来的 {lv} 挑战！给他发一个回敬吧。", "आपने {name} की चुनौती वाला स्तर {lv} जीत लिया! उन्हें जवाबी चुनौती भेजें।", "¡Superaste el nivel {lv} del reto de {name}! Envíale la revancha.", "Tu as battu le niveau {lv} du défi de {name} ! Envoie-lui une revanche.", "تغلبت على المرحلة {lv} من تحدي {name}! أرسل له ردًّا.", "তুমি {name}-এর চ্যালেঞ্জের স্তর {lv} জিতেছ! তাকে পাল্টা চ্যালেঞ্জ পাঠাও।", "Você venceu o nível {lv} do desafio de {name}! Mande uma revanche.", "Ты прошёл уровень {lv} из вызова {name}! Отправь ответный вызов.", "آپ نے {name} کے چیلنج کا درجہ {lv} جیت لیا! انہیں جوابی چیلنج بھیجیں۔", "Kamu menaklukkan level {lv} dari tantangan {name}! Kirim tantangan balik.", "Du hast Level {lv} aus der Herausforderung von {name} geschafft! Schick eine Revanche.", "{name}からの挑戦、レベル {lv} をクリア！リベンジを送ろう。", "{name} kişisinin meydan okumasındaki {lv} seviyesini geçtin! Ona rövanş gönder.", "{name}님의 도전 {lv} 레벨을 깼어요! 리매치를 보내 보세요."],
+    vy_lost: ["Úroveň {lv} tě tentokrát porazila. Zkus to znovu!", "Level {lv} beat you this time. Try again!", "这次 {lv} 难住了你。再试一次！", "इस बार स्तर {lv} ने आपको हरा दिया। फिर कोशिश करें!", "Esta vez el nivel {lv} pudo contigo. ¡Inténtalo de nuevo!", "Le niveau {lv} t’a battu cette fois. Réessaie !", "هزمتك المرحلة {lv} هذه المرة. حاول مجددًا!", "এবার স্তর {lv} তোমাকে হারিয়েছে। আবার চেষ্টা করো!", "Desta vez o nível {lv} venceu você. Tente de novo!", "На этот раз уровень {lv} оказался сильнее. Попробуй ещё!", "اس بار درجہ {lv} نے آپ کو ہرا دیا۔ دوبارہ کوشش کریں!", "Kali ini level {lv} mengalahkanmu. Coba lagi!", "Level {lv} war diesmal stärker. Versuch es noch mal!", "今回はレベル {lv} に負けました。もう一度挑戦！", "{lv} seviyesi bu sefer seni yendi. Tekrar dene!", "이번엔 {lv} 레벨에 졌어요. 다시 도전해 보세요!"]
+  });
+
   /* ---------- kódování výzvy do odkazu ---------- */
   const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   const b64d = s => { try { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch (e) { return null; } };
@@ -98,12 +114,13 @@
       if (window.Pozvi && Pozvi.available()) { try { await Pozvi.load(); } catch (e) { /* nic */ } }
       const c = this._pozvCode(); return SITE + (c ? '?pozvanka=' + encodeURIComponent(c) : '');
     },
-    async challengeUrl(App) {
+    async challengeUrl(App, extra) {
       const s = App.save;
       await this.gameUrl();
       const c = this._pozvCode();
       const o = { v: 1, n: (s.name || 'Velitel').slice(0, 16), f: s.faction, cs: (s.skins && s.skins.castle) || 'kralovsky',
         cl: Math.max(1, Math.min(14, G.calc.castleLevel(s))), tr: s.trophies || 0, w: (s.stats && s.stats.wins) || 0 };
+      if (extra) Object.assign(o, extra);   // výzva na úroveň příběhu: { lv: id úrovně, st: hvězdy }
       return SITE + '?vyzva=' + b64e(o) + (c ? '&pozvanka=' + encodeURIComponent(c) : '');
     },
 
@@ -158,7 +175,8 @@
     async shareBattle(App, cfg, res) {
       if (portal()) return;
       const file = await this.battleCard(App, cfg, res).catch(() => null);
-      const url = cfg.mode === 'vyzva' ? await this.challengeUrl(App) : await this.gameUrl();
+      const lvx = cfg.mode === 'vyzva' && cfg.level ? { lv: cfg.level.id, st: res.win ? (res.playerHp >= 0.8 ? 3 : res.playerHp >= 0.5 ? 2 : 1) : 0 } : null;
+      const url = cfg.mode === 'vyzva' ? await this.challengeUrl(App, lvx) : await this.gameUrl();
       const text = res.win
         ? L(`Vyhrál jsem bitvu v Castle WARS – ${fmt(res.kills)} zabitých! 🏰⚔️ Dokážeš to líp?`, `I won a battle in Castle WARS – ${fmt(res.kills)} kills! 🏰⚔️ Can you beat that?`)
         : L('Hraju Castle WARS – bitvu hradů. Pojď mě porazit! 🏰', 'Playing Castle WARS – battle of castles. Come beat me! 🏰');
@@ -169,8 +187,118 @@
         text: L(`⚔️ Vyzývám tě v Castle WARS! Porazíš můj hrad? (úroveň ${G.calc.castleLevel(App.save)})`, `⚔️ I challenge you in Castle WARS! Can you beat my castle? (level ${G.calc.castleLevel(App.save)})`) });
     },
 
+    /* ---------- karta „Vyzvi kamaráda“ (po vítězství v příběhu a občas na domovské obrazovce) ----------
+       Odkaz ?vyzva= nese úroveň, kterou hráč porazil, a kód pozvánky (?pozvanka=) – kamarád
+       tak dostane i dárek na začátek (pravidla v js/ui/pozvi.js). Na portálech se nezobrazuje. */
+    _today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); },
+    _gift() {
+      const P = window.Pozvi, g = (P && P.info && P.info.gift) || { gold: 1000, gems: 50 };
+      return { gold: g.gold | 0, gems: g.gems | 0 };
+    },
+    vyCardHtml(lv, stars, where) {
+      const g = this._gift();
+      return `<section class="vy-card" data-vy-card data-vy-where="${where}">
+        <div class="vy-badge" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M10 8l26 26-5 5L5 13V8z" fill="#dfe6f2" stroke="#1a0e06" stroke-width="3" stroke-linejoin="round"/><path d="M54 8L28 34l5 5 26-26V8z" fill="#dfe6f2" stroke="#1a0e06" stroke-width="3" stroke-linejoin="round"/><path d="M16 40l8 8-6 6-8-8zM48 40l-8 8 6 6 8-8z" fill="#c99a2a" stroke="#1a0e06" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="44" r="7" fill="#ffd24a" stroke="#1a0e06" stroke-width="3"/></svg></div>
+        <div class="vy-body">
+          <h3>${t('vy_title')}</h3>
+          <p class="vy-lead">${t(where === 'home' ? 'vy_lead_home' : 'vy_lead', { lv: '<b>' + esc(this._lvName(lv)) + '</b>' + (stars ? ' <span class="vy-stars">' + '★'.repeat(Math.min(3, stars)) + '</span>' : '') })}</p>
+          <p class="vy-gift" data-vy-gift hidden>🎁 ${t('inv_friend_gets')}: <span>${ico('coin')} ${fmt(g.gold)}</span><span>${ico('gem')} ${fmt(g.gems)}</span></p>
+          <div class="vy-row">
+            <button class="btn btn-gold vy-share" data-vy-share>${t('vy_send')}</button>
+            <button class="btn vy-copy" data-vy-copy>${t('inv_copy')}</button>
+          </div>
+          <input class="vy-url" readonly data-vy-url value="${esc(SITE)}" aria-label="${t('vy_title')}">
+        </div>
+      </section>`;
+    },
+    bindVyCard(App, root, lv, stars) {
+      const card = root.querySelector('[data-vy-card]'); if (!card) return;
+      const where = card.dataset.vyWhere || 'win';
+      const inp = card.querySelector('[data-vy-url]'), gift = card.querySelector('[data-vy-gift]');
+      let url = null;
+      const text = () => {
+        const g = this._gift();
+        return t('vy_share_text', { lv: this._lvName(lv), s: this._starsTxt(stars) }) + (url && url.includes('pozvanka=') ? ' ' + t('vy_gift_text', { g: `${fmt(g.gold)} 🪙 + ${fmt(g.gems)} 💎` }) : '');
+      };
+      // odkaz se připraví hned (kód pozvánky ze serveru), ať sdílení proběhne v rámci kliknutí
+      const ready = this.challengeUrl(App, { lv: lv.id, st: stars | 0 }).then(u => {
+        url = u; if (inp) inp.value = u;
+        if (gift) gift.hidden = !u.includes('pozvanka=');
+        return u;
+      }).catch(() => null);
+      const copy = async () => {
+        const u = url || await ready || SITE;
+        let ok = false;
+        try { await navigator.clipboard.writeText(text() + '\n' + u); ok = true; } catch (e) {
+          if (inp) { inp.value = u; inp.select(); try { ok = document.execCommand('copy'); } catch (e2) { ok = false; } }
+        }
+        App.toast(ok ? t('inv_copied') : u);
+        if (window.Stat) try { Stat.ev('vyzva_copy', { p: where }); } catch (e) { /* nic */ }
+      };
+      card.querySelector('[data-vy-copy]').addEventListener('click', copy);
+      if (inp) inp.addEventListener('focus', () => inp.select());
+      card.querySelector('[data-vy-share]').addEventListener('click', async () => {
+        const u = url || await ready || SITE;
+        if (navigator.share) {
+          try { await navigator.share({ title: 'Castle WARS', text: text(), url: u }); if (window.Stat) try { Stat.ev('vyzva_share', { p: where }); } catch (e) { /* nic */ } return; }
+          catch (e) { if (e && e.name === 'AbortError') return; }
+        }
+        copy();
+      });
+    },
+    /* do okna s výsledkem bitvy (main.js): jen vítězství v příběhu, ne online, ne na portálu */
+    victoryCardHtml(App, cfg, res, stars) {
+      if (portal() || !res || !res.win || cfg.mode !== 'campaign' || cfg.net || cfg.coop || !cfg.level || cfg.film) return '';
+      App.save.vyDay = this._today();   // ten den už se karta na domovské obrazovce neukáže
+      return this.vyCardHtml(cfg.level, stars, 'win');
+    },
+    bindVictoryCard(App, root, cfg, stars) {
+      if (!cfg || !cfg.level || !root.querySelector('[data-vy-card]')) return;
+      App.persist();
+      this.bindVyCard(App, root, cfg.level, stars);
+      if (window.Stat) try { Stat.ev('vyzva_card', { p: 'win' }); } catch (e) { /* nic */ }
+    },
+    /* domovská obrazovka: nejvýš jednou denně, jen hráčům, kteří už pár úrovní porazili */
+    homeChallenge(App) {
+      const s = App.save;
+      if (portal() || this._homeVyAt || !s || s.vyDay === this._today()) return;
+      const H = G.campaignHelpers, cleared = s.campaign && s.campaign.cleared ? s.campaign.cleared : {};
+      if (Object.keys(cleared).filter(k => cleared[k]).length < 2 || ((s.stats && s.stats.wins) || 0) < 3) return;
+      const all = H.allLevels().filter(l => cleared[l.id] && !l.alliance);
+      const lv = (s.vyLast && cleared[s.vyLast] && H.find(s.vyLast)) || all[all.length - 1];
+      if (!lv) return;
+      this._homeVyAt = Date.now();
+      let tries = 0, free = true;
+      const show = () => {
+        if (App.current !== 'hrad' || App.battle || s.vyDay === this._today()) { this._homeVyAt = 0; return; }   // jindy znovu
+        // jiné okno (denní odměna, registrace…) nebo tutoriál: počkat, až hráč skončí
+        const busy = !s.lang || (window.Tutorial && Tutorial.active) || !document.getElementById('modal').hidden;
+        if (busy || !free) { free = !busy; if (++tries < 60) setTimeout(show, 2000); else this._homeVyAt = 0; return; }
+        s.vyDay = this._today(); App.persist();
+        const st = (s.campaign.stars && s.campaign.stars[lv.id]) || 0;
+        App.modal(`${this.vyCardHtml(lv, st, 'home')}<div class="modal-actions"><button class="btn" data-close>${t('vy_later')}</button></div>`, c => this.bindVyCard(App, c, lv, st));
+        if (window.Stat) try { Stat.ev('vyzva_card', { p: 'home' }); } catch (e) { /* nic */ }
+      };
+      setTimeout(show, 6000);
+    },
+
     /* ---------- výzva: bitva proti hradu kamaráda ---------- */
+    /* úroveň příběhu z výzvy (kamarád ji porazil a posílá ji dál) */
+    _lvOf(o) { const H = G.campaignHelpers; return o && typeof o.lv === 'string' && H && H.find ? H.find(o.lv) : null; },
+    _lvName(lv) { return `${lv.label} ${lv.name}`; },
+    _starsTxt(n) { n = n | 0; return n > 0 ? ' ' + '★'.repeat(Math.min(3, n)) : ''; },
     startChallenge(App, o) {
+      const lv = this._lvOf(o);
+      if (lv) {   // stejná nepřátelská armáda jako v úrovni příběhu; postup v příběhu se nemění
+        const EF = G.factions[lv.enemy] || G.factions.kralovstvi;
+        return App.pickArmy(pf => App.startBattle({ playFaction: pf,
+          mode: 'vyzva', title: `${t('vy_title')}: ${this._lvName(lv)}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
+          enemyFaction: lv.enemy, theme: lv.theme || EF.theme, enemyName: lv.name,
+          enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
+          boss: typeof lv.boss === 'string' ? lv.boss : null,
+          ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: G.battleConfig.worldW + 640 } } : {}),
+          level: lv, challenge: o }));
+      }
       const ef = G.factions[o.f] && G.factions[o.f].roles ? o.f : 'kralovstvi';
       const pw = G.pvpHelpers && G.pvpHelpers.basePower ? G.pvpHelpers.basePower({ trophies: o.tr || 0 }) : 1;
       const diff = Math.max(0.7, Math.min(2.2, pw + Math.min(0.5, (o.cl || 1) * 0.03) + Math.min(0.3, (o.w || 0) / 400)));
@@ -181,6 +309,15 @@
         enemyCastleLevel: Math.max(1, Math.min(14, o.cl || 1)), challenge: o }));
     },
     challengeModal(App, o) {
+      const lv = this._lvOf(o);
+      if (lv) {
+        App.modal(`<div class="eyebrow">${t('vy_title')}</div><h2>⚔️ ${t('vy_recv', { name: esc(o.n) })}</h2>
+          <p>${t('vy_recv_lv', { name: '<b>' + esc(o.n) + '</b>', lv: '<b>' + esc(this._lvName(lv)) + '</b>', s: this._starsTxt(o.st) })}</p>
+          <div class="modal-actions"><button class="btn btn-gold" id="vyGo">${t('vy_accept')}</button><button class="btn" data-close>${t('vy_later')}</button></div>`, (c, close) => {
+          c.querySelector('#vyGo').addEventListener('click', () => { close(); this.startChallenge(App, o); });
+        });
+        return;
+      }
       App.modal(`<div class="eyebrow">${L('Výzva', 'Challenge')}</div><h2>⚔️ ${esc(o.n)} ${L('tě vyzývá na souboj!', 'challenges you!')}</h2>
         <p>${L(`Porazíš jeho hrad úrovně ${o.cl}? Když vyhraješ, pošli mu odvetu.`, `Can you beat their level ${o.cl} castle? If you win, send them a rematch.`)}</p>
         <div class="modal-actions"><button class="btn btn-gold" id="vyGo">${L('Přijmout výzvu', 'Accept')}</button><button class="btn" data-close>${L('Později', 'Later')}</button></div>`, (c, close) => {
@@ -201,7 +338,10 @@
           else App.persist();
         }).catch(() => {});
       }
-      if (cfg.mode === 'vyzva') out.note = res.win
+      if (cfg.mode === 'vyzva' && cfg.level && cfg.challenge) out.note = res.win
+        ? t('vy_won', { lv: '<b>' + esc(this._lvName(cfg.level)) + '</b>', name: '<b>' + esc(cfg.challenge.n) + '</b>' })
+        : t('vy_lost', { lv: '<b>' + esc(this._lvName(cfg.level)) + '</b>' });
+      else if (cfg.mode === 'vyzva') out.note = res.win
         ? L(`Porazil jsi hrad hráče <b>${esc(cfg.enemyName)}</b>! Pošli mu výsledek a vyzvi ho na odvetu.`, `You beat <b>${esc(cfg.enemyName)}</b>'s castle! Send them the result and challenge them back.`)
         : L(`<b>${esc(cfg.enemyName)}</b> tě tentokrát porazil. Zkus to znovu, nebo ho vyzvi ty.`, `<b>${esc(cfg.enemyName)}</b> won this time. Try again or challenge them yourself.`);
       return out;
