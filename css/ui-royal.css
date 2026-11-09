@@ -1,0 +1,179 @@
+/* =====================================================================
+   KRÁLOVSKÝ VZHLED (načítá se po ui-modern.css)
+   Jednotný „kovaný“ jazyk celé hry: tmavá půlnoční modř, teplé zlato,
+   jemné vnitřní světlo shora. Jeden podpis všude – zlatý rámek nad
+   tmavou obrubou – na panelech, oknech, tlačítkách, záložkách i liště.
+   Žádné zbytečnosti: ornament jen tam, kde vede oko.
+   ===================================================================== */
+:root {
+  --ry-gold: #f3c45c;
+  --ry-gold-hi: #ffe9b0;
+  --ry-gold-dk: #c9821f;
+  --ry-rim: rgba(243, 196, 92, .34);
+  --ry-rim-soft: rgba(243, 196, 92, .16);
+  --ry-ink: #0a0d16;
+  --m-gold: var(--ry-gold);
+}
+
+/* ---------- ATMOSFÉRA: hlubší nebe, teplý obzor, jemná vinětace ---------- */
+body { background: #090d16; }
+#app {
+  background:
+    radial-gradient(1200px 560px at 50% -14%, rgba(70, 104, 180, .30), transparent 64%),
+    radial-gradient(760px 400px at 88% 110%, rgba(243, 196, 92, .10), transparent 70%),
+    radial-gradient(760px 400px at 8% 104%, rgba(120, 70, 160, .08), transparent 70%),
+    radial-gradient(140% 100% at 50% 50%, transparent 58%, rgba(0, 0, 0, .34) 100%),
+    linear-gradient(180deg, #0f1628, #0a0e1a 58%, #0b101d);
+}
+
+/* ---------- NADPISY: gilotýnové zlato s pečetí ---------- */
+.sec-head h1 { display: flex; align-items: center; gap: 12px; }
+.sec-head h1::before, .sec-head h1::after {
+  content: ""; flex: none; width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg);
+  background: linear-gradient(135deg, var(--ry-gold-hi), var(--ry-gold-dk));
+  box-shadow: 0 0 0 2.5px rgba(243, 196, 92, .18), 0 0 12px rgba(243, 196, 92, .55);
+}
+.sec-head h1::after { width: 84px; height: 1.5px; transform: none; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(243, 196, 92, .6), transparent);
+  box-shadow: none;
+}
+.sec-head h2 { color: #f7edd6; }
+
+/* ---------- PANELY: kovaný rám (zlatá linka nad tmavou obrubou) ---------- */
+.panel {
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .012) 58%),
+    linear-gradient(180deg, #1a2338, #131a2b);
+  box-shadow:
+    0 0 0 1px var(--ry-ink),
+    inset 0 0 0 1px var(--ry-rim-soft),
+    inset 0 1.5px 0 rgba(255, 255, 255, .09),
+    0 18px 38px -18px rgba(0, 0, 0, .8);
+}
+.panel:where(.skin, .offer, .sk-card, .chest-card, .div-card, .big-offer, .ucard):hover {
+  box-shadow:
+    0 0 0 1px var(--ry-ink),
+    inset 0 0 0 1px var(--ry-rim),
+    inset 0 1.5px 0 rgba(255, 255, 255, .12),
+    0 26px 48px -18px rgba(0, 0, 0, .85);
+}
+
+/* ---------- TLAČÍTKA: broušený kov, stisk „zapadne“ ---------- */
+.btn {
+  border-radius: 13px;
+  background: linear-gradient(180deg, #3d4c6e 0%, #2b3752 55%, #243048 100%);
+  box-shadow:
+    0 0 0 1px var(--ry-ink),
+    inset 0 0 0 1px rgba(255, 255, 255, .10),
+    inset 0 1.5px 0 rgba(255, 255, 255, .18),
+    inset 0 -2.5px 0 rgba(0, 0, 0, .35),
+    0 7px 16px -8px rgba(0, 0, 0, .9);
+}
+.btn:active { transform: translateY(1.5px); box-shadow: 0 0 0 1px var(--ry-ink), inset 0 0 0 1px rgba(255, 255, 255, .07), inset 0 3px 8px rgba(0, 0, 0, .45); }
+.btn:focus-visible { outline: 2px solid var(--ry-gold); outline-offset: 2px; }
+.btn-gold {
+  color: #2a1803;
+  background: linear-gradient(180deg, #ffeab0 0%, #f6c35b 44%, #dd9a2e 80%, #c98318 100%);
+  box-shadow:
+    0 0 0 1px #3a2605,
+    inset 0 0 0 1px rgba(255, 248, 220, .65),
+    inset 0 1.5px 0 rgba(255, 255, 255, .55),
+    inset 0 -3px 0 rgba(128, 73, 8, .45),
+    0 9px 20px -8px rgba(243, 170, 60, .75);
+  position: relative; overflow: hidden;
+}
+@media (hover: hover) {
+  .btn-gold::after { content: ""; position: absolute; top: -40%; bottom: -40%; left: -70%; width: 40%; transform: rotate(18deg); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent); opacity: 0; transition: opacity .2s; }
+  .btn-gold:hover::after { opacity: 1; animation: rySweep .8s ease; }
+}
+@keyframes rySweep { from { left: -70%; } to { left: 140%; } }
+.btn-green { background: linear-gradient(180deg, #74da72 0%, #44ad4e 55%, #2e8c3f 100%); box-shadow: 0 0 0 1px #0c2a10, inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 -2.5px 0 rgba(0, 60, 20, .4), 0 8px 18px -8px rgba(70, 200, 110, .55); }
+.btn-blue { background: linear-gradient(180deg, #6ba6ff 0%, #3c70dd 55%, #2c58bd 100%); box-shadow: 0 0 0 1px #0c1a3a, inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 -2.5px 0 rgba(10, 30, 90, .4), 0 8px 18px -8px rgba(80, 140, 255, .55); }
+.btn-red { background: linear-gradient(180deg, #ff7f72 0%, #d9453a 55%, #b5332a 100%); box-shadow: 0 0 0 1px #3a0c08, inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 -2.5px 0 rgba(90, 10, 10, .4), 0 8px 18px -8px rgba(255, 90, 80, .5); }
+
+/* ---------- ZÁLOŽKY: ražené zlato pro aktivní, rytina pro klidné ---------- */
+.tab, .act-tab, .sub-tab {
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012)), rgba(12, 17, 28, .6);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .07), inset 0 -2px 6px rgba(0, 0, 0, .25);
+}
+.tab[aria-selected="true"], .act-tab[aria-selected="true"], .sub-tab[aria-selected="true"] {
+  background: linear-gradient(180deg, #ffeab0, #f2bd4e 60%, #d9962c);
+  box-shadow: 0 0 0 1px #3a2605, inset 0 0 0 1px rgba(255, 248, 220, .6), inset 0 -2.5px 0 rgba(128, 73, 8, .4), 0 10px 22px -10px rgba(243, 170, 60, .7);
+}
+
+/* ---------- HORNÍ LIŠTA: tesaná římsa se zlatou obrubou ---------- */
+#topbar {
+  background: linear-gradient(180deg, #1b2540 0%, #131c30 62%, #0e1524 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .07),
+    0 1px 0 #000,
+    0 2px 0 rgba(243, 196, 92, .5),
+    0 3.5px 0 rgba(96, 60, 12, .55),
+    0 16px 34px -14px rgba(0, 0, 0, .85);
+}
+.pill {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02) 55%), rgba(8, 12, 20, .82);
+  box-shadow: 0 0 0 1px var(--ry-ink), inset 0 0 0 1px var(--ry-rim), inset 0 1px 0 rgba(255, 255, 255, .1), 0 6px 14px -6px rgba(0, 0, 0, .7);
+}
+.avatar { box-shadow: 0 0 0 1px var(--ry-ink), 0 0 0 2.5px rgba(243, 196, 92, .6), 0 6px 16px rgba(0, 0, 0, .5); }
+#nav button[aria-current="page"] {
+  color: var(--ry-gold-hi);
+  background: linear-gradient(180deg, rgba(243, 196, 92, .17), rgba(243, 196, 92, .04));
+  box-shadow: inset 0 0 0 1px rgba(243, 196, 92, .38), 0 8px 22px -10px rgba(243, 170, 60, .5);
+}
+
+/* ---------- OKNA: dvojitý zlatý rám, světlo shora ---------- */
+.overlay { background: radial-gradient(120% 120% at 50% 42%, rgba(5, 8, 14, .45), rgba(3, 5, 9, .78)); }
+.modal-card {
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 64% at 50% 0%, rgba(243, 196, 92, .08), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .012) 50%),
+    linear-gradient(180deg, #1b2440, #121827);
+  box-shadow:
+    0 0 0 1px var(--ry-ink),
+    0 0 0 2.5px rgba(243, 196, 92, .42),
+    0 0 0 4.5px rgba(10, 8, 4, .6),
+    inset 0 0 0 1px rgba(255, 255, 255, .07),
+    inset 0 1.5px 0 rgba(255, 255, 255, .1),
+    0 50px 110px -30px rgba(0, 0, 0, .95);
+}
+.modal-card h2 { text-align: center; background: linear-gradient(180deg, #fff6dc, var(--ry-gold) 60%, var(--ry-gold-dk)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- OZNÁMENÍ, VSTUPY, POSUVNÍKY ---------- */
+.notice { box-shadow: 0 0 0 1px var(--ry-ink), inset 0 0 0 1px rgba(243, 196, 92, .26), inset 3px 0 0 var(--ry-gold); }
+input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, .sel {
+  border-radius: 12px; border: 0; color: var(--m-text);
+  background: rgba(7, 11, 19, .72);
+  box-shadow: 0 0 0 1px var(--ry-ink), inset 0 0 0 1px rgba(255, 255, 255, .09), inset 0 2.5px 7px rgba(0, 0, 0, .45);
+}
+input:focus-visible, textarea:focus-visible, .sel:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--ry-ink), inset 0 0 0 1.5px var(--ry-rim), inset 0 2.5px 7px rgba(0, 0, 0, .45), 0 0 0 3px rgba(243, 196, 92, .18); }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { border-radius: 8px; background: linear-gradient(180deg, rgba(243, 196, 92, .38), rgba(201, 130, 31, .3)); border: 2px solid rgba(9, 13, 22, .9); }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, rgba(243, 196, 92, .6), rgba(201, 130, 31, .5)); }
+
+/* ---------- DOMOVSKÁ OBRAZOVKA: štítky tlačítek jako pečetě ---------- */
+.daily-lbl {
+  -webkit-text-stroke: 0; text-shadow: none; margin-top: 3px;
+  font-family: var(--font-body); font-weight: 800; font-size: 11px; letter-spacing: .05em; color: #ffe9b0;
+  padding: 2.5px 10px; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(22, 28, 46, .95), rgba(10, 14, 24, .95));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(243, 196, 92, .32), 0 3px 8px rgba(0, 0, 0, .55);
+}
+#screen.home-mode .daily-lbl { font-size: 11px; }
+
+/* ---------- VOLBY (další nastavení) ---------- */
+.volba b { box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .12); }
+.volba.on b { background: linear-gradient(180deg, #74da72, #2e8c3f); }
+
+/* ---------- VÝSLEDEK BITVY: štít lehce překrývá rám ---------- */
+.rs-emb { filter: drop-shadow(0 7px 14px #000c) drop-shadow(0 0 18px rgba(243, 196, 92, .25)); }
+.install-home span:last-child {
+  text-shadow: none; font-family: var(--font-body); font-weight: 800; font-size: 11px; letter-spacing: .05em; color: #ffe9b0;
+  padding: 2.5px 10px; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(22, 28, 46, .95), rgba(10, 14, 24, .95));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(243, 196, 92, .32), 0 3px 8px rgba(0, 0, 0, .55);
+}
