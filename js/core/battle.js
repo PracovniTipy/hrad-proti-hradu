@@ -1373,7 +1373,12 @@
     _damage(target, raw, from, fire) {
       if (!from && this._sheltered(target)) return false;
       const G = this._abGate;
-      if (G && target.team === G.foe) { const k = this._gateK(G, target); if (!k) return false; raw *= k; }
+      if (G && target.team === G.foe) {
+        const k = this._gateK(G, target); if (!k) return false; raw *= k;
+        // speciální útok zraní nejvýš 10 vojáků (každé seslání zvlášť)
+        const H = G.hit || (G.hit = new Set());
+        if (!H.has(target)) { if (H.size >= 10) return false; H.add(target); }
+      }
       if (target.gen && from && from.def && from.def.ranged && this._genEvade && this._genEvade(target)) return;   // schovaný za hradbami
       const s = this.side[target.team];
       let dmg = raw * (1 - Math.min(0.8, target.def.armor + (target.armorBonus || 0)));
