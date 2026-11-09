@@ -83,7 +83,8 @@
           skins: opts.player.unitSkins
         },
         enemy: {
-          coins: cfg.startCoins, income: es.income, baseIncome: es.income, maxCoins: Infinity,
+          // v příběhu má protivník o 10 % méně peněz (lehčí kampaň)
+          coins: cfg.startCoins * (opts.mode === 'campaign' ? 0.9 : 1), income: es.income * (opts.mode === 'campaign' ? 0.9 : 1), baseIncome: es.income * (opts.mode === 'campaign' ? 0.9 : 1), maxCoins: Infinity,
           hpMult: es.hpMult, dmgMult: es.dmgMult,
           castle: { hp: es.castleHp * (opts.enemyCastleHpMult || 1), maxHp: es.castleHp * (opts.enemyCastleHpMult || 1), front: cfg.enemyFront, tower: es.towerDmg, towerTimer: 1.5 },
           cooldowns: {}, abilityCd: {}, shieldUntil: 0,
