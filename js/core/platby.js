@@ -96,7 +96,9 @@
         await Ucet.ensure();
         if (!Ucet.s || !Ucet.s.token) return { ok: false, err: 'acc_e_net' };
         const r = await fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: Ucet.apiKey, Authorization: 'Bearer ' + Ucet.apiKey },
-          body: JSON.stringify({ token: Ucet.s.token, input: String(input).trim() }) });
+          /* bw = platné kliknutí BrosWars Partner (≤ 365 dní) – server zapíše provizi tvůrci jen u ověřeného nákupu z itch.io.
+             Nákupy přes Microsoft Store a Google Play server neověřuje, proto se tvůrcům nepočítají. */
+          body: JSON.stringify({ token: Ucet.s.token, input: String(input).trim(), bw: (window.Partner && Partner.click()) || undefined }) });
         const body = await r.json().catch(() => ({}));
         if (body.product) { const d = this.deliver(App, body.product); return Object.assign({ ok: true }, d); }
         const err = { not_configured: 'itch_soon', itch_used: 'itch_used', itch_invalid: 'itch_invalid', acc_e_session: 'acc_e_session' }[body.error] || 'acc_e_net';

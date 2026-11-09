@@ -172,6 +172,11 @@ Hraj Castle WARS na Androidu jako první – stačí 2 kroky:
 
 Ve webové verzi (a na itch.io, v Microsoft Storu a na počítači) to samé ukazuje zavíratelná karta na domovské obrazovce (`Instalace.testBanner` v `js/ui/instalace.js`); v aplikaci pro Android, na iPhonu a na herních portálech se nezobrazuje.
 
+### Pozvi kamaráda (verze s pravidly na serveru) a kód tvůrce (verze 139)
+
+- **Pozvi kamaráda** (`js/ui/pozvi.js`, tlačítko „Pozvi“ na domovské obrazovce a karta v Profilu): každý hráč má odkaz `…/hrad-proti-hradu/?pozvanka=<kód>`. Pozvaný dostane při prvním spuštění přes odkaz dárek (1 000 zlata + 50 drahokamů), zvoucí dostane 1 500 zlata + 60 drahokamů, až pozvaný dohraje 3 bitvy – nejvýš za 10 kamarádů. Jen herní odměny, jedna úroveň. Pravdu drží server (RPC `hra_pozvanka_info / _prijmout / _bitva / _odmeny`, migrace `supabase/migrations/20261109120000_hra_pozvi_kamarada.sql`): pozvat sebe (stejný účet nebo zařízení) nejde, dárek jen pro účet mladší 3 dnů a jednou na zařízení, max. 5 přijetí z jedné IP za 24 h. Dokud server neodpoví, je funkce skrytá; na herních portálech se nezobrazuje. **Zatím uspaná:** ve hře běží i starší „Pozvi kamaráda“ ze `js/ui/sireni.js` (kódy `?ref=`, 200 drahokamů oběma), a dokud tam je, tahle verze se hráčům neukazuje (`Pozvi.dormant()`; pro test `localStorage['cw-pozvi-on'] = '1'`). Je potřeba rozhodnout, která z obou zůstane.
+- **BrosWars Partner / kód tvůrce** (`js/core/partner.js`): `?bw=<clickId>` se uloží do `localStorage.bw_click` (poslední klik vyhrává, platí 365 dní) a zmizí z adresy. V Profilu → Nastavení je „Kód tvůrce“ (POST `functions/v1/aff/code`). Při uplatnění nákupu z itch.io hra pošle platné `bw` edge funkci `itch` (`supabase/functions/itch/index.ts`), která po ověřeném prvním uplatnění zapíše provizi přes `rpc('aff_record')`. Nákupy přes Microsoft Store a Google Play server neověřuje, proto se tvůrcům nepočítají.
+
 Dlouhodobě se dá hra přepsat do **Godot 4**: data jednotek, skinů a kampaně jsou oddělená a logika boje (`battle.js`, metoda `update`) je oddělená od kreslení.
 
 ## Novinky (verze 21)

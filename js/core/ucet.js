@@ -12,7 +12,8 @@
     username_invalid: 'acc_e_user', email_invalid: 'acc_e_email', password_short: 'acc_e_pass',
     username_taken: 'acc_e_user_taken', email_taken: 'acc_e_email_taken', login_failed: 'acc_e_login',
     login_locked: 'acc_e_locked', rescue_failed: 'acc_e_rescue', session_invalid: 'acc_e_session', network: 'acc_e_net',
-    code_invalid: 'code_e_invalid', code_used: 'code_e_used', code_spent: 'code_e_spent', code_busy: 'code_e_busy'
+    code_invalid: 'code_e_invalid', code_used: 'code_e_used', code_spent: 'code_e_spent', code_busy: 'code_e_busy',
+    invite_invalid: 'inv_e_invalid', invite_self: 'inv_e_self', invite_done: 'inv_e_old', invite_old: 'inv_e_old', invite_busy: 'code_e_busy'
   };
 
   async function rpc(fn, args, opts) {
@@ -121,6 +122,11 @@
     async turnajWin() { return rpc('hra_turnaj_win', { p_token: await this._tok() }); },
     async turnajBoard() { return rpc('hra_turnaj_board', { p_token: (this.s && this.s.token) || '' }); },
     async turnajOdmena() { return rpc('hra_turnaj_odmena', { p_token: await this._tok() }); },
+    /* Pozvi kamaráda (pravda na serveru, odměny jen herní věci) */
+    async inviteInfo(device) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'network' }; return rpc('hra_pozvanka_info', { p_token: this.s.token, p_device: device }); },
+    async inviteAccept(code, device) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'network' }; return rpc('hra_pozvanka_prijmout', { p_token: this.s.token, p_code: code, p_device: device }); },
+    async inviteBattle() { if (!this.s || !this.s.token) return null; return rpc('hra_pozvanka_bitva', { p_token: this.s.token }); },
+    async inviteClaim() { if (!this.s || !this.s.token) throw { code: 'network' }; return rpc('hra_pozvanka_odmeny', { p_token: this.s.token }); },
     async redeem(code) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_redeem', { p_token: this.s.token, p_code: code }); },
 
     /* Nahrání postupu: po každé změně s malým zpožděním, při zavření hned */

@@ -555,6 +555,7 @@
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
+      if (window.Pozvi) Pozvi.battle(this);   // pozvaný kamarád: dohraná bitva se počítá na serveru
       const rewards = [];
       let note = '', stars = 0;
       const coopLocked = cfg.coop && !GameData.campaignHelpers.isUnlocked(save, cfg.level.id);
@@ -866,6 +867,7 @@
         if ((this.save.tut || {}).home && Denni.available(this.save)) setTimeout(() => { if (!this.battle && !Tutorial.active) Denni.open(this); }, 700);
       }
       // fonty se načítají asynchronně – po načtení překresli plátna s textem
+      if (window.Pozvi) Pozvi.boot(this);   // dárek pro kamaráda, který přišel přes pozvánku
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.battle) this.go(this.current, { keepScroll: true }); });
     }
   };
