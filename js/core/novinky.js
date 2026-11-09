@@ -1064,8 +1064,8 @@
     const p = this.pet; if (!p) return;
     // mince letící k mazlíčkovi
     for (const c of p.coins) { const x = c.x + (p.x - c.x) * c.t, y = c.y + (p.y - c.y) * c.t - Math.sin(c.t * Math.PI) * 40; ctx.beginPath(); ctx.ellipse(x, y, 5, 5 * Math.abs(Math.cos(t * 8 + c.x)), 0, 0, TAU); ctx.fillStyle = '#ffd24a'; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = '#8a5a10'; ctx.stroke(); }
-    const S = 1.25 * US();
-    ctx.save(); ctx.translate(p.x, p.y); ctx.scale(S, S);
+    const S0 = 1.25 * US(), S = S0 * 0.5;   // mazlíček velký zhruba jako holub (nohy zůstávají na zemi)
+    ctx.save(); ctx.translate(p.x, p.y + 26 * (S0 - S)); ctx.scale(S, S);
     ctx.beginPath(); ctx.ellipse(0, 26, 13.6, 3.4, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fill();
     G.drawPet(ctx, p.def.id, t, p.act > 0);
     ctx.restore();

@@ -155,7 +155,7 @@
       if (!save || !G.drawPet) return;
       const p = G.petOf(save);
       const x = 700 + Math.sin(t * 0.35) * 240, y = 250 + Math.sin(t * 0.9) * 26, dir = Math.cos(t * 0.35) >= 0 ? 1 : -1;
-      ctx.save(); ctx.translate(x, y); ctx.scale(dir * 1.5, 1.5); G.drawPet(ctx, p.id, t, false); ctx.restore();
+      ctx.save(); ctx.translate(x, y); ctx.scale(dir * 0.75, 0.75); G.drawPet(ctx, p.id, t, false); ctx.restore();
     }
   };
   if (window.Screens) Screens.mazlicci = (App, opts) => Sin.screen(App, opts);
