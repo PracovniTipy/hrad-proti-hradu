@@ -1392,3 +1392,7 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .modal-card .vy-card { margin: 6px 0 2px; }
 @media (max-width: 380px) { .vy-card { grid-template-columns: 1fr; } .vy-badge { display: none; } }
 @media (max-height: 460px) and (orientation: landscape) { .vy-card { padding: 9px 12px; gap: 10px; } .vy-badge { width: 44px; height: 44px; } .vy-badge svg { width: 38px; height: 38px; } .vy-url { display: none; } }
+/* nováček: velké tlačítko do první bitvy */
+.first-fight { position: absolute; left: 50%; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 5;
+  font-size: 1.25rem; padding: 14px 34px; animation: ffPulse 1.6s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(242,201,76,.6); }
+@keyframes ffPulse { 0%,100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(242,201,76,.55); } 50% { transform: translateX(-50%) scale(1.06); box-shadow: 0 0 0 14px rgba(242,201,76,0); } }

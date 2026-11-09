@@ -76,7 +76,7 @@
       let sel = (opts && opts.pet) || G.petOf(save).id;
       const needTxt = p => { const N = G.petNeed(p), have = G.petProgress(save, p);
         if (N.k === 'gems') return `${ico('gem')} ${N.n}`;
-        const lbl = { wins: L('vítězství', 'victories'), kills: L('zabití', 'kills'), trophies: L('trofejí', 'trophies'), refs: L('pozvaných přátel', 'invited friends') }[N.k];
+        const lbl = { wins: L('vítězství', 'victories'), kills: L('zabití', 'kills'), trophies: L('trofejí', 'trophies'), refs: L('pozvaných přátel', 'invited friends'), xmas: L('adventních okének', 'advent doors') }[N.k] || '';
         return `${Math.min(have, N.n)} / ${N.n} ${lbl}`; };
       const render = () => {
         const P = G.pets.find(x => x.id === sel), un = G.petUnlocked(save, P), on = G.petOf(save).id === P.id, N = G.petNeed(P);

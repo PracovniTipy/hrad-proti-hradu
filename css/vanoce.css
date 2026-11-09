@@ -1,0 +1,154 @@
+/* =========================================================================
+   VÁNOCE – adventní kalendář, Santův obchůdek, koulovačka (js/core/vanoce.js)
+   ========================================================================= */
+/* tlačítko na domovské obrazovce (vedle Přátel a Turnaje) */
+#screen.home-mode .xm-btn, .xm-btn { left: 172px; top: calc(430px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .xm-btn { top: 300px; left: 160px; } }
+.xm-btn .daily-chest svg { animation-delay: .9s; }
+.xm-btn .daily-lbl { color: #fff; text-shadow: 0 2px 0 #000, 0 0 8px rgba(255,60,60,.6); }
+.xm-teaser .daily-lbl.xm-count { font-size: 11px; max-width: 70px; white-space: nowrap; line-height: 1.1; text-align: center; padding: 2px 6px; margin-top: 1px; border-radius: 8px; background: linear-gradient(180deg, rgba(200,24,40,.92), rgba(120,12,22,.92)); box-shadow: 0 0 0 1.5px #ffd24a, 0 2px 6px rgba(0,0,0,.6); }
+
+/* široké okno (kalendář má 8 sloupců) */
+#modalCard:has(.xm-adv) { width: min(940px, 96vw); padding: 14px 16px 14px; gap: 8px; }
+#modalCard:has(.xm-small), #modalCard:has(.xm-rew) { width: min(560px, 96vw); }
+.xm-adv { position: relative; display: grid; gap: 10px; }
+.xm-x { position: absolute; top: 6px; right: 6px; z-index: 5; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer; font-size: 17px; font-weight: 900; color: #fff3cf;
+  background: radial-gradient(circle at 40% 30%, #3a4664, #141b2c); box-shadow: 0 0 0 2px #e8b84a, 0 3px 8px rgba(0,0,0,.6); }
+.xm-x:hover { filter: brightness(1.25); }
+.xm-adv .modal-actions { margin-top: 2px; }
+.xm-fl, .xm-fl-s { width: 18px; height: 18px; color: #bfeaff; vertical-align: -4px; filter: drop-shadow(0 1px 0 rgba(0,0,0,.7)); }
+.xm-fl-s { width: 14px; height: 14px; vertical-align: -2px; }
+.xm-ok { color: #8fe08a; font-weight: 900; }
+
+/* záhlaví: zasněžená noc se saněmi */
+.xm-hero { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; min-height: 112px; border-radius: 16px; overflow: hidden; padding: 10px 14px;
+  border: 2px solid transparent; background: linear-gradient(#0b1636, #0b1636) padding-box, var(--gold-rim) border-box; box-shadow: 0 8px 22px rgba(0,0,0,.45); }
+.xm-hero > canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.xm-hero-txt, .xm-pet { position: relative; z-index: 1; }
+.xm-hero h2 { font-size: 26px; margin: 0; line-height: 1.05; background: linear-gradient(180deg, #ffffff, #ffe7a8 55%, #e8b84a); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.7)); }
+.xm-hero .eyebrow { color: #ffd0d0; text-shadow: 0 1px 0 #000; }
+.xm-chips { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.xm-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 6px; border-radius: 999px; background: rgba(6,10,24,.72); box-shadow: inset 0 0 0 1.5px rgba(255,215,122,.55); color: #fff; font-family: var(--font-display); font-size: 15px; }
+.xm-chip .ico, .xm-chip svg { width: 18px; height: 18px; }
+.xm-pet { margin-right: 30px; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 14px; background: rgba(6,10,24,.66); box-shadow: inset 0 0 0 1.5px rgba(255,120,110,.55), 0 0 18px rgba(255,80,80,.18); color: #f4ecd8; max-width: 300px; }
+.xm-pet canvas { width: 68px; height: 62px; flex: none; }
+.xm-pet-n { font-family: var(--font-display); font-weight: 900; font-size: 14px; color: #fff3cf; }
+.xm-leg { font-size: 10px; color: #f2b440; border: 1px solid rgba(242,180,64,.6); border-radius: 6px; padding: 0 4px; vertical-align: 1px; }
+.xm-pet small { display: block; font-size: 11.5px; opacity: .85; line-height: 1.25; }
+.xm-bar { display: block; height: 8px; border-radius: 6px; background: rgba(0,0,0,.45); overflow: hidden; margin: 3px 0 2px; width: 150px; }
+.xm-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #ff4a5a, #ffd24a); }
+
+/* záložky */
+.xm-tabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.xm-tab { position: relative; border: 0; cursor: pointer; padding: 7px 16px; border-radius: 999px; font: 900 14px var(--font-display); color: #f4ecd8; background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1.5px rgba(255,215,122,.25); }
+.xm-tab.on { color: #2a1804; background: linear-gradient(180deg, #fff1b8, #e8b84a 60%, #b8841e); box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.xm-dot { position: absolute; top: 2px; right: 4px; width: 9px; height: 9px; border-radius: 50%; background: #ff4a3a; box-shadow: 0 0 0 2px #1a1410; }
+.xm-body { max-height: calc(100vh - 270px); min-height: 120px; overflow: auto; padding: 2px; }
+.xm-note { margin: 4px 2px 0; font-size: 12.5px; color: #cfc4a8; text-align: center; }
+.xm-note .ico { width: 15px; height: 15px; vertical-align: -3px; }
+
+/* ===== okénka ===== */
+.xm-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+.xm-door { --c1: #c8182a; --c2: #8a0e18; --rb: #ffd24a; position: relative; aspect-ratio: 1 / 0.86; border: 0; padding: 0; cursor: pointer; border-radius: 10px; overflow: hidden; display: grid; place-items: center;
+  background: linear-gradient(90deg, transparent 43%, var(--rb) 43% 57%, transparent 57%), linear-gradient(0deg, transparent 43%, var(--rb) 43% 57%, transparent 57%), linear-gradient(160deg, var(--c1), var(--c2));
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.55), inset 0 2px 0 3px rgba(255,255,255,.12), 0 4px 8px rgba(0,0,0,.45); transition: transform .15s; perspective: 400px; transform-origin: left center; }
+.xm-door.c1 { --c1: #2a9a4a; --c2: #11502a; --rb: #ffffff; }
+.xm-door.c2 { --c1: #2a5ad8; --c2: #14306a; --rb: #ffd24a; }
+.xm-door.c3 { --c1: #f2ecdc; --c2: #c8bca4; --rb: #d6243a; }
+.xm-door.big { --rb: #ffd24a; box-shadow: inset 0 0 0 2px rgba(0,0,0,.55), 0 0 0 2px #ffd24a, 0 0 14px rgba(255,210,74,.45), 0 4px 8px rgba(0,0,0,.45); }
+.xm-door::before { content: ""; position: absolute; left: 50%; top: 50%; width: 46%; height: 26%; transform: translate(-50%, -96%); z-index: 1;
+  background: radial-gradient(ellipse 40% 50% at 28% 60%, var(--rb) 0 62%, rgba(0,0,0,.55) 64% 72%, transparent 74%), radial-gradient(ellipse 40% 50% at 72% 60%, var(--rb) 0 62%, rgba(0,0,0,.55) 64% 72%, transparent 74%); }
+.xm-num { position: relative; z-index: 2; display: grid; place-items: center; width: 1.85em; height: 1.85em; border-radius: 50%; font: 900 clamp(13px, 2.1vw, 21px) var(--font-display); line-height: 1; color: #7a0e16;
+  background: radial-gradient(circle at 35% 30%, #fffdf6, #efe2c4 70%, #d8c49a); box-shadow: 0 0 0 2px var(--rb), 0 0 0 3.5px rgba(0,0,0,.55), 0 3px 6px rgba(0,0,0,.5); }
+.xm-door.c1 .xm-num { color: #11502a; } .xm-door.c2 .xm-num { color: #14306a; }
+.xm-star { position: absolute; top: 2px; right: 5px; z-index: 1; color: #ffd24a; font-size: 14px; text-shadow: 0 1px 0 #000; }
+.xm-hint, .xm-cost, .xm-date { position: absolute; bottom: 3px; left: 0; right: 0; z-index: 1; font-size: 10.5px; font-weight: 900; text-align: center; color: #fff; text-shadow: 0 1px 0 #000, 0 0 4px #000; }
+.xm-cost { color: #bfeaff; }
+.xm-door.now { animation: xmPulse 1.3s ease-in-out infinite; }
+.xm-door.now .xm-hint { color: #ffe9a0; }
+@keyframes xmPulse { 0%, 100% { transform: scale(1) rotate(0); filter: brightness(1); } 25% { transform: scale(1.06) rotate(-2deg); } 50% { transform: scale(1.08) rotate(2deg); filter: brightness(1.18); } 75% { transform: scale(1.04) rotate(-1deg); } }
+.xm-door.now::after { content: ""; position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent, rgba(255,240,180,.45), transparent 20%, transparent 50%, rgba(255,240,180,.35), transparent 70%); animation: xmSpin 3s linear infinite; z-index: 0; mix-blend-mode: screen; }
+@keyframes xmSpin { to { transform: rotate(360deg); } }
+.xm-door.miss { filter: saturate(.55) brightness(.82); }
+.xm-door.lock { cursor: default; filter: saturate(.35) brightness(.6); }
+.xm-door.lock::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 40%), linear-gradient(180deg, rgba(220,235,255,.25), rgba(220,235,255,0) 60%); }
+.xm-door.open { cursor: default; background: radial-gradient(circle at 50% 40%, #2a3654, #10162a 80%); box-shadow: inset 0 0 0 2px rgba(255,215,122,.35), inset 0 6px 14px rgba(0,0,0,.6); }
+.xm-door.open::before { display: none; }
+.xm-in { display: grid; place-items: center; width: 100%; height: 100%; }
+.xm-in canvas { width: 92%; height: 92%; }
+.xm-ri { display: grid; justify-items: center; gap: 0; color: #fff3cf; font: 900 12px var(--font-display); }
+.xm-ri svg, .xm-ri .ico { width: 36px; height: 30px; }
+.xm-ri-fl svg { color: #bfeaff; }
+.xm-door.opening { animation: xmOpen .65s cubic-bezier(.5,0,.7,1) forwards; z-index: 2; }
+@keyframes xmOpen { 0% { transform: none; } 30% { transform: scale(1.18) rotate(-4deg); filter: brightness(1.4); } 100% { transform: scale(1.25) rotateY(-100deg); opacity: .15; filter: brightness(2); } }
+.xm-door.shake { animation: xmShake .4s; }
+@keyframes xmShake { 25% { transform: translateX(-4px) rotate(-2deg); } 75% { transform: translateX(4px) rotate(2deg); } }
+
+/* ===== koulovačka ===== */
+.xm-snow { display: grid; grid-template-columns: minmax(200px, 1fr) 1.2fr; gap: 14px; align-items: center; }
+.xm-snow-art canvas { width: 100%; height: 190px; border-radius: 14px; box-shadow: inset 0 0 0 2px rgba(255,215,122,.35); display: block; }
+.xm-snow-txt h3 { margin: 0 0 4px; color: #fff3cf; }
+.xm-snow-txt p { margin: 0 0 8px; font-size: 14px; }
+.xm-rw-line { color: #ffe9a8; }
+.xm-rw-line .ico { width: 16px; height: 16px; vertical-align: -3px; }
+.xm-how { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px; font-size: 12.5px; color: #cfc4a8; }
+.xm-how b { color: #fff3cf; margin-left: 4px; }
+
+/* ===== Santův obchůdek ===== */
+.xm-shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 8px; }
+.xm-card { display: grid; gap: 6px; padding: 8px; border-radius: 14px; background: linear-gradient(180deg, rgba(200,24,40,.16), rgba(10,14,22,.6)); box-shadow: inset 0 0 0 1.5px rgba(255,215,122,.3); }
+.xm-card.wide { grid-column: 1 / -1; grid-template-columns: 280px 1fr auto; align-items: center; background: linear-gradient(90deg, rgba(255,210,74,.2), rgba(200,24,40,.2) 60%, rgba(10,14,22,.6)); box-shadow: inset 0 0 0 2px #ffd24a, 0 0 18px rgba(255,210,74,.25); }
+.xm-card canvas { width: 100%; height: 108px; border-radius: 10px; display: block; }
+.xm-card.wide canvas { height: 118px; }
+.xm-card-t b { display: block; font-family: var(--font-display); font-size: 15px; color: #fff3cf; }
+.xm-card-t small { font-size: 12px; opacity: .8; }
+.xm-buy { display: flex; gap: 6px; flex-wrap: wrap; }
+.xm-buy .btn { flex: 1; min-width: 0; }
+.xm-card.own { opacity: .8; }
+
+/* odměny: otevírající se dárek */
+.xm-gift-open { position: relative; display: grid; place-items: center; height: 120px; }
+.xm-gift-lid { position: relative; z-index: 1; animation: xmGift .8s cubic-bezier(.3,1.6,.5,1); }
+.xm-gift-lid svg { width: 120px; height: 100px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.6)); }
+@keyframes xmGift { 0% { transform: scale(.2) rotate(-20deg); opacity: 0; } 60% { transform: scale(1.15) rotate(6deg); opacity: 1; } 100% { transform: none; } }
+.xm-flk { color: #bfeaff; }
+.rw .xm-flk svg, .rw .xm-wr svg { width: 40px; height: 40px; }
+.pill.xm-pill { color: #dff4ff; }
+
+/* odpočet před Vánoci */
+.xm-big-count { margin: 4px 0 0; font: 900 30px var(--font-display); color: #ff6a6a; text-shadow: 0 2px 0 #000, 0 0 14px rgba(255,80,80,.6); }
+.xm-tz-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.xm-tz-list li { display: grid; grid-template-columns: 56px 1fr; gap: 8px; align-items: center; padding: 8px; border-radius: 12px; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,215,122,.25); font-size: 12.5px; }
+.xm-tz-list li svg, .xm-tz-list li canvas { width: 56px; height: 48px; }
+.xm-tz-list b { display: block; font-family: var(--font-display); color: #fff3cf; font-size: 14px; }
+
+/* telefon na šířku: kompaktní */
+@media (orientation: landscape) and (max-height: 520px) {
+  #modalCard:has(.xm-adv) { padding: 8px 10px; gap: 6px; }
+  .xm-adv { gap: 6px; }
+  .xm-hero { min-height: 74px; padding: 6px 10px; }
+  .xm-hero h2 { font-size: 19px; }
+  .xm-hero .eyebrow { font-size: 10px; }
+  .xm-chips { margin-top: 3px; }
+  .xm-chip { font-size: 12px; padding: 1px 8px 1px 4px; }
+  .xm-pet canvas { width: 50px; height: 44px; }
+  .xm-pet { padding: 4px 8px 4px 4px; }
+  .xm-pet small { font-size: 10.5px; }
+  .xm-bar { width: 110px; height: 6px; }
+  .xm-tab { padding: 4px 12px; font-size: 12px; }
+  .xm-body { max-height: calc(100vh - 150px); }
+  .xm-grid { gap: 5px; }
+  .xm-door { aspect-ratio: 1 / 0.62; border-radius: 8px; }
+  .xm-door::before { width: 40%; height: 30%; }
+  .xm-x { width: 28px; height: 28px; font-size: 14px; top: 4px; right: 4px; }
+  .xm-hint, .xm-cost, .xm-date { font-size: 9px; bottom: 1px; }
+  .xm-note { font-size: 11px; margin-top: 2px; }
+  .xm-snow-art canvas { height: 140px; }
+  .xm-snow-txt p { font-size: 12.5px; }
+  .xm-card canvas { height: 84px; }
+  .xm-card.wide { grid-template-columns: 200px 1fr auto; }
+  .xm-gift-open { height: 84px; } .xm-gift-lid svg { width: 90px; height: 76px; }
+  .xm-tz-list { grid-template-columns: 1fr; gap: 4px; } .xm-big-count { font-size: 22px; }
+}
+@media (max-width: 640px) and (orientation: portrait) { .xm-grid { grid-template-columns: repeat(6, 1fr); } .xm-snow { grid-template-columns: 1fr; } .xm-pet { display: none; } }
+@media (prefers-reduced-motion: reduce) { .xm-door.now, .xm-door.now::after, .xm-gift-lid { animation: none; } }

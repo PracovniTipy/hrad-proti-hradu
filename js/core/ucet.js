@@ -28,7 +28,7 @@
     if (!res.ok) {
       const m = (body && body.message) || 'network';
       const code = Object.keys(ERR).find(k => m.includes(k)) || 'network';
-      const er = new Error(code); er.code = code; throw er;
+      const er = new Error(code); er.code = code; er.msg = m; throw er;
     }
     return body;
   }
@@ -122,6 +122,8 @@
     async turnajWin() { return rpc('hra_turnaj_win', { p_token: await this._tok() }); },
     async turnajBoard() { return rpc('hra_turnaj_board', { p_token: (this.s && this.s.token) || '' }); },
     async turnajOdmena() { return rpc('hra_turnaj_odmena', { p_token: await this._tok() }); },
+    /* klany (js/ui/klany.js): hra_klan_<fn>; anon = čtení i bez účtu (hledání, žebříček) */
+    async klan(fn, args, anon) { return rpc('hra_klan_' + fn, Object.assign({ p_token: anon ? ((this.s && this.s.token) || '') : await this._tok() }, args || {})); },
     /* Pozvi kamaráda (pravda na serveru, odměny jen herní věci) */
     async inviteInfo(device) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'network' }; return rpc('hra_pozvanka_info', { p_token: this.s.token, p_device: device }); },
     async inviteAccept(code, device) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'network' }; return rpc('hra_pozvanka_prijmout', { p_token: this.s.token, p_code: code, p_device: device }); },

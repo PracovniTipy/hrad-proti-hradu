@@ -10,7 +10,7 @@ css = (root / 'css/style.css').read_text(encoding='utf-8')
 html = html.replace('<link rel="stylesheet" href="css/style.css">', '<style>\n' + css + '\n</style>')
 html = html.replace('<link rel="stylesheet" href="css/fonts.css">', '<style>\n' + (root / 'css/fonts.css').read_text(encoding='utf-8') + '\n</style>')
 html = html.replace('<link rel="stylesheet" href="css/ui-pro.css">', '<style>\n' + (root / 'css/ui-pro.css').read_text(encoding='utf-8') + '\n</style>')
-for _c in ['fonts-modern', 'ui-modern']:
+for _c in ['fonts-modern', 'ui-modern', 'klany', 'vanoce']:
     html = html.replace('<link rel="stylesheet" href="css/%s.css">' % _c, '<style>\n' + (root / ('css/%s.css' % _c)).read_text(encoding='utf-8') + '\n</style>')
 
 def inline(m):

@@ -280,6 +280,7 @@
     return `
       ${Platby.on() ? `<div class="sec-head"><h2>${t('div_title')}</h2><span class="muted">${t('div_sub')}</span></div>
       <div class="div-row">${divCard('andel')}${divCard('kral')}</div>` : ''}
+      ${window.Reklamy ? Reklamy.shopHtml(App) : ''}
       <div class="sec-head"><h2>${t('chests')}</h2><span class="muted">${t('chests_sub')}</span></div>
       <div class="chest-row">${chestCard(C.denni)}${chestCard(C.tydenni)}</div>
       ${Platby.on() ? `<div class="sec-head"><h2>${t('offers')}</h2><span class="muted">${t('offers_sub')}</span></div>
@@ -307,6 +308,7 @@
   }
   function bindOffers(App, el) {
     const save = ensure(App.save);
+    if (window.Reklamy) Reklamy.shopBind(App, el);
     el.querySelectorAll('canvas[data-divcv]').forEach(cv => paintDivine(cv, cv.dataset.divcv));
     el.querySelectorAll('[data-divbuy]').forEach(b => b.addEventListener('click', () => {
       const id = b.dataset.divbuy, D = GameData.divineSets[id], nm = I18N.lang === 'cs' ? D.name : D.en;

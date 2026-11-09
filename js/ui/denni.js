@@ -79,6 +79,7 @@
         <p class="muted" style="margin:0">${loyal ? t('daily_rule2') : t('daily_rule')}</p>
         <div class="dd-grid">${grid}</div>
         <div class="dd-streak">${t('streak_n', { n: st.streak })}</div>
+        ${window.Reklamy ? Reklamy.denniHtml(App) : ''}
         <div class="modal-actions">
           ${st.claimedToday ? `<button class="btn" disabled>${t('daily_tomorrow')}</button>` : `<button class="btn btn-gold btn-big" id="ddClaim">${t('claim')}</button>`}
           <button class="btn" data-close>${t('back')}</button>
@@ -87,6 +88,7 @@
         if (cv) requestAnimationFrame(() => Art.renderUnitIcon(cv, GameData.factions[save.faction].roles.tezka, 'player', 'verny', { zoom: 0.9 }));
         const btn = c.querySelector('#ddClaim');
         if (btn) btn.addEventListener('click', () => { close(); this.claim(App); });
+        if (window.Reklamy) Reklamy.denniBind(App, c, close);
       });
     },
 

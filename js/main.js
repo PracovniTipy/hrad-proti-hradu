@@ -47,10 +47,24 @@
       // tutoriály při první návštěvě
       const tut = this.save.tut || (this.save.tut = {});
       if (this.save.lang && !Tutorial.active) {
-        if (name === 'hrad' && !tut.home) { tut.home = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.HOME), 600); }
+        if (name === 'hrad' && !tut.home) {
+          tut.home = true; Save.save();
+          // nováček: po krátké prohlídce rovnou do první bitvy (většina nových hráčů dřív odešla bez jediné bitvy)
+          const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
+          setTimeout(() => Tutorial.run(Tutorial.HOME, first), 600);
+        }
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
       if (name === 'hrad' && window.UcetUI && UcetUI.nudge) try { UcetUI.nudge(this); } catch (e) { /* nic */ }
+      if (name === 'hrad') {   // dokud hráč neodehrál bitvu: velké tlačítko „Do první bitvy“
+        const st = this.save.stats || {};
+        if ((st.wins || 0) + (st.losses || 0) === 0 && !document.getElementById('firstFight')) {
+          const lv = GameData.campaignHelpers.currentLevel(this.save), host = document.getElementById('screen');
+          if (lv && host) { const b = document.createElement('button'); b.id = 'firstFight'; b.className = 'btn btn-gold btn-big first-fight';
+            b.innerHTML = '⚔️ ' + ((window.I18N && I18N.lang === 'cs') ? 'Do první bitvy!' : 'To your first battle!');
+            b.addEventListener('click', () => this.openLevel(lv.id)); host.appendChild(b); }
+        }
+      }
       if (name === 'hrad' && window.Sireni) { try { Sireni.home(this); if ((this.save.stats.wins || 0) >= 1) Sireni.notifyAsk(this); } catch (e) { /* nic */ } }
       this.screenEl.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
       this.screenEl.scrollTop = opts.keepScroll ? scroll : 0;
@@ -555,13 +569,14 @@
     _battleEnd(cfg, res) {
       if (this.battle && this.battle.aiRemember) try { this.battle.aiRemember(res); } catch (e) { /* nic */ }
       const save = this.save, R = GameData.pvpRules;
+      const adGold0 = save.gold;   // reklamy za odměnu: kolik zlata bitva dala (pro „Zdvojnásob odměnu“)
       if (!this.battle) return;
       if (cfg.film) { this._closeBattle(); this.go('hrad'); return; }   // natáčecí bitva: žádné odměny ani statistiky
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
       if (window.Pozvi) Pozvi.battle(this);   // pozvaný kamarád: dohraná bitva se počítá na serveru
-      const rewards = [];
+      const rewards = [], klGold0 = save.gold;   // klany: bonus zlata z úrovně klanu
       let note = '', stars = 0;
       const coopLocked = cfg.coop && !GameData.campaignHelpers.isUnlocked(save, cfg.level.id);
       if (cfg.coop && res.reason === 'spojeni') note = t('onl_conn_lost');
@@ -643,6 +658,8 @@
         note = t('note_training');
       }
       if (window.Sireni) { const ex = Sireni.onBattleEnd(this, cfg, res); if (ex) { rewards.push(...ex.rewards); if (ex.note) note = ex.note; } }
+      if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
+      if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) rewards.push(...kx.rewards); }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
       if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
@@ -666,6 +683,7 @@
         ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.25}s">★</i>`).join('')}</div><p class="muted res-stars-note">${t('stars_note')}</p>` : ''}
         <p style="text-align:center;margin:0" class="muted">${reason}</p>
         ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
+        ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
         <dl class="kv">
           <dt>${t('battle_lbl')}</dt><dd>${esc(cfg.title)}</dd>
           <dt>${t('duration')}</dt><dd>${Math.floor(res.time / 60)}:${String(Math.floor(res.time % 60)).padStart(2, '0')}</dd>
@@ -681,6 +699,7 @@
           <button class="btn btn-gold" id="resBack">${t('continue')}</button>
         </div>`, (c, close) => {
         const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
+        if (window.Reklamy) Reklamy.battleBind(this, c);
         if (window.Sireni && Sireni.bindVictoryCard) Sireni.bindVictoryCard(this, c, cfg, stars);
         const mc = c.querySelector('canvas[data-mvp]');
         if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
@@ -866,7 +885,13 @@
         const ok = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko'];
         this.save.langAsked2 = 1; this.setLang(ok.includes(nav) ? nav : 'en');
         this.go('hrad');
-      } else if (!this.save.lang || !this.save.langAsked2) {
+      } else if (!this.save.lang) {
+        // nový hráč: jazyk podle telefonu/prohlížeče, žádné úvodní okno (z něj nejvíc lidí odcházelo)
+        const nav = String(navigator.language || 'en').slice(0, 2).toLowerCase();
+        const ids = I18N.LANGS.map(l => l.id);
+        this.save.langAsked2 = 1; this.setLang(nav === 'sk' ? 'cs' : (ids.includes(nav) ? nav : 'en'));
+        this.go('hrad');
+      } else if (!this.save.langAsked2) {
         this.go('hrad');
         Tutorial.pickLanguage(l => { this.save.langAsked2 = 1; this.setLang(l); });
       } else {
