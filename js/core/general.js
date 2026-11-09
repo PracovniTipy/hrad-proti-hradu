@@ -384,7 +384,7 @@
   function useSkills(B, br, S) {
     if (!br.skills.length || B.o.noSkills) return;
     // delší prodlevy: první kouzlo nejdřív po 60 s, mezi kouzly nepřítele aspoň 30 s
-    if (B.time < 60 || B.time - (B._eSkillAt || -1e9) < 30) return;
+    if (B.time < 60 || B.time - (B._eSkillAt || -1e9) < 30 || (B._eSkillN || 0) >= 4) return;   // nejvýš 4 kouzla za bitvu
     if (Math.random() > 0.35 + br.per.magic * 0.5) return;
     const E = B.side.enemy, cfg = C(), front = E.castle.front;
     const foes = S.foes.filter(u => !B._sheltered(u));
@@ -411,7 +411,7 @@
         case 'gold': use = true; break;
         default: use = cluster() >= need;
       }
-      if (use && B.useAbility('enemy', id)) { br.saving = 0; B._eSkillAt = B.time; return; }
+      if (use && B.useAbility('enemy', id)) { br.saving = 0; B._eSkillAt = B.time; B._eSkillN = (B._eSkillN || 0) + 1; return; }
     }
   }
 
