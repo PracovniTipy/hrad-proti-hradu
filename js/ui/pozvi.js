@@ -31,6 +31,9 @@
     inv_e_invalid: ['Pozvánka neplatí.', 'This invite link is not valid.', '邀请链接无效。', 'यह आमंत्रण लिंक मान्य नहीं है।', 'Esta invitación no es válida.', 'Cette invitation n’est pas valide.', 'رابط الدعوة غير صالح.', 'এই আমন্ত্রণ লিংক বৈধ নয়।', 'Este convite não é válido.', 'Приглашение недействительно.', 'یہ دعوتی لنک درست نہیں۔', 'Undangan ini tidak berlaku.', 'Diese Einladung ist ungültig.', 'この招待リンクは無効です。', 'Bu davet geçerli değil.', '유효하지 않은 초대 링크입니다.'],
     inv_e_self: ['Vlastní pozvánku použít nejde – pošli ji kamarádovi.', "You can't use your own invite – send it to a friend.", '不能使用自己的邀请——发给好友吧。', 'अपना आमंत्रण खुद इस्तेमाल नहीं कर सकते – दोस्त को भेजें।', 'No puedes usar tu propia invitación: envíasela a un amigo.', 'Tu ne peux pas utiliser ta propre invitation – envoie-la à un ami.', 'لا يمكنك استخدام دعوتك – أرسلها إلى صديق.', 'নিজের আমন্ত্রণ নিজে ব্যবহার করা যায় না – বন্ধুকে পাঠাও।', 'Você não pode usar seu próprio convite – envie a um amigo.', 'Своё приглашение использовать нельзя — отправь его другу.', 'اپنی دعوت خود استعمال نہیں کر سکتے – دوست کو بھیجیں۔', 'Kamu tidak bisa memakai undanganmu sendiri – kirim ke teman.', 'Deine eigene Einladung kannst du nicht nutzen – schick sie einem Freund.', '自分の招待は使えません――友達に送ってね。', 'Kendi davetini kullanamazsın – bir arkadaşına gönder.', '내 초대는 직접 쓸 수 없어요 – 친구에게 보내세요.'],
     inv_e_old: ['Dárek z pozvánky je jen pro nové hráče.', 'The invite gift is only for new players.', '邀请礼物仅限新玩家。', 'आमंत्रण उपहार केवल नए खिलाड़ियों के लिए है।', 'El regalo de invitación es solo para jugadores nuevos.', 'Le cadeau d’invitation est réservé aux nouveaux joueurs.', 'هدية الدعوة للاعبين الجدد فقط.', 'আমন্ত্রণের উপহার শুধু নতুন খেলোয়াড়দের জন্য।', 'O presente de convite é só para novos jogadores.', 'Подарок по приглашению — только для новых игроков.', 'دعوت کا تحفہ صرف نئے کھلاڑیوں کے لیے ہے۔', 'Hadiah undangan hanya untuk pemain baru.', 'Das Einladungsgeschenk gibt es nur für neue Spieler.', '招待ギフトは新規プレイヤー限定です。', 'Davet hediyesi yalnızca yeni oyuncular için.', '초대 선물은 신규 플레이어 전용입니다.'],
+    inv_pet: ['Za {n} odměněných kamarádů získáš exkluzivního mazlíčka, kterého jinak mít nejde.', 'Get {n} friends rewarded to unlock an exclusive pet you can’t get any other way.', '成功奖励 {n} 位好友即可解锁专属宠物，别无他法获得。', '{n} दोस्तों का इनाम मिलने पर एक खास पालतू मिलेगा, जो और किसी तरह नहीं मिलता।', 'Consigue la recompensa de {n} amigos y desbloquea una mascota exclusiva que no se obtiene de otra forma.', 'Fais récompenser {n} amis pour débloquer un familier exclusif, impossible à obtenir autrement.', 'احصل على مكافأة {n} أصدقاء لتفتح حيوانًا أليفًا حصريًا لا يمكن الحصول عليه بطريقة أخرى.', '{n} জন বন্ধুর পুরস্কার পেলে একটি এক্সক্লুসিভ পোষা প্রাণী পাবে, যা অন্য কোনোভাবে পাওয়া যায় না।', 'Receba a recompensa de {n} amigos e desbloqueie um mascote exclusivo que não dá para conseguir de outro jeito.', 'Получи награды за {n} друзей — и откроешь эксклюзивного питомца, которого больше никак не достать.', '{n} دوستوں کا انعام ملنے پر ایک خاص پالتو کھلے گا جو کسی اور طرح نہیں ملتا۔', 'Dapatkan hadiah dari {n} teman untuk membuka peliharaan eksklusif yang tidak bisa didapat dengan cara lain.', 'Lass {n} Freunde belohnen und schalte ein exklusives Haustier frei, das es sonst nirgends gibt.', '{n}人分の報酬を受け取ると、ほかでは手に入らない限定ペットが解放されます。', '{n} arkadaşın ödülünü alarak başka yolla elde edilemeyen özel bir evcil hayvanın kilidini aç.', '친구 {n}명 보상을 받으면 다른 방법으로는 얻을 수 없는 전용 펫이 열립니다.'],
+    inv_pet_have: ['Exkluzivní mazlíček je tvůj!', 'The exclusive pet is yours!', '专属宠物已归你所有！', 'खास पालतू अब आपका है!', '¡La mascota exclusiva es tuya!', 'Le familier exclusif est à toi !', 'الحيوان الأليف الحصري أصبح لك!', 'এক্সক্লুসিভ পোষা প্রাণী এখন তোমার!', 'O mascote exclusivo é seu!', 'Эксклюзивный питомец твой!', 'خاص پالتو اب آپ کا ہے!', 'Peliharaan eksklusif jadi milikmu!', 'Das exklusive Haustier gehört dir!', '限定ペットを手に入れました！', 'Özel evcil hayvan artık senin!', '전용 펫을 얻었어요!'],
+    inv_pet_got: ['Odemkl jsi exkluzivního mazlíčka: {pet}!', 'You unlocked the exclusive pet: {pet}!', '你解锁了专属宠物：{pet}！', 'आपने खास पालतू खोला: {pet}!', '¡Has desbloqueado la mascota exclusiva: {pet}!', 'Tu as débloqué le familier exclusif : {pet} !', 'لقد فتحت الحيوان الأليف الحصري: {pet}!', 'তুমি এক্সক্লুসিভ পোষা প্রাণী আনলক করেছ: {pet}!', 'Você desbloqueou o mascote exclusivo: {pet}!', 'Ты открыл эксклюзивного питомца: {pet}!', 'آپ نے خاص پالتو کھول لیا: {pet}!', 'Kamu membuka peliharaan eksklusif: {pet}!', 'Du hast das exklusive Haustier freigeschaltet: {pet}!', '限定ペットを解放しました：{pet}！', 'Özel evcil hayvanın kilidini açtın: {pet}!', '전용 펫을 잠금 해제했어요: {pet}!'],
     cc_title: ['Kód tvůrce', 'Creator code', '创作者代码', 'क्रिएटर कोड', 'Código de creador', 'Code créateur', 'رمز صانع المحتوى', 'ক্রিয়েটর কোড', 'Código de criador', 'Код автора', 'کریئیٹر کوڈ', 'Kode kreator', 'Creator-Code', 'クリエイターコード', 'İçerik üretici kodu', '크리에이터 코드'],
     cc_hint: ['Hraješ díky youtuberovi nebo streamerovi? Zadej jeho kód a podpoříš ho. Tebe to nic nestojí.', 'Found the game through a YouTuber or streamer? Enter their code to support them. It costs you nothing.', '通过主播或视频作者发现了这款游戏？输入他们的代码来支持他们，你无需花费任何费用。', 'किसी यूट्यूबर या स्ट्रीमर से गेम मिला? उनका कोड डालकर उन्हें सपोर्ट करें। आपको कुछ खर्च नहीं होगा।', '¿Conociste el juego por un youtuber o streamer? Introduce su código para apoyarle. No te cuesta nada.', 'Tu as découvert le jeu grâce à un youtubeur ou streamer ? Entre son code pour le soutenir. Ça ne te coûte rien.', 'هل عرفت اللعبة من يوتيوبر أو صانع بث؟ أدخل رمزه لتدعمه. لن يكلّفك ذلك شيئًا.', 'কোনো ইউটিউবার বা স্ট্রিমারের মাধ্যমে গেমটি পেয়েছ? তাদের কোড দিয়ে সমর্থন করো। তোমার কোনো খরচ নেই।', 'Conheceu o jogo por um youtuber ou streamer? Digite o código dele para apoiá-lo. Não custa nada para você.', 'Узнал об игре от ютубера или стримера? Введи его код, чтобы поддержать его. Тебе это ничего не стоит.', 'کسی یوٹیوبر یا اسٹریمر سے گیم ملا؟ ان کا کوڈ درج کر کے ان کی مدد کریں۔ آپ کا کوئی خرچ نہیں۔', 'Tahu game ini dari YouTuber atau streamer? Masukkan kodenya untuk mendukung mereka. Gratis untukmu.', 'Spiel über einen YouTuber oder Streamer entdeckt? Gib seinen Code ein und unterstütze ihn. Dich kostet das nichts.', 'YouTuber や配信者からこのゲームを知った？コードを入力して応援しよう。あなたの負担はありません。', 'Oyunu bir YouTuber veya yayıncı sayesinde mi buldun? Kodunu girerek onu destekle. Sana hiçbir maliyeti yok.', '유튜버나 스트리머를 통해 게임을 알게 됐나요? 코드를 입력해 응원하세요. 비용은 들지 않아요.'],
     cc_btn: ['Potvrdit', 'Apply', '确认', 'लागू करें', 'Aplicar', 'Valider', 'تطبيق', 'প্রয়োগ করো', 'Aplicar', 'Применить', 'لاگو کریں', 'Terapkan', 'Übernehmen', '適用', 'Uygula', '적용'],
@@ -44,6 +47,7 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const PET_N = 5;   // stejně jako REF_PET v js/ui/sireni.js (mazlíček Posel)
   const GIFT_SVG = '<svg viewBox="0 0 120 100" aria-hidden="true"><path d="M18 44h84v46a6 6 0 0 1-6 6H24a6 6 0 0 1-6-6z" fill="#c0392b" stroke="#1a0e06" stroke-width="4"/><path d="M12 30h96v16H12z" fill="#e74c3c" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M52 30h16v66H52z" fill="#ffd24a" stroke="#1a0e06" stroke-width="4"/><path d="M60 30c-6-14-26-22-30-10s20 10 30 10c10 0 34 2 30-10S66 16 60 30z" fill="#ffd24a" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M26 58l6 6M94 58l-6 6" stroke="#fff3cf" stroke-width="4" stroke-linecap="round" opacity=".7"/></svg>';
 
   /* počkat na účet (host se zakládá ~1,5 s po spuštění) */
@@ -61,14 +65,8 @@
     info: null,
     _at: 0,
     _loading: null,
-    /* Ve hře už běží jiné „Pozvi kamaráda“ (js/ui/sireni.js, kódy ?ref=). Dvě pozvánky vedle sebe
-       by hráče mátly a odměny by se sčítaly, proto je tato verze uspaná, dokud se nerozhodne,
-       která zůstane. Zapnutí: smazat sireni pozvánky, nebo pro test localStorage cw-pozvi-on = 1. */
-    dormant() {
-      try { if (localStorage.getItem('cw-pozvi-on') === '1') return false; } catch (e) { /* nic */ }
-      return !!(window.Sireni && Sireni.openFriends);
-    },
-    available() { return !window.CW_PORTAL && !!window.Partner && !this.dormant(); },
+    /* Jediná pozvánka ve hře (stará ?ref= ze sireni.js v138 jen dobíhá, nové se nezapisují). */
+    available() { return !window.CW_PORTAL && !!window.Partner; },
     link() { return this.info ? SITE + '?pozvanka=' + encodeURIComponent(this.info.code) : SITE; },
 
     /* stav ze serveru; při chybě (RPC ještě neexistuje / bez internetu) zůstane funkce skrytá */
@@ -80,11 +78,37 @@
         try {
           if (!(await token())) return this.info;
           const r = await Ucet.inviteInfo(Partner.device());
-          if (r && r.code) { this.info = r; this._at = Date.now(); }
+          if (r && r.code) { this.info = r; this._at = Date.now(); this.syncPet(); }
         } catch (e) { /* skryto, dokud server neodpoví */ }
         return this.info;
       })().finally(() => { this._loading = null; });
       return this._loading;
+    },
+
+    /* exkluzivní mazlíček Posel za PET_N odměněných kamarádů (počet drží server, odemčení se uloží do save) */
+    syncPet() {
+      const App = window.App, I = this.info;
+      if (!App || !App.save || !I) return;
+      const n = Math.max(App.save.pozviRewarded || 0, I.rewarded || 0);
+      if (n !== App.save.pozviRewarded) { App.save.pozviRewarded = n; App.persist(); }
+      if (window.Sireni && Sireni.checkPet) Sireni.checkPet(App);
+    },
+    petHtml() {
+      const P = window.GameData && GameData.pets && GameData.pets.find(p => p.id === 'posel');
+      if (!P) return '';
+      const save = window.App && App.save, own = !!(save && (save.petsOwned || []).includes('posel'));
+      const have = own ? PET_N : Math.min(PET_N, ((save && save.refCount) || 0) + (this.info.rewarded || 0));
+      return `<div class="pozvi-pet${own ? ' on' : ''}"><canvas width="96" height="96" data-pozvi-pet></canvas><div>
+        <b>${esc(P.name)}</b><small>${own ? '✓ ' + t('inv_pet_have') : t('inv_pet', { n: PET_N }) + ` (${have} / ${PET_N})`}</small></div></div>`;
+    },
+    drawPet(root) {
+      const G = window.GameData;
+      root.querySelectorAll('[data-pozvi-pet]').forEach(cv => {
+        if (!G || !G.drawPet) return;
+        const x = cv.getContext('2d'); x.clearRect(0, 0, cv.width, cv.height); x.save(); x.translate(48, 54); x.scale(1.2, 1.2);
+        try { G.drawPet(x, 'posel', 0.6, false); } catch (e) { /* nic */ }
+        x.restore();
+      });
     },
 
     /* hezká karta (modal i profil) */
@@ -106,12 +130,14 @@
           <button class="btn btn-gold btn-big pozvi-share" data-pozvi-share>${t('inv_share')}</button>`}
           <div class="pozvi-prog"><div class="lvbar"><i style="width:${Math.min(100, (I.rewarded / I.limit) * 100)}%"></i></div>
             <small>${t('inv_progress', { a: I.rewarded, b: I.limit })} · ${t('inv_joined', { n: I.joined })}</small></div>
+          ${this.petHtml()}
           <p class="pozvi-rules">${t('inv_rules', { n: I.need, m: I.limit })}</p>
         </div>
       </section>`;
     },
     bindCard(App, root, after) {
       const url = this.link();
+      this.drawPet(root);
       const copy = async () => {
         let ok = false;
         try { await navigator.clipboard.writeText(url); ok = true; } catch (e) {

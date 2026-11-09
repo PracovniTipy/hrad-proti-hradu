@@ -456,7 +456,6 @@
           ${window.CW_PORTAL ? '' : `<button class="daily-btn friends-btn" id="friendsBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Přátelé' : 'Friends'}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><circle cx="42" cy="34" r="16" fill="#ffd9b0" stroke="#1a0e06" stroke-width="4"/><path d="M14 92c0-22 12-34 28-34s28 12 28 34z" fill="#3d7fe0" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><circle cx="80" cy="38" r="14" fill="#ffd9b0" stroke="#1a0e06" stroke-width="4"/><path d="M58 92c0-20 10-30 22-30s24 10 24 30z" fill="#d6453c" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M92 6l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#ffd24a" stroke="#1a0e06" stroke-width="2.5"/></svg></span>
             <span class="daily-lbl">${(window.I18N && I18N.lang === 'cs') ? 'Přátelé' : 'Friends'}</span>
-            ${(save.refCount || 0) < 5 ? '<i class="daily-dot">+</i>' : ''}
           </button>
           <button class="daily-btn turnaj-btn" id="turnajBtn" aria-label="${(window.I18N && I18N.lang === 'cs') ? 'Turnaj' : 'Tournament'}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M30 92V40h60v52z" fill="#7a4a1c" stroke="#1a0e06" stroke-width="4"/><path d="M24 40l36-30 36 30z" fill="#d6453c" stroke="#1a0e06" stroke-width="4" stroke-linejoin="round"/><path d="M60 50l6 12 13 2-9 9 2 13-12-6-12 6 2-13-9-9 13-2z" fill="#ffd24a" stroke="#1a0e06" stroke-width="3" stroke-linejoin="round"/></svg></span>
@@ -1235,7 +1234,7 @@
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 139 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 140 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

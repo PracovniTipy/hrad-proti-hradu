@@ -1,7 +1,8 @@
 /* =========================================================================
    ŠÍŘENÍ HRY
-   - Pozvi kamaráda: vlastní kód/odkaz, 200 drahokamů oběma po první výhře
-     pozvaného, exkluzivní mazlíček Posel za 5 pozvaných
+   - Pozvi kamaráda je v js/ui/pozvi.js (?pozvanka=). Tady zůstal jen exkluzivní
+     mazlíček Posel (5 odměněných pozvánek) a dobíhání starých pozvánek ?ref=
+     (v138): už zapsaným pozvánkám se dovyplatí odměny, nové se nezapisují.
    - Sdílet bitvu: obrázek s výsledkem a odkazem (TikTok, Instagram, WhatsApp)
    - Výzva kamarádovi: odkaz spustí bitvu proti hradu odesílatele
    - Týdenní turnaj: žebříček vítězství za týden, odměny pro nejlepší
@@ -15,7 +16,7 @@
   const L = (c, e) => (window.I18N && I18N.lang === 'cs') ? c : e;
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
-  const REF_GEMS = 200, REF_PET = 5;
+  const REF_PET = 5;
   const portal = () => !!window.CW_PORTAL;
   const net = () => window.Ucet && navigator.onLine !== false;
   const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* nic */ } } };
@@ -32,7 +33,9 @@
       need: { k: 'refs', n: REF_PET }, cd: 10, kind: 'gold', col: '#7fb8ff', rar: 'legendary', excl: true });
     const P = G.pets.find(p => p.id === 'posel'); P.name = L(P.cs, P.en); P.desc = L(P.d[0], P.d[1]);
     const oldProg = G.petProgress;
-    G.petProgress = (s, p) => (G.petNeed(p).k === 'refs' ? (s.refCount || 0) : oldProg(s, p));
+    /* staré pozvánky (v138) + odměnění kamarádi z nové pozvánky (pozvi.js); jednou odemčený zůstává */
+    G.petProgress = (s, p) => (G.petNeed(p).k === 'refs'
+      ? ((s.petsOwned || []).includes(p.id) ? p.need.n : (s.refCount || 0) + (s.pozviRewarded || 0)) : oldProg(s, p));
   }
   /* kresba holuba (stejný styl jako ostatní mazlíčci) */
   if (G && G.petDrawFns && G.petKit) {
@@ -88,20 +91,20 @@
   }
 
   const Sireni = {
-    code: null,
     /* ---------- odkazy ---------- */
-    async myCode() {
-      if (this.code) return this.code;
-      const c = ls.get('cw-mycode'); if (c) return (this.code = c);
-      try { this.code = await Ucet.refCode(); ls.set('cw-mycode', this.code); } catch (e) { this.code = null; }
-      return this.code;
+    /* kód pozvánky z nového systému (js/ui/pozvi.js), jen když ho server už dal */
+    _pozvCode() { const P = window.Pozvi; return P && P.available && P.available() && P.info && P.info.code ? P.info.code : ''; },
+    async gameUrl() {
+      if (window.Pozvi && Pozvi.available()) { try { await Pozvi.load(); } catch (e) { /* nic */ } }
+      const c = this._pozvCode(); return SITE + (c ? '?pozvanka=' + encodeURIComponent(c) : '');
     },
-    async inviteUrl() { const c = await this.myCode(); return SITE + (c ? '?ref=' + c : ''); },
     async challengeUrl(App) {
-      const s = App.save, c = await this.myCode();
+      const s = App.save;
+      await this.gameUrl();
+      const c = this._pozvCode();
       const o = { v: 1, n: (s.name || 'Velitel').slice(0, 16), f: s.faction, cs: (s.skins && s.skins.castle) || 'kralovsky',
-        cl: Math.max(1, Math.min(14, G.calc.castleLevel(s))), tr: s.trophies || 0, w: (s.stats && s.stats.wins) || 0, r: c || '' };
-      return SITE + '?vyzva=' + b64e(o) + (c ? '&ref=' + c : '');
+        cl: Math.max(1, Math.min(14, G.calc.castleLevel(s))), tr: s.trophies || 0, w: (s.stats && s.stats.wins) || 0 };
+      return SITE + '?vyzva=' + b64e(o) + (c ? '&pozvanka=' + encodeURIComponent(c) : '');
     },
 
     /* ---------- sdílení (Web Share → schránka → stažení) ---------- */
@@ -148,7 +151,6 @@
       rr(80, by, W - 160, 170, 28); c.fill(); c.stroke();
       c.fillStyle = '#fff'; c.font = '800 46px Inter, sans-serif'; c.fillText(L('Dokážeš to líp? Hraj zdarma!', 'Can you do better? Play free!'), W / 2, by + 68);
       c.fillStyle = '#f2c94c'; c.font = '700 34px Inter, sans-serif'; c.fillText('pracovnitipy.github.io/hrad-proti-hradu', W / 2, by + 122);
-      const code = await this.myCode(); if (code) { c.fillStyle = 'rgba(255,255,255,.7)'; c.font = '600 28px Inter, sans-serif'; c.fillText(L(`Kód pozvánky: ${code} (+${REF_GEMS} drahokamů)`, `Invite code: ${code} (+${REF_GEMS} gems)`), W / 2, by + 160 + 40); }
       const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
       return blob ? new File([blob], 'castle-wars-bitva.png', { type: 'image/png' }) : null;
     },
@@ -156,15 +158,11 @@
     async shareBattle(App, cfg, res) {
       if (portal()) return;
       const file = await this.battleCard(App, cfg, res).catch(() => null);
-      const url = cfg.mode === 'vyzva' ? await this.challengeUrl(App) : await this.inviteUrl();
+      const url = cfg.mode === 'vyzva' ? await this.challengeUrl(App) : await this.gameUrl();
       const text = res.win
         ? L(`Vyhrál jsem bitvu v Castle WARS – ${fmt(res.kills)} zabitých! 🏰⚔️ Dokážeš to líp?`, `I won a battle in Castle WARS – ${fmt(res.kills)} kills! 🏰⚔️ Can you beat that?`)
         : L('Hraju Castle WARS – bitvu hradů. Pojď mě porazit! 🏰', 'Playing Castle WARS – battle of castles. Come beat me! 🏰');
       this.share(App, { title: 'Castle WARS', text, url, file });
-    },
-    async shareInvite(App) {
-      this.share(App, { title: 'Castle WARS', url: await this.inviteUrl(),
-        text: L(`Hraj se mnou Castle WARS – bitvu hradů! Funguje i bez internetu. Přes můj odkaz dostaneš ${REF_GEMS} drahokamů navíc. 🏰`, `Play Castle WARS with me – battle of castles! Works offline too. Use my link and get ${REF_GEMS} bonus gems. 🏰`) });
     },
     async shareChallenge(App) {
       this.share(App, { title: 'Castle WARS', url: await this.challengeUrl(App),
@@ -196,6 +194,7 @@
       if (cfg.film) return out;
       if (res.win && !portal() && net()) {
         if (Ucet.logged && Ucet.logged()) Ucet.turnajWin().catch(() => {});
+        // stará pozvánka (v138), zapsaná už dřív: pozvaný ji dokončí první výhrou
         if (save.refDone && !save.refWon) Ucet.refWin().then(g => {
           save.refWon = 1;
           if (g > 0) { save.gems += g; App.persist(); App.toast(L(`Dárek za pozvánku od kamaráda: +${g} drahokamů!`, `Friend invite gift: +${g} gems!`)); }
@@ -213,16 +212,18 @@
     async home(App) {
       if (this._homeDone || portal() || !net()) return; this._homeDone = true;
       const save = App.save;
-      try {
-        const r = await Ucet.refClaim();
-        if (r) {
-          const before = save.refCount || 0;
-          save.refCount = r.total || 0; save.refWaiting = r.waiting || 0;
-          if (r.gems > 0) { save.gems += r.gems; App.toast(L(`Tví přátelé hrají! Odměna za pozvánky: +${r.gems} drahokamů`, `Your friends are playing! Invite reward: +${r.gems} gems`)); }
-          if (before < REF_PET && save.refCount >= REF_PET) setTimeout(() => App.toast(L('Odemkl jsi exkluzivního mazlíčka Posla!', 'You unlocked the exclusive pet Herald!')), 2500);
-          App.persist();
-        }
-      } catch (e) { this._homeDone = false; return; }
+      /* dobíhání starých pozvánek (v138): jen hráč, který si tehdy vytvořil kód, nebo ještě na někoho čeká */
+      if (ls.get('cw-mycode') || save.refCount || save.refWaiting) {
+        try {
+          const r = await Ucet.refClaim();
+          if (r) {
+            save.refCount = r.total || 0; save.refWaiting = r.waiting || 0;
+            if (r.gems > 0) { save.gems += r.gems; App.toast(L(`Tví přátelé hrají! Odměna za pozvánky: +${r.gems} drahokamů`, `Your friends are playing! Invite reward: +${r.gems} gems`)); }
+            this.checkPet(App);
+            App.persist();
+          }
+        } catch (e) { this._homeDone = false; return; }
+      }
       try {
         if (Ucet.logged() && !Ucet.guest()) {
           const o = await Ucet.turnajOdmena();
@@ -235,21 +236,21 @@
       } catch (e) { /* nic */ }
     },
 
-    /* ---------- okno Přátelé ---------- */
+    /* ---------- exkluzivní mazlíček Posel: odemknout natrvalo při 5 odměněných pozvánkách ---------- */
+    checkPet(App) {
+      const save = App && App.save, P = G && G.pets && G.pets.find(p => p.id === 'posel');
+      if (!save || !P || (save.petsOwned || []).includes('posel')) return false;
+      if ((save.refCount || 0) + (save.pozviRewarded || 0) < REF_PET) return false;
+      save.petsOwned = (save.petsOwned || []).concat('posel');
+      App.persist();
+      setTimeout(() => App.toast(window.t ? t('inv_pet_got', { pet: P.name }) : P.name), 2500);
+      return true;
+    },
+
+    /* ---------- okno Přátelé (výzva + natáčení; pozvánka je v js/ui/pozvi.js) ---------- */
     async openFriends(App) {
-      const save = App.save, n = save.refCount || 0;
-      const pet = G.pets.find(p => p.id === 'posel');
       App.modal(`<div class="eyebrow">${L('Přátelé', 'Friends')}</div><h2>${L('Hraj s přáteli', 'Play with friends')}</h2>
         ${portal() ? '' : `<section class="sh-box">
-          <h3>🎁 ${L('Pozvi kamaráda', 'Invite a friend')}</h3>
-          <p class="muted">${L(`Pošli kamarádovi svůj odkaz. Až vyhraje první bitvu, dostanete <b>oba ${REF_GEMS} drahokamů</b>. Za ${REF_PET} pozvaných získáš exkluzivního mazlíčka, kterého jinak mít nejde.`, `Send your link to a friend. When they win their first battle, <b>you both get ${REF_GEMS} gems</b>. Invite ${REF_PET} friends to get an exclusive pet you can't get any other way.`)}</p>
-          <div class="sh-code"><span>${L('Tvůj kód', 'Your code')}</span><b id="shCode">…</b></div>
-          <div class="sh-pet"><canvas id="shPet" width="120" height="120"></canvas><div>
-            <b>${esc(pet ? pet.name : 'Posel')}</b><div class="bar"><i style="width:${Math.min(100, n / REF_PET * 100)}%"></i></div>
-            <small>${L(`${Math.min(n, REF_PET)} / ${REF_PET} pozvaných přátel`, `${Math.min(n, REF_PET)} / ${REF_PET} invited friends`)}${save.refWaiting ? L(` · ${save.refWaiting} čeká na první výhru`, ` · ${save.refWaiting} waiting for first win`) : ''}</small></div></div>
-          <div class="modal-actions"><button class="btn btn-green" id="shInv">${L('Poslat pozvánku', 'Send invite')}</button></div>
-        </section>
-        <section class="sh-box">
           <h3>⚔️ ${L('Vyzvi kamaráda', 'Challenge a friend')}</h3>
           <p class="muted">${L('Kamarád dostane odkaz a bude bojovat proti tvému hradu. Kdo vyhraje, pošle odvetu.', 'Your friend gets a link and fights against your castle. The winner sends a rematch.')}</p>
           <div class="modal-actions"><button class="btn btn-gold" id="shVy">${L('Poslat výzvu', 'Send challenge')}</button></div>
@@ -265,10 +266,6 @@
           <p class="muted sh-tip">${L('Tip: v každé bitvě zapneš filmový režim v pauze tlačítkem „Režim natáčení“.', 'Tip: in any battle, turn on cinematic mode in the pause menu with "Recording mode".')}</p>
         </section>
         <div class="modal-actions"><button class="btn" data-close>${L('Zavřít', 'Close')}</button></div>`, (c, close) => {
-        const pc = c.querySelector('#shPet');
-        if (pc && G.drawPet) { const x = pc.getContext('2d'); x.translate(60, 66); x.scale(1.5, 1.5); try { G.drawPet(x, 'posel', 0.6, false); } catch (e) { /* nic */ } }
-        const cd = c.querySelector('#shCode'); if (cd) this.myCode().then(v => { cd.textContent = v || L('bez internetu', 'offline'); });
-        const inv = c.querySelector('#shInv'); if (inv) inv.addEventListener('click', () => this.shareInvite(App));
         const vy = c.querySelector('#shVy'); if (vy) vy.addEventListener('click', () => this.shareChallenge(App));
         c.querySelectorAll('[data-film]').forEach(b => b.addEventListener('click', () => { close(); this.filmBattle(App, b.dataset.film); }));
       });
@@ -358,16 +355,12 @@
     /* ---------- start ---------- */
     boot(App) {
       const q = new URLSearchParams(location.search);
-      const ref = (q.get('ref') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-      if (ref) ls.set('cw-ref', ref);
+      /* starý odkaz ?ref= (v138) se jen tiše odstraní – nové staré pozvánky se nezapisují */
+      const ref = q.get('ref');
       const vy = q.get('vyzva') ? b64d(q.get('vyzva')) : null;
-      if (ref || vy) { try { const u = new URL(location.href); u.searchParams.delete('ref'); u.searchParams.delete('vyzva'); history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) { /* nic */ } }
-      // pozvánka: zapsat jednou (až je účet)
-      const tryRef = async () => {
-        const r = ls.get('cw-ref'); if (!r || App.save.refDone || portal()) return;
-        try { await Ucet.refSet(r); App.save.refDone = 1; App.persist(); } catch (e) { setTimeout(tryRef, 30000); }
-      };
-      setTimeout(tryRef, 3000);
+      if (ref != null || vy) { try { const u = new URL(location.href); u.searchParams.delete('ref'); u.searchParams.delete('vyzva'); history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) { /* nic */ } }
+      try { localStorage.removeItem('cw-ref'); } catch (e) { /* nic */ }
+      setTimeout(() => this.checkPet(App), 3000);
       if (vy && vy.n && !portal()) {
         const go = () => { if (App.battle || !App.save.lang || (window.Tutorial && Tutorial.active) || !document.getElementById('modal').hidden) return setTimeout(go, 1500); this.challengeModal(App, vy); };
         setTimeout(go, 2500);
