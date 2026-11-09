@@ -51,6 +51,7 @@
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
       if (name === 'hrad' && window.UcetUI && UcetUI.nudge) try { UcetUI.nudge(this); } catch (e) { /* nic */ }
+      if (name === 'hrad' && window.Sireni) { try { Sireni.home(this); if ((this.save.stats.wins || 0) >= 1) Sireni.notifyAsk(this); } catch (e) { /* nic */ } }
       this.screenEl.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.go(b.dataset.go)));
       this.screenEl.scrollTop = opts.keepScroll ? scroll : 0;
       if (location.hash.slice(1) !== name) { try { history.replaceState(null, '', '#' + name); } catch (e) { /* nic */ } }
@@ -550,6 +551,7 @@
       if (this.battle && this.battle.aiRemember) try { this.battle.aiRemember(res); } catch (e) { /* nic */ }
       const save = this.save, R = GameData.pvpRules;
       if (!this.battle) return;
+      if (cfg.film) { this._closeBattle(); this.go('hrad'); return; }   // natáčecí bitva: žádné odměny ani statistiky
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
@@ -633,6 +635,7 @@
         if (res.win) { save.gold += 100; rewards.push(`<span class="pill">${ico('coin')} +100</span>`); }
         note = t('note_training');
       }
+      if (window.Sireni) { const ex = Sireni.onBattleEnd(this, cfg, res); if (ex) { rewards.push(...ex.rewards); if (ex.note) note = ex.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
       if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
@@ -666,8 +669,10 @@
         ${statsHtml}
         ${note ? `<div class="notice"><div>${note}</div></div>` : ''}
         <div class="modal-actions">
+          ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn btn-green" id="resShare">${cfg.mode === 'vyzva' ? (I18N.lang === 'cs' ? 'Poslat odvetu' : 'Send rematch') : (I18N.lang === 'cs' ? 'Sdílet bitvu' : 'Share battle')}</button>` : ''}
           <button class="btn btn-gold" id="resBack">${t('continue')}</button>
         </div>`, (c, close) => {
+        const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
         const mc = c.querySelector('canvas[data-mvp]');
         if (mc) Art.renderUnitIcon(mc, mc.dataset.mvp, 'player', save.skins.unit[mc.dataset.mvp], { headshot: true, noShadow: true });
         c.querySelector('#resBack').addEventListener('click', () => {

@@ -112,6 +112,15 @@
     async payStart(product) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_platba_start', { p_token: this.s.token, p_product: product }); },
     async payClaim() { if (!this.s || !this.s.token) return []; return rpc('hra_platby_vyzvednout', { p_token: this.s.token }); },
     apiKey: KEY,
+    /* šíření hry: pozvánky a týdenní turnaj */
+    async _tok() { await this.ensure(); if (!this.s || !this.s.token) { const e = new Error('network'); e.code = 'network'; throw e; } return this.s.token; },
+    async refCode() { return rpc('hra_ref_code', { p_token: await this._tok() }); },
+    async refSet(code) { return rpc('hra_ref_set', { p_token: await this._tok(), p_code: code }); },
+    async refWin() { return rpc('hra_ref_win', { p_token: await this._tok() }); },
+    async refClaim() { return rpc('hra_ref_claim', { p_token: await this._tok() }); },
+    async turnajWin() { return rpc('hra_turnaj_win', { p_token: await this._tok() }); },
+    async turnajBoard() { return rpc('hra_turnaj_board', { p_token: (this.s && this.s.token) || '' }); },
+    async turnajOdmena() { return rpc('hra_turnaj_odmena', { p_token: await this._tok() }); },
     async redeem(code) { await this.ensure(); if (!this.s || !this.s.token) throw { code: 'acc_e_net' }; return rpc('hra_redeem', { p_token: this.s.token, p_code: code }); },
 
     /* Nahrání postupu: po každé změně s malým zpožděním, při zavření hned */
