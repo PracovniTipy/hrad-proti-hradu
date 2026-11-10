@@ -68,7 +68,7 @@ if(!cs)tp.lastChild.nodeValue=' Preparing the battle…';
 var iv=setInterval(function(){p+= (92-p)*0.06;b.style.width=p+'%'},120);
 (function(){var d=document.getElementById('ld');for(var i=0;i<16;i++){var e=document.createElement('i');e.className='em';e.style.left=(4+Math.random()*92)+'%';e.style.setProperty('--dx',(Math.random()*120-60)+'px');e.style.animationDuration=(4.5+Math.random()*5)+'s';e.style.animationDelay=(Math.random()*5)+'s';var k=.5+Math.random()*1.2;e.style.width=5*k+'px';e.style.height=5*k+'px';d.appendChild(e)}})();
 window.__ldDone=function(){clearInterval(iv);b.style.width='100%';var d=document.getElementById('ld');if(!d||d._x)return;d._x=1;setTimeout(function(){d.classList.add('out');setTimeout(function(){d.remove()},600)},250)};
-window.addEventListener('load',function(){setTimeout(window.__ldDone,150)});setTimeout(function(){window.__ldDone&&window.__ldDone()},15000)})()</script>
+window.addEventListener('load',function(){setTimeout(window.__ldDone,150)});setTimeout(function(){window.__ldDone&&window.__ldDone()},8000);window.addEventListener('pageshow',function(){setTimeout(function(){window.__ldDone&&window.__ldDone()},2500)})})()</script>
   <div id="rotate" aria-live="polite"><div class="rot-phone"><i></i></div><b data-i18n="rotate">Otoč zařízení na šířku</b></div>
 <div id="app">
   <header id="topbar">

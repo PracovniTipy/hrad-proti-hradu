@@ -27,7 +27,16 @@
       cv.width = Math.ceil(bw * this.r); cv.height = Math.ceil(bh * this.r);
       const c = cv.getContext('2d');
       c.scale(this.r, this.r); c.translate(-bx0, -by0);
-      Art.drawUnit(c, def, pal, Object.assign({ x: 0, y: 0, facing: 1, scaleMul, ring: true, t: 0 }, st));
+      try {
+        Art.drawUnit(c, def, pal, Object.assign({ x: 0, y: 0, facing: 1, scaleMul, ring: true, t: 0 }, st));
+      } catch (err) {   // vadný skin nesmí zmrazit hru – nouzově základní vzhled
+        try {
+          c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height);
+          c.scale(this.r, this.r); c.translate(-bx0, -by0);
+          Art.drawUnit(c, def, Art.unitPalette(pal.team || 'player'), Object.assign({ x: 0, y: 0, facing: 1, scaleMul, ring: true, t: 0 }, st));
+        } catch (e2) {}
+        if (!SpriteCache._err) { SpriteCache._err = 1; try { console.warn('skin draw', err); } catch (e3) {} }
+      }
       e = { cv, bx0, by0, bw, bh };
       this.map.set(key, e);
       if (this.map.size > this.max) this.map.delete(this.map.keys().next().value);
@@ -808,13 +817,19 @@
       this._rt = (this._rt || 0) + dt;
       if (!this.paused && !this.over) {
         const steps = this.speed;
-        for (let i = 0; i < steps; i++) this.update(dt);
+        for (let i = 0; i < steps; i++) { try { this.update(dt); } catch (err) { this._uerr = (this._uerr || 0) + 1; if (this._uerr === 1) { try { console.warn('update', err); } catch (e) {} } } }
       } else if (this.over) {
         this._updateFx(dt);
       }
-      this.render();
-      this._warmStep();
-      if (this.o.onUpdateHud) this.o.onUpdateHud(this);
+      try {
+        this.render();
+        this._warmStep();
+        if (this.o.onUpdateHud) this.o.onUpdateHud(this);
+      } catch (err) {
+        this._rerr = (this._rerr || 0) + 1;
+        if (this._rerr === 1) { try { console.warn('render', err); } catch (e) {} }
+        try { const x = this.ctx; if (x) x.setTransform(1, 0, 0, 1, 0, 0); } catch (e) {}
+      }
       if (!this.destroyed) this.raf = requestAnimationFrame(this._loop);
     }
 
