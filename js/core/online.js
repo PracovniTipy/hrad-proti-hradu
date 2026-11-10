@@ -551,6 +551,7 @@
       else if (d.k === 'ab' && GameData.abilities[d.a]) run(() => b.useAbility(r.team, d.a));
       else if (d.k === 'fm' && /^(utok|formace|ustup)$/.test(d.m)) { b._forceFm = true; b.setFormation(r.team, d.m, d.x == null ? null : +d.x); b._forceFm = false; }
       else if (d.k === 'q') this.gone[d.p] = true;
+      else if (this.onCtl) this.onCtl(d, r);
     }
     _flush() {
       const b = this.b, u = [];
@@ -603,8 +604,9 @@
         const id = U[i], x = map.get(id); seen.add(id);
         if (!x) continue;
         const hx = this.mx(U[i + 1]), hy = U[i + 2], dx = hx - x.x;
-        if (Math.abs(dx) > 90) x.x = hx; else x.x += dx * 0.4;
-        x.y += (hy - x.y) * 0.4;
+        if (x === b.hero) { if (Math.abs(dx) > 140) x.x = hx; else x.x += dx * 0.08; x.y += (hy - x.y) * 0.08; }   // můj voják: vlastní předpověď, jen jemná korekce
+        else { if (Math.abs(dx) > 90) x.x = hx; else x.x += dx * 0.4;
+        x.y += (hy - x.y) * 0.4; }
         if (!x.dead) x.hp = Math.min(x.maxHp, U[i + 3]);
         if (U[i + 4] && !x.dead) this._kill(x);
       }

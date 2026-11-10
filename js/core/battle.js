@@ -195,7 +195,7 @@
         if (drag.sel) { const w = toWorld(e.clientX, e.clientY); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] }; }
         // podržení prstu = začátek výběru oddílu
         clearTimeout(this._lp);
-        if (!drag.sel && !this.hero && !this.net) this._lp = setTimeout(() => {
+        if (!drag.sel && !this.hero) this._lp = setTimeout(() => {
           if (!drag || drag.moved || this.over) return;
           drag.sel = true;
           const w = toWorld(drag.x, drag.y); this.selRect = { x0: w[0], y0: w[1], x1: w[0], y1: w[1] };
@@ -230,7 +230,7 @@
           const wx = this.cam.x + (e.clientX - r.left) / this.cam.scale;
           const wy = (this.H - this.cam.viewH) + (e.clientY - r.top) / this.cam.scale;
           const u = this.unitAt(wx, wy);
-          if (u && !this.net && u !== this.hero) this.takeControl(u);
+          if (u && u !== this.hero) this.takeControl(u);
           else if (this.squad && this.active === 'squad') this.setSquad('formace', wx);
           else {
             // rozkaz „sem“: armáda (bez vojáka, kterého ovládáš) jde na místo klepnutí
@@ -635,7 +635,7 @@
       const x0 = Math.min(r.x0, r.x1) - 14, x1 = Math.max(r.x0, r.x1) + 14;
       const y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);
       const wide = (x1 - x0) < 40;   // jen klepnutí → vezme vojáky v okolí
-      const pick = this.units.filter(u => u.team === 'player' && !u.dead && !u.controlled &&
+      const pick = this.units.filter(u => u.team === 'player' && !u.dead && !u.controlled && !(this.net && u.owner && u.owner !== this.net.me) &&
         (wide ? Math.abs(u.x - r.x0) < 90 : (u.x >= x0 && u.x <= x1 && u.y - 90 * US() <= y1 + 10 && u.y >= y0 - 10)));
       this.setSelectMode(false);
       if (!pick.length) return;
@@ -670,6 +670,7 @@
       let best = null, bd = 1e9;
       for (const u of this.units) {
         if (u.team !== 'player' || u.dead) continue;
+        if (this.net && u.owner && u.owner !== this.net.me) continue;   // online jen vlastní vojáci
         const dx = Math.abs(u.x - wx);
         if (dx > 34 * US() || wy < u.y - 100 * US() || wy > u.y + 20) continue;
         if (dx < bd) { bd = dx; best = u; }
@@ -725,12 +726,12 @@
         .map(e => ({ e, d: (e.x - u.x) * f }))
         .filter(o => o.d > -12 && o.d <= reach && (u.def.ranged || Math.abs(o.e.y - u.y) < 46))
         .sort((a, b) => a.d - b.d);
-      const foeCastle = this.side.enemy.castle;
-      const castleD = (foeCastle.front - u.x) * f;
+      const foeCastle = this.side[u.team === 'player' ? 'enemy' : 'player'].castle;
+      const castleD = (foeCastle.front - u.x) * f, fwd = u.team === 'player' ? 1 : -1;
       if (u.def.ranged) {
         const ox = u.x + f * 30 * US(), oy = u.y - 47 * US();
         if (foes.length) this._shoot(u.team, ox, oy, foes[0].e, dmg * this._bonus(u, foes[0].e), u.def.projectileSpeed, u);
-        else if (f === 1 && castleD <= reach) this._shoot(u.team, ox, oy, null, dmg, u.def.projectileSpeed, u, foeCastle);
+        else if (f === fwd && castleD <= reach) this._shoot(u.team, ox, oy, null, dmg, u.def.projectileSpeed, u, foeCastle);
         else {
           const tx = u.x + f * reach, ty = u.y - 10;
           this.projectiles.push({ team: u.team, x0: ox, y0: oy, tx, ty, target: null, castle: null, dmg: 0, from: u, t: 0, dur: reach / u.def.projectileSpeed, arc: reach * 0.2, done: false });
@@ -738,7 +739,7 @@
         return;
       }
       if (foes.length) foes.slice(0, 3).forEach(o => this._damage(o.e, dmg * this._bonus(u, o.e), u));
-      else if (f === 1 && castleD <= reach) this._damageCastle(foeCastle, dmg, u);
+      else if (f === fwd && castleD <= reach) this._damageCastle(foeCastle, dmg, u);
       else this._sparks(u.x + f * 30, u.y - 40, '#ffffff', 2);
     }
 
@@ -957,6 +958,7 @@
         }
         const slowK = (u.slowUntil > this.time ? 0.5 : 1) * ((this.side[u.team].hornUntil || 0) > this.time ? 1.3 : 1);
         if (u === this.hero) { this._updateHero(u, dt); continue; }
+        if (u.rctl && this.rctrl) { const keep = this.ctrl; this.ctrl = this.rctrl[u.rctl] || { mx: 0, my: 0 }; try { this._updateHero(u, dt); } finally { this.ctrl = keep; } continue; }
         if (u.gen && this._updateGeneral) { this._updateGeneral(u, dt, slowK); continue; }
         if (u.stunUntil > this.time) { u.moving = false; continue; }
         const foeTeam = u.team === 'player' ? 'enemy' : 'player';
