@@ -1187,7 +1187,7 @@
       for (const c of this.clouds) {
         this._abGate = c.gate || null;
         c.tick -= dt;
-        if (c.tick <= 0) { c.tick = 0.5; for (const e of this.units) if (e.team !== (c.team || 'player') && !e.dead && Math.abs(e.x - c.x) < c.r) this._damage(e, c.dps * 0.5, null); }
+        if (c.tick <= 0) { c.tick = 0.5; let n = 0; for (const e of this.units) if (e.team !== (c.team || 'player') && !e.dead && Math.abs(e.x - c.x) < c.r) { if (c.cap && n >= c.cap) break; n++; this._damage(e, c.dps * 0.5, null); } }
       }
       this.clouds = this.clouds.filter(c => c.until > this.time);
       this._abGate = null;
@@ -1661,9 +1661,11 @@
       });
     }
     _catImpact(p) {
-      const t = this.time, x = p.tx, y = p.ty, dmg = p.dmg;
+      // katapulty: o 60 % slabší, jedna koule zasáhne nejvýš 3 vojáky (blesk a jed 4)
+      const isCat = p.kind === 'cat', CAP = isCat ? (p.el === 'blesk' || p.el === 'jed' ? 4 : 3) : Infinity;
+      const t = this.time, x = p.tx, y = p.ty, dmg = p.dmg * (isCat ? 0.4 : 1);
       const foeT = p.team === 'player' ? 'enemy' : 'player';
-      const near = r => this._range(foeT, x - r, x + r).filter(e => Math.hypot(e.x - x, (e.y - y) * 1.5) < r);
+      const near = r => { const a = this._range(foeT, x - r, x + r).filter(e => Math.hypot(e.x - x, (e.y - y) * 1.5) < r); return a.length > CAP ? a.sort((m, n) => Math.hypot(m.x - x, m.y - y) - Math.hypot(n.x - x, n.y - y)).slice(0, CAP) : a; };
       const E = GameData.catapultEl(p.el);
       const burst = (n, col) => { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 180; this.particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 80, g: 300, t: 0, life: 0.6, r: 2 + Math.random() * 3, color: col }); } };
       const S = p.big ? 140 : 62;
@@ -1702,7 +1704,7 @@
         burst(24, '#7fc0ff'); near(115).forEach(e => { if (this._damage(e, dmg * 0.7, null) === false) return; if (!e.def.boss) { e.x = p.team === 'player' ? Math.min(C().enemyFront - 20, e.x + 70) : Math.max(C().playerFront + 20, e.x - 70); e.slotX = null; } });
       } else if (p.el === 'jed') {
         burst(10, '#9be07a'); near(90).forEach(e => this._damage(e, dmg * 0.5, null));
-        this.clouds.push({ team: p.team, x, y, r: 105, until: t + (p.team === 'player' && !p.from ? 5 : 4), dps: dmg * 0.3, tick: 0.2 });
+        this.clouds.push({ team: p.team, x, y, r: 105, until: t + (p.team === 'player' && !p.from ? 5 : 4), dps: dmg * 0.3, tick: 0.2, cap: isCat ? CAP : 0 });
       }
     }
 
