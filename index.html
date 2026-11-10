@@ -18,30 +18,64 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style id="ldCss">
-#ld{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;overflow:hidden;
-background:radial-gradient(ellipse at 50% 118%,#6b3312 0%,#34183a 36%,#0d121f 72%),#0d121f;color:#ffe6a8;font-family:Cinzel,Georgia,serif;transition:opacity .5s}
-#ld.out{opacity:0;pointer-events:none}
-#ld .st{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff8,transparent),radial-gradient(1px 1px at 33% 9%,#fff9,transparent),radial-gradient(1.5px 1.5px at 58% 22%,#fff7,transparent),radial-gradient(1px 1px at 76% 12%,#fffa,transparent),radial-gradient(1.5px 1.5px at 90% 30%,#fff6,transparent),radial-gradient(1px 1px at 22% 35%,#fff6,transparent),radial-gradient(1px 1px at 68% 40%,#fff5,transparent),radial-gradient(2px 2px at 45% 14%,#fff7,transparent);animation:ldTw 3s ease-in-out infinite alternate}
-#ld .gnd{position:absolute;left:0;right:0;bottom:0;height:26vh;background:radial-gradient(130% 170% at 50% 175%,#000c 55%,transparent 75%)}
-#ld .em{position:absolute;bottom:-12px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle,#ffd98a,#ff7a2a 60%,transparent 75%);filter:blur(.4px);opacity:0;animation:ldEm linear infinite}
-#ld svg{width:min(44vw,290px,46vh);height:auto;filter:drop-shadow(0 0 26px rgba(255,160,60,.22)) drop-shadow(0 7px 18px #000b)}
-#ld .fl{transform-origin:0 50%;animation:ldFl 1.1s ease-in-out infinite alternate}
-#ld .w{animation:ldWin 2.3s ease-in-out infinite}
-#ld .w2{animation-delay:.8s}#ld .w3{animation-delay:1.5s}
-#ld h1{margin:0;font-size:clamp(26px,6vw,52px);font-weight:900;letter-spacing:.06em;background:linear-gradient(100deg,#e7a83a 0%,#fff3c4 28%,#e7a83a 46%,#9a5a14 72%,#e7a83a 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #0007);animation:ldShine 3.2s linear infinite}
-#ld .bar{width:min(58vw,350px);height:13px;border-radius:9px;padding:2px;background:#0009;box-shadow:0 0 0 1px #090c14,0 0 0 2.5px #c9993daa,0 0 0 4px #0008,inset 0 2px 5px #000c,0 0 18px #e7a83a33;overflow:hidden}
-#ld .bar i{display:block;height:100%;width:4%;border-radius:7px;background:repeating-linear-gradient(-55deg,#ffcf5e 0 9px,#f0a93c 9px 18px);background-size:26px 100%;box-shadow:inset 0 1.5px 0 #fff8,inset 0 -2px 0 #9a5a1480,0 0 12px #ffb24a;transition:width .3s;animation:ldFlow 1s linear infinite}
-#ld p{margin:0;font:600 14px/1.3 "Alegreya Sans",system-ui,sans-serif;color:#e8d6b0;opacity:.85}
-#ld .by{position:absolute;bottom:7px;font:700 11px "Alegreya Sans",system-ui,sans-serif;letter-spacing:.24em;color:#c9b38a88}
-#ld .sw{animation:ldSw 1.4s ease-in-out infinite}
-@keyframes ldFl{from{transform:skewY(-6deg) scaleX(.92)}to{transform:skewY(6deg) scaleX(1.05)}}
-@keyframes ldTw{from{opacity:.5}to{opacity:1}}
-@keyframes ldSw{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
-@keyframes ldWin{0%,100%{opacity:1}50%{opacity:.45}}
-@keyframes ldShine{to{background-position:-220% 0}}
-@keyframes ldFlow{to{background-position:26px 0}}
-@keyframes ldEm{0%{transform:translate(0,0) scale(1);opacity:0}8%{opacity:.9}100%{transform:translate(var(--dx),-108vh) scale(.25);opacity:0}}
-@media (prefers-reduced-motion: reduce){#ld .em,#ld .fl,#ld .sw,#ld h1{animation:none}}
+#ld{position:fixed;inset:0;z-index:99999;overflow:hidden;background:#0b0f1e;color:#ffe6a8;font-family:Cinzel,Georgia,serif;transition:opacity .6s,transform .6s}
+#ld.out{opacity:0;transform:scale(1.04);pointer-events:none}
+#ld .ldscn{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+#ld .tw{animation:ldTw 2.6s ease-in-out infinite alternate}
+#ld .tw2{animation-delay:1.3s}
+#ld .moonG{animation:ldMoon 6s ease-in-out infinite alternate;transform-origin:1290px 250px}
+#ld .fogA{animation:ldFog 28s linear infinite}
+#ld .fogB{animation:ldFog 40s linear infinite reverse}
+#ld .flag{transform-box:fill-box;transform-origin:0 50%;animation:ldFl 1.2s ease-in-out infinite alternate}
+#ld .flag.b{animation-duration:1.5s}
+#ld .win{animation:ldWin 2.4s ease-in-out infinite}
+#ld .win.d1{animation-delay:.7s}#ld .win.d2{animation-delay:1.4s}#ld .win.d3{animation-delay:2s}
+#ld .drag{animation:ldDrag 22s linear infinite}
+#ld .wing{transform-box:fill-box;transform-origin:50% 100%;animation:ldWing .6s ease-in-out infinite alternate}
+#ld .bird{animation:ldBird 16s linear infinite}
+#ld .bird.b2{animation-duration:19s;animation-delay:-7s}
+#ld .torchL{animation:ldMarchL 9s linear infinite}
+#ld .torchR{animation:ldMarchR 9s linear infinite}
+#ld .ui{position:absolute;z-index:2;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.6vh,14px);padding:0 16px;text-align:center}
+#ld .ldemb{background:none!important;box-shadow:none!important;border:0!important;width:clamp(64px,16vh,118px);height:auto;filter:drop-shadow(0 6px 16px #000c) drop-shadow(0 0 22px rgba(255,190,80,.35));animation:ldEmb 1s cubic-bezier(.3,1.5,.5,1) both}
+#ld .ldemb .sh{animation:ldShine 3.4s ease-in-out infinite}
+#ld h1{margin:0;font-size:clamp(28px,7.2vh,64px);font-weight:900;letter-spacing:.07em;line-height:1;
+ background:linear-gradient(100deg,#b8741c 0%,#ffe9a8 22%,#f3c45c 38%,#8a5410 58%,#f3c45c 78%,#fff3c4 100%);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 2px 0 #3a2205) drop-shadow(0 4px 10px #000c);animation:ldTitle 4s linear infinite,ldIn .9s .1s ease both}
+#ld .sub{font:700 clamp(10px,1.9vh,14px)/1 "Alegreya Sans",system-ui,sans-serif;letter-spacing:.42em;color:#e8cf98;opacity:.9;display:flex;align-items:center;gap:12px;animation:ldIn .9s .25s ease both}
+#ld .sub:before,#ld .sub:after{content:"";width:46px;height:1px;background:linear-gradient(90deg,transparent,#e8cf98)}
+#ld .sub:after{transform:scaleX(-1)}
+#ld .barW{position:relative;width:min(62vw,420px);margin-top:clamp(4px,1.4vh,12px);animation:ldIn .9s .35s ease both}
+#ld .bar{height:16px;border-radius:10px;padding:3px;background:linear-gradient(180deg,#0a0c12,#1a1e2a);
+ box-shadow:0 0 0 1.5px #07080c,0 0 0 3.5px #6d7487,0 0 0 4.5px #2a2f3c,0 0 0 6px #c9993d55,inset 0 2px 6px #000,0 8px 22px -6px #000c}
+#ld .bar i{position:relative;display:block;height:100%;width:3%;border-radius:7px;overflow:hidden;
+ background:linear-gradient(180deg,#fff0b8 0%,#f6c35b 45%,#d88a24 100%);box-shadow:0 0 14px #ffb24a,inset 0 -2px 0 #9a5a1499;transition:width .35s ease}
+#ld .bar i:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent 0 8px,rgba(255,255,255,.28) 8px 14px);background-size:30px 100%;animation:ldFlow .9s linear infinite}
+#ld .bar i:before{content:"";position:absolute;right:-2px;top:-6px;width:16px;height:22px;background:radial-gradient(closest-side,#fff,#ffd27a 40%,transparent);filter:blur(1px)}
+#ld .rv{position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffeab0,#d9a43c 45%,#6e4a10);box-shadow:0 0 0 1.5px #140d04,0 2px 4px #000a}
+#ld .rv.l{left:-10px}#ld .rv.r{right:-10px}
+#ld .pct{position:absolute;right:0;top:-20px;font:800 12px "Alegreya Sans",system-ui,sans-serif;color:#f3c45c;letter-spacing:.06em}
+#ld .tip{min-height:2.6em;max-width:min(80vw,520px);font:600 clamp(12px,2vh,15px)/1.35 "Alegreya Sans",system-ui,sans-serif;color:#efe2c4;transition:opacity .4s;animation:ldIn .9s .45s ease both}
+#ld .tip b{color:#f3c45c;font-weight:800}
+#ld .by{position:absolute;z-index:2;bottom:10px;left:0;right:0;text-align:center;font:800 10px "Alegreya Sans",system-ui,sans-serif;letter-spacing:.34em;color:#c9b38a99}
+#ld .em{position:absolute;z-index:1;bottom:-10px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle,#ffe2a0,#ff7a2a 60%,transparent 75%);opacity:0;animation:ldEm linear infinite;pointer-events:none}
+@keyframes ldTw{from{opacity:.25}to{opacity:1}}
+@keyframes ldMoon{from{opacity:.75}to{opacity:1}}
+@keyframes ldFog{from{transform:translateX(0)}to{transform:translateX(-1600px)}}
+@keyframes ldFl{from{transform:skewY(-7deg) scaleX(.9)}to{transform:skewY(7deg) scaleX(1.06)}}
+@keyframes ldWin{0%,100%{opacity:1}45%{opacity:.55}60%{opacity:.9}}
+@keyframes ldDrag{0%{transform:translate(1800px,40px) scale(.9)}100%{transform:translate(-500px,120px) scale(.9)}}
+@keyframes ldWing{from{transform:scaleY(1)}to{transform:scaleY(-.55)}}
+@keyframes ldBird{0%{transform:translate(-200px,0)}100%{transform:translate(1900px,-60px)}}
+@keyframes ldMarchL{0%{transform:translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(260px);opacity:0}}
+@keyframes ldMarchR{0%{transform:translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(-260px);opacity:0}}
+@keyframes ldEmb{from{transform:scale(.4) rotate(-14deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes ldShine{0%,60%{transform:translateX(-120px)}100%{transform:translateX(140px)}}
+@keyframes ldTitle{to{background-position:-240% 0}}
+@keyframes ldIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ldFlow{to{background-position:30px 0}}
+@keyframes ldEm{0%{transform:translate(0,0) scale(1);opacity:0}10%{opacity:.95}100%{transform:translate(var(--dx),-100vh) scale(.2);opacity:0}}
+@media (prefers-reduced-motion: reduce){#ld *{animation:none!important}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,19 +90,104 @@ background:radial-gradient(ellipse at 50% 118%,#6b3312 0%,#34183a 36%,#0d121f 72
 <link rel="stylesheet" href="css/klany.css">
 </head>
 <body>
-<div id="ld" aria-label="Načítání"><div class="st"></div><div class="gnd"></div>
-<svg viewBox="0 0 200 140" aria-hidden="true"><defs><linearGradient id="ldg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6f80"/><stop offset="1" stop-color="#2b2d38"/></linearGradient></defs>
-<path class="fl" d="M100 6v0l26 7-26 7z" fill="#d23a2a"/><rect x="99" y="4" width="2.4" height="30" fill="#c9b38a"/>
-<path fill="url(#ldg)" stroke="#16171e" stroke-width="2" d="M20 136V62h-6V48h10v8h8v-8h10v8h8v-8h10v14h-6v14h18V44h-6V30h10v8h8v-8h12v8h8v-8h10v14h-6v32h18V62h-6V48h10v8h8v-8h10v8h8v-8h10v14h-6v74z"/>
-<path d="M88 136v-24a12 12 0 0 1 24 0v24z" fill="#120c08"/><rect class="w" x="95" y="58" width="10" height="16" rx="5" fill="#ffb84a"/><rect class="w w2" x="34" y="84" width="8" height="12" rx="4" fill="#ffb84a"/><rect class="w w3" x="158" y="84" width="8" height="12" rx="4" fill="#ffb84a"/>
+<div id="ld" aria-label="Načítání">
+<svg class="ldscn" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<defs>
+<linearGradient id="ldSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070a18"/><stop offset=".45" stop-color="#1b1640"/><stop offset=".72" stop-color="#4a2348"/><stop offset=".9" stop-color="#a2452e"/><stop offset="1" stop-color="#e0843a"/></linearGradient>
+<radialGradient id="ldMoonG" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6dc" stop-opacity=".55"/><stop offset=".3" stop-color="#ffe2a8" stop-opacity=".18"/><stop offset="1" stop-color="#ffe2a8" stop-opacity="0"/></radialGradient>
+<radialGradient id="ldMoonF" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#fffaf0"/><stop offset=".7" stop-color="#f3e3bf"/><stop offset="1" stop-color="#d8c296"/></radialGradient>
+<linearGradient id="ldMtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a55"/><stop offset="1" stop-color="#22193a"/></linearGradient>
+<linearGradient id="ldMtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241a36"/><stop offset="1" stop-color="#140f22"/></linearGradient>
+<linearGradient id="ldStone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c2a3c"/><stop offset=".55" stop-color="#3f3c52"/><stop offset="1" stop-color="#1e1c2a"/></linearGradient>
+<radialGradient id="ldGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb04a" stop-opacity=".55"/><stop offset="1" stop-color="#ff7a2a" stop-opacity="0"/></radialGradient>
+<linearGradient id="ldFogG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9a6d6" stop-opacity="0"/><stop offset=".5" stop-color="#b9a6d6" stop-opacity=".16"/><stop offset="1" stop-color="#b9a6d6" stop-opacity="0"/></linearGradient>
+<g id="ldTorch"><circle r="9" fill="url(#ldGlow)"/><circle r="2.2" fill="#ffd27a"/></g>
+</defs>
+<rect width="1600" height="900" fill="url(#ldSky)"/>
+<!-- hvězdy -->
+<g fill="#fff">
+<circle class="tw" cx="120" cy="80" r="1.6"/><circle class="tw tw2" cx="260" cy="150" r="1.2"/><circle class="tw" cx="410" cy="60" r="1.8"/><circle class="tw tw2" cx="560" cy="120" r="1.1"/><circle class="tw" cx="700" cy="40" r="1.4"/><circle class="tw tw2" cx="860" cy="100" r="1.7"/><circle class="tw" cx="980" cy="50" r="1.2"/><circle class="tw tw2" cx="1110" cy="140" r="1.5"/><circle class="tw" cx="1460" cy="70" r="1.6"/><circle class="tw tw2" cx="1540" cy="200" r="1.2"/><circle class="tw" cx="60" cy="230" r="1.1"/><circle class="tw tw2" cx="340" cy="250" r="1.3"/><circle class="tw" cx="760" cy="210" r="1"/><circle class="tw tw2" cx="1010" cy="240" r="1.1"/><circle class="tw" cx="1200" cy="30" r="1.3"/>
+</g>
+<!-- měsíc -->
+<g class="moonG"><circle cx="1290" cy="250" r="190" fill="url(#ldMoonG)"/></g>
+<circle cx="1290" cy="250" r="62" fill="url(#ldMoonF)"/>
+<g fill="#d6c093" opacity=".55"><circle cx="1272" cy="230" r="10"/><circle cx="1310" cy="268" r="7"/><circle cx="1300" cy="220" r="4.5"/><circle cx="1262" cy="270" r="5"/></g>
+<!-- drak letící přes nebe -->
+<g class="drag"><g fill="#120b1a">
+<path d="M0 30c30-6 60-4 92 4 14 3 26 0 36-8l8 6c-10 12-26 18-44 16-30-3-60-4-92-18z"/>
+<path class="wing" d="M40 30c6-30 26-48 52-52-8 16-10 30-6 46z"/>
+<path d="M128 22l18-6-6 10z"/><path d="M0 30l-34 10 22-2-16 14 30-14z"/>
+</g></g>
+<!-- ptáci -->
+<g class="bird" fill="none" stroke="#130d1c" stroke-width="3" stroke-linecap="round"><path d="M0 300q10-10 20 0q10-10 20 0"/><path d="M50 280q7-7 14 0q7-7 14 0"/></g>
+<g class="bird b2" fill="none" stroke="#130d1c" stroke-width="2.5" stroke-linecap="round"><path d="M0 220q8-8 16 0q8-8 16 0"/></g>
+<!-- vzdálené hory -->
+<path fill="url(#ldMtA)" d="M0 560L120 470 210 520 330 410 450 500 560 430 690 520 800 450 930 530 1050 440 1180 520 1300 430 1420 510 1520 460 1600 500V900H0z"/>
+<path fill="#fff" opacity=".08" d="M330 410l-40 34 22-6 18 12 16-14 24 8zM1050 440l-36 30 20-4 16 10 14-12 22 6zM1300 430l-34 28 20-4 14 10 14-12 20 6z"/>
+<rect y="470" width="1600" height="120" fill="url(#ldFogG)" class="fogA"/>
+<rect x="1600" y="470" width="1600" height="120" fill="url(#ldFogG)" class="fogA"/>
+<!-- údolí: záře bitvy a pochodující pochodně -->
+<ellipse cx="800" cy="640" rx="420" ry="60" fill="url(#ldGlow)" opacity=".7"/>
+<g><use href="#ldTorch" class="torchL" x="470" y="648"/><use href="#ldTorch" class="torchL" x="440" y="656" style="animation-delay:-3s"/><use href="#ldTorch" class="torchL" x="500" y="660" style="animation-delay:-6s"/>
+<use href="#ldTorch" class="torchR" x="1130" y="648"/><use href="#ldTorch" class="torchR" x="1160" y="656" style="animation-delay:-4s"/><use href="#ldTorch" class="torchR" x="1100" y="662" style="animation-delay:-7s"/></g>
+<!-- kopce s hrady -->
+<path fill="url(#ldMtB)" d="M0 900V610C120 560 260 545 400 575 480 592 540 640 600 700 700 740 900 740 1000 700 1060 640 1120 592 1200 575 1340 545 1480 560 1600 610V900z"/>
+<!-- LEVÝ HRAD (modrý) -->
+<g transform="translate(150 380)">
+<path fill="url(#ldStone)" stroke="#0c0b14" stroke-width="3" d="M20 220V90H8V64h16v12h14V64h16v12h14V64h16v26H72v40h46V40H104V12h18v14h16V12h18v14h16V12h18v28h-14v90h46V90h-12V64h16v12h14V64h16v12h14V64h16v26h-12v130z"/>
+<path fill="#09070f" d="M138 220v-46a22 22 0 0 1 44 0v46z"/>
+<rect class="win" x="152" y="70" width="14" height="24" rx="7" fill="#ffb84a"/><rect class="win d1" x="34" y="120" width="11" height="18" rx="5.5" fill="#ffb84a"/><rect class="win d2" x="270" y="120" width="11" height="18" rx="5.5" fill="#ffb84a"/><rect class="win d3" x="112" y="150" width="9" height="14" rx="4.5" fill="#ffcf7a"/>
+<rect x="158" y="-30" width="4" height="44" fill="#c9b38a"/><path class="flag" d="M162 -28h42l-10 11 10 11h-42z" fill="#2f6fd6"/>
+<rect x="40" y="10" width="3" height="56" fill="#c9b38a"/><path class="flag b" d="M43 12h26l-6 8 6 8h-26z" fill="#2f6fd6"/>
+<rect x="276" y="10" width="3" height="56" fill="#c9b38a"/><path class="flag b" d="M279 12h26l-6 8 6 8h-26z" fill="#2f6fd6"/>
+</g>
+<!-- PRAVÝ HRAD (rudý) -->
+<g transform="translate(1450 380) scale(-1 1)">
+<path fill="url(#ldStone)" stroke="#0c0b14" stroke-width="3" d="M20 220V90H8V64h16v12h14V64h16v12h14V64h16v26H72v40h46V40H104V12h18v14h16V12h18v14h16V12h18v28h-14v90h46V90h-12V64h16v12h14V64h16v12h14V64h16v26h-12v130z"/>
+<path fill="#09070f" d="M138 220v-46a22 22 0 0 1 44 0v46z"/>
+<rect class="win d2" x="152" y="70" width="14" height="24" rx="7" fill="#ffb84a"/><rect class="win d3" x="34" y="120" width="11" height="18" rx="5.5" fill="#ffb84a"/><rect class="win" x="270" y="120" width="11" height="18" rx="5.5" fill="#ffb84a"/><rect class="win d1" x="112" y="150" width="9" height="14" rx="4.5" fill="#ffcf7a"/>
+<rect x="158" y="-30" width="4" height="44" fill="#c9b38a"/><path class="flag" d="M162 -28h42l-10 11 10 11h-42z" fill="#d23a2a"/>
+<rect x="40" y="10" width="3" height="56" fill="#c9b38a"/><path class="flag b" d="M43 12h26l-6 8 6 8h-26z" fill="#d23a2a"/>
+<rect x="276" y="10" width="3" height="56" fill="#c9b38a"/><path class="flag b" d="M279 12h26l-6 8 6 8h-26z" fill="#d23a2a"/>
+</g>
+<!-- popředí -->
+<path fill="#07050c" d="M0 900V790c90-30 180-40 260-28 60 10 100 40 160 44 90 6 160-40 380-40s290 46 380 40c60-4 100-34 160-44 80-12 170-2 260 28V900z"/>
+<rect y="700" width="1600" height="140" fill="url(#ldFogG)" class="fogB"/>
+<rect x="1600" y="700" width="1600" height="140" fill="url(#ldFogG)" class="fogB"/>
+<rect width="1600" height="900" fill="url(#ldVig)"/>
+<radialGradient id="ldVig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
 </svg>
-<h1>Castle WARS</h1><div class="bar"><i id="ldBar"></i></div><p id="ldTip"><span class="sw" style="display:inline-block">⚔️</span> Připravujeme bitvu…</p><div class="by">BROSWARS STUDIO</div></div>
-<script>(function(){var b=document.getElementById('ldBar'),tp=document.getElementById('ldTip'),p=4,cs=/^(cs|sk)/i.test(navigator.language||'');
-if(!cs)tp.lastChild.nodeValue=' Preparing the battle…';
-var iv=setInterval(function(){p+= (92-p)*0.06;b.style.width=p+'%'},120);
-(function(){var d=document.getElementById('ld');for(var i=0;i<16;i++){var e=document.createElement('i');e.className='em';e.style.left=(4+Math.random()*92)+'%';e.style.setProperty('--dx',(Math.random()*120-60)+'px');e.style.animationDuration=(4.5+Math.random()*5)+'s';e.style.animationDelay=(Math.random()*5)+'s';var k=.5+Math.random()*1.2;e.style.width=5*k+'px';e.style.height=5*k+'px';d.appendChild(e)}})();
-window.__ldDone=function(){clearInterval(iv);b.style.width='100%';var d=document.getElementById('ld');if(!d||d._x)return;d._x=1;setTimeout(function(){d.classList.add('out');setTimeout(function(){d.remove()},600)},250)};
-window.addEventListener('load',function(){setTimeout(window.__ldDone,150)});setTimeout(function(){window.__ldDone&&window.__ldDone()},8000);window.addEventListener('pageshow',function(){setTimeout(function(){window.__ldDone&&window.__ldDone()},2500)})})()</script>
+<div class="ui">
+<svg class="ldemb" viewBox="-4 -4 128 136" aria-hidden="true"><defs>
+<linearGradient id="ldGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".45" stop-color="#f3c45c"/><stop offset="1" stop-color="#a8681a"/></linearGradient>
+<linearGradient id="ldSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6fb"/><stop offset=".5" stop-color="#a9b2c4"/><stop offset="1" stop-color="#5f687c"/></linearGradient>
+<clipPath id="ldShC"><path d="M60 8l44 14v34c0 32-20 52-44 66C36 108 16 88 16 56V22z"/></clipPath></defs>
+<g stroke="#140d04" stroke-width="3" stroke-linejoin="round">
+<path d="M12 118L110 2l6 6-98 116z" fill="url(#ldSteel)"/><path d="M108 118L10 2l-6 6 98 116z" fill="url(#ldSteel)"/>
+<path d="M60 8l44 14v34c0 32-20 52-44 66C36 108 16 88 16 56V22z" fill="#1f3c7a"/>
+<path d="M60 16l36 11v29c0 26-16 43-36 55C40 99 24 82 24 56V27z" fill="#2f5cb0" stroke-width="2"/>
+<path d="M60 8l44 14v34c0 32-20 52-44 66C36 108 16 88 16 56V22z" fill="none" stroke="url(#ldGold)" stroke-width="5"/>
+<path d="M60 34l6 13 14 1-11 9 4 14-13-8-13 8 4-14-11-9 14-1z" fill="url(#ldGold)" stroke-width="2"/>
+<path d="M8 120l14-14 6 6-14 14zM112 120l-14-14-6 6 14 14z" fill="url(#ldGold)" stroke-width="2"/>
+</g>
+<g clip-path="url(#ldShC)"><rect class="sh" x="0" y="-10" width="26" height="150" fill="#fff" opacity=".28" transform="skewX(-18)"/></g>
+</svg>
+<h1>Castle WARS</h1>
+<div class="sub" id="ldSub">VÁLKA HRADŮ</div>
+<div class="barW"><span class="pct" id="ldPct">0 %</span><div class="bar"><i id="ldBar"></i></div><span class="rv l"></span><span class="rv r"></span></div>
+<p class="tip" id="ldTip"></p>
+</div>
+<div class="by">BROSWARS STUDIO</div>
+</div>
+<script>(function(){var d=document.getElementById('ld'),b=document.getElementById('ldBar'),pc=document.getElementById('ldPct'),tp=document.getElementById('ldTip'),p=3,cs=/^(cs|sk)/i.test(navigator.language||'');
+var T=cs?['<b>Kopiníci</b> zastaví jízdu – postav je dopředu.','<b>Lučištníci</b> střílí přes hlavy vlastních vojáků.','Rozkaz <b>Hradby</b> stáhne armádu k obraně brány.','<b>Speciální útoky</b> nabíjíš mincemi – šetři na Bouři bohů.','Vylepši <b>Pokladnici</b> a budeš mít víc mincí v boji.','Hvězdy získáš, když ti zůstane co nejvíc z hradu.','Mazlíček ti v bitvě sbírá mince a pomáhá.']:['<b>Spearmen</b> stop cavalry – put them up front.','<b>Archers</b> shoot over your own soldiers.','The <b>Walls</b> order pulls your army back to guard the gate.','<b>Special attacks</b> cost coins – save up for the God Storm.','Upgrade the <b>Treasury</b> for more coins in battle.','Keep more of your castle standing to earn stars.','Your pet collects coins and helps in battle.'];
+if(!cs)document.getElementById('ldSub').textContent='WAR OF CASTLES';
+var ti=Math.floor(Math.random()*T.length);tp.innerHTML=T[ti];
+var tv=setInterval(function(){tp.style.opacity=0;setTimeout(function(){ti=(ti+1)%T.length;tp.innerHTML=T[ti];tp.style.opacity=1},400)},2800);
+var iv=setInterval(function(){p+=(93-p)*0.05;b.style.width=p+'%';pc.textContent=Math.round(p)+' %'},110);
+for(var i=0;i<18;i++){var e=document.createElement('i');e.className='em';e.style.left=(3+Math.random()*94)+'%';e.style.setProperty('--dx',(Math.random()*140-70)+'px');e.style.animationDuration=(5+Math.random()*6)+'s';e.style.animationDelay=(Math.random()*6)+'s';var k=.5+Math.random()*1.3;e.style.width=5*k+'px';e.style.height=5*k+'px';d.appendChild(e)}
+window.__ldDone=function(){clearInterval(iv);b.style.width='100%';pc.textContent='100 %';var d=document.getElementById('ld');if(!d||d._x)return;d._x=1;setTimeout(function(){clearInterval(tv);d.classList.add('out');setTimeout(function(){d.remove()},650)},350)};
+window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setTimeout(function(){window.__ldDone&&window.__ldDone()},8000);window.addEventListener('pageshow',function(){setTimeout(function(){window.__ldDone&&window.__ldDone()},2500)})})()</script>
   <div id="rotate" aria-live="polite"><div class="rot-phone"><i></i></div><b data-i18n="rotate">Otoč zařízení na šířku</b></div>
 <div id="app">
   <header id="topbar">
