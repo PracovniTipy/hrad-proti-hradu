@@ -460,6 +460,7 @@
         Zvuk.play('skill', 0.7); setTimeout(() => Zvuk.play(snd, 1), 120);
       }
       const tx = frontX();
+      this._abInfo = { a, team, tx, midY, dir };
       // OMEZENÍ SÍLY: útok zasáhne naplno jen přední řady nepřátel (2 řady, nad 50 vojáků 3 řady,
       // nad 100 vojáků 3 řady + 2 další řady lehce) – žádný útok nezničí celou armádu
       const prevGate = this._abGate, lens = ['meteors', 'walls', 'tornados', 'projectiles', 'clouds'].map(k => (this[k] || []).length);
@@ -1690,6 +1691,7 @@
           const pts = [[px, py]];
           for (let k = 1; k < 6; k++) pts.push([px + (cur.x - px) * k / 6 + (Math.random() - 0.5) * 24, py + (cur.y - 40 - py) * k / 6 + (Math.random() - 0.5) * 18]);
           pts.push([cur.x, cur.y - 40]);
+          if (n && this.vfx.arc) this.vfx.arc(pts);
           this.vfx.lightning(cur.x, (this.H - this.cam.viewH) - 20, cur.y - 10);
           this._damage(cur, dmg * (n ? 0.75 : 1), null);
           px = cur.x; py = cur.y - 40;

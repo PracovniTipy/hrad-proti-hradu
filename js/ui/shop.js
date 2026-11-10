@@ -136,6 +136,13 @@
       got.push({ kind: 'all', a: nA, w: nW });
     }
     if (give.unlimited) { save.unlimited = true; got.push({ kind: 'gold', n: 9999999 }, { kind: 'gems', n: 9999999 }); App._unl && App._unl(); }
+    if (give.story) {   // celý příběh dohraný – nic se nemaže, jen doplní
+      const H = GameData.campaignHelpers, C = save.campaign;
+      C.cleared = C.cleared || {}; C.stars = C.stars || {};
+      let n = 0;
+      H.allLevels().forEach(l => { if (!C.cleared[l.id]) { C.cleared[l.id] = true; n++; } if (!C.stars[l.id]) C.stars[l.id] = 3; });
+      got.push({ kind: 'story', n });
+    }
     if (give.buff) { save.codeBuff = Math.max(save.codeBuff || 0, give.buff); got.push({ kind: 'buff', n: give.buff }); }
     if (give.gold) { save.gold += give.gold; got.push({ kind: 'gold', n: give.gold }); }
     if (give.gems) { save.gems += give.gems; got.push({ kind: 'gems', n: give.gems }); }
@@ -207,6 +214,7 @@
       if (r.kind === 'skill') { const k = GameData.skillById(r.id); return `<div class="rw"><span class="rw-ico">${GameData.skillIcon ? GameData.skillIcon(k) : '⚡'}</span><b>${esc(k.name)}</b><small>${t('rw_skill')}</small></div>`; }
       if (r.kind === 'skills') return `<div class="rw"><span class="rw-ico">⚡</span><b>${t('rw_all_skills', { n: r.n })}</b><small>${t('rw_skill')}</small></div>`;
       if (r.kind === 'all') return `<div class="rw"><span class="rw-ico">👑</span><b>${I18N.L('Úplně všechno ze hry', 'Everything in the game')}</b><small>${r.a} ${I18N.L('zbrojí', 'armors')} · ${r.w} ${I18N.L('zbraní', 'weapons')}</small></div>`;
+      if (r.kind === 'story') return `<div class="rw"><span class="rw-ico">📜</span><b>${I18N.L('Celý příběh otevřen', 'Whole story unlocked')}</b><small>${I18N.L('samurajové i vikingové odemčeni', 'samurai and vikings unlocked')}</small></div>`;
       if (r.kind === 'buff') return `<div class="rw"><span class="rw-ico">💪</span><b>+${r.n} %</b><small>${I18N.L('síla a životy tvých vojáků (napořád)', 'your soldiers’ attack and HP (forever)')}</small></div>`;
       if (r.kind === 'big') return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${t('big_name')}</b><small>${t('big_short')}</small></div>`;
       if (r.kind === 'decor') { const d = GameData.castleCustom.decorations.find(x => x.id === r.id); return `<div class="rw"><span class="rw-ico">${ico('castle')}</span><b>${esc(d.name)}</b><small>${t('decor_word')}</small></div>`; }
