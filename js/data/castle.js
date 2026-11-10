@@ -52,7 +52,7 @@ GameData.calc = {
     return {
       castleHp: c.castleHp(b.hradby || 0),
       income: c.income(b.pokladnice || 0),
-      unitMult: c.unitMult(b.kasarna || 0),
+      unitMult: c.unitMult(b.kasarna || 0) * (1 + (save.codeBuff || 0) / 100),   // trvalý bonus z kódu
       towerDmg: c.towerDmg(b.vez || 0),
       maxCoins: Infinity,
       startCoins: c.startCoins(b.zbrojnice || 0),
