@@ -24,9 +24,9 @@
 (function () {
   const ADS = {
     /* true = Googlovy veřejné TESTOVACÍ reklamy (nic nevydělávají, ale nehrozí zablokování účtu) */
-    TEST: true,
-    appId: 'ca-app-pub-3940256099942544~3347511713',          // ID aplikace AdMob (musí sedět s AndroidManifestem)
-    rewardedId: 'ca-app-pub-3940256099942544/5224354917',     // reklamní jednotka „S odměnou“
+    TEST: false,
+    appId: 'ca-app-pub-8372177693491161~7297121142',          // ID aplikace AdMob (musí sedět s AndroidManifestem)
+    rewardedId: 'ca-app-pub-8372177693491161/8362790801',     // reklamní jednotka „S odměnou“
     testDevices: [],                                          // ID testovacích telefonů (z Logcatu), nepovinné
     maxAdContentRating: 'ParentalGuidance',                   // General | ParentalGuidance | Teen | MatureAudience
     /* produkty „bez reklam“ – kdo některý koupí, tlačítka reklam se mu už nezobrazí */
