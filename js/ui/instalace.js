@@ -46,6 +46,27 @@
     /* KARTA „Hraj na Androidu jako první“ – nábor testerů uzavřeného testu Google Play.
        Jen mimo nativní aplikaci pro Android (web, itch.io, Microsoft Store, počítač), ne na iPhonu
        a ne na herních portálech. Po zavření (×) se už neukáže. */
+    /* Po 5. vyhrané bitvě se jednou zeptá, jestli nechce být testerem na Google Play. */
+    askTester(App) {
+      const KEY = 'cw-gp-test-asked';
+      try { if (localStorage.getItem(KEY)) return; } catch (e) { return; }
+      const nativeAndroid = (() => { try { const C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform() && C.getPlatform && C.getPlatform() === 'android'); } catch (e) { return false; } })();
+      const wins = ((App.save && App.save.stats) || {}).wins || 0;
+      if (wins < 5 || nativeAndroid || window.CW_PORTAL || isIOS()) return;
+      const m = document.getElementById('modal');
+      if (m && !m.hidden) return;   // jiné okno má přednost, zeptáme se příště
+      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      const GROUP = 'https://groups.google.com/g/castlewars-testers';
+      const PLAY = 'https://play.google.com/apps/testing/cz.broswars.castlewars';
+      App.modal(`<h2>${L('Chceš hrát jako první na Androidu?', 'Want to play first on Android?')}</h2>
+        <p>${L('Vyhrál jsi už 5 bitev! 🎉 Pomoz nám dostat Castle WARS na Google Play – staň se testerem. Stačí 2 kliknutí a hru nech v telefonu aspoň 14 dní.', 'You have won 5 battles! 🎉 Help us bring Castle WARS to Google Play – become a tester. Just 2 taps, then keep the game on your phone for at least 14 days.')}</p>
+        <ol class="gp-steps" style="text-align:left">
+          <li><a href="${GROUP}" target="_blank" rel="noopener">${L('1. Přidej se do skupiny testerů', '1. Join the testers group')}</a></li>
+          <li><a href="${PLAY}" target="_blank" rel="noopener">${L('2. Nainstaluj z Google Play', '2. Install from Google Play')}</a></li>
+        </ol>
+        <div class="modal-actions"><button class="btn" data-close>${L('Teď ne', 'Not now')}</button><a class="btn btn-gold" href="${GROUP}" target="_blank" rel="noopener" data-gp>${L('Chci být tester', 'I want to test')}</a></div>`,
+        c => c.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { if (window.Stat) try { Stat.ev('gp_test_ask', {}); } catch (e) {} })));
+    },
     testBanner(App, el) {
       const KEY = 'cw-gp-test-skryto';
       let hidden = false;
