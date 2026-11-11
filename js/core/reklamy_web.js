@@ -30,6 +30,26 @@
         const S = window.CrazyGames && CrazyGames.SDK;
         if (S && S.init) S.init().then(() => {
           try { S.game.loadingStop(); } catch (e) {}
+          /* postup i v cloudu CrazyGames (Data Module) – nic se nemaže, jen zrcadlí */
+          try {
+            const D = S.data, K = 'hrad-proti-hradu-save-v1';
+            if (D && window.Save) {
+              const cloud = D.getItem(K);
+              let loc = null; try { loc = localStorage.getItem(K); } catch (e) {}
+              const lvl = t => { try { const o = JSON.parse(t); return (o.stats && (o.stats.wins || 0)) + (o.gold ? 1 : 0); } catch (e) { return -1; } };
+              if (cloud && (!loc || lvl(cloud) > lvl(loc))) {
+                try { Save.replace(JSON.parse(cloud), 'crazygames'); location.reload(); return; } catch (e) {}
+              }
+              const os = Save.save;
+              Save.save = function () { const r = os.apply(this, arguments); try { D.setItem(K, JSON.stringify(this.data)); } catch (e) {} return r; };
+              try { if (Save.data) D.setItem(K, JSON.stringify(Save.data)); } catch (e) {}
+            }
+          } catch (e) {}
+          /* ztlumení zvuku z nastavení CrazyGames */
+          try {
+            const mute = () => { try { const m = S.game.settings && S.game.settings.muteAudio; window.Reklamy && Reklamy._mute && Reklamy._mute(!!m); } catch (e) {} };
+            mute(); S.game.addSettingsChangeListener && S.game.addSettingsChangeListener(mute);
+          } catch (e) {}
           /* CrazyGames chce vědět, kdy se hraje (kvůli reklamám a statistikám) */
           const hook = () => {
             const A = window.App;
