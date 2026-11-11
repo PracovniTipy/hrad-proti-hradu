@@ -1,5 +1,5 @@
 /* Service worker: hra funguje i bez internetu (PWA). Při změně souborů zvyš VERZE. */
-const VERZE = 'hrad-v161';
+const VERZE = 'hrad-v162';
 const SOUBORY = ['./', './index.html', './css/fonts.css', './css/style.css', './css/ui-pro.css', './css/fonts-modern.css', './css/ui-modern.css', './css/vanoce.css','./manifest.webmanifest',
   './js/core/portal.js', './js/core/reklamy_web.js', './js/core/partner.js', './js/i18n.js', './js/i18n_l.js', './js/i18n_de.js', './js/i18n_pl.js', './js/i18n_es.js', './js/i18n_pt.js', './js/data/units.js', './js/data/skins.js', './js/data/narody.js', './js/data/jednotky_plus.js', './js/data/demoni.js', './js/data/castle.js',
   './js/data/campaign.js', './js/data/pvp.js', './js/data/obchod.js', './js/data/vybava.js', './js/data/skiny_plus.js', './js/data/skiny_vic.js', './js/data/skiny_nove.js', './js/data/skills.js', './js/data/vez.js', './js/i18n_obsah.js', './js/core/save.js', './js/core/ucet.js', './js/core/zvuk.js', './js/core/art.js',
