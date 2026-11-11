@@ -26,7 +26,24 @@
   /* ---------- portály: jejich SDK ---------- */
   if (portal === 'crazygames') {
     load('https://sdk.crazygames.com/crazygames-sdk-v3.js').then(() => {
-      try { const S = window.CrazyGames && CrazyGames.SDK; if (S && S.init) S.init().catch(() => {}); } catch (e) {}
+      try {
+        const S = window.CrazyGames && CrazyGames.SDK;
+        if (S && S.init) S.init().then(() => {
+          try { S.game.loadingStop(); } catch (e) {}
+          /* CrazyGames chce vědět, kdy se hraje (kvůli reklamám a statistikám) */
+          const hook = () => {
+            const A = window.App;
+            if (!A || !A.startBattle || A._cgHook) return !!(A && A._cgHook);
+            A._cgHook = true;
+            const st = A.startBattle, cl = A._closeBattle;
+            A.startBattle = function () { try { S.game.gameplayStart(); } catch (e) {} return st.apply(this, arguments); };
+            if (cl) A._closeBattle = function () { try { S.game.gameplayStop(); } catch (e) {} return cl.apply(this, arguments); };
+            return true;
+          };
+          if (!hook()) window.addEventListener('load', hook);
+        }).catch(() => {});
+        try { S.game && S.game.loadingStart && S.game.loadingStart(); } catch (e) {}
+      } catch (e) {}
     }).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
