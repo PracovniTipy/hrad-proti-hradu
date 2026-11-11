@@ -688,6 +688,7 @@
         if (window.Reklamy) Reklamy.battleBind(this, c);
         c.querySelector('#resBack').addEventListener('click', () => {
           close(); this._closeBattle(); if (cfg.net && window.Online) Online.afterBattle(); this.go(back);
+          if (!cfg.net && !cfg.film && window.CW_AdBetween) setTimeout(() => window.CW_AdBetween(), 400);
           if (cfg.afterScene && !cfg.net) this.playScene(cfg.afterScene, null, true);
         });
       });

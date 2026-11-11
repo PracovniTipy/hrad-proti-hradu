@@ -62,10 +62,12 @@
   };
   const crazy = () => { const S = window.CrazyGames && window.CrazyGames.SDK; return S && S.ad && typeof S.ad.requestAd === 'function' ? S : null; };
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
+  const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
     if (crazy()) return 'crazygames';
     if (poki()) return 'poki';
+    if (h5()) return 'h5';
     return '';
   }
 
@@ -239,6 +241,7 @@
   const Reklamy = {
     ADS, PLACES,
     provider,
+    _mute: on => mute(on),
     /* reklamy jsou na tomhle zařízení k dispozici */
     available() {
       const App = window.App;
@@ -272,7 +275,7 @@
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;
