@@ -200,3 +200,6 @@ input:focus-visible, textarea:focus-visible, .sel:focus-visible { outline: none;
 
 /* ---------- VÝSLEDEK BITVY: štít lehce překrývá rám ---------- */
 .rs-emb { filter: drop-shadow(0 7px 14px #000c) drop-shadow(0 0 18px rgba(243, 196, 92, .25)); }
+
+/* nízké okno (portály, telefon na šířku): okna se nikdy neořežou, dají se posunout */
+#modal .modal-card { max-height: calc(100vh - 44px); max-height: calc(100dvh - 44px); overflow-y: auto; overscroll-behavior: contain; }
