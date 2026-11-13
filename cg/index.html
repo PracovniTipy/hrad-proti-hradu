@@ -3681,7 +3681,7 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
       const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
       if (H5.on && H5.ready) {
         adBreak({ type: 'next', name: 'po-bitve', beforeAd: () => mute(true), afterAd: () => mute(false) });
-      } else if (portal === 'crazygames' && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
+      } else if (portal === 'crazygames' && window.CW_CG_ADS && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => mute(true), adFinished: () => mute(false), adError: () => mute(false) });
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
@@ -34670,7 +34670,8 @@ GameData.defenseOf = save => {
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
-    if (crazy()) return 'crazygames';
+    // CrazyGames: v „Basic launch“ reklamy zakázané – zapne se až po přechodu na Full (CW_CG_ADS)
+    if (crazy()) return window.CW_CG_ADS ? 'crazygames' : '';
     if (poki()) return 'poki';
     if (h5()) return 'h5';
     return '';
@@ -38784,7 +38785,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 162 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 163 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

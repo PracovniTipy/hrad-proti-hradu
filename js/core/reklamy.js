@@ -65,7 +65,8 @@
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
-    if (crazy()) return 'crazygames';
+    // CrazyGames: v „Basic launch“ reklamy zakázané – zapne se až po přechodu na Full (CW_CG_ADS)
+    if (crazy()) return window.CW_CG_ADS ? 'crazygames' : '';
     if (poki()) return 'poki';
     if (h5()) return 'h5';
     return '';

@@ -141,7 +141,7 @@
       const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
       if (H5.on && H5.ready) {
         adBreak({ type: 'next', name: 'po-bitve', beforeAd: () => mute(true), afterAd: () => mute(false) });
-      } else if (portal === 'crazygames' && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
+      } else if (portal === 'crazygames' && window.CW_CG_ADS && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => mute(true), adFinished: () => mute(false), adError: () => mute(false) });
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
