@@ -74,6 +74,7 @@
         try {
           if (ev.name === 'SDK_GAME_PAUSE') { mute(true); const b = window.App && App.battle; if (b && !b.over && b.setPaused) b.setPaused(true); }
           else if (ev.name === 'SDK_GAME_START') { mute(false); }
+          else if (ev.name === 'SDK_READY') { try { sdk.showBanner(); } catch (e) {} }   // úvodní reklama (GameMonetize ji vyžaduje)
         } catch (e) {}
       }
     };
