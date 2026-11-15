@@ -2,8 +2,10 @@
    VÁNOCE – adventní kalendář, Santův obchůdek, koulovačka (js/core/vanoce.js)
    ========================================================================= */
 /* tlačítko na domovské obrazovce (vedle Přátel a Turnaje) */
-#screen.home-mode .xm-btn, .xm-btn { left: 172px; top: calc(430px + env(safe-area-inset-top, 0px)); }
-@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .xm-btn { top: 300px; left: 160px; } }
+/* v levém sloupci pod Úkoly */
+#screen.home-mode .xm-btn, .xm-btn { left: 12px; top: calc(342px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (min-height: 521px) { #screen.home-mode .xm-btn { top: calc(342px + env(safe-area-inset-top, 0px)); left: 14px; } }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .xm-btn { top: 222px; left: 10px; } }
 .xm-btn .daily-chest svg { animation-delay: .9s; }
 .xm-btn .daily-lbl { color: #fff; text-shadow: 0 2px 0 #000, 0 0 8px rgba(255,60,60,.6); }
 .xm-teaser .daily-lbl.xm-count { font-size: 11px; max-width: 70px; white-space: nowrap; line-height: 1.1; text-align: center; padding: 2px 6px; margin-top: 1px; border-radius: 8px; background: linear-gradient(180deg, rgba(200,24,40,.92), rgba(120,12,22,.92)); box-shadow: 0 0 0 1.5px #ffd24a, 0 2px 6px rgba(0,0,0,.6); }
