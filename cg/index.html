@@ -3605,6 +3605,19 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         try { S.game && S.game.loadingStart && S.game.loadingStart(); } catch (e) {}
       } catch (e) {}
     }).catch(() => {});
+  } else if (portal === 'gamemonetize') {
+    /* GameMonetize: reklama mezi bitvami; během reklamy hra stojí a je ztlumená */
+    const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+    window.SDK_OPTIONS = {
+      gameId: window.CW_GM_ID || '0w8vgt6j9mtlda7exs27rmv0cbmjpw9z',
+      onEvent: function (ev) {
+        try {
+          if (ev.name === 'SDK_GAME_PAUSE') { mute(true); const b = window.App && App.battle; if (b && !b.over && b.setPaused) b.setPaused(true); }
+          else if (ev.name === 'SDK_GAME_START') { mute(false); }
+        } catch (e) {}
+      }
+    };
+    load('https://api.gamemonetize.com/sdk.js').catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -3683,6 +3696,8 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         adBreak({ type: 'next', name: 'po-bitve', beforeAd: () => mute(true), afterAd: () => mute(false) });
       } else if (portal === 'crazygames' && window.CW_CG_ADS && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => mute(true), adFinished: () => mute(false), adError: () => mute(false) });
+      } else if (portal === 'gamemonetize' && window.sdk && typeof sdk.showBanner === 'function') {
+        sdk.showBanner();
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
@@ -38785,7 +38800,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 164 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 165 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

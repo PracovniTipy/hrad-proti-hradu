@@ -65,6 +65,19 @@
         try { S.game && S.game.loadingStart && S.game.loadingStart(); } catch (e) {}
       } catch (e) {}
     }).catch(() => {});
+  } else if (portal === 'gamemonetize') {
+    /* GameMonetize: reklama mezi bitvami; během reklamy hra stojí a je ztlumená */
+    const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+    window.SDK_OPTIONS = {
+      gameId: window.CW_GM_ID || '0w8vgt6j9mtlda7exs27rmv0cbmjpw9z',
+      onEvent: function (ev) {
+        try {
+          if (ev.name === 'SDK_GAME_PAUSE') { mute(true); const b = window.App && App.battle; if (b && !b.over && b.setPaused) b.setPaused(true); }
+          else if (ev.name === 'SDK_GAME_START') { mute(false); }
+        } catch (e) {}
+      }
+    };
+    load('https://api.gamemonetize.com/sdk.js').catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -143,6 +156,8 @@
         adBreak({ type: 'next', name: 'po-bitve', beforeAd: () => mute(true), afterAd: () => mute(false) });
       } else if (portal === 'crazygames' && window.CW_CG_ADS && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => mute(true), adFinished: () => mute(false), adError: () => mute(false) });
+      } else if (portal === 'gamemonetize' && window.sdk && typeof sdk.showBanner === 'function') {
+        sdk.showBanner();
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
