@@ -239,3 +239,11 @@ body:has(#battle:not([hidden])) #fsBtn { display: none; }
 #app:has(#screen.home-mode) #topbar { background: linear-gradient(180deg, rgba(6,8,12,.9), rgba(6,8,12,.6) 65%, rgba(6,8,12,0)) !important; }
 #app:has(#screen.home-mode) #topbar::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 26px; pointer-events: none; background: linear-gradient(180deg, rgba(6,8,12,.35), rgba(6,8,12,0)); }
 #nav .nav-lbl { color: #fff3d0; text-shadow: 0 1px 0 #000, 0 0 4px #000, 0 0 2px #000; }
+
+/* jméno hráče: čitelné i na malém telefonu (místo kovového přechodu plná barva) */
+.pname-btn b { background: none !important; color: #fff6dc !important; -webkit-text-stroke: 0 !important; text-shadow: 0 2px 0 #000, 0 0 6px rgba(0,0,0,.9), 0 0 2px #000; filter: none !important; letter-spacing: .02em; }
+/* mazlíček na tlačítku */
+.pet-ico canvas { width: 62px; height: 52px; display: block; filter: drop-shadow(0 3px 3px rgba(0,0,0,.6)); animation: chestBob 2.4s ease-in-out infinite; animation-delay: .3s; }
+@media (max-width: 480px) { .pet-ico canvas { width: 52px; height: 44px; } }
+@media (orientation: landscape) and (max-height: 520px) { .pet-ico canvas { width: 50px; height: 42px; } }
+@media (pointer: fine) and (min-width: 1000px) and (min-height: 600px) { .daily-btn .pet-ico canvas { width: 74px; height: 62px; } }

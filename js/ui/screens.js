@@ -446,7 +446,7 @@
             ${window.Pas && Pas.ready(save) ? '<i class="daily-dot">!</i>' : ''}
           </button>
           <button class="daily-btn pet-btn" id="petBtn" aria-label="${I18N.L('Mazlíček', 'Pet')}">
-            <span class="daily-chest"><svg viewBox="0 0 120 100"><ellipse cx="60" cy="58" rx="30" ry="32" fill="#f4f8ff" stroke="#1a1410" stroke-width="4"/><path d="M34 34q26-10 52 0L64 4q-6 18-30 30z" fill="#3a4aa8" stroke="#1a1410" stroke-width="4" stroke-linejoin="round"/><circle cx="48" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="72" cy="52" r="9" fill="#fff" stroke="#1a1410" stroke-width="3"/><circle cx="50" cy="52" r="5" fill="#e8a020"/><circle cx="74" cy="52" r="5" fill="#e8a020"/><path d="M56 62h8l-4 8z" fill="#e8a020" stroke="#1a1410" stroke-width="2"/><path d="M30 60q-20-6-24 14 14-4 24 0zM90 60q20-6 24 14-14-4-24 0z" fill="#e8f0ff" stroke="#1a1410" stroke-width="3"/></svg></span>
+            <span class="daily-chest pet-ico"><canvas id="petIcoCv" width="120" height="100"></canvas></span>
             <span class="daily-lbl">${I18N.L('Mazlíček', 'Pet')}</span>
           </button>
           <button class="daily-btn hall-btn" id="hallBtn" aria-label="${I18N.L('Síň slávy', 'Hall of Fame')}">
@@ -472,6 +472,15 @@
       el.querySelector('#questBtn').addEventListener('click', () => Ukoly.open(App));
       el.querySelector('#passBtn').addEventListener('click', () => App.go('obchod', { tab: 'pas' }));
       el.querySelector('#petBtn').addEventListener('click', () => App.go('mazlicci'));
+      /* ikona mazlíčka = tvůj skutečný mazlíček (dřív bledá sova) */
+      try {
+        const pc = el.querySelector('#petIcoCv'), G = GameData;
+        if (pc && G.drawPet && G.petOf) {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2); pc.width = 120 * dpr; pc.height = 100 * dpr;
+          const c = pc.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.translate(60, 58); c.scale(1.9, 1.9);
+          G.drawPet(c, G.petOf(save).id, 1.2, false);
+        }
+      } catch (e) {}
       el.querySelector('#hallBtn').addEventListener('click', () => Sin.openHall(App));
       if (el.querySelector('#friendsBtn')) el.querySelector('#friendsBtn').addEventListener('click', () => Sireni.openFriends(App));
       if (el.querySelector('#turnajBtn')) el.querySelector('#turnajBtn').addEventListener('click', () => Sireni.openTurnaj(App));
@@ -1239,7 +1248,7 @@
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 176 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 177 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
