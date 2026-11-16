@@ -2860,6 +2860,36 @@ input:focus-visible, textarea:focus-visible, .sel:focus-visible { outline: none;
 #fsBtn[hidden] { display: none; }
 body:has(#battle:not([hidden])) #fsBtn { display: none; }
 
+/* ===== Telefon na šířku (i uvnitř portálů): popisky menu vždy viditelné, sytější ikony, čitelné akty ===== */
+@media (orientation: landscape) and (max-height: 520px) {
+  #nav .nav-medal { filter: drop-shadow(0 2px 2px rgba(0,0,0,.8)) drop-shadow(0 0 1px #000) saturate(1.15) !important; }
+  #nav button[aria-current="page"] .nav-medal { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--tint) 85%, transparent)) drop-shadow(0 2px 2px rgba(0,0,0,.8)) saturate(1.2) !important; }
+  #nav .nav-lbl { color: #fff3d0; text-shadow: 0 1px 0 #000, 0 0 4px #000, 0 0 2px #000; }
+  /* akty příběhu: menší číslo, zámek jako odznak, název smí na dva řádky */
+  .act-tabs { gap: 3px; }
+  .act-arrow { display: none; }
+  .act-tab { min-width: 0; gap: 6px; padding: 5px 8px; position: relative; }
+  .act-tab .act-num { width: 26px; height: 26px; font-size: 12px; }
+  .act-tab .act-nm { font-size: 12.5px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.05; font-size: 11.5px; hyphens: manual; }
+  .act-tab .ico, .act-tab .crown { position: absolute; top: 3px; right: 4px; width: 12px; height: 10px; margin: 0; }
+}
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 760px) {
+  #nav .nav-lbl { display: block !important; font-size: 9px !important; letter-spacing: -.01em; white-space: nowrap; margin-top: -1px; }
+  #nav .nav-medal, #nav .nav-big .nav-medal { width: 27px !important; height: 25px !important; }
+  #nav button, #nav button[aria-current="page"] { min-width: 0 !important; padding: 1px 0 !important; }
+  #nav, #nav[style] { padding-left: calc(var(--nav-l, 196px) + env(safe-area-inset-left, 0px)) !important; padding-right: calc(var(--nav-r, 184px) + env(safe-area-inset-right, 0px)) !important; gap: 0; }
+  #topbar .plvl, #topbar #pLevel { display: none; }
+  .nav-group, .nav-group.nav-right { gap: 0; }
+  #topbar .pill { padding-inline: 8px; }
+}
+/* tlačítko celé obrazovky v horní liště vedle zlata a drahokamů */
+#topbar .res #fsBtn { position: static; transform: none; width: 32px; height: 32px; flex: none; border-radius: 10px; }
+
+/* hlavní obrazovka: horní lišta tmavší, aby menu nad světlou oblohou nebylo vybledlé */
+#app:has(#screen.home-mode) #topbar { background: linear-gradient(180deg, rgba(6,8,12,.9), rgba(6,8,12,.6) 65%, rgba(6,8,12,0)) !important; }
+#app:has(#screen.home-mode) #topbar::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 26px; pointer-events: none; background: linear-gradient(180deg, rgba(6,8,12,.35), rgba(6,8,12,0)); }
+#nav .nav-lbl { color: #fff3d0; text-shadow: 0 1px 0 #000, 0 0 4px #000, 0 0 2px #000; }
+
 </style>
 <style>
 /* =========================================================================
@@ -38874,7 +38904,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 174 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 175 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -42581,6 +42611,7 @@ GameData.defenseOf = save => {
       this.screenEl.classList.remove('home-mode');
       Screens[name](this, opts);
       applyIcons(this.screenEl);
+      try { window.CW_navFit && requestAnimationFrame(window.CW_navFit); } catch (_) {}
       // tutoriály při první návštěvě
       const tut = this.save.tut || (this.save.tut = {});
       if (this.save.lang && !Tutorial.active) {
@@ -43278,6 +43309,21 @@ GameData.defenseOf = save => {
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // menu nahoře mezi profilem a penězi: odsazení podle skutečné šířky (ať se popisky nepřekrývají)
+      (() => {
+        const fit = () => {
+          const pf = document.getElementById('profileBtn'), rs = document.querySelector('#topbar .res'), nav = document.getElementById('nav');
+          if (!pf || !rs || !nav || !pf.getBoundingClientRect().width || !rs.getBoundingClientRect().width) return;
+          const W = innerWidth, l = Math.ceil(pf.getBoundingClientRect().right) + 6, r = Math.ceil(W - rs.getBoundingClientRect().left) + 6;
+          nav.style.setProperty('--nav-l', l + 'px'); nav.style.setProperty('--nav-r', r + 'px');
+          // tlačítko Nainstalovat vedle Úkolů (dřív se překrývalo s dárkem)
+          const q = document.querySelector('#screen.home-mode .quest-btn'), ins = document.querySelector('#screen.home-mode .install-home');
+          if (q && ins && q.offsetWidth) { ins.style.setProperty('top', q.offsetTop + 'px', 'important'); ins.style.setProperty('left', (q.offsetLeft + q.offsetWidth + 14) + 'px', 'important'); }
+        };
+        window.CW_navFit = fit;
+        addEventListener('resize', () => setTimeout(fit, 60)); setTimeout(fit, 50); setTimeout(fit, 800);
+        document.addEventListener('fullscreenchange', () => setTimeout(fit, 120));
+      })();
       // tlačítko celé obrazovky (telefon, tablet i počítač; iPhone Fullscreen API nemá → nezobrazí se)
       (() => {
         const de = document.documentElement;
@@ -43290,7 +43336,8 @@ GameData.defenseOf = save => {
           const lock = () => { try { const p = matchMedia('(pointer: coarse)').matches && screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {}); } catch (_) {} };
           try { de.requestFullscreen({ navigationUI: 'hide' }).then(lock).catch(() => {}); } catch (_) {}
         });
-        document.body.appendChild(b);
+        const res = document.querySelector('#topbar .res');
+        (res || document.body).appendChild(b);
         const upd = () => b.hidden = !!document.fullscreenElement;
         document.addEventListener('fullscreenchange', upd); upd();
       })();

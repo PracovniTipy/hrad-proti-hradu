@@ -44,6 +44,7 @@
       this.screenEl.classList.remove('home-mode');
       Screens[name](this, opts);
       applyIcons(this.screenEl);
+      try { window.CW_navFit && requestAnimationFrame(window.CW_navFit); } catch (_) {}
       // tutoriály při první návštěvě
       const tut = this.save.tut || (this.save.tut = {});
       if (this.save.lang && !Tutorial.active) {
@@ -741,6 +742,21 @@
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // menu nahoře mezi profilem a penězi: odsazení podle skutečné šířky (ať se popisky nepřekrývají)
+      (() => {
+        const fit = () => {
+          const pf = document.getElementById('profileBtn'), rs = document.querySelector('#topbar .res'), nav = document.getElementById('nav');
+          if (!pf || !rs || !nav || !pf.getBoundingClientRect().width || !rs.getBoundingClientRect().width) return;
+          const W = innerWidth, l = Math.ceil(pf.getBoundingClientRect().right) + 6, r = Math.ceil(W - rs.getBoundingClientRect().left) + 6;
+          nav.style.setProperty('--nav-l', l + 'px'); nav.style.setProperty('--nav-r', r + 'px');
+          // tlačítko Nainstalovat vedle Úkolů (dřív se překrývalo s dárkem)
+          const q = document.querySelector('#screen.home-mode .quest-btn'), ins = document.querySelector('#screen.home-mode .install-home');
+          if (q && ins && q.offsetWidth) { ins.style.setProperty('top', q.offsetTop + 'px', 'important'); ins.style.setProperty('left', (q.offsetLeft + q.offsetWidth + 14) + 'px', 'important'); }
+        };
+        window.CW_navFit = fit;
+        addEventListener('resize', () => setTimeout(fit, 60)); setTimeout(fit, 50); setTimeout(fit, 800);
+        document.addEventListener('fullscreenchange', () => setTimeout(fit, 120));
+      })();
       // tlačítko celé obrazovky (telefon, tablet i počítač; iPhone Fullscreen API nemá → nezobrazí se)
       (() => {
         const de = document.documentElement;
@@ -753,7 +769,8 @@
           const lock = () => { try { const p = matchMedia('(pointer: coarse)').matches && screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {}); } catch (_) {} };
           try { de.requestFullscreen({ navigationUI: 'hide' }).then(lock).catch(() => {}); } catch (_) {}
         });
-        document.body.appendChild(b);
+        const res = document.querySelector('#topbar .res');
+        (res || document.body).appendChild(b);
         const upd = () => b.hidden = !!document.fullscreenElement;
         document.addEventListener('fullscreenchange', upd); upd();
       })();
