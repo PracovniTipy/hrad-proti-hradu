@@ -112,7 +112,12 @@
           if (cl) A._closeBattle = function () { try { B.platform.sendMessage('gameplay_stopped'); } catch (e) {} return cl.apply(this, arguments); };
           return true;
         };
-        const ready = () => { hook(); try { B.platform.sendMessage('game_ready'); } catch (e) {} };
+        const ready = () => {
+          hook();
+          try { B.platform.sendMessage('game_ready'); } catch (e) {}
+          /* první bitva (tutoriál) může běžet dřív, než se hook nainstaluje */
+          try { const b = window.App && App.battle; if (b && !b.over) B.platform.sendMessage('gameplay_started'); } catch (e) {}
+        };
         if (document.readyState === 'complete') setTimeout(ready, 300); else window.addEventListener('load', () => setTimeout(ready, 300));
       }).catch(() => {});
     }).catch(() => {});
