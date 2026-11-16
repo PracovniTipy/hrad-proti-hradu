@@ -65,8 +65,9 @@
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
-    // CrazyGames: v „Basic launch“ reklamy zakázané – zapne se až po přechodu na Full (CW_CG_ADS)
-    if (crazy()) return window.CW_CG_ADS ? 'crazygames' : '';
+    /* CrazyGames: v „Basic launch“ reklamy nechodí. Tlačítka za odměnu se proto ukážou,
+       až CrazyGames poprvé opravdu pustí nějakou reklamu (po přechodu na Full Launch) – samo, bez nové verze. */
+    if (crazy()) return window.CW_CG_ADS && window.CW_CG_AdOk && CW_CG_AdOk() ? 'crazygames' : '';
     if (poki()) return 'poki';
     if (h5()) return 'h5';
     return '';
@@ -143,7 +144,7 @@
       let over = false;
       const end = v => { if (!over) { over = true; resolve(v); } };
       try {
-        S.ad.requestAd('rewarded', { adStarted: () => {}, adFinished: () => end(true), adError: () => end(false) });
+        S.ad.requestAd('rewarded', { adStarted: () => { try { window.CW_CG_AdOk && CW_CG_AdOk(true); } catch (e) { /* nic */ } }, adFinished: () => end(true), adError: () => end(false) });
       } catch (e) { end(false); }
       setTimeout(() => end(false), 180000);
     });

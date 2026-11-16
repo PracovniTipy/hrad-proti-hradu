@@ -25,6 +25,11 @@
 
   /* ---------- portály: jejich SDK ---------- */
   if (portal === 'crazygames') {
+    /* reklamy CrazyGames (mezi bitvami + za odměnu). V Basic Launch je CrazyGames nepouští,
+       po Full Launch začnou chodit samy. Jakmile se jednou nějaká opravdu spustí, ukážou se i tlačítka za odměnu. */
+    window.CW_CG_ADS = true;
+    let adOk = false; try { adOk = localStorage.getItem('cw-cg-adok') === '1'; } catch (e) {}
+    window.CW_CG_AdOk = function (set) { if (set && !adOk) { adOk = true; try { localStorage.setItem('cw-cg-adok', '1'); } catch (e) {} } return adOk; };
     load('https://sdk.crazygames.com/crazygames-sdk-v3.js').then(() => {
       try {
         const S = window.CrazyGames && CrazyGames.SDK;
@@ -156,7 +161,7 @@
       if (H5.on && H5.ready) {
         adBreak({ type: 'next', name: 'po-bitve', beforeAd: () => mute(true), afterAd: () => mute(false) });
       } else if (portal === 'crazygames' && window.CW_CG_ADS && window.CrazyGames && CrazyGames.SDK && CrazyGames.SDK.ad) {
-        CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => mute(true), adFinished: () => mute(false), adError: () => mute(false) });
+        CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => { mute(true); window.CW_CG_AdOk(true); }, adFinished: () => mute(false), adError: () => mute(false) });
       } else if (portal === 'gamemonetize' && window.sdk && typeof sdk.showBanner === 'function') {
         sdk.showBanner();
       } else if (portal === 'poki' && window.PokiSDK) {
