@@ -89,7 +89,8 @@
   const BUF = {}; let loading = false, crowd = null;
   function loadSamples() {
     if (loading || !ctx) return; loading = true;
-    const get = (url) => fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((ok, no) => ctx.decodeAudioData(a, ok, no)));
+    /* portálové buildy (CrazyGames) mají zvuky vložené přímo v HTML jako data: URL (window.CW_ZVUKY) */
+    const get = (url) => fetch((window.CW_ZVUKY && CW_ZVUKY[url.split('/').pop()]) || url).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((ok, no) => ctx.decodeAudioData(a, ok, no)));
     Object.keys(SADY).forEach(k => { BUF[k] = []; for (let i = 0; i < SADY[k]; i++) get(BASE + k + '_' + i + '.mp3').then(b => BUF[k].push(b)).catch(() => {}); });
     get(BASE + 'bitva_dav.mp3').then(b => { BUF.dav = b; }).catch(() => {});
     get(BASE + 'hudba_bitva.mp3').then(b => { BUF.hudba = b; if (Music.on && Music.kind === 'battle' && !Music.track) Music.playTrack(); }).catch(() => {});
