@@ -62,6 +62,7 @@
   };
   const crazy = () => { const S = window.CrazyGames && window.CrazyGames.SDK; return S && S.ad && typeof S.ad.requestAd === 'function' ? S : null; };
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
+  const pg = () => { const B = window.CW_PG; return B && B.advertisement && B.advertisement.isRewardedSupported ? B : null; };
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
@@ -69,6 +70,7 @@
        až CrazyGames poprvé opravdu pustí nějakou reklamu (po přechodu na Full Launch) – samo, bez nové verze. */
     if (crazy()) return window.CW_CG_ADS && window.CW_CG_AdOk && CW_CG_AdOk() ? 'crazygames' : '';
     if (poki()) return 'poki';
+    if (pg()) return 'playgama';
     if (h5()) return 'h5';
     return '';
   }
@@ -147,6 +149,24 @@
         S.ad.requestAd('rewarded', { adStarted: () => { try { window.CW_CG_AdOk && CW_CG_AdOk(true); } catch (e) { /* nic */ } }, adFinished: () => end(true), adError: () => end(false) });
       } catch (e) { end(false); }
       setTimeout(() => end(false), 180000);
+    });
+  }
+  function pgShow() {
+    ui.hideWait();
+    const B = pg();
+    return new Promise(resolve => {
+      let got = false, over = false;
+      const end = v => { if (over) return; over = true; resolve(v); };
+      try {
+        B.advertisement.on(B.EVENT_NAME.REWARDED_STATE_CHANGED, st => {
+          if (over) return;
+          if (st === 'rewarded') got = true;
+          else if (st === 'closed') setTimeout(() => end(got), 300);
+          else if (st === 'failed') end(false);
+        });
+        B.advertisement.showRewarded('odmena');
+      } catch (e) { end(false); }
+      setTimeout(() => end(got), 180000);
     });
   }
   async function pokiShow() {
@@ -277,7 +297,7 @@
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;

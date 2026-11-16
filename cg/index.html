@@ -3626,6 +3626,38 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
       }
     };
     load('https://api.gamemonetize.com/sdk.js').catch(() => {});
+  } else if (portal === 'playgama') {
+    /* Playgama Bridge: game_ready, pauza/ztlumení z platformy, reklamy mezi bitvami a za odměnu */
+    load('https://bridge.playgama.com/v1/stable/playgama-bridge.js').then(() => {
+      const B = window.bridge;
+      if (!B || !B.initialize) return;
+      B.initialize().then(() => {
+        window.CW_PG = B;
+        const E = B.EVENT_NAME || {};
+        const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+        let paused = false;
+        const pause = on => { try { const b = window.App && App.battle; if (!b || b.over || !b.setPaused) return; if (on) { b.setPaused(true); paused = true; } else if (paused) { b.setPaused(false); paused = false; } } catch (e) {} };
+        try { B.platform.on(E.AUDIO_STATE_CHANGED, en => mute(!en)); } catch (e) {}
+        try { B.platform.on(E.PAUSE_STATE_CHANGED, p => { mute(!!p); pause(!!p); }); } catch (e) {}
+        try {
+          B.advertisement.on(E.INTERSTITIAL_STATE_CHANGED, st => {
+            if (st === 'opened') { mute(true); pause(true); } else if (st === 'closed' || st === 'failed') { mute(false); pause(false); }
+          });
+          if (B.advertisement.interstitialState === 'opened') mute(true);
+        } catch (e) {}
+        const hook = () => {
+          const A = window.App;
+          if (!A || !A.startBattle || A._pgHook) return !!(A && A._pgHook);
+          A._pgHook = true;
+          const st = A.startBattle, cl = A._closeBattle;
+          A.startBattle = function () { try { B.platform.sendMessage('gameplay_started'); } catch (e) {} return st.apply(this, arguments); };
+          if (cl) A._closeBattle = function () { try { B.platform.sendMessage('gameplay_stopped'); } catch (e) {} return cl.apply(this, arguments); };
+          return true;
+        };
+        const ready = () => { hook(); try { B.platform.sendMessage('game_ready'); } catch (e) {} };
+        if (document.readyState === 'complete') setTimeout(ready, 300); else window.addEventListener('load', () => setTimeout(ready, 300));
+      }).catch(() => {});
+    }).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -3706,6 +3738,8 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => { mute(true); window.CW_CG_AdOk(true); }, adFinished: () => mute(false), adError: () => mute(false) });
       } else if (portal === 'gamemonetize' && window.sdk && typeof sdk.showBanner === 'function') {
         sdk.showBanner();
+      } else if (portal === 'playgama' && window.CW_PG && CW_PG.advertisement && CW_PG.advertisement.isInterstitialSupported) {
+        CW_PG.advertisement.showInterstitial('po-bitve');
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
@@ -34691,6 +34725,7 @@ GameData.defenseOf = save => {
   };
   const crazy = () => { const S = window.CrazyGames && window.CrazyGames.SDK; return S && S.ad && typeof S.ad.requestAd === 'function' ? S : null; };
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
+  const pg = () => { const B = window.CW_PG; return B && B.advertisement && B.advertisement.isRewardedSupported ? B : null; };
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
@@ -34698,6 +34733,7 @@ GameData.defenseOf = save => {
        až CrazyGames poprvé opravdu pustí nějakou reklamu (po přechodu na Full Launch) – samo, bez nové verze. */
     if (crazy()) return window.CW_CG_ADS && window.CW_CG_AdOk && CW_CG_AdOk() ? 'crazygames' : '';
     if (poki()) return 'poki';
+    if (pg()) return 'playgama';
     if (h5()) return 'h5';
     return '';
   }
@@ -34776,6 +34812,24 @@ GameData.defenseOf = save => {
         S.ad.requestAd('rewarded', { adStarted: () => { try { window.CW_CG_AdOk && CW_CG_AdOk(true); } catch (e) { /* nic */ } }, adFinished: () => end(true), adError: () => end(false) });
       } catch (e) { end(false); }
       setTimeout(() => end(false), 180000);
+    });
+  }
+  function pgShow() {
+    ui.hideWait();
+    const B = pg();
+    return new Promise(resolve => {
+      let got = false, over = false;
+      const end = v => { if (over) return; over = true; resolve(v); };
+      try {
+        B.advertisement.on(B.EVENT_NAME.REWARDED_STATE_CHANGED, st => {
+          if (over) return;
+          if (st === 'rewarded') got = true;
+          else if (st === 'closed') setTimeout(() => end(got), 300);
+          else if (st === 'failed') end(false);
+        });
+        B.advertisement.showRewarded('odmena');
+      } catch (e) { end(false); }
+      setTimeout(() => end(got), 180000);
     });
   }
   async function pokiShow() {
@@ -34906,7 +34960,7 @@ GameData.defenseOf = save => {
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;
@@ -38810,7 +38864,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 166 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 170 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

@@ -84,6 +84,38 @@
       }
     };
     load('https://api.gamemonetize.com/sdk.js').catch(() => {});
+  } else if (portal === 'playgama') {
+    /* Playgama Bridge: game_ready, pauza/ztlumení z platformy, reklamy mezi bitvami a za odměnu */
+    load('https://bridge.playgama.com/v1/stable/playgama-bridge.js').then(() => {
+      const B = window.bridge;
+      if (!B || !B.initialize) return;
+      B.initialize().then(() => {
+        window.CW_PG = B;
+        const E = B.EVENT_NAME || {};
+        const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+        let paused = false;
+        const pause = on => { try { const b = window.App && App.battle; if (!b || b.over || !b.setPaused) return; if (on) { b.setPaused(true); paused = true; } else if (paused) { b.setPaused(false); paused = false; } } catch (e) {} };
+        try { B.platform.on(E.AUDIO_STATE_CHANGED, en => mute(!en)); } catch (e) {}
+        try { B.platform.on(E.PAUSE_STATE_CHANGED, p => { mute(!!p); pause(!!p); }); } catch (e) {}
+        try {
+          B.advertisement.on(E.INTERSTITIAL_STATE_CHANGED, st => {
+            if (st === 'opened') { mute(true); pause(true); } else if (st === 'closed' || st === 'failed') { mute(false); pause(false); }
+          });
+          if (B.advertisement.interstitialState === 'opened') mute(true);
+        } catch (e) {}
+        const hook = () => {
+          const A = window.App;
+          if (!A || !A.startBattle || A._pgHook) return !!(A && A._pgHook);
+          A._pgHook = true;
+          const st = A.startBattle, cl = A._closeBattle;
+          A.startBattle = function () { try { B.platform.sendMessage('gameplay_started'); } catch (e) {} return st.apply(this, arguments); };
+          if (cl) A._closeBattle = function () { try { B.platform.sendMessage('gameplay_stopped'); } catch (e) {} return cl.apply(this, arguments); };
+          return true;
+        };
+        const ready = () => { hook(); try { B.platform.sendMessage('game_ready'); } catch (e) {} };
+        if (document.readyState === 'complete') setTimeout(ready, 300); else window.addEventListener('load', () => setTimeout(ready, 300));
+      }).catch(() => {});
+    }).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -164,6 +196,8 @@
         CrazyGames.SDK.ad.requestAd('midgame', { adStarted: () => { mute(true); window.CW_CG_AdOk(true); }, adFinished: () => mute(false), adError: () => mute(false) });
       } else if (portal === 'gamemonetize' && window.sdk && typeof sdk.showBanner === 'function') {
         sdk.showBanner();
+      } else if (portal === 'playgama' && window.CW_PG && CW_PG.advertisement && CW_PG.advertisement.isInterstitialSupported) {
+        CW_PG.advertisement.showInterstitial('po-bitve');
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
