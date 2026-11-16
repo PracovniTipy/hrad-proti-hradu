@@ -31,11 +31,8 @@
           return u ? null : 'crazygames';
         } catch (e) { return null; }
       }
-      if (p) return null;
-      if (!window.Ucet || !window.UcetUI) return null;
-      // přihlášený (ne host) = už má účet
-      if (Ucet.logged() && !Ucet.guest()) return null;
-      return 'web';
+      // web / Store / Android: výzvu k registraci už dělá UcetUI.nudge (po každé 3. bitvě) – nezdvojovat
+      return null;
     },
     check(App) {
       const s = this.state(App.save);
