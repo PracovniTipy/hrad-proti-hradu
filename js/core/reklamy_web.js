@@ -65,7 +65,9 @@
             if (cl) A._closeBattle = function () { try { S.game.gameplayStop(); } catch (e) {} return cl.apply(this, arguments); };
             return true;
           };
-          if (!hook()) window.addEventListener('load', hook);
+          /* první (výuková) bitva může běžet dřív, než se SDK načte → gameplayStart hned */
+          const already = () => { try { const b = window.App && App.battle; if (b && !b.over) S.game.gameplayStart(); } catch (e) {} };
+          if (!hook()) window.addEventListener('load', () => { hook(); already(); }); else already();
         }).catch(() => {});
         try { S.game && S.game.loadingStart && S.game.loadingStart(); } catch (e) {}
       } catch (e) {}
