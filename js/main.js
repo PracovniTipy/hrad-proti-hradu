@@ -47,9 +47,14 @@
       // tutoriály při první návštěvě
       const tut = this.save.tut || (this.save.tut = {});
       if (this.save.lang && !Tutorial.active) {
-        if (name === 'hrad' && !tut.home) {
+        const st0 = this.save.stats || {}, fresh = (st0.wins || 0) + (st0.losses || 0) === 0;
+        if (name === 'hrad' && !tut.home && fresh && !tut.quick) {
+          /* úplný nováček: hned do první bitvy – bez prohlídky hradu, příběhové scény a okna úrovně
+             (na mobilu dřív třetina hráčů odešla, než vůbec začala hrát). Prohlídka hradu přijde po první bitvě. */
+          tut.quick = 1; Save.save();
+          setTimeout(() => { if (!this.battle && !Tutorial.active) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true }); } }, 350);
+        } else if (name === 'hrad' && !tut.home) {
           tut.home = true; Save.save();
-          // nováček: po krátké prohlídce rovnou do první bitvy (většina nových hráčů dřív odešla bez jediné bitvy)
           const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
           setTimeout(() => Tutorial.run(Tutorial.HOME, first), 600);
         }
@@ -179,7 +184,8 @@
       });
     },
 
-    openLevel(id) {
+    openLevel(id, opts) {
+      const quick = !!(opts && opts.quick);
       const H = GameData.campaignHelpers;
       const lv = H.find(id);
       if (!lv) return;
@@ -187,7 +193,7 @@
       const act = H.act(lv.act);
       if (!H.isUnlocked(this.save, id)) { this.toast(t('t_prev_first')); return; }
       // první úroveň aktu: nejdřív příběhová scéna
-      if (H.isFirstOfAct(id) && !(this.save.seenScenes || {})[act.scene]) { this.playScene(act.scene, () => this.openLevel(id)); return; }
+      if (!quick && H.isFirstOfAct(id) && !(this.save.seenScenes || {})[act.scene]) { this.playScene(act.scene, () => this.openLevel(id)); return; }
       if (lv.faction !== 'spojenectvi' && this.save.faction !== lv.faction && GameData.campaignHelpers.factionUnlocked(this.save, lv.faction)) this.setFaction(lv.faction, { silent: true });
       const EF = GameData.factions[lv.enemy];
       lv.enemyUnits = lv.roles.map(r => GameData.unitForRole(lv.enemy, r));
@@ -196,6 +202,22 @@
       const gold = cleared ? Math.round(lv.reward.gold * 0.25) : lv.reward.gold;
       const gems = cleared ? 0 : lv.reward.gems;
       const allyF = lv.alliance ? GameData.factionOrder : [lv.faction];
+      const fight = () => {
+        const go = () => this.startBattle({
+          mode: 'campaign', title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
+          enemyFaction: lv.enemy, theme: lv.theme || EF.theme,
+          enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
+          alliance: !!lv.alliance, playFaction: lv._pf || lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
+          ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: GameData.battleConfig.worldW + 640 } } : {}),
+          hostages: lv.hostages || 0,
+          level: lv
+        });
+        // po dokončení příběhu samurajů si hráč v každém zápase vybere armádu
+        const pick = !lv.alliance && H.actDone(this.save, 'samurajove');
+        const go2 = pick ? () => this.pickArmy(pf => { lv._pf = pf; go(); }) : go;
+        if (!quick && lv.scene && GameData.scenes[lv.scene]) this.playScene(lv.scene, go2); else go2();
+      };
+      if (quick) { if (window.Stat) try { Stat.ev('rychly_start'); } catch (e) { /* nic */ } fight(); return; }
       this.modal(`
         <div class="eyebrow">${t('act_n', { n: act.n })} · ${t('chapter', { n: ch.id })} · ${esc(ch.name)}</div>
         <h2>${lv.label} ${esc(lv.name)}${lv.boss ? ' <span class="tag tag-demo">Boss</span>' : ''}</h2>
@@ -214,22 +236,7 @@
           <button class="btn" data-close>${t('back')}</button>
         </div>`, (c, close) => {
         c.querySelectorAll('canvas[data-eu]').forEach(cv => Art.renderUnitIcon(cv, cv.dataset.eu, 'enemy', GameData.units[cv.dataset.eu].faction === lv.enemy ? (lv.unitSkin || 'zakladni') : 'zakladni', { zoom: GameData.units[cv.dataset.eu].boss ? 0.55 : 1 }));
-        c.querySelector('#goFight').addEventListener('click', () => {
-          close();
-          const go = () => this.startBattle({
-            mode: 'campaign', title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
-            enemyFaction: lv.enemy, theme: lv.theme || EF.theme,
-            enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
-            alliance: !!lv.alliance, playFaction: lv._pf || lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
-            ...(lv.megaCastle ? { enemyCastleStyle: 'peklo3', enemyCastleHpMult: 1.5, world: { worldW: GameData.battleConfig.worldW + 640 } } : {}),
-            hostages: lv.hostages || 0,
-            level: lv
-          });
-          // po dokončení příběhu samurajů si hráč v každém zápase vybere armádu
-          const pick = !lv.alliance && H.actDone(this.save, 'samurajove');
-          const go2 = pick ? () => this.pickArmy(pf => { lv._pf = pf; go(); }) : go;
-          if (lv.scene && GameData.scenes[lv.scene]) this.playScene(lv.scene, go2); else go2();
-        });
+        c.querySelector('#goFight').addEventListener('click', () => { close(); fight(); });
       });
     },
 
