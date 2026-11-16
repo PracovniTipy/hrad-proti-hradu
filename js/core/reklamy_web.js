@@ -86,7 +86,7 @@
     load('https://api.gamemonetize.com/sdk.js').catch(() => {});
   } else if (portal === 'playgama') {
     /* Playgama Bridge: game_ready, pauza/ztlumení z platformy, reklamy mezi bitvami a za odměnu */
-    load('https://bridge.playgama.com/v1/stable/playgama-bridge.js').then(() => {
+    (window.bridge ? Promise.resolve() : load('https://bridge.playgama.com/v2/stable/playgama-bridge.js')).then(() => {
       const B = window.bridge;
       if (!B || !B.initialize) return;
       B.initialize().then(() => {
