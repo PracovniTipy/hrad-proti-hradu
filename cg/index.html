@@ -2855,6 +2855,11 @@ input:focus-visible, textarea:focus-visible, .sel:focus-visible { outline: none;
 #modal .modal-card { max-height: calc(100vh - 44px); max-height: calc(100dvh - 44px); overflow-y: auto; overscroll-behavior: contain; }
 #firstFight.first-fight { position: fixed; }
 
+/* tlačítko celé obrazovky (jen telefon s Fullscreen API) */
+#fsBtn { position: fixed; z-index: 60; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); left: calc(8px + env(safe-area-inset-left, 0px)); width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border-radius: 10px; border: 1px solid rgba(255,220,140,.55); background: rgba(20,14,8,.55); color: #ffe6a8; opacity: .8; }
+#fsBtn[hidden] { display: none; }
+body:has(#battle:not([hidden])) #fsBtn { display: none; }
+
 </style>
 <style>
 /* =========================================================================
@@ -38869,7 +38874,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 172 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 173 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -43273,6 +43278,18 @@ GameData.defenseOf = save => {
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // tlačítko celé obrazovky na telefonu (portály v iframu, kde první pokus nemusí vyjít; iPhone API nemá → nezobrazí se)
+      (() => {
+        const de = document.documentElement;
+        if (!matchMedia('(pointer: coarse)').matches || !document.fullscreenEnabled || !de.requestFullscreen) return;
+        const b = document.createElement('button');
+        b.id = 'fsBtn'; b.type = 'button'; b.setAttribute('aria-label', I18N.L('Celá obrazovka', 'Fullscreen'));
+        b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+        b.addEventListener('click', e => { e.stopPropagation(); lockLand(); });
+        document.body.appendChild(b);
+        const upd = () => b.hidden = !!document.fullscreenElement;
+        document.addEventListener('fullscreenchange', upd); upd();
+      })();
       // bez zapojených plateb se věci za skutečné peníze v obchodě neukazují
       document.body.classList.toggle('paid-off', !Platby.on());
       // trofeje se počítají od nuly – kdo ještě nehrál souboj, nemá mít darované trofeje

@@ -741,6 +741,18 @@
       };
       lockLand();
       document.addEventListener('pointerdown', lockLand, { once: true, capture: true });
+      // tlačítko celé obrazovky na telefonu (portály v iframu, kde první pokus nemusí vyjít; iPhone API nemá → nezobrazí se)
+      (() => {
+        const de = document.documentElement;
+        if (!matchMedia('(pointer: coarse)').matches || !document.fullscreenEnabled || !de.requestFullscreen) return;
+        const b = document.createElement('button');
+        b.id = 'fsBtn'; b.type = 'button'; b.setAttribute('aria-label', I18N.L('Celá obrazovka', 'Fullscreen'));
+        b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+        b.addEventListener('click', e => { e.stopPropagation(); lockLand(); });
+        document.body.appendChild(b);
+        const upd = () => b.hidden = !!document.fullscreenElement;
+        document.addEventListener('fullscreenchange', upd); upd();
+      })();
       // bez zapojených plateb se věci za skutečné peníze v obchodě neukazují
       document.body.classList.toggle('paid-off', !Platby.on());
       // trofeje se počítají od nuly – kdo ještě nehrál souboj, nemá mít darované trofeje
