@@ -376,7 +376,7 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
 <script src="js/ui/hodnoceni.js"></script>
 <script>
   // Offline režim (PWA) – jen když hra běží z webu, ne ze souboru ani v náhledu
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && window.top === window.self) {
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && window.top === window.self && !window.Capacitor) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {}));
     let reloaded = false; const hadCtl = !!navigator.serviceWorker.controller; navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || !hadCtl) return; reloaded = true; if (!(window.App && App.battle)) location.reload(); });
   }

@@ -237,7 +237,7 @@
     el.querySelector('#onlCopy').addEventListener('click', () => {
       const txt = r.code;
       const ok = () => App.toast(t('onl_copied'));
-      try { if (navigator.share && matchMedia('(pointer: coarse)').matches) { navigator.share({ title: 'Castle WARS', text: `Castle WARS – ${t('onl_room')} ${txt}`, url: location.origin + location.pathname }).catch(() => {}); return; } } catch (_) { /* nic */ }
+      try { if (navigator.share && matchMedia('(pointer: coarse)').matches) { navigator.share({ title: 'Castle WARS', text: `Castle WARS – ${t('onl_room')} ${txt}`, url: (window.Capacitor || !/^https?:$/.test(location.protocol)) ? 'https://pracovnitipy.github.io/hrad-proti-hradu/' : location.origin + location.pathname }).catch(() => {}); return; } } catch (_) { /* nic */ }
       try { navigator.clipboard.writeText(txt).then(ok, ok); } catch (_) { ok(); }
     });
     el.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => O.setMode(b.dataset.mode)));

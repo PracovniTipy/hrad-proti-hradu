@@ -35,21 +35,54 @@ if var.exists():
         v = v.replace('ext {', "ext {\n    kotlin_version = '2.2.20'", 1)
         var.write_text(v)
 
-# 2) celá obrazovka bez lišt (immersive)
+# 2) celá obrazovka bez lišt telefonu + hra nikdy pod výřezem kamery / tlačítky Androidu
+#    + písmo vždy 100 % (Samsung a další jinak hru zvětší podle velikosti písma v telefonu
+#    a texty přetečou z rámečků)
 act = next(root.glob('app/src/main/java/**/MainActivity.java'))
 pkg = re.search(r'package ([\w.]+);', act.read_text()).group(1)
 act.write_text(f'''package {pkg};
 
 import android.os.Bundle;
-import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {{
+    private static final int BG = 0xFF0D121C;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {{
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().getDecorView().setBackgroundColor(BG);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WebView wv = getBridge().getWebView();
+        wv.getSettings().setTextZoom(100);
+        wv.setBackgroundColor(BG);
+        ViewCompat.setOnApplyWindowInsetsListener(wv, (v, insets) -> {{
+            Insets c = insets.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.systemBars());
+            ViewGroup.LayoutParams lp = v.getLayoutParams();
+            if (lp instanceof ViewGroup.MarginLayoutParams) {{
+                ViewGroup.MarginLayoutParams m = (ViewGroup.MarginLayoutParams) lp;
+                if (m.leftMargin != c.left || m.topMargin != c.top || m.rightMargin != c.right || m.bottomMargin != c.bottom) {{
+                    m.setMargins(c.left, c.top, c.right, c.bottom);
+                    v.setLayoutParams(m);
+                }}
+            }}
+            return WindowInsetsCompat.CONSUMED;
+        }});
+        hideBars();
+    }}
+
+    @Override
+    public void onResume() {{
+        super.onResume();
         hideBars();
     }}
 
@@ -60,9 +93,9 @@ public class MainActivity extends BridgeActivity {{
     }}
 
     private void hideBars() {{
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        WindowInsetsControllerCompat c = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        c.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        c.hide(WindowInsetsCompat.Type.systemBars());
     }}
 }}
 ''')
