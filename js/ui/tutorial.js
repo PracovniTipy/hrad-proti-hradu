@@ -9,7 +9,9 @@
 
     /* steps: [{ sel, key }] – sel = CSS selektor prvku (nebo null = střed) */
     run(steps, onDone) {
-      if (this.active) return;
+      // zaseknutý stav (bublina už zmizela s obrazovkou) – uvolnit
+      if (this.active && !document.querySelector('.tut:not(.out)')) this.active = false;
+      if (this.active) return false;
       this.active = true;
       const ov = document.createElement('div');
       ov.className = 'tut';
@@ -73,6 +75,7 @@
       });
       window.addEventListener('resize', place);
       show();
+      return true;
     },
 
     /* Úvodní výběr jazyka */

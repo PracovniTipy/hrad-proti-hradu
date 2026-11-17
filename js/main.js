@@ -54,10 +54,10 @@
              (na mobilu dřív třetina hráčů odešla, než vůbec začala hrát). Prohlídka hradu přijde po první bitvě. */
           tut.quick = 1; Save.save();
           setTimeout(() => { if (!this.battle && !Tutorial.active) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true }); } }, 350);
-        } else if (name === 'hrad' && !tut.home) {
-          tut.home = true; Save.save();
+        } else if (name === 'hrad' && !tut.home && !(fresh && tut.quick)) {
+          // prohlídka hradu – u rychlého startu až po první bitvě, nikdy přes běžící bitvu
           const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
-          setTimeout(() => Tutorial.run(Tutorial.HOME, first), 600);
+          setTimeout(() => { if (this.battle || Tutorial.active || this.current !== 'hrad') return; tut.home = true; Save.save(); Tutorial.run(Tutorial.HOME, first); }, 600);
         }
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
@@ -427,7 +427,7 @@
       if (!(save.tut || {}).battle && !cfg.net) {
         save.tut = save.tut || {}; save.tut.battle = true; Save.save();
         battle.togglePause(true);
-        setTimeout(() => Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false)), 450);
+        setTimeout(() => { if (App.battle !== battle) return; if (!Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false))) battle.togglePause(false); }, 450);
       }
       this._formUi('utok');
       this._squadUi(0, null);
