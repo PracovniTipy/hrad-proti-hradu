@@ -13,8 +13,14 @@ for f in sorted(os.listdir(os.path.join(ROOT, 'zvuky'))):
 import shutil
 zdst = os.path.join(ROOT, 'cg', 'zvuky'); os.makedirs(zdst, exist_ok=True)
 for f in zv: shutil.copyfile(os.path.join(ROOT, 'zvuky', f), os.path.join(zdst, f))
+# zvuky se nahrávají do portálu jako ploché soubory vedle index.html (nahrání složky přes prohlížeč cestu zvuky/ ztrácí)
 inj = '<script>window.CW_PORTAL="crazygames";</script>'
-html = html.replace('<head>', '<head>' + inj, 1)
+inj_flat = '<script>window.CW_PORTAL="crazygames";window.CW_ZVUKY=' + json.dumps({f: f for f in zv}) + ';</script>'
+fdst = os.path.join(ROOT, 'cg', 'plochy'); os.makedirs(fdst, exist_ok=True)
+for f in zv: shutil.copyfile(os.path.join(ROOT, 'zvuky', f), os.path.join(fdst, f))
+html0 = html
+html = html0.replace('<head>', '<head>' + inj, 1)
 os.makedirs(os.path.join(ROOT, 'cg'), exist_ok=True)
 open(os.path.join(ROOT, 'cg', 'index.html'), 'w', encoding='utf-8').write(html)
+open(os.path.join(fdst, 'index.html'), 'w', encoding='utf-8').write(html0.replace('<head>', '<head>' + inj_flat, 1))
 print('cg/index.html', round(len(html) / 1e6, 1), 'MB,', len(zv), 'zvuků')
