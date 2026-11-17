@@ -121,6 +121,7 @@
     toast(msg) {
       const t = $('#toast');
       t.textContent = msg; t.hidden = false;
+      t.classList.toggle('tiny', !!this.battle);   // v bitvě jen malý proužek nahoře, nic nezakrývá
       clearTimeout(this._tt);
       this._tt = setTimeout(() => (t.hidden = true), 2200);
     },
@@ -128,6 +129,7 @@
     modal(html, onMount) {
       const m = $('#modal'), c = $('#modalCard');
       c.classList.remove('res-simple');
+      { const tt = $('#toast'); if (tt) tt.hidden = true; clearTimeout(this._tt); }
       c.innerHTML = html;
       applyIcons(c);
       m.hidden = false;
@@ -674,33 +676,26 @@
       if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) rewards.push(...kx.rewards); }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
-      if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
-      if (bp && bp.up) note += (note ? '<br>' : '') + `★ ${t('pas_lvl_up', { n: Pas.level(save) })}`;
-      if (qDone) note += (note ? '<br>' : '') + `📜 ${t('quests_ready', { n: qDone })}`;
-      /* návrat zítra: po prvních výhrách připomenout denní odměnu */
-      if (res.win && !cfg.net && (save.stats.wins || 0) <= 3) note += (note ? '<br>' : '') + '🎁 ' + I18N.L('Zítra tě čeká další denní odměna – vrať se!', 'Another daily reward waits for you tomorrow – come back!');
+      /* okno po bitvě je schválně jednoduché: XP do Battle pasu a splněné úkoly hráč uvidí ve hře (odznak na tlačítku) */
+      void bp; void qDone;
       this.persist();
       const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       /* rovnou do další bitvy příběhu (výhra) / znovu (prohra) – hráč nemusí přes menu */
       const nextLv = cfg.mode === 'campaign' && !cfg.net && !cfg.film && !cfg.afterScene ? GameData.campaignHelpers.currentLevel(save) : null;
-      const mm = Math.floor(res.time / 60) + ':' + String(Math.floor(res.time % 60)).padStart(2, '0');
       this.modal(`
         <div class="rs ${res.win ? 'win' : 'loss'}">
           <div class="rs-emb" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4l24 8v18c0 16-11 26-24 30C19 56 8 46 8 30V12z" fill="${res.win ? '#c8902a' : '#7a2a24'}" stroke="#1a0e06" stroke-width="3"/><path d="M32 9l19 6v15c0 13-9 21-19 25-10-4-19-12-19-25V15z" fill="${res.win ? '#ffd77a' : '#c0564a'}" opacity=".35"/>${res.win ? '<path d="M18 18l26 26M46 18L20 44" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M16 42l6 6M48 42l-6 6" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>' : '<path d="M22 20l10 12M36 38l8 9" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M42 18L22 46" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>'}</svg></div>
           <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
           ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.2}s">★</i>`).join('')}</div>` : ''}
           ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
-          <p class="rs-line">⏱ ${mm} · ⚔️ ${res.kills} · 🏰 ${Math.round(res.playerHp * 100)} %</p>
-          ${note ? `<p class="rs-note">${note}</p>` : ''}
+          ${note && note !== t('note_tip') && note !== t('note_training') ? `<p class="rs-note">${note}</p>` : ''}
           ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
           <div class="modal-actions">
-            ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn rs-share" id="resShare" aria-label="${I18N.L('Sdílet bitvu', 'Share battle')}">📤</button>` : ''}
             <button class="btn ${nextLv ? '' : 'btn-gold'}" id="resBack">${t('continue')}</button>
             ${nextLv ? `<button class="btn btn-gold" id="resNext">${res.win ? '⚔️ ' + I18N.L('Další bitva', 'Next battle') : '🔁 ' + I18N.L('Zkusit znovu', 'Try again')}</button>` : ''}
           </div>
         </div>`, (c, close) => {
         c.classList.add('res-simple');
-        const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
         if (window.Reklamy) Reklamy.battleBind(this, c);
         const nx = c.querySelector('#resNext');
         if (nx) nx.addEventListener('click', () => {
@@ -851,10 +846,7 @@
         e.preventDefault(); e.stopPropagation();
         if (!this.battle || this.battle.over) return;
         const k = btn.dataset.order;
-        this.battle.order(k);
-        if (k === 'ustup') this.toast(t('retreat_hint'));
-        else if (k === 'hradby') this.toast(t('walls_hint'));
-        else if (k === 'stred') this.toast(t('center_hint'));
+        this.battle.order(k);   // bez nápovědy přes bojiště – popisky tlačítek stačí
       }));
       // ovládání hrdiny – držení tlačítek
       const ctrlSet = () => {

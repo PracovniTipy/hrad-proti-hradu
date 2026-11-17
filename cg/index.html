@@ -2458,6 +2458,46 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .rs .ad-slot{width:100%}
 @keyframes rsPop{from{transform:scale(.3) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
 
+/* ===== v181: klidné a přehledné rozhraní (hlavně telefon na šířku) ===== */
+/* žádné poskakující / pulzující rámečky a tlačítka */
+#firstFight.first-fight, .first-fight, .node.current, .chest-card .chest-art svg, .daily-chest svg, .daily-dot, .pozvi-gift, .vy-badge,
+.pet-ico canvas, .kl-claim-ico, .kl-cele-chest, .kl-hero-art img, .kl-form-prev img, .xm-door.now, .xm-door.now::after,
+.ad-btn .ad-play, .ad-btn:not([disabled]) .ad-play, .auto-tg[aria-pressed="true"] i, .timer-medal > span, #bTimer.low, .hp i::after, .chest-rays,
+.rs-emb, .res-stars i { animation: none !important; }
+#firstFight.first-fight { transform: translateX(-50%) !important; }
+/* zpráva během bitvy: malý proužek nahoře, nezakrývá bojiště */
+#toast.tiny { top: auto !important; bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important; padding: 4px 12px !important; font-size: 12px !important; line-height: 1.25 !important; max-width: min(40vw, 380px) !important; border-radius: 10px !important; opacity: .95; pointer-events: none; }
+/* okno po bitvě: jedno jednoduché okno bez posouvání */
+.modal-card.res-simple { width: min(400px, 92vw); max-height: none; overflow: visible; }
+.rs .ad-slot { width: 100%; }
+.ad-mini { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 9px 12px; font-size: 15px; line-height: 1.15;
+  background: linear-gradient(180deg, #5b4bd6, #3a2c9e) !important; color: #fff !important; border-color: #8f82ff !important; }
+.ad-mini b { font-weight: 900; color: #ffe08a; display: inline-flex; align-items: center; gap: 3px; }
+.ad-mini small { font-size: 11px; opacity: .8; font-weight: 700; }
+.ad-mini.ad-done { background: linear-gradient(180deg, #2d6b3a, #1f4b29) !important; border-color: #5fbf73 !important; }
+@media (max-height: 520px) and (orientation: landscape) {
+  .modal-card.res-simple { width: min(460px, 70vw); padding: 10px 14px 12px; }
+  .rs { gap: 6px; }
+  .rs-emb { display: none; }
+  .rs .result-title { font-size: 26px !important; }
+  .rs .res-stars { font-size: 22px; line-height: 1; }
+  .rs .reward-row .pill { font-size: 13px; padding: 3px 9px; }
+  .rs-note { font-size: 12px; max-height: 2.8em; overflow: hidden; }
+  .ad-mini { padding: 7px 10px; font-size: 13.5px; }
+  .rs .modal-actions .btn { padding: 8px 12px; font-size: 15px; min-height: 0; }
+}
+@media (max-height: 360px) and (orientation: landscape) {
+  .modal-card.res-simple { padding: 6px 12px 8px; }
+  .rs { gap: 4px; }
+  .rs .result-title { font-size: 21px !important; }
+  .rs .res-stars { font-size: 17px; }
+  .rs .reward-row .pill { font-size: 11.5px; padding: 2px 8px; }
+  .rs-note { font-size: 11px; max-height: 1.4em; }
+  .ad-mini { padding: 5px 10px; font-size: 12.5px; }
+  .ad-mini small { display: none; }
+  .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
+}
+
 </style>
 <style>
 /* Cinzel a Inter (SIL OFL) – vložené, fungují bez internetu */
@@ -34982,6 +35022,7 @@ GameData.defenseOf = save => {
     if (!btn) return;
     btn.disabled = true; btn.classList.add('ad-done');
     const s = btn.querySelector('.ad-txt small'); if (s) s.innerHTML = text;
+    else if (btn.classList.contains('ad-mini')) btn.innerHTML = text;
   }
 
   /* ========================================================================= */
@@ -35056,13 +35097,13 @@ GameData.defenseOf = save => {
         const bonus = Math.min(MAX_WIN_BONUS, Math.max(0, Math.round(goldWon || 0)));
         if (bonus < 10) return '';
         this._battle = { place: 'win2x', gold: bonus };
-        return `<div class="ad-slot">${btnHtml('win2x', L('Zdvojnásob odměnu', 'Double your reward'), `${icon('coin')} +${fmt(bonus)} · ${L('zhlédni krátkou reklamu', 'watch a short ad')}`)}</div>`;
+        return `<div class="ad-slot"><button class="btn ad-mini" data-ad="win2x">▶ ${L('Zdvojnásob odměnu', 'Double your reward')} <b>${icon('coin')} +${fmt(bonus)}</b><small>${L('krátká reklama', 'short ad')}</small></button></div>`;
       }
       if (res.reason === 'spojeni' || (res.time || 0) < MIN_LOSS_TIME) return '';
       const base = cfg.level && cfg.level.reward && cfg.level.reward.gold ? cfg.level.reward.gold : 300;
       const gold = Math.max(100, Math.min(2000, Math.round(base * 0.5 / 10) * 10));
       this._battle = { place: 'second', gold };
-      return `<div class="ad-slot">${btnHtml('second', L('Druhá šance', 'Second chance'), `${icon('coin')} +${fmt(gold)} ${L('i za prohru', 'even for a loss')}`)}</div>`;
+      return `<div class="ad-slot"><button class="btn ad-mini" data-ad="second">▶ ${L('Druhá šance', 'Second chance')} <b>${icon('coin')} +${fmt(gold)}</b><small>${L('krátká reklama', 'short ad')}</small></button></div>`;
     },
     battleBind(App, card) {
       const o = this._battle, btn = card.querySelector('[data-ad="win2x"],[data-ad="second"]');
@@ -42722,6 +42763,7 @@ GameData.defenseOf = save => {
     toast(msg) {
       const t = $('#toast');
       t.textContent = msg; t.hidden = false;
+      t.classList.toggle('tiny', !!this.battle);   // v bitvě jen malý proužek nahoře, nic nezakrývá
       clearTimeout(this._tt);
       this._tt = setTimeout(() => (t.hidden = true), 2200);
     },
@@ -42729,6 +42771,7 @@ GameData.defenseOf = save => {
     modal(html, onMount) {
       const m = $('#modal'), c = $('#modalCard');
       c.classList.remove('res-simple');
+      { const tt = $('#toast'); if (tt) tt.hidden = true; clearTimeout(this._tt); }
       c.innerHTML = html;
       applyIcons(c);
       m.hidden = false;
@@ -43275,33 +43318,26 @@ GameData.defenseOf = save => {
       if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) rewards.push(...kx.rewards); }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
-      if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
-      if (bp && bp.up) note += (note ? '<br>' : '') + `★ ${t('pas_lvl_up', { n: Pas.level(save) })}`;
-      if (qDone) note += (note ? '<br>' : '') + `📜 ${t('quests_ready', { n: qDone })}`;
-      /* návrat zítra: po prvních výhrách připomenout denní odměnu */
-      if (res.win && !cfg.net && (save.stats.wins || 0) <= 3) note += (note ? '<br>' : '') + '🎁 ' + I18N.L('Zítra tě čeká další denní odměna – vrať se!', 'Another daily reward waits for you tomorrow – come back!');
+      /* okno po bitvě je schválně jednoduché: XP do Battle pasu a splněné úkoly hráč uvidí ve hře (odznak na tlačítku) */
+      void bp; void qDone;
       this.persist();
       const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       /* rovnou do další bitvy příběhu (výhra) / znovu (prohra) – hráč nemusí přes menu */
       const nextLv = cfg.mode === 'campaign' && !cfg.net && !cfg.film && !cfg.afterScene ? GameData.campaignHelpers.currentLevel(save) : null;
-      const mm = Math.floor(res.time / 60) + ':' + String(Math.floor(res.time % 60)).padStart(2, '0');
       this.modal(`
         <div class="rs ${res.win ? 'win' : 'loss'}">
           <div class="rs-emb" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4l24 8v18c0 16-11 26-24 30C19 56 8 46 8 30V12z" fill="${res.win ? '#c8902a' : '#7a2a24'}" stroke="#1a0e06" stroke-width="3"/><path d="M32 9l19 6v15c0 13-9 21-19 25-10-4-19-12-19-25V15z" fill="${res.win ? '#ffd77a' : '#c0564a'}" opacity=".35"/>${res.win ? '<path d="M18 18l26 26M46 18L20 44" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M16 42l6 6M48 42l-6 6" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>' : '<path d="M22 20l10 12M36 38l8 9" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M42 18L22 46" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>'}</svg></div>
           <div class="result-title ${res.win ? 'win' : 'loss'}">${res.win ? t('victory') : t('defeat')}</div>
           ${stars ? `<div class="res-stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? 'on' : ''}" style="animation-delay:${i * 0.2}s">★</i>`).join('')}</div>` : ''}
           ${rewards.length ? `<div class="reward-row">${rewards.join('')}</div>` : ''}
-          <p class="rs-line">⏱ ${mm} · ⚔️ ${res.kills} · 🏰 ${Math.round(res.playerHp * 100)} %</p>
-          ${note ? `<p class="rs-note">${note}</p>` : ''}
+          ${note && note !== t('note_tip') && note !== t('note_training') ? `<p class="rs-note">${note}</p>` : ''}
           ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
           <div class="modal-actions">
-            ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn rs-share" id="resShare" aria-label="${I18N.L('Sdílet bitvu', 'Share battle')}">📤</button>` : ''}
             <button class="btn ${nextLv ? '' : 'btn-gold'}" id="resBack">${t('continue')}</button>
             ${nextLv ? `<button class="btn btn-gold" id="resNext">${res.win ? '⚔️ ' + I18N.L('Další bitva', 'Next battle') : '🔁 ' + I18N.L('Zkusit znovu', 'Try again')}</button>` : ''}
           </div>
         </div>`, (c, close) => {
         c.classList.add('res-simple');
-        const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
         if (window.Reklamy) Reklamy.battleBind(this, c);
         const nx = c.querySelector('#resNext');
         if (nx) nx.addEventListener('click', () => {
@@ -43452,10 +43488,7 @@ GameData.defenseOf = save => {
         e.preventDefault(); e.stopPropagation();
         if (!this.battle || this.battle.over) return;
         const k = btn.dataset.order;
-        this.battle.order(k);
-        if (k === 'ustup') this.toast(t('retreat_hint'));
-        else if (k === 'hradby') this.toast(t('walls_hint'));
-        else if (k === 'stred') this.toast(t('center_hint'));
+        this.battle.order(k);   // bez nápovědy přes bojiště – popisky tlačítek stačí
       }));
       // ovládání hrdiny – držení tlačítek
       const ctrlSet = () => {

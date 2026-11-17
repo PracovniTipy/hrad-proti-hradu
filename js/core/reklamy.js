@@ -257,6 +257,7 @@
     if (!btn) return;
     btn.disabled = true; btn.classList.add('ad-done');
     const s = btn.querySelector('.ad-txt small'); if (s) s.innerHTML = text;
+    else if (btn.classList.contains('ad-mini')) btn.innerHTML = text;
   }
 
   /* ========================================================================= */
@@ -331,13 +332,13 @@
         const bonus = Math.min(MAX_WIN_BONUS, Math.max(0, Math.round(goldWon || 0)));
         if (bonus < 10) return '';
         this._battle = { place: 'win2x', gold: bonus };
-        return `<div class="ad-slot">${btnHtml('win2x', L('Zdvojnásob odměnu', 'Double your reward'), `${icon('coin')} +${fmt(bonus)} · ${L('zhlédni krátkou reklamu', 'watch a short ad')}`)}</div>`;
+        return `<div class="ad-slot"><button class="btn ad-mini" data-ad="win2x">▶ ${L('Zdvojnásob odměnu', 'Double your reward')} <b>${icon('coin')} +${fmt(bonus)}</b><small>${L('krátká reklama', 'short ad')}</small></button></div>`;
       }
       if (res.reason === 'spojeni' || (res.time || 0) < MIN_LOSS_TIME) return '';
       const base = cfg.level && cfg.level.reward && cfg.level.reward.gold ? cfg.level.reward.gold : 300;
       const gold = Math.max(100, Math.min(2000, Math.round(base * 0.5 / 10) * 10));
       this._battle = { place: 'second', gold };
-      return `<div class="ad-slot">${btnHtml('second', L('Druhá šance', 'Second chance'), `${icon('coin')} +${fmt(gold)} ${L('i za prohru', 'even for a loss')}`)}</div>`;
+      return `<div class="ad-slot"><button class="btn ad-mini" data-ad="second">▶ ${L('Druhá šance', 'Second chance')} <b>${icon('coin')} +${fmt(gold)}</b><small>${L('krátká reklama', 'short ad')}</small></button></div>`;
     },
     battleBind(App, card) {
       const o = this._battle, btn = card.querySelector('[data-ad="win2x"],[data-ad="second"]');

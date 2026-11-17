@@ -1417,3 +1417,43 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .rs .modal-actions .rs-share{flex:0 0 54px;width:54px;min-width:0;padding:0;font-size:20px}
 .rs .ad-slot{width:100%}
 @keyframes rsPop{from{transform:scale(.3) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== v181: klidné a přehledné rozhraní (hlavně telefon na šířku) ===== */
+/* žádné poskakující / pulzující rámečky a tlačítka */
+#firstFight.first-fight, .first-fight, .node.current, .chest-card .chest-art svg, .daily-chest svg, .daily-dot, .pozvi-gift, .vy-badge,
+.pet-ico canvas, .kl-claim-ico, .kl-cele-chest, .kl-hero-art img, .kl-form-prev img, .xm-door.now, .xm-door.now::after,
+.ad-btn .ad-play, .ad-btn:not([disabled]) .ad-play, .auto-tg[aria-pressed="true"] i, .timer-medal > span, #bTimer.low, .hp i::after, .chest-rays,
+.rs-emb, .res-stars i { animation: none !important; }
+#firstFight.first-fight { transform: translateX(-50%) !important; }
+/* zpráva během bitvy: malý proužek nahoře, nezakrývá bojiště */
+#toast.tiny { top: auto !important; bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important; padding: 4px 12px !important; font-size: 12px !important; line-height: 1.25 !important; max-width: min(40vw, 380px) !important; border-radius: 10px !important; opacity: .95; pointer-events: none; }
+/* okno po bitvě: jedno jednoduché okno bez posouvání */
+.modal-card.res-simple { width: min(400px, 92vw); max-height: none; overflow: visible; }
+.rs .ad-slot { width: 100%; }
+.ad-mini { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 9px 12px; font-size: 15px; line-height: 1.15;
+  background: linear-gradient(180deg, #5b4bd6, #3a2c9e) !important; color: #fff !important; border-color: #8f82ff !important; }
+.ad-mini b { font-weight: 900; color: #ffe08a; display: inline-flex; align-items: center; gap: 3px; }
+.ad-mini small { font-size: 11px; opacity: .8; font-weight: 700; }
+.ad-mini.ad-done { background: linear-gradient(180deg, #2d6b3a, #1f4b29) !important; border-color: #5fbf73 !important; }
+@media (max-height: 520px) and (orientation: landscape) {
+  .modal-card.res-simple { width: min(460px, 70vw); padding: 10px 14px 12px; }
+  .rs { gap: 6px; }
+  .rs-emb { display: none; }
+  .rs .result-title { font-size: 26px !important; }
+  .rs .res-stars { font-size: 22px; line-height: 1; }
+  .rs .reward-row .pill { font-size: 13px; padding: 3px 9px; }
+  .rs-note { font-size: 12px; max-height: 2.8em; overflow: hidden; }
+  .ad-mini { padding: 7px 10px; font-size: 13.5px; }
+  .rs .modal-actions .btn { padding: 8px 12px; font-size: 15px; min-height: 0; }
+}
+@media (max-height: 360px) and (orientation: landscape) {
+  .modal-card.res-simple { padding: 6px 12px 8px; }
+  .rs { gap: 4px; }
+  .rs .result-title { font-size: 21px !important; }
+  .rs .res-stars { font-size: 17px; }
+  .rs .reward-row .pill { font-size: 11.5px; padding: 2px 8px; }
+  .rs-note { font-size: 11px; max-height: 1.4em; }
+  .ad-mini { padding: 5px 10px; font-size: 12.5px; }
+  .ad-mini small { display: none; }
+  .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
+}
