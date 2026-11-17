@@ -62,13 +62,16 @@
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
       if (name === 'hrad' && window.UcetUI && UcetUI.nudge) try { UcetUI.nudge(this); } catch (e) { /* nic */ }
-      if (name === 'hrad') {   // dokud hráč neodehrál bitvu: velké tlačítko „Do první bitvy“
+      if (name === 'hrad') {   // velké tlačítko do další bitvy příběhu – hráč hned ví, kudy hrát
         const st = this.save.stats || {};
-        if ((st.wins || 0) + (st.losses || 0) === 0 && !document.getElementById('firstFight')) {
-          const lv = GameData.campaignHelpers.currentLevel(this.save), host = document.getElementById('screen');
-          if (lv && host) { const b = document.createElement('button'); b.id = 'firstFight'; b.className = 'btn btn-gold btn-big first-fight';
-            b.innerHTML = '⚔️ ' + (I18N.L('Do první bitvy!', 'To your first battle!'));
-            b.addEventListener('click', () => this.openLevel(lv.id)); host.appendChild(b); }
+        const first = (st.wins || 0) + (st.losses || 0) === 0;
+        const lv = GameData.campaignHelpers.currentLevel(this.save), host = document.getElementById('screen');
+        const old = document.getElementById('firstFight'); if (old) old.remove();
+        if (lv && host) {
+          const b = document.createElement('button'); b.id = 'firstFight'; b.className = 'btn btn-gold btn-big first-fight' + (first ? '' : ' play-next');
+          b.innerHTML = first ? '⚔️ ' + I18N.L('Do první bitvy!', 'To your first battle!')
+            : '⚔️ ' + I18N.L('Do bitvy', 'Battle') + (lv.name ? '<small>' + I18N.L(lv.name, (lv.en && lv.en.name) || lv.name) + '</small>' : '');
+          b.addEventListener('click', () => this.openLevel(lv.id)); host.appendChild(b);
         }
       }
       if (name === 'hrad' && window.Sireni) { try { Sireni.home(this); if ((this.save.stats.wins || 0) >= 1) Sireni.notifyAsk(this); } catch (e) { /* nic */ } }
@@ -674,8 +677,12 @@
       if (bp && bp.xp) rewards.push(`<span class="pill bp-pill">★ ${t('pas_xp_gain', { n: bp.xp })}</span>`);
       if (bp && bp.up) note += (note ? '<br>' : '') + `★ ${t('pas_lvl_up', { n: Pas.level(save) })}`;
       if (qDone) note += (note ? '<br>' : '') + `📜 ${t('quests_ready', { n: qDone })}`;
+      /* návrat zítra: po prvních výhrách připomenout denní odměnu */
+      if (res.win && !cfg.net && (save.stats.wins || 0) <= 3) note += (note ? '<br>' : '') + '🎁 ' + I18N.L('Zítra tě čeká další denní odměna – vrať se!', 'Another daily reward waits for you tomorrow – come back!');
       this.persist();
       const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
+      /* rovnou do další bitvy příběhu (výhra) / znovu (prohra) – hráč nemusí přes menu */
+      const nextLv = cfg.mode === 'campaign' && !cfg.net && !cfg.film && !cfg.afterScene ? GameData.campaignHelpers.currentLevel(save) : null;
       const mm = Math.floor(res.time / 60) + ':' + String(Math.floor(res.time % 60)).padStart(2, '0');
       this.modal(`
         <div class="rs ${res.win ? 'win' : 'loss'}">
@@ -688,12 +695,19 @@
           ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
           <div class="modal-actions">
             ${window.Sireni && Sireni.canShare() && !cfg.net ? `<button class="btn rs-share" id="resShare" aria-label="${I18N.L('Sdílet bitvu', 'Share battle')}">📤</button>` : ''}
-            <button class="btn btn-gold" id="resBack">${t('continue')}</button>
+            <button class="btn ${nextLv ? '' : 'btn-gold'}" id="resBack">${t('continue')}</button>
+            ${nextLv ? `<button class="btn btn-gold" id="resNext">${res.win ? '⚔️ ' + I18N.L('Další bitva', 'Next battle') : '🔁 ' + I18N.L('Zkusit znovu', 'Try again')}</button>` : ''}
           </div>
         </div>`, (c, close) => {
         c.classList.add('res-simple');
         const sh = c.querySelector('#resShare'); if (sh) sh.addEventListener('click', () => Sireni.shareBattle(this, cfg, res));
         if (window.Reklamy) Reklamy.battleBind(this, c);
+        const nx = c.querySelector('#resNext');
+        if (nx) nx.addEventListener('click', () => {
+          close(); this._closeBattle(); this.go(back);
+          const go = () => this.openLevel(nextLv.id);
+          if (window.CW_AdBetween) setTimeout(() => { window.CW_AdBetween(); setTimeout(go, 300); }, 300); else go();
+        });
         c.querySelector('#resBack').addEventListener('click', () => {
           close(); this._closeBattle(); if (cfg.net && window.Online) Online.afterBattle(); this.go(back);
           if (!cfg.net && !cfg.film && window.CW_AdBetween) setTimeout(() => window.CW_AdBetween(), 400);

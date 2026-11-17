@@ -9,7 +9,11 @@ zv = {}
 for f in sorted(os.listdir(os.path.join(ROOT, 'zvuky'))):
     if f.endswith('.mp3'):
         zv[f] = 'data:audio/mpeg;base64,' + base64.b64encode(open(os.path.join(ROOT, 'zvuky', f), 'rb').read()).decode()
-inj = '<script>window.CW_PORTAL="crazygames";window.CW_ZVUKY=' + json.dumps(zv) + ';</script>'
+# zvuky jako samostatné soubory ve složce cg/zvuky (rychlejší první načtení: HTML bez 3 MB base64)
+import shutil
+zdst = os.path.join(ROOT, 'cg', 'zvuky'); os.makedirs(zdst, exist_ok=True)
+for f in zv: shutil.copyfile(os.path.join(ROOT, 'zvuky', f), os.path.join(zdst, f))
+inj = '<script>window.CW_PORTAL="crazygames";</script>'
 html = html.replace('<head>', '<head>' + inj, 1)
 os.makedirs(os.path.join(ROOT, 'cg'), exist_ok=True)
 open(os.path.join(ROOT, 'cg', 'index.html'), 'w', encoding='utf-8').write(html)

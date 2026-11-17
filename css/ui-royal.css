@@ -247,3 +247,15 @@ body:has(#battle:not([hidden])) #fsBtn { display: none; }
 @media (max-width: 480px) { .pet-ico canvas { width: 52px; height: 44px; } }
 @media (orientation: landscape) and (max-height: 520px) { .pet-ico canvas { width: 50px; height: 42px; } }
 @media (pointer: fine) and (min-width: 1000px) and (min-height: 600px) { .daily-btn .pet-ico canvas { width: 74px; height: 62px; } }
+
+/* tlačítko Do bitvy na hlavní obrazovce (pro všechny, ne jen první bitvu) */
+#firstFight.play-next { display: flex; flex-direction: column; align-items: center; line-height: 1.05; padding-block: 8px; min-width: 190px; }
+#firstFight.play-next small { display: block; font-size: .62em; opacity: .9; font-weight: 700; letter-spacing: .02em; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#firstFight.first-fight { animation: ffPulse 1.6s ease-in-out infinite; }
+@keyframes ffPulse { 50% { transform: translateX(-50%) scale(1.05); } }
+body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #firstFight { display: none; }
+#firstFight.play-next small { text-transform: none; font-family: inherit; }
+@media (orientation: landscape) and (max-height: 520px) {
+  #firstFight.first-fight { font-size: 15px !important; padding: 6px 18px !important; bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important; min-width: 0; }
+  #firstFight.play-next small { font-size: 11px; }
+}
