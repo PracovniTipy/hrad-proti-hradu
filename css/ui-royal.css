@@ -251,8 +251,6 @@ body:has(#battle:not([hidden])) #fsBtn { display: none; }
 /* tlačítko Do bitvy na hlavní obrazovce (pro všechny, ne jen první bitvu) */
 #firstFight.play-next { display: flex; flex-direction: column; align-items: center; line-height: 1.05; padding-block: 8px; min-width: 190px; }
 #firstFight.play-next small { display: block; font-size: .62em; opacity: .9; font-weight: 700; letter-spacing: .02em; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#firstFight.first-fight { animation: ffPulse 1.6s ease-in-out infinite; }
-@keyframes ffPulse { 50% { transform: translateX(-50%) scale(1.05); } }
 body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #firstFight { display: none; }
 #firstFight.play-next small { text-transform: none; font-family: inherit; }
 @media (orientation: landscape) and (max-height: 520px) {

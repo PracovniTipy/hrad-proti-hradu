@@ -2941,8 +2941,6 @@ body:has(#battle:not([hidden])) #fsBtn { display: none; }
 /* tlačítko Do bitvy na hlavní obrazovce (pro všechny, ne jen první bitvu) */
 #firstFight.play-next { display: flex; flex-direction: column; align-items: center; line-height: 1.05; padding-block: 8px; min-width: 190px; }
 #firstFight.play-next small { display: block; font-size: .62em; opacity: .9; font-weight: 700; letter-spacing: .02em; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#firstFight.first-fight { animation: ffPulse 1.6s ease-in-out infinite; }
-@keyframes ffPulse { 50% { transform: translateX(-50%) scale(1.05); } }
 body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #firstFight { display: none; }
 #firstFight.play-next small { text-transform: none; font-family: inherit; }
 @media (orientation: landscape) and (max-height: 520px) {
@@ -39018,7 +39016,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 182 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 183 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

@@ -9,6 +9,9 @@ man = root / 'app/src/main/AndroidManifest.xml'
 m = man.read_text()
 if 'screenOrientation' not in m:
     m = m.replace('<activity', '<activity android:screenOrientation="sensorLandscape"', 1)
+# na šířku, ale displej na šířku není „povinná funkce“ – jinak Google Play hlásí omezenou dostupnost
+if 'android.hardware.screen.landscape' not in m:
+    m = m.replace('<application', '<uses-feature android:name="android.hardware.screen.landscape" android:required="false"/>\n    <uses-feature android:name="android.hardware.screen.portrait" android:required="false"/>\n    <application', 1)
 # 1b) reklamy za odměnu (AdMob): bez ID aplikace v manifestu by Google Mobile Ads SDK
 #     aplikaci při startu shodilo. ID se bere z js/core/reklamy.js (ADS.appId) – jedno místo pro změnu.
 #     Když tam nic není, použije se veřejné testovací ID Googlu.
