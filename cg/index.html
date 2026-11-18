@@ -2983,6 +2983,8 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #screen.home-mode .gp-test .gp-steps a { font-size: 12px; }
   #screen.home-mode .gp-test .gp-x { width: 26px; height: 26px; font-size: 17px; }
 }
+/* nápověda s klávesami jen tam, kde je klávesnice (na telefonu nedává smysl) */
+@media (pointer: coarse) { .pause-keys { display: none; } }
 
 </style>
 <style>
@@ -3537,6 +3539,19 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
 }
 @media (max-width: 600px) { .kw-prov { min-width: 0; } .kw-prov b { display: none; } }
 
+/* relikvie bestie (jedinečný set) */
+.kb-relic { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rc) 55%, transparent), 0 0 24px -10px var(--rc); background: radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--rc) 18%, transparent), transparent 60%), var(--kl-card, rgba(255,255,255,.04)); }
+.kb-relic h4 { color: #fff; text-shadow: 0 0 10px var(--rc); }
+.kb-rel { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.kb-rel-u { display: grid; justify-items: center; gap: 1px; padding: 6px 4px; border-radius: 12px; background: rgba(0,0,0,.28); opacity: .78; text-align: center; }
+.kb-rel-u canvas { width: 70px; height: 70px; filter: grayscale(.35) brightness(.8); }
+.kb-rel-u.ready, .kb-rel-u.own { opacity: 1; }
+.kb-rel-u.ready canvas, .kb-rel-u.own canvas { filter: drop-shadow(0 0 8px var(--rc)); }
+.kb-rel-u.own { box-shadow: inset 0 0 0 1px var(--rc); }
+.kb-rel-u b { font-size: 11px; color: #fff; line-height: 1.15; } .kb-rel-u small { font-size: 10.5px; color: #c8c0ae; }
+.kb-rel-u.own small { color: #9fffb0; }
+@media (max-width: 900px), (orientation: landscape) and (max-height: 520px) { .kb-rel { grid-template-columns: repeat(3, 1fr); } .kb-rel-u canvas { width: 54px; height: 54px; } }
+
 </style>
 </head>
 <body>
@@ -3735,7 +3750,7 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
   <div id="bPauseMenu" class="overlay" hidden>
     <div class="modal-card panel">
       <h2 data-i18n="pause">Pauza</h2>
-      <p class="muted" data-i18n="pause_text"></p>
+      <p class="muted pause-keys" data-i18n="pause_text"></p>
       <div class="modal-actions snd-row" id="bSnd"></div>
       <div class="modal-actions">
         <button class="btn btn-green" id="bResume" data-i18n="resume">Pokračovat</button>
@@ -42324,7 +42339,7 @@ GameData.defenseOf = save => {
   const left = iso => { const ms = new Date(iso) - Date.now(); if (!(ms > 0)) return '0 h'; const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4); return d ? `${d} d ${h} h` : h ? `${h} h ${m} min` : `${m} min`; };
 
   /* ======================= BESTIE ======================= */
-  const ROLE_N = { pech: ['pěchota', 'infantry'], strelec: ['lučištníci a střelci', 'archers'], kopi: ['kopiníci', 'spearmen'], tezka: ['těžká pěchota', 'heavy infantry'], jizda: ['jízda', 'cavalry'], mag: ['mágové', 'mages'] };
+  const ROLE_N = { pech: ['pěchota', 'infantry'], strelec: ['lučištníci a střelci', 'archers'], kopi: ['kopiníci', 'spearmen'], tezka: ['těžká pěchota', 'heavy infantry'], jizda: ['jízda', 'cavalry'], mag: ['mágové', 'mages'], velitel: ['velitelé', 'commanders'] };
   const BOSSES = [
     { id: 'kb_pyrogor', name: ['Pyrogor, Pán popela', 'Pyrogor, Lord of Ash'], sub: ['Ohnivý tyran z Popelavých plání', 'Fire tyrant of the Ashen Plains'],
       lore: ['Probudil se pod sopkou Karrag a jeho křídla zatemnila slunce. Kudy táhne, hoří vesnice i lesy. Jeho šupiny taví meče – jen šípy dokážou proletět mezerami v jeho pancíři.',
@@ -42362,6 +42377,80 @@ GameData.defenseOf = save => {
       });
     });
   })();
+
+  /* ======================= KLANOVÉ RELIKVIE – 4 jedinečné legendární sety =======================
+     Každá bestie nese jednu relikvii: zbroj + zbraň s vlastním tvarem pro všech 6 druhů vojáků
+     všech národů. Nedají se koupit ani získat jinak – jen společným bojem klanu:
+       fáze 1 (−25 %) → pěšáci · fáze 2 (−50 %) → lučištníci a kopiníci
+       fáze 3 (−75 %) → jezdci a mágové · bestie poražena → velitelé
+     Legendární bonus: +12 % životy, +12 % útok. */
+  const PHASE_ROLES = [['pech'], ['strelec', 'kopi'], ['jizda', 'mag'], ['velitel']];
+  const RELICS = [
+    { a: 'kl_popel', name: ['Relikvie Popelavého draka', 'Ashwyrm Relic'], short: ['Popelavý drak', 'Ashwyrm'], glow: '#ff8a2a',
+      desc: ['Černá ocel prosycená žhavým popelem, dračí přilba s planoucím hledím, ohnivá křídla a šupinatý hrudní plát.', 'Black steel soaked in glowing ash, a dragon helm with a burning visor, wings of fire and a scaled breastplate.'],
+      pal: { tunic: '#2a1410', tunicDark: '#160a08', trim: '#ff8a2a', metal: '#3a302a', metalDark: '#140e0c', cape: '#5a1a0a', plume: '#ff5a1a', hood: '#2a1410', hat: '#2a1410', robe: '#2a1410', lace: '#ff8a2a', mask: '#3a302a', sashi: '#5a1a0a', mon: '#ffb02a', crest: '#ff8a2a', fur: '#3a2a20', bear: '#2a1a14' },
+      helm: { shell: 'great', crest: 'dragon', visor: 'glow', colors: { metal: '#3a302a', trim: '#ff8a2a', glow: '#ffb02a', plume: '#ff5a1a' } },
+      shield: { shape: 'spiked', emblem: 'dragon', pattern: 'rays', colors: { field: '#1a0e0a', field2: '#5a1a0a', emblem: '#ffb02a', rim: '#3a302a' } },
+      af: { back: 'wing_flame', chest: 'dragonscale', shoulder: 'dragon', aura: 'embers', glow: '#ff8a2a', accent: '#ffcf4a', wing: '#ff5a1a' },
+      w: { melee: { blade: 'flame', guard: 'wings', pommel: 'gem', deco: ['magma', 'flames'] }, pole: { head: 'winged', collar: 'fur' }, bow: { style: 'dragon' }, staff: { head: 'flamebowl' } },
+      wc: { blade: '#ff9a4a', dark: '#5a1a0a', edge: '#ffe0a0', glow: '#ff8a2a', guard: '#3a302a', grip: '#1a0e0a', pommel: '#ffb02a', gem: '#ff5a1a', wood: '#2a1a14', string: '#ffcf4a', arrow: '#ff9a4a', tip: '#ffcf4a' } },
+    { a: 'kl_mraz', name: ['Relikvie Mrazivého obra', 'Frostborn Relic'], short: ['Mrazivý obr', 'Frostborn'], glow: '#9fe0ff',
+      desc: ['Runová ocel z věčného ledu, přilba s ledovými parohy, kožešinový plášť obra a krystalové nárameníky.', 'Rune steel of eternal ice, a helm with frozen antlers, the giant’s fur cloak and crystal pauldrons.'],
+      pal: { tunic: '#1a2e44', tunicDark: '#0e1a2a', trim: '#bfeeff', metal: '#d6efff', metalDark: '#5a7a9a', cape: '#e8f4ff', plume: '#9fe0ff', hood: '#1a2e44', hat: '#1a2e44', robe: '#1a2e44', lace: '#bfeeff', mask: '#d6efff', sashi: '#1a2e44', mon: '#9fe0ff', crest: '#9fe0ff', fur: '#eef6ff', bear: '#d8e6f0' },
+      helm: { shell: 'spangen', crest: 'antler', visor: 'veil', colors: { metal: '#d6efff', trim: '#9fe0ff', glow: '#bfeeff', plume: '#e8f4ff' } },
+      shield: { shape: 'viking', emblem: 'runes', pattern: 'quarters', colors: { field: '#1a2e44', field2: '#2a4a6a', emblem: '#bfeeff', rim: '#d6efff' } },
+      af: { back: 'furcloak', chest: 'runestone', shoulder: 'crystal', aura: 'snow', glow: '#9fe0ff', accent: '#ffffff', fur: '#eef6ff' },
+      w: { melee: { head: 'double', pommel: 'gem', deco: ['frost', 'runes'] }, pole: { head: 'bardiche', collar: 'fur' }, bow: { style: 'shards' }, staff: { head: 'cluster' } },
+      wc: { blade: '#e8f8ff', dark: '#4a6a8a', edge: '#ffffff', glow: '#9fe0ff', guard: '#bfeeff', grip: '#1a2e44', pommel: '#bfeeff', gem: '#7fd0ff', wood: '#2a3a52', string: '#ffffff', arrow: '#e8f8ff', tip: '#9fe0ff' } },
+    { a: 'kl_mor', name: ['Relikvie Morového kata', 'Plaguebringer Relic'], short: ['Morový kat', 'Plaguebringer'], glow: '#9be07a',
+      desc: ['Zbroj z kostí bažinných bestií, lebeční přilba s beraními rohy, potrhaný plášť a jedovatá mlha kolem.', 'Armour of marsh-beast bones, a skull helm with ram horns, a tattered cloak and poisonous mist all around.'],
+      pal: { tunic: '#1e2a14', tunicDark: '#10180a', trim: '#9be07a', metal: '#4a5a3a', metalDark: '#1a220e', cape: '#2a3a1a', plume: '#c8ff6a', hood: '#1e2a14', hat: '#1e2a14', robe: '#1e2a14', lace: '#9be07a', mask: '#d8d0b0', sashi: '#2a3a1a', mon: '#c8ff6a', crest: '#9be07a', fur: '#4a4a3a', bear: '#3a3a2a' },
+      helm: { shell: 'skull', crest: 'horn_ram', visor: 'jaw', colors: { metal: '#d8d0b0', trim: '#9be07a', glow: '#c8ff6a', plume: '#9be07a' } },
+      shield: { shape: 'gothic', emblem: 'skull', pattern: 'chevron', colors: { field: '#1e2a14', field2: '#3a5a22', emblem: '#d8d0b0', rim: '#4a5a3a' } },
+      af: { back: 'tattered', chest: 'skull', shoulder: 'skull', aura: 'wisps', glow: '#9be07a', accent: '#c8ff6a' },
+      w: { melee: { blade: 'serrated', guard: 'skull', pommel: 'skull', deco: ['vines', 'chain'] }, pole: { head: 'scythe', collar: 'skull' }, bow: { style: 'skulls' }, staff: { head: 'serpent' } },
+      wc: { blade: '#c8d8a0', dark: '#3a4a22', edge: '#eaffc0', glow: '#9be07a', guard: '#d8d0b0', grip: '#1e2a14', pommel: '#d8d0b0', gem: '#9be07a', wood: '#3a3a2a', string: '#c8ff6a', arrow: '#c8d8a0', tip: '#9be07a' } },
+    { a: 'kl_stin', name: ['Relikvie Stínové koruny', 'Shadow Crown Relic'], short: ['Stínová koruna', 'Shadow Crown'], glow: '#b98aff',
+      desc: ['Půlnoční zbroj se stříbrnou korunou, netopýří křídla, měsíční amulet a víření hvězdného prachu.', 'Midnight armour with a silver crown, bat wings, a moon amulet and swirling star dust.'],
+      pal: { tunic: '#1a0e2e', tunicDark: '#0c0618', trim: '#d8b8ff', metal: '#2a2240', metalDark: '#0c0818', cape: '#24143a', plume: '#b98aff', hood: '#1a0e2e', hat: '#1a0e2e', robe: '#1a0e2e', lace: '#d8b8ff', mask: '#2a2240', sashi: '#24143a', mon: '#d8b8ff', crest: '#b98aff', fur: '#2a2240', bear: '#1a1430' },
+      helm: { shell: 'armet', crest: 'crown', visor: 'glow', colors: { metal: '#2a2240', trim: '#d8d8f0', glow: '#c89aff', plume: '#b98aff' } },
+      shield: { shape: 'crescent', emblem: 'moon', pattern: 'bordure', colors: { field: '#1a0e2e', field2: '#3a2a5a', emblem: '#e8e0ff', rim: '#d8d8f0' } },
+      af: { back: 'wing_bat', chest: 'amulet', shoulder: 'wing', aura: 'motes', glow: '#b98aff', accent: '#e8e0ff', wing: '#24143a' },
+      w: { melee: { blade: 'katana', guard: 'tsuba', pommel: 'eye', deco: ['starfield', 'lightning'] }, pole: { head: 'moon', collar: 'chain' }, bow: { style: 'moon' }, staff: { head: 'eye' } },
+      wc: { blade: '#e8e0ff', dark: '#3a2a5a', edge: '#ffffff', glow: '#b98aff', guard: '#d8d8f0', grip: '#1a0e2e', pommel: '#c89aff', gem: '#b98aff', wood: '#24143a', string: '#e8e0ff', arrow: '#e8e0ff', tip: '#b98aff' }, samurai: true }
+  ];
+  (function defineRelics() {
+    RELICS.forEach(R => {
+      const id = R.a;
+      if (window.ArmorForge && ArmorForge.helmet) { ArmorForge.helmet(id + '_h', R.helm); ArmorForge.shield(id + '_s', R.shield); }
+      if (window.Forge && Forge.melee) {
+        Forge.melee(id, R.w.melee); Forge.pole(id, R.w.pole); Forge.bow(id, R.w.bow); Forge.staff(id, R.w.staff);
+        if (G.SAM_OK) { G.SAM_OK.pole.push(id); if (R.samurai) G.SAM_OK.melee.push(id); }
+      }
+      G.unitSkins.push({ id, only: null, name: R.name[0], rarity: 'Legendární', palette: R.pal, look: { helmet: id + '_h', shield: id + '_s' },
+        feat: { emblemColor: R.glow, af: R.af }, desc: R.desc[0] + ' Jen z klanového bosse.', en: { name: R.name[1], desc: R.desc[1] + ' Clan boss only.' },
+        codeOnly: true, klan: true, glow: R.glow, bonus: { hp: 0.12, dmg: 0.12 }, cost: {} });
+      const mk = (pre, cat, nm, en) => ({ id: pre + '_' + id, name: nm, rarity: 'Legendární', cat, model: Object.assign({ cat, id }, R.wc), desc: R.desc[0], en: { name: en, desc: R.desc[1] }, codeOnly: true, klan: true, bonus: { dmg: 0.12, hp: 0.12 }, cost: {} });
+      R.ws = ['w', 'k', 'l', 'h'].map(p => p + '_' + id);
+      G.weaponSkins.push(mk('w', 'melee', 'Čepel: ' + R.short[0], R.short[1] + ' Blade'), mk('k', 'pole', 'Kopí: ' + R.short[0], R.short[1] + ' Spear'),
+        mk('l', 'bow', 'Luk: ' + R.short[0], R.short[1] + ' Bow'), mk('h', 'staff', 'Hůl: ' + R.short[0], R.short[1] + ' Staff'));
+    });
+  })();
+  /* náhled vojáka v relikvii (zbroj + zbraň) */
+  function relicIcon(cv, role, R) {
+    try {
+      const GH = G.gearHelpers, uid = G.skinOwn.unitsOfRole(role)[0], def = G.units[uid]; if (!uid) return;
+      const W = R.ws.map(x => G.weaponSkins.find(y => y.id === x)).find(x => x && G.weaponSkinFits(x, uid));
+      const fake = { skins: { unit: { [uid]: R.a }, weapon: { [uid]: W ? W.id : null }, own: {}, ownW: {} } };
+      Art.renderUnitIcon(cv, uid, 'player', R.a, { zoom: 0.95, def: GH.drawDef(def, GH.look(fake, uid)) });
+    } catch (e) { /* nic */ }
+  }
+  /* kolik dílů relikvie hráč má (podle druhů vojáků) */
+  function relicHave(save, R) {
+    const O = G.skinOwn; const out = {};
+    PHASE_ROLES.flat().forEach(r => { const u = O.unitsOfRole(r); out[r] = u.length > 0 && u.every(uid => O.has(save, uid, R.a)); });
+    return out;
+  }
   const bossIdx = () => { const w0 = Date.UTC(2026, 0, 5), now = new Date(), d = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()); const wd = (new Date(d).getUTCDay() + 6) % 7; return (((Math.floor((d - wd * 864e5 - w0) / (7 * 864e5))) % 4) + 4) % 4; };
 
   /* portrét bosse (vykreslený z jednotky) */
@@ -42412,6 +42501,16 @@ GameData.defenseOf = save => {
     }
     return msg0.call(this, z);
   };
+  /* výhody klanu (karta pro hráče bez klanu) */
+  K._perks = function () {
+    return `<ul class="kl-perks">
+        <li><span>✨</span><div><b>${L('4 jedinečné legendární sety', '4 unique legendary sets')}</b><small>${L('Relikvie bestií – nedají se koupit, jen vybojovat s klanem', 'Beast relics – cannot be bought, only won with your clan')}</small></div></li>
+        <li><span>🐉</span><div><b>${L('Klanový boss každý týden', 'A clan boss every week')}</b><small>${L('Společně porazte bestii – až 12 000 zlata a 220 drahokamů', 'Defeat the beast together – up to 12,000 gold and 220 gems')}</small></div></li>
+        <li><span>⚔️</span><div><b>${L('Válka o říši', 'War for the Realm')}</b><small>${L('Dobývejte provincie – 40 drahokamů za každou', 'Conquer provinces – 40 gems for each')}</small></div></li>
+        <li><span>🎁</span><div><b>${L('Klanové truhly a turnaj', 'Clan chests and tournament')}</b><small>${L('Až 500 drahokamů každému členovi', 'Up to 500 gems for every member')}</small></div></li>
+        <li><span>💰</span><div><b>${L('Bonus zlata a vlajka na hradu', 'Gold bonus and castle banner')}</b><small>${L('Až +10 % zlata z každé bitvy', 'Up to +10% gold from every battle')}</small></div></li>
+      </ul>`;
+  };
   const badge0 = K.badge;
   K.badge = function (i) { return badge0.call(this, i) || !!(this._boss && this._boss.reward && (this._boss.reward.gold > 0 || this._boss.reward.gems > 0)); };
 
@@ -42459,6 +42558,11 @@ GameData.defenseOf = save => {
         <div class="kb-rws">${phases.map(p => `<div class="kb-rw ${p.on ? 'on' : ''}"><b>${p.i === 4 ? L('Poražení', 'Kill') : L(`Fáze ${p.i}`, `Phase ${p.i}`)}</b><span>${coin()} ${fmt(p.rw[0])}</span><span>${gem()} ${p.rw[1]}</span></div>`).join('')}</div>
         <p class="kl-hint">${L('Každá tvoje výhra v jakékoli bitvě = <b>150 zranění</b>. Nájezd na bosse = tolik, kolik mu v bitvě ubereš (až 12 000).', 'Each of your wins in any battle = <b>150 damage</b>. A boss raid = as much as you take from him in battle (up to 12,000).')}</p>
       </section>
+      ${(() => { const R = RELICS[s.boss | 0], have = relicHave(App.save, R); return `<section class="kl-card kb-relic" style="--rc:${R.glow}">
+        <div class="kl-sec-h"><h4>✨ ${esc(L(R.name[0], R.name[1]))}</h4><small>${L('legendární · jen z této bestie', 'legendary · only from this beast')}</small></div>
+        <p class="kl-hint">${esc(L(R.desc[0], R.desc[1]))} <b>+12 % ${L('životy', 'health')}, +12 % ${L('útok', 'attack')}</b> · ${L('pro všechny národy', 'for every nation')}</p>
+        <div class="kb-rel">${PHASE_ROLES.map((roles, i) => roles.map(role => `<div class="kb-rel-u ${have[role] ? 'own' : pct >= (i + 1) * 25 ? 'ready' : ''}"><canvas data-kbrel="${role}"></canvas><b>${esc(L(ROLE_N[role] ? ROLE_N[role][0] : role, ROLE_N[role] ? ROLE_N[role][1] : role))}</b><small>${have[role] ? '✓ ' + L('máš', 'owned') : i === 3 ? L('za poražení', 'for the kill') : L(`fáze ${i + 1}`, `phase ${i + 1}`)}</small></div>`).join('')).join('')}</div>
+      </section>`; })()}
       <div class="kl-grid">
         <section class="kl-card kb-raid">
           <div class="kl-sec-h"><h4>⚔️ ${L('Nájezd na bosse', 'Boss raid')}</h4><small>${L('dnes zbývá', 'left today')} ${s.raids_left}/3</small></div>
@@ -42474,6 +42578,7 @@ GameData.defenseOf = save => {
       <section class="kl-card kb-next"><div class="kl-sec-h"><h4>${L('Příští týdny', 'Coming weeks')}</h4></div>
         <div class="kb-cycle">${[1, 2, 3].map(d => { const N = BOSSES[((s.boss | 0) + d) % 4]; return `<div style="--bc:${N.color}"><span>${N.art}</span><b>${esc(L(N.name[0], N.name[1]).split(',')[0])}</b><small>${L('za', 'in')} ${d} ${L(d === 1 ? 'týden' : 'týdny', d === 1 ? 'week' : 'weeks')}</small></div>`; }).join('')}</div></section>
     </div>`;
+    body.querySelectorAll('canvas[data-kbrel]').forEach(cv => relicIcon(cv, cv.dataset.kbrel, RELICS[s.boss | 0]));
     const art = body.querySelector('[data-kbart]'); if (art) art.appendChild(portrait(Object.assign({}, B, { id: B.id }), 150));
     if (window.applyIcons) applyIcons(body);
     bindClaim.call(this, body);
@@ -42487,9 +42592,14 @@ GameData.defenseOf = save => {
       cl.disabled = true;
       try {
         const r = await Ucet.klan('boss_claim');
-        if (r && (r.gold || r.gems)) {
-          App.save.gold += r.gold | 0; App.save.gems += r.gems | 0; App.persist();
+        if (r && (r.gold || r.gems || (r.items || []).length)) {
+          /* relikvie: díly setu podle fáze bestie (pro všechny vojáky dané role ve všech národech) */
+          const gift = [];
+          (r.items || []).filter(x => x.kind === 'boss').forEach(x => { const R = RELICS[(x.boss | 0) % 4]; (PHASE_ROLES[(x.phase | 0) - 1] || []).forEach(role => gift.push({ role, a: R.a, ws: R.ws })); });
+          const got = window.Shop && Shop.grant ? Shop.grant(App, { gold: r.gold | 0, gems: r.gems | 0, gift }) : (App.save.gold += r.gold | 0, App.save.gems += r.gems | 0, []);
+          App.persist();
           if (window.Zvuk && Zvuk.play) try { Zvuk.play('coin', 1); } catch (e) { /* nic */ }
+          if (got && got.length && Shop.rewardsModal) { this._boss = null; Shop.rewardsModal(App, L('Kořist z klanové výpravy', 'Clan expedition loot'), got); return; }
           App.toast(L(`Kořist vyzvednuta: +${fmt(r.gold)} zlata, +${fmt(r.gems)} drahokamů`, `Loot claimed: +${fmt(r.gold)} gold, +${fmt(r.gems)} gems`));
         }
       } catch (e) { App.toast(L('Nepodařilo se vyzvednout – zkus to znovu.', 'Could not claim – try again.')); }
@@ -42599,7 +42709,7 @@ GameData.defenseOf = save => {
     void crest;
   }
 
-  window.KlanyBoss = { BOSSES, PROV, bossIdx, startRaid };
+  window.KlanyBoss = { BOSSES, PROV, RELICS, PHASE_ROLES, bossIdx, startRaid };
 })();
 
 </script>

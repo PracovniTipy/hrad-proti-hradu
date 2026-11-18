@@ -293,3 +293,5 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #screen.home-mode .gp-test .gp-steps a { font-size: 12px; }
   #screen.home-mode .gp-test .gp-x { width: 26px; height: 26px; font-size: 17px; }
 }
+/* nápověda s klávesami jen tam, kde je klávesnice (na telefonu nedává smysl) */
+@media (pointer: coarse) { .pause-keys { display: none; } }
