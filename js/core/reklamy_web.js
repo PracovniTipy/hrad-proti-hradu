@@ -123,6 +123,38 @@
         if (document.readyState === 'complete') setTimeout(ready, 300); else window.addEventListener('load', () => setTimeout(ready, 300));
       }).catch(() => {});
     }).catch(() => {});
+  } else if (portal === 'gamepix') {
+    /* GamePix SDK v3 (načtený v <head> před hrou kvůli synchronizaci localStorage):
+       povinná pauza/ztlumení, loaded + gameStart, reklamy mezi bitvami a za odměnu */
+    const go = () => {
+      const G = window.GamePix;
+      if (!G || !G.events) return;
+      window.CW_GPX = G;
+      const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+      let paused = false;
+      G.events.on('pause', () => { mute(true); try { const b = window.App && App.battle; if (b && !b.over && b.setPaused && !paused) { b.setPaused(true); paused = true; } } catch (e) {} });
+      G.events.on('resume', () => { mute(false); try { const b = window.App && App.battle; if (paused && b && b.setPaused) b.setPaused(false); } catch (e) {} paused = false; });
+      const started = () => { try { G.lifecycle.gameStart(); } catch (e) {} };
+      const hook = () => {
+        const A = window.App;
+        if (!A || !A.startBattle || A._gpxHook) return !!(A && A._gpxHook);
+        A._gpxHook = true;
+        const st = A.startBattle;
+        A.startBattle = function () { started(); return st.apply(this, arguments); };
+        return true;
+      };
+      const ready = () => {
+        hook();
+        try { G.lifecycle.loading(100); } catch (e) {}
+        Promise.resolve(G.lifecycle.loaded()).then(() => {
+          window.CW_GPX_READY = true;
+          try { const b = window.App && App.battle; if (b && !b.over) started(); } catch (e) {}
+        }).catch(() => {});
+      };
+      try { G.lifecycle.loading(10); } catch (e) {}
+      if (document.readyState === 'complete') setTimeout(ready, 200); else window.addEventListener('load', () => setTimeout(ready, 200));
+    };
+    if (window.GamePix) go(); else load('https://integration.gamepix.com/sdk/v3/gamepix.sdk.js').then(go).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -205,6 +237,8 @@
         sdk.showBanner();
       } else if (portal === 'playgama' && window.CW_PG && CW_PG.advertisement && CW_PG.advertisement.isInterstitialSupported) {
         CW_PG.advertisement.showInterstitial('po-bitve');
+      } else if (portal === 'gamepix' && window.CW_GPX_READY && window.CW_GPX && CW_GPX.ads) {
+        CW_GPX.ads.interstitial().catch(() => {});
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
