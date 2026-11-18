@@ -3760,6 +3760,38 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         if (document.readyState === 'complete') setTimeout(ready, 300); else window.addEventListener('load', () => setTimeout(ready, 300));
       }).catch(() => {});
     }).catch(() => {});
+  } else if (portal === 'gamepix') {
+    /* GamePix SDK v3 (načtený v <head> před hrou kvůli synchronizaci localStorage):
+       povinná pauza/ztlumení, loaded + gameStart, reklamy mezi bitvami a za odměnu */
+    const go = () => {
+      const G = window.GamePix;
+      if (!G || !G.events) return;
+      window.CW_GPX = G;
+      const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+      let paused = false;
+      G.events.on('pause', () => { mute(true); try { const b = window.App && App.battle; if (b && !b.over && b.setPaused && !paused) { b.setPaused(true); paused = true; } } catch (e) {} });
+      G.events.on('resume', () => { mute(false); try { const b = window.App && App.battle; if (paused && b && b.setPaused) b.setPaused(false); } catch (e) {} paused = false; });
+      const started = () => { try { G.lifecycle.gameStart(); } catch (e) {} };
+      const hook = () => {
+        const A = window.App;
+        if (!A || !A.startBattle || A._gpxHook) return !!(A && A._gpxHook);
+        A._gpxHook = true;
+        const st = A.startBattle;
+        A.startBattle = function () { started(); return st.apply(this, arguments); };
+        return true;
+      };
+      const ready = () => {
+        hook();
+        try { G.lifecycle.loading(100); } catch (e) {}
+        Promise.resolve(G.lifecycle.loaded()).then(() => {
+          window.CW_GPX_READY = true;
+          try { const b = window.App && App.battle; if (b && !b.over) started(); } catch (e) {}
+        }).catch(() => {});
+      };
+      try { G.lifecycle.loading(10); } catch (e) {}
+      if (document.readyState === 'complete') setTimeout(ready, 200); else window.addEventListener('load', () => setTimeout(ready, 200));
+    };
+    if (window.GamePix) go(); else load('https://integration.gamepix.com/sdk/v3/gamepix.sdk.js').then(go).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -3842,6 +3874,8 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         sdk.showBanner();
       } else if (portal === 'playgama' && window.CW_PG && CW_PG.advertisement && CW_PG.advertisement.isInterstitialSupported) {
         CW_PG.advertisement.showInterstitial('po-bitve');
+      } else if (portal === 'gamepix' && window.CW_GPX_READY && window.CW_GPX && CW_GPX.ads) {
+        CW_GPX.ads.interstitial().catch(() => {});
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
@@ -27435,7 +27469,7 @@ GameData.defenseOf = save => {
         if (Math.abs(dx) > 6) { drag.moved = true; clearTimeout(this._lp); }
         if (drag.moved) {
           this.cam.x = this._clampCam(drag.cam - dx);
-          this.cam.manualUntil = this.time + 24;   // hráč má dost času prohlížet bojiště
+          this.cam.manualReal = performance.now() + 10000; this.cam.catchUp = true;   // po 10 s nečinnosti se kamera vrátí k vojákům
         }
       };
       this._onUp = e => {
@@ -27469,7 +27503,7 @@ GameData.defenseOf = save => {
           const r = this.o.mini.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width * this.W;
           this.cam.x = this._clampCam(x - this.cam.viewW / 2);
-          this.cam.manualUntil = this.time + 30;
+          this.cam.manualReal = performance.now() + 10000; this.cam.catchUp = true;
         };
         this.o.mini.addEventListener('pointerdown', this._onMini);
         this.o.mini.addEventListener('pointermove', e => { if (e.buttons) this._onMini(e); });
@@ -27906,7 +27940,7 @@ GameData.defenseOf = save => {
       u.face = u.face || u.dir;
       u.slotX = null;
       this.ctrl = { mx: 0, my: 0, attack: false, block: false };
-      this.cam.manualUntil = 0;
+      this.cam.manualUntil = 0; this.cam.manualReal = 0;
       this.texts.push({ x: u.x, y: u.y - 120 * US(), txt: t('controlling', { name: u.def.name }), color: '#ffd77a', t: 0, life: 1.5, big: true });
       if (this.o.onHero) this.o.onHero(u);
     }
@@ -28551,7 +28585,7 @@ GameData.defenseOf = save => {
     }
 
     _camera(dt) {
-      if (!this.panEnabled || this.time < this.cam.manualUntil) return;
+      if (!this.panEnabled || this.time < this.cam.manualUntil || performance.now() < (this.cam.manualReal || 0)) return;
       if (this.hero) {
         const want = this._clampCam(this.hero.x - this.cam.viewW * 0.45);
         this.cam.x += (want - this.cam.x) * Math.min(1, dt * 4);
@@ -28569,7 +28603,9 @@ GameData.defenseOf = save => {
       if (this.side.player.formation === 'formace' && (ex == null || ex > this.side.player.flagX + 500)) focus = this.side.player.flagX + 120;
       if (ex != null && fx != null) focus = (fx + Math.min(ex, fx + 300)) / 2;
       const want = this._clampCam(focus - this.cam.viewW * 0.55);
-      this.cam.x += (want - this.cam.x) * Math.min(1, dt * 0.45);   // pomalé, klidné sledování
+      /* po ručním posunu se vrací rychleji, pak zase pomalé klidné sledování */
+      if (this.cam.catchUp && Math.abs(want - this.cam.x) < 30) this.cam.catchUp = false;
+      this.cam.x += (want - this.cam.x) * Math.min(1, dt * (this.cam.catchUp ? 2.2 : 0.45));
     }
 
     _strike(u) {
@@ -34828,6 +34864,7 @@ GameData.defenseOf = save => {
   const crazy = () => { const S = window.CrazyGames && window.CrazyGames.SDK; return S && S.ad && typeof S.ad.requestAd === 'function' ? S : null; };
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
   const pg = () => { const B = window.CW_PG; return B && B.advertisement && B.advertisement.isRewardedSupported ? B : null; };
+  const gpx = () => { const G = window.CW_GPX; return window.CW_GPX_READY && G && G.ads && typeof G.ads.reward === 'function' ? G : null; };
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
@@ -34836,6 +34873,7 @@ GameData.defenseOf = save => {
     if (crazy()) return window.CW_CG_ADS && window.CW_CG_AdOk && CW_CG_AdOk() ? 'crazygames' : '';
     if (poki()) return 'poki';
     if (pg()) return 'playgama';
+    if (gpx()) return 'gamepix';
     if (h5()) return 'h5';
     return '';
   }
@@ -34933,6 +34971,10 @@ GameData.defenseOf = save => {
       } catch (e) { end(false); }
       setTimeout(() => end(got), 180000);
     });
+  }
+  async function gpxShow() {
+    ui.hideWait();
+    try { const r = await gpx().ads.reward(); return !!(r && r.success); } catch (e) { return false; }
   }
   async function pokiShow() {
     ui.hideWait();
@@ -35063,7 +35105,7 @@ GameData.defenseOf = save => {
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : prov === 'gamepix' ? gpxShow() : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;
@@ -38976,7 +39018,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 178 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 182 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>

@@ -214,7 +214,7 @@
         if (Math.abs(dx) > 6) { drag.moved = true; clearTimeout(this._lp); }
         if (drag.moved) {
           this.cam.x = this._clampCam(drag.cam - dx);
-          this.cam.manualUntil = this.time + 24;   // hráč má dost času prohlížet bojiště
+          this.cam.manualReal = performance.now() + 10000; this.cam.catchUp = true;   // po 10 s nečinnosti se kamera vrátí k vojákům
         }
       };
       this._onUp = e => {
@@ -248,7 +248,7 @@
           const r = this.o.mini.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width * this.W;
           this.cam.x = this._clampCam(x - this.cam.viewW / 2);
-          this.cam.manualUntil = this.time + 30;
+          this.cam.manualReal = performance.now() + 10000; this.cam.catchUp = true;
         };
         this.o.mini.addEventListener('pointerdown', this._onMini);
         this.o.mini.addEventListener('pointermove', e => { if (e.buttons) this._onMini(e); });
@@ -685,7 +685,7 @@
       u.face = u.face || u.dir;
       u.slotX = null;
       this.ctrl = { mx: 0, my: 0, attack: false, block: false };
-      this.cam.manualUntil = 0;
+      this.cam.manualUntil = 0; this.cam.manualReal = 0;
       this.texts.push({ x: u.x, y: u.y - 120 * US(), txt: t('controlling', { name: u.def.name }), color: '#ffd77a', t: 0, life: 1.5, big: true });
       if (this.o.onHero) this.o.onHero(u);
     }
@@ -1330,7 +1330,7 @@
     }
 
     _camera(dt) {
-      if (!this.panEnabled || this.time < this.cam.manualUntil) return;
+      if (!this.panEnabled || this.time < this.cam.manualUntil || performance.now() < (this.cam.manualReal || 0)) return;
       if (this.hero) {
         const want = this._clampCam(this.hero.x - this.cam.viewW * 0.45);
         this.cam.x += (want - this.cam.x) * Math.min(1, dt * 4);
@@ -1348,7 +1348,9 @@
       if (this.side.player.formation === 'formace' && (ex == null || ex > this.side.player.flagX + 500)) focus = this.side.player.flagX + 120;
       if (ex != null && fx != null) focus = (fx + Math.min(ex, fx + 300)) / 2;
       const want = this._clampCam(focus - this.cam.viewW * 0.55);
-      this.cam.x += (want - this.cam.x) * Math.min(1, dt * 0.45);   // pomalé, klidné sledování
+      /* po ručním posunu se vrací rychleji, pak zase pomalé klidné sledování */
+      if (this.cam.catchUp && Math.abs(want - this.cam.x) < 30) this.cam.catchUp = false;
+      this.cam.x += (want - this.cam.x) * Math.min(1, dt * (this.cam.catchUp ? 2.2 : 0.45));
     }
 
     _strike(u) {
