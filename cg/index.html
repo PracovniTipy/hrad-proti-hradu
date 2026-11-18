@@ -2948,6 +2948,14 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #firstFight.play-next small { font-size: 11px; }
 }
 
+/* v184: křížek zpět v každém okně – drží se nahoře v rohu i při posouvání */
+#modalCard { position: relative; }
+#modalCard > .modal-x { position: sticky; top: 0; align-self: flex-end; margin-left: auto; margin-right: -4px; margin-top: -4px; margin-bottom: -36px; flex: 0 0 auto; z-index: 6; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid rgba(242,201,76,.75); background: #1b2440; color: #fff6dc; font-size: 20px; font-weight: 900; line-height: 1; display: grid; place-items: center;
+  cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.45); padding: 0; }
+#modalCard > .modal-x:hover { background: #2a3760; }
+@media (orientation: landscape) and (max-height: 520px) { #modalCard > .modal-x { width: 36px; height: 36px; font-size: 18px; } }
+
 </style>
 <style>
 /* =========================================================================
@@ -39016,7 +39024,7 @@ GameData.defenseOf = save => {
           ${window.Pozvi ? Pozvi.creatorHtml() : ''}
           <button class="btn btn-blue" id="bugBtn">${t('bug_report')}</button>
           <button class="btn" id="tutAgain">${t('replay_tutorials')}</button>
-          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 183 · beta · © 2026 BrosWars Studio</p>
+          <p class="muted" style="margin:0;font-size:12px;text-align:center">${t('app_version')} 184 · beta · © 2026 BrosWars Studio</p>
           <p class="muted" style="margin:0;font-size:11px;text-align:center">${t('credits_sfx')} <a href="https://www.wildfiregames.com/" target="_blank" rel="noopener">0 A.D. – Wildfire Games</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> · ${t('credits_cries')} <a href="https://elevenlabs.io/sound-effects" target="_blank" rel="noopener">elevenlabs.io</a></p>
           <div id="resetBox"><button class="btn btn-red" id="resetBtn">${t('reset')}</button></div>
         </section>
@@ -42819,6 +42827,14 @@ GameData.defenseOf = save => {
       // delegace: funguje i když se obsah okna znovu vykreslí (např. po vyzvednutí odměny)
       c.onclick = e => { const b = e.target.closest('[data-close]'); if (b && c.contains(b)) close(); };
       if (onMount) onMount(c, close);
+      /* křížek „zpět“ vždy vidět nahoře v rohu (na telefonu bývá tlačítko Zavřít až dole pod okrajem).
+         Jen u oken, která se zavřít dají (mají [data-close]); křížek klikne na jejich vlastní Zavřít. */
+      if (!c.querySelector('.modal-x') && c.querySelector('[data-close]')) {
+        const x = document.createElement('button');
+        x.type = 'button'; x.className = 'modal-x'; x.setAttribute('aria-label', I18N.L('Zpět', 'Back')); x.textContent = '✕';
+        x.addEventListener('click', e => { e.stopPropagation(); const b = [...c.querySelectorAll('[data-close]')].filter(el => el !== x).pop(); if (b) b.click(); else close(); });
+        c.prepend(x);
+      }
       const first = c.querySelector('.btn:not([disabled])');
       if (first) first.focus();
       return close;

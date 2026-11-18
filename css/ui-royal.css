@@ -257,3 +257,11 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #firstFight.first-fight { font-size: 15px !important; padding: 6px 18px !important; bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important; min-width: 0; }
   #firstFight.play-next small { font-size: 11px; }
 }
+
+/* v184: křížek zpět v každém okně – drží se nahoře v rohu i při posouvání */
+#modalCard { position: relative; }
+#modalCard > .modal-x { position: sticky; top: 0; align-self: flex-end; margin-left: auto; margin-right: -4px; margin-top: -4px; margin-bottom: -36px; flex: 0 0 auto; z-index: 6; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid rgba(242,201,76,.75); background: #1b2440; color: #fff6dc; font-size: 20px; font-weight: 900; line-height: 1; display: grid; place-items: center;
+  cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.45); padding: 0; }
+#modalCard > .modal-x:hover { background: #2a3760; }
+@media (orientation: landscape) and (max-height: 520px) { #modalCard > .modal-x { width: 36px; height: 36px; font-size: 18px; } }

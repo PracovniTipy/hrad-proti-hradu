@@ -137,6 +137,14 @@
       // delegace: funguje i když se obsah okna znovu vykreslí (např. po vyzvednutí odměny)
       c.onclick = e => { const b = e.target.closest('[data-close]'); if (b && c.contains(b)) close(); };
       if (onMount) onMount(c, close);
+      /* křížek „zpět“ vždy vidět nahoře v rohu (na telefonu bývá tlačítko Zavřít až dole pod okrajem).
+         Jen u oken, která se zavřít dají (mají [data-close]); křížek klikne na jejich vlastní Zavřít. */
+      if (!c.querySelector('.modal-x') && c.querySelector('[data-close]')) {
+        const x = document.createElement('button');
+        x.type = 'button'; x.className = 'modal-x'; x.setAttribute('aria-label', I18N.L('Zpět', 'Back')); x.textContent = '✕';
+        x.addEventListener('click', e => { e.stopPropagation(); const b = [...c.querySelectorAll('[data-close]')].filter(el => el !== x).pop(); if (b) b.click(); else close(); });
+        c.prepend(x);
+      }
       const first = c.querySelector('.btn:not([disabled])');
       if (first) first.focus();
       return close;
