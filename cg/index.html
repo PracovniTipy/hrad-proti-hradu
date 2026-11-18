@@ -2969,6 +2969,20 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #battle .b-squad .obtn.sqb > span:not([data-ico]) { display: none; }
   #battle .b-squad .sq-x { font-size: 12px; padding: 1px 6px; }
 }
+/* okna s vlastním křížkem v hlavičce: zůstane jen jeden (náš přilepený nahoře) */
+#modalCard:has(> .modal-x) .kl-x, #modalCard:has(> .modal-x) .xm-x { display: none; }
+#modalCard:has(> .modal-x) .kl-head { padding-right: 56px; }
+
+/* v186: karta „Testuj na Androidu“ na telefonu nahoře uprostřed, kompaktní – nepřekrývá tlačítko Do bitvy ani Síň slávy */
+@media (orientation: landscape) and (max-height: 520px) {
+  #screen.home-mode .gp-test { top: 54px; bottom: auto !important; left: 200px; right: auto; margin: 0; width: min(430px, calc(100vw - 420px)); padding: 6px 10px; }
+  #screen.home-mode .gp-test .gp-head small { display: none; }
+  #screen.home-mode .gp-test .gp-head b { font-size: 12.5px; }
+  #screen.home-mode .gp-test .gp-head svg { width: 20px; height: 20px; }
+  #screen.home-mode .gp-test .gp-steps { grid-auto-flow: column; gap: 10px; margin-top: 4px; }
+  #screen.home-mode .gp-test .gp-steps a { font-size: 12px; }
+  #screen.home-mode .gp-test .gp-x { width: 26px; height: 26px; font-size: 17px; }
+}
 
 </style>
 <style>
@@ -3412,6 +3426,116 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   .kl-hero-art { display: none; }
   .kl-emb { grid-template-columns: repeat(6, 1fr); }
 }
+
+</style>
+<style>
+/* =========================================================================
+   UDÁLOST TÝDNE (js/core/udalosti.js) + KLANOVÝ BOSS a VÁLKA O ŘÍŠI (js/ui/klany_boss.js)
+   ========================================================================= */
+
+/* ---------- tlačítko na domovské obrazovce (vedle klanu) ---------- */
+#screen.home-mode .ud-btn, .ud-btn { left: 330px; top: calc(430px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .ud-btn { top: 222px; left: 90px; } }
+.ud-btn-art { display: grid; place-items: center; width: 58px; height: 50px; font-size: 38px; line-height: 1;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,.55)) drop-shadow(0 0 10px var(--ec, #ffd24a)); }
+.ud-btn .daily-lbl { max-width: 96px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; text-shadow: 0 2px 0 #000, 0 0 8px var(--ec, #ffd24a); }
+@media (orientation: landscape) and (max-height: 520px) { .ud-btn-art { width: 46px; height: 40px; font-size: 30px; } }
+
+/* ---------- okno události ---------- */
+#modalCard:has(.ud) { width: min(900px, 96vw); }
+.ud { display: grid; gap: 12px; }
+.ud-hero { display: flex; gap: 16px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--ebg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 45%, transparent), 0 10px 26px -12px var(--ec); }
+.ud-art { flex: none; width: 96px; height: 96px; display: grid; place-items: center; font-size: 66px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--ec) 40%, transparent), transparent 70%); filter: drop-shadow(0 0 16px var(--ec)); }
+.ud-hero h2 { margin: 2px 0 4px; color: #fff; text-shadow: 0 0 14px var(--ec); }
+.ud-lore { margin: 0 0 8px; color: #e8e0cc; font-size: 13.5px; line-height: 1.45; }
+.ud-rule { display: inline-block; padding: 5px 10px; border-radius: 10px; font-weight: 800; font-size: 12.5px; color: #fff; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 60%, transparent); }
+.ud-tok { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border-radius: 12px; background: rgba(0,0,0,.25); }
+.ud-tok-n { font-size: 22px; } .ud-tok-n b { font-family: var(--font-display); color: var(--ec); font-size: 26px; }
+.ud-tok small { color: #c8c0ae; flex: 1; }
+.ud-path { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.ud-path li { position: relative; display: grid; gap: 3px; justify-items: center; padding: 8px 4px; border-radius: 12px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); opacity: .72; text-align: center; }
+.ud-path li.on { opacity: 1; background: color-mix(in srgb, var(--ec) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 70%, transparent); }
+.ud-path li.got { opacity: .55; }
+.ud-path li.big { background: linear-gradient(180deg, rgba(255,210,74,.18), rgba(255,210,74,.04)); }
+.ud-path .ud-t { font-size: 11.5px; color: #c8c0ae; font-weight: 800; }
+.ud-path .ud-r { font-size: 12.5px; font-weight: 900; color: #fff; display: flex; gap: 3px; align-items: center; }
+.ud-path .ud-r svg { width: 14px; height: 14px; }
+.ud-path i { font-style: normal; font-size: 14px; }
+.ud-how { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ud-how > div { display: grid; gap: 3px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.04); font-size: 12.5px; color: #d8d0bc; }
+.ud-how b { color: #fff; }
+.ud-next { display: flex; gap: 8px; flex-wrap: wrap; }
+.ud-next span { flex: 1; min-width: 140px; display: grid; padding: 6px 10px; border-radius: 10px; font-weight: 800; font-size: 12.5px; color: #fff; background: rgba(0,0,0,.25); box-shadow: inset 3px 0 0 var(--ec); }
+.ud-next small { color: #a8a090; font-weight: 700; }
+.ud-go { display: flex; gap: 10px; justify-content: center; }
+.pill.ud-pill { box-shadow: inset 0 0 0 1px var(--ec); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .ud { gap: 8px; } .ud-hero { padding: 8px 10px; gap: 10px; } .ud-art { width: 62px; height: 62px; font-size: 42px; }
+  .ud-lore { font-size: 12px; } .ud-path { grid-template-columns: repeat(12, minmax(54px, 1fr)); overflow-x: auto; }
+  .ud-how { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) { .ud-path { grid-template-columns: repeat(4, 1fr); } .ud-how { grid-template-columns: 1fr; } }
+
+/* ---------- KLANOVÝ BOSS ---------- */
+.kb { display: grid; gap: 12px; }
+.kb-hero { display: flex; gap: 16px; align-items: center; background: radial-gradient(120% 140% at 0% 50%, color-mix(in srgb, var(--bc) 30%, transparent), transparent 60%), var(--kl-card, rgba(255,255,255,.04)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bc) 55%, transparent); }
+.kb-art { flex: none; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, color-mix(in srgb, var(--bc) 35%, transparent), transparent 70%); }
+.kb-art canvas { filter: drop-shadow(0 0 12px var(--bc)); }
+.kb-txt h3 { margin: 2px 0 0; color: #fff; text-shadow: 0 0 14px var(--bc); }
+.kb-sub { display: block; color: var(--bc); font-weight: 800; font-style: normal; margin-bottom: 6px; }
+.kb-lore { margin: 0 0 8px; color: #d8d0bc; font-size: 13px; line-height: 1.45; }
+.kb-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.kb-tags span { padding: 4px 9px; border-radius: 9px; font-size: 12px; font-weight: 800; background: rgba(0,0,0,.3); color: #fff; }
+.kb-weak b { color: #9fffb0; }
+.kb-bar { position: relative; height: 26px; margin: 26px 4px 30px; border-radius: 13px; background: #1a0a0a; box-shadow: inset 0 0 0 2px #05070b, inset 0 3px 8px rgba(0,0,0,.6); }
+.kb-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 80%, #fff), var(--bc) 50%, color-mix(in srgb, var(--bc) 60%, #000)); box-shadow: 0 0 14px var(--bc); transition: width .8s; }
+.kb-ph { position: absolute; top: -24px; transform: translateX(-50%); display: grid; justify-items: center; font-size: 11px; color: #c8c0ae; }
+.kb-ph b { position: absolute; top: 50px; } .kb-ph.on b { color: #ffd77a; }
+.kb-rws { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.kb-rw { display: grid; justify-items: center; gap: 2px; padding: 6px; border-radius: 10px; background: rgba(255,255,255,.04); font-size: 12px; opacity: .7; }
+.kb-rw.on { opacity: 1; background: rgba(255,210,74,.12); box-shadow: inset 0 0 0 1px rgba(255,210,74,.5); }
+.kb-rw span { display: flex; gap: 3px; align-items: center; } .kb-rw svg { width: 13px; height: 13px; }
+.kb-mine { display: flex; gap: 10px; margin: 6px 0 10px; }
+.kb-mine span { flex: 1; display: grid; padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,.25); font-size: 11.5px; color: #c8c0ae; }
+.kb-mine b { font-family: var(--font-display); font-size: 20px; color: #fff; }
+.kb-raid .btn-big { width: 100%; }
+.kb-cycle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kb-cycle div { display: grid; justify-items: center; padding: 8px; border-radius: 12px; background: rgba(0,0,0,.25); box-shadow: inset 0 -3px 0 var(--bc); }
+.kb-cycle span { font-size: 26px; } .kb-cycle b { color: #fff; font-size: 12.5px; } .kb-cycle small { color: #a8a090; font-size: 11px; }
+.kb-teaser { display: flex; gap: 10px; justify-content: center; font-size: 40px; }
+.kb-teaser span { filter: drop-shadow(0 0 10px var(--bc)); }
+.kl-sys-boss { color: #ffd77a; } .kl-sys-raid { color: #ffb07a; } .kl-sys-cil { color: #9fd0ff; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .kb-hero { gap: 10px; } .kb-art { width: 90px; height: 90px; } .kb-art canvas { width: 90px !important; height: 90px !important; }
+  .kb-lore { font-size: 12px; } .kb-rws { gap: 4px; }
+}
+@media (max-width: 600px) { .kb-hero { flex-direction: column; text-align: center; } .kb-tags { justify-content: center; } }
+
+/* ---------- VÁLKA O ŘÍŠI ---------- */
+.kw { display: grid; gap: 12px; }
+.kw-head { display: flex; gap: 14px; align-items: center; }
+.kw-head h3 { margin: 2px 0 4px; color: #fff; }
+.kw-me { flex: none; display: grid; justify-items: center; padding: 8px 14px; border-radius: 14px; background: rgba(255,210,74,.12); box-shadow: inset 0 0 0 1px rgba(255,210,74,.5); }
+.kw-me b { font-family: var(--font-display); font-size: 30px; color: #ffd77a; } .kw-me small { font-size: 11px; color: #c8c0ae; text-align: center; }
+.kw-map { position: relative; height: 340px; border-radius: 18px; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255,236,190,.16), transparent 70%), repeating-linear-gradient(45deg, rgba(255,255,255,.015) 0 10px, transparent 10px 20px), linear-gradient(160deg, #3a4a2a, #2a3420 40%, #3a2e1e);
+  box-shadow: inset 0 0 0 2px rgba(232,184,74,.45), inset 0 0 40px rgba(0,0,0,.6); }
+.kw-roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kw-roads line { stroke: rgba(255,230,170,.35); stroke-width: .6; stroke-dasharray: 1.6 1.2; vector-effect: non-scaling-stroke; }
+.kw-prov { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; min-width: 96px; padding: 6px 8px; border-radius: 14px; border: 0; cursor: pointer; color: #fff;
+  background: rgba(14,18,28,.82); box-shadow: inset 0 0 0 2px var(--oc, rgba(255,255,255,.18)), 0 6px 14px rgba(0,0,0,.45); font: inherit; }
+.kw-prov.taken { background: color-mix(in srgb, var(--oc) 32%, rgba(14,18,28,.88)); }
+.kw-prov.ours { box-shadow: inset 0 0 0 2px #ffd24a, 0 0 18px rgba(255,210,74,.55); }
+.kw-prov.target { outline: 2px dashed #9fd0ff; outline-offset: 3px; }
+.kw-prov.sel { transform: translate(-50%, -50%) scale(1.08); }
+.kw-ico { font-size: 24px; line-height: 1; } .kw-prov b { font-size: 12px; white-space: nowrap; } .kw-prov small { font-size: 10.5px; color: #e8dcc0; }
+.kw-flag { position: absolute; top: -12px; right: -6px; font-style: normal; font-size: 18px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .kw-map { height: 250px; } .kw-prov { min-width: 78px; padding: 3px 6px; } .kw-ico { font-size: 18px; } .kw-prov b { font-size: 10.5px; } .kw-prov small { font-size: 9.5px; }
+  .kw-head { gap: 8px; } .kw-head h3 { font-size: 15px; }
+}
+@media (max-width: 600px) { .kw-prov { min-width: 0; } .kw-prov b { display: none; } }
 
 </style>
 </head>
@@ -38280,6 +38404,7 @@ GameData.defenseOf = save => {
       if (window.Pozvi) Pozvi.homeButton(App, el);
       if (window.Vanoce) try { Vanoce.home(App, el); } catch (e) { /* nic */ }   // vánoční událost (js/core/vanoce.js)
       if (window.Klany) Klany.homeButton(App, el);
+      if (window.Udalosti) try { Udalosti.homeButton(App, el); } catch (e) { /* nic */ }   // událost týdne (js/core/udalosti.js)
       if (window.Sireni && Sireni.homeChallenge) Sireni.homeChallenge(App);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
@@ -42173,6 +42298,592 @@ GameData.defenseOf = save => {
 
 </script>
 <script>
+/* js/ui/klany_boss.js */
+/* =========================================================================
+   KLANY 2 – KLANOVÝ BOSS a VÁLKA O ŘÍŠI (rozšiřuje js/ui/klany.js)
+   - Klanový boss: každý týden jiná bestie (4 v rotaci). Celý klan jí ubírá
+     společné životy: každá výhra člena = 150 zranění, Nájezd na bosse
+     (speciální bitva, 3× denně) = zranění, které boss v bitvě dostal.
+     Fáze 25 / 50 / 75 / 100 % → odměny pro každého, kdo přispěl.
+     Každý boss má slabinu (druh vojáka, který mu dává 1,6× zranění)
+     a vlastní ničivý útok v bitvě.
+   - Válka o říši: mapa 9 provincií. Vůdce/důstojník určí cíl, každá výhra
+     člena = 1 bod vlivu. V neděli o půlnoci provincii drží klan s nejvíc
+     vlivem → 40 drahokamů každému, kdo přispěl, za každou drženou provincii.
+   Server: supabase/migrations/20261119010000_hra_klan_boss_valka.sql
+   Na herních portálech (window.CW_PORTAL) se nic z toho neukazuje (Klany.available()).
+   ========================================================================= */
+(function () {
+  const G = window.GameData, K = window.Klany;
+  if (!G || !K) return;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
+  const coin = () => (window.ico ? `<i class="kl-i">${ico('coin')}</i>` : '🪙');
+  const gem = () => (window.ico ? `<i class="kl-i">${ico('gem')}</i>` : '💎');
+  const left = iso => { const ms = new Date(iso) - Date.now(); if (!(ms > 0)) return '0 h'; const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4); return d ? `${d} d ${h} h` : h ? `${h} h ${m} min` : `${m} min`; };
+
+  /* ======================= BESTIE ======================= */
+  const ROLE_N = { pech: ['pěchota', 'infantry'], strelec: ['lučištníci a střelci', 'archers'], kopi: ['kopiníci', 'spearmen'], tezka: ['těžká pěchota', 'heavy infantry'], jizda: ['jízda', 'cavalry'], mag: ['mágové', 'mages'] };
+  const BOSSES = [
+    { id: 'kb_pyrogor', name: ['Pyrogor, Pán popela', 'Pyrogor, Lord of Ash'], sub: ['Ohnivý tyran z Popelavých plání', 'Fire tyrant of the Ashen Plains'],
+      lore: ['Probudil se pod sopkou Karrag a jeho křídla zatemnila slunce. Kudy táhne, hoří vesnice i lesy. Jeho šupiny taví meče – jen šípy dokážou proletět mezerami v jeho pancíři.',
+        'He woke beneath Mount Karrag and his wings blotted out the sun. Where he marches, villages and forests burn. His scales melt swords – only arrows can slip through the gaps in his armour.'],
+      weak: 'strelec', theme: 'peklo', color: '#ff7a2a', art: '🔥',
+      special: ['Ohnivý déšť: každých 14 s sešle plameny na tvé vojáky.', 'Rain of Fire: every 14 s he hurls flames at your troops.'],
+      pal: { skin: '#5a1a0a', tunic: '#2a0a04', metal: '#7a2a10', metalDark: '#3a0e04', fire: '#ffb02a', wing: '#4a1206', cape: '#2a0804', trim: '#ffcf4a', eyes: '#fff2a0' } },
+    { id: 'kb_hrimtur', name: ['Hrimtur, Ledový obr', 'Hrimtur, the Frost Giant'], sub: ['Strážce Věčné zimy', 'Warden of the Eternal Winter'],
+      lore: ['Spal tisíc let v ledovci nad fjordy. Teď sestoupil a s každým krokem zamrzají řeky. Mráz z něj vysává sílu obyčejných vojáků – jen těžká pěchota vydrží jeho chlad a rozbije led na jeho zbroji.',
+        'He slept a thousand years in the glacier above the fjords. Now he has come down and rivers freeze with each step. His frost drains ordinary soldiers – only heavy infantry can endure the cold and shatter the ice on his armour.'],
+      weak: 'tezka', theme: 'sever', color: '#7fd0ff', art: '❄️',
+      special: ['Ledový dech: každých 14 s zmrazí tvou první linii.', 'Frost Breath: every 14 s he freezes your front line.'],
+      pal: { skin: '#5a8ab0', tunic: '#16263a', metal: '#cfeeff', metalDark: '#4a7aa0', fire: '#bfeeff', wing: '#2a4a6a', cape: '#16304a', trim: '#e6f8ff', eyes: '#ffffff' } },
+    { id: 'kb_morvath', name: ['Morvath, Morový chřtán', 'Morvath, the Plague Maw'], sub: ['Bestie z Hnilobných bažin', 'Beast of the Rotting Marsh'],
+      lore: ['Vylezl z bažin, kde se dřív topily celé armády. Jeho dech otráví vše živé a jeho kůže se hojí rychleji, než ji meč stihne rozseknout. Kopiníci ho ale udrží na dálku a probodnou mu jedové žlázy.',
+        'He crawled out of the marshes where whole armies once drowned. His breath poisons all that lives and his hide heals faster than a sword can cut. Spearmen, though, can keep him at bay and pierce his venom glands.'],
+      weak: 'kopi', theme: 'evropa', color: '#9be07a', art: '☠️',
+      special: ['Morový mrak: každých 14 s otráví tvé vojáky v okolí.', 'Plague Cloud: every 14 s he poisons your nearby troops.'],
+      pal: { skin: '#4a6a2a', tunic: '#1a2410', metal: '#3a5a22', metalDark: '#16220c', fire: '#b8ff6a', wing: '#2a4016', cape: '#1a2a10', trim: '#c8ff6a', eyes: '#eaff9a' } },
+    { id: 'kb_nyx', name: ['Nyx, Královna stínů', 'Nyx, Queen of Shadows'], sub: ['Paní Bezměsíčné noci', 'Mistress of the Moonless Night'],
+      lore: ['Když zhasne měsíc, vychází z trhliny mezi světy. Její stíny se mění v bojovníky a mizí dřív, než je zasáhneš. Rychlá pěchota je ale dokáže rozprášit a dostat se až k ní.',
+        'When the moon goes dark, she steps out of the rift between worlds. Her shadows become warriors and vanish before you can strike them. Swift infantry, however, can scatter them and reach her.'],
+      weak: 'pech', theme: 'peklo', color: '#b98aff', art: '🌑',
+      special: ['Stínové klony: každých 14 s vyvolá stínové bojovníky.', 'Shadow Clones: every 14 s she summons shadow warriors.'],
+      pal: { skin: '#2a1a3a', tunic: '#120a1e', metal: '#3a2a5a', metalDark: '#140a24', fire: '#c89aff', wing: '#24143a', cape: '#1a0a2e', trim: '#d8b8ff', eyes: '#ffffff' } }
+  ];
+  const RAID_HP = 12000;
+  (function defineBosses() {
+    const base = G.units && G.units.demonkral; if (!base) return;
+    BOSSES.forEach((b, i) => {
+      G.units[b.id] = Object.assign({}, base, {
+        id: b.id, name: L(b.name[0], b.name[1]).split(',')[0], role: L(b.sub[0], b.sub[1]), desc: L(b.lore[0], b.lore[1]), pal: b.pal,
+        hp: RAID_HP, maxHp: RAID_HP, dmg: 64, cleave: 5, speed: 26, armor: 0.28,
+        look: Object.assign({}, base.look, { scale: 2.15, capeColor: b.pal.cape }, i === 1 ? { wings: null, helmet: 'hellhelm', weapon: 'flamesword' } : i === 2 ? { weapon: 'trident' } : {})
+      });
+    });
+  })();
+  const bossIdx = () => { const w0 = Date.UTC(2026, 0, 5), now = new Date(), d = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()); const wd = (new Date(d).getUTCDay() + 6) % 7; return (((Math.floor((d - wd * 864e5 - w0) / (7 * 864e5))) % 4) + 4) % 4; };
+
+  /* portrét bosse (vykreslený z jednotky) */
+  function portrait(b, size) {
+    const cv = document.createElement('canvas'); cv.width = cv.height = size * 2; cv.style.width = cv.style.height = size + 'px';
+    try { if (window.Art && Art.renderUnitIcon) Art.renderUnitIcon(cv, b.id, 'enemy', 'zakladni', { zoom: 0.5 }); } catch (e) { /* nic */ }
+    return cv;
+  }
+
+  /* ======================= PROVINCIE ======================= */
+  const PROV = [
+    { n: ['Zlaté doly', 'Golden Mines'], x: 18, y: 22, ico: '⛏️' }, { n: ['Královské město', 'Royal City'], x: 50, y: 18, ico: '🏰' }, { n: ['Ledové fjordy', 'Frozen Fjords'], x: 82, y: 20, ico: '🧊' },
+    { n: ['Šeptající hvozd', 'Whispering Woods'], x: 16, y: 52, ico: '🌲' }, { n: ['Srdce říše', 'Heart of the Realm'], x: 50, y: 50, ico: '👑' }, { n: ['Dračí hory', 'Dragon Peaks'], x: 84, y: 50, ico: '🐉' },
+    { n: ['Rybářský přístav', 'Fishers’ Harbour'], x: 20, y: 82, ico: '⚓' }, { n: ['Pšeničné pláně', 'Wheat Plains'], x: 52, y: 82, ico: '🌾' }, { n: ['Popelavá poušť', 'Ashen Desert'], x: 82, y: 82, ico: '🏜️' }
+  ];
+
+  /* ======================= OKNO KLANU: nové karty ======================= */
+  const open0 = K.open, render0 = K.render, msg0 = K._msg;
+  K.open = function (App, tab) {
+    open0.call(this, App, tab === 'boss' || tab === 'valka' ? 'muj' : tab);
+    const nav = this._root && this._root.querySelector('.kl-tabs');
+    if (nav && !nav.querySelector('[data-kt="boss"]')) {
+      const mk = (id, txt) => { const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.kt = id; b.innerHTML = txt; b.addEventListener('click', () => { this._tab = id; this._view = null; this.render(); }); return b; };
+      const z = nav.querySelector('[data-kt="zebricek"]');
+      nav.insertBefore(mk('boss', '🐉 ' + L('Boss', 'Boss')), z);
+      nav.insertBefore(mk('valka', '⚔️ ' + L('Válka', 'War')), z);
+    }
+    if (tab === 'boss' || tab === 'valka') { this._tab = tab; this.render(); }
+  };
+  K.render = function (quiet) {
+    const body = this._body(); if (!body) return;
+    if ((this._tab === 'boss' || this._tab === 'valka') && !this._view) {
+      this._setTabs();
+      return this._tab === 'boss' ? renderBoss.call(this, body, quiet) : renderValka.call(this, body, quiet);
+    }
+    return render0.call(this, quiet);
+  };
+  K._msg = function (z) {
+    if (z.kind === 'sys' && (z.code === 'boss' || z.code === 'raid' || z.code === 'cil')) {
+      const a = esc(z.arg || ''), B = BOSSES[bossIdx()], bn = L(B.name[0], B.name[1]).split(',')[0];
+      const T = {
+        boss: +a >= 4 ? L(`${B.art} ${bn} padl! Celý klan si může vyzvednout kořist 🏆`, `${B.art} ${bn} has fallen! The whole clan can claim the loot 🏆`)
+          : L(`${B.art} ${bn} ztratil ${a * 25} % životů! Odměna fáze ${a} je připravená 🎁`, `${B.art} ${bn} lost ${a * 25}% of his life! Phase ${a} reward is ready 🎁`),
+        raid: L(`<b>${esc(z.name || '')}</b> zasadil bossovi ${fmt(+a)} zranění v jednom nájezdu! ⚔️`, `<b>${esc(z.name || '')}</b> dealt ${fmt(+a)} damage to the boss in one raid! ⚔️`),
+        cil: L(`<b>${esc(z.name || '')}</b> vyhlásil útok na provincii ${PROV[+a - 1] ? PROV[+a - 1].ico + ' ' + PROV[+a - 1].n[0] : ''} 🚩`, `<b>${esc(z.name || '')}</b> ordered an attack on ${PROV[+a - 1] ? PROV[+a - 1].ico + ' ' + PROV[+a - 1].n[1] : ''} 🚩`)
+      };
+      return `<div class="kl-sys kl-sys-${z.code}">${T[z.code]}</div>`;
+    }
+    return msg0.call(this, z);
+  };
+  const badge0 = K.badge;
+  K.badge = function (i) { return badge0.call(this, i) || !!(this._boss && this._boss.reward && (this._boss.reward.gold > 0 || this._boss.reward.gems > 0)); };
+
+  /* ---------- karta Boss ---------- */
+  async function renderBoss(body, quiet) {
+    const App = this._App;
+    if (!window.Ucet || !Ucet.logged() || Ucet.guest()) return this._guest(body);
+    if (navigator.onLine === false) return this._offline(body);
+    if (!quiet) this._loading(body);
+    let s;
+    try { s = this._boss = await Ucet.klan('boss'); } catch (e) { this._offline(body); return; }
+    if (body !== this._body() || this._tab !== 'boss') return;
+    const rw = s.reward || {};
+    const claimHtml = (rw.gold > 0 || rw.gems > 0) ? `<section class="kl-card kl-claim kb-claim">
+        <div class="kl-claim-ico">🏆</div>
+        <div><b>${L('Kořist z bosse a války je tvoje!', 'Boss and war loot is yours!')}</b>
+        <small>${(rw.items || []).map(x => x.kind === 'valka' ? L(`Válka o říši: ${x.held} provincie`, `Realm war: ${x.held} province(s)`) : x.phase === 4 ? L('Boss poražen', 'Boss defeated') : L(`Fáze ${x.phase}`, `Phase ${x.phase}`)).join(' · ')}</small></div>
+        <div class="kl-claim-r">${rw.gold ? `<span class="kl-amt">${coin()} ${fmt(rw.gold)}</span>` : ''}${rw.gems ? `<span class="kl-amt">${gem()} ${fmt(rw.gems)}</span>` : ''}
+        <button class="btn btn-gold" data-kbclaim>${L('Vyzvednout', 'Claim')}</button></div></section>` : '';
+    if (!s.klan) {
+      body.innerHTML = `<div class="kl-empty">${claimHtml}<div class="kb-teaser">${BOSSES.map(b => `<span style="--bc:${b.color}">${b.art}</span>`).join('')}</div>
+        <h3>${L('Klanový boss', 'Clan boss')}</h3><p class="muted">${L('Každý týden se probudí nová bestie. Přidej se ke klanu a porazte ji společně – kořist dostane každý, kdo pomohl.', 'Every week a new beast awakens. Join a clan and defeat it together – everyone who helped gets the loot.')}</p>
+        <button class="btn btn-gold" data-kt3="hledat">${L('Najít klan', 'Find a clan')}</button></div>`;
+      const h = body.querySelector('[data-kt3]'); if (h) h.addEventListener('click', () => { this._tab = 'hledat'; this.render(); });
+      bindClaim.call(this, body); return;
+    }
+    const B = BOSSES[s.boss | 0], hp = s.hp, dmg = Math.min(hp, s.dmg), pct = Math.min(100, dmg / hp * 100), dead = dmg >= hp;
+    const phases = [1, 2, 3, 4].map(i => ({ i, at: i * 25, on: pct >= i * 25, rw: [[1500, 20], [2500, 30], [4000, 50], [6000, 120]][i - 1] }));
+    const top = s.top || [];
+    body.innerHTML = `<div class="kb" style="--bc:${B.color}">
+      ${claimHtml}
+      <section class="kl-card kb-hero kb-${B.id}">
+        <div class="kb-art" data-kbart></div>
+        <div class="kb-txt">
+          <span class="eyebrow">${L('Bestie tohoto týdne', 'Beast of the week')} · ⏳ ${left(s.ends)}</span>
+          <h3>${B.art} ${esc(L(B.name[0], B.name[1]))}</h3>
+          <i class="kb-sub">${esc(L(B.sub[0], B.sub[1]))}</i>
+          <p class="kb-lore">${esc(L(B.lore[0], B.lore[1]))}</p>
+          <div class="kb-tags"><span class="kb-weak">🎯 ${L('Slabina', 'Weakness')}: <b>${esc(L(ROLE_N[B.weak][0], ROLE_N[B.weak][1]))}</b> ×1,6</span><span class="kb-spec">⚡ ${esc(L(B.special[0], B.special[1]))}</span></div>
+        </div>
+      </section>
+      <section class="kl-card kb-hp">
+        <div class="kl-sec-h"><h4>${dead ? L('Bestie padla! 🏆', 'The beast has fallen! 🏆') : L('Životy bestie', 'Beast health')}</h4><small>${fmt(Math.max(0, hp - dmg))} / ${fmt(hp)}</small></div>
+        <div class="kb-bar"><div class="kb-fill" style="width:${100 - pct}%"></div>${phases.map(p => `<div class="kb-ph ${p.on ? 'on' : ''}" style="left:${100 - p.at}%"><span>${p.on ? '🎁' : '🔒'}</span><b>${100 - p.at} %</b></div>`).join('')}</div>
+        <div class="kb-rws">${phases.map(p => `<div class="kb-rw ${p.on ? 'on' : ''}"><b>${p.i === 4 ? L('Poražení', 'Kill') : L(`Fáze ${p.i}`, `Phase ${p.i}`)}</b><span>${coin()} ${fmt(p.rw[0])}</span><span>${gem()} ${p.rw[1]}</span></div>`).join('')}</div>
+        <p class="kl-hint">${L('Každá tvoje výhra v jakékoli bitvě = <b>150 zranění</b>. Nájezd na bosse = tolik, kolik mu v bitvě ubereš (až 12 000).', 'Each of your wins in any battle = <b>150 damage</b>. A boss raid = as much as you take from him in battle (up to 12,000).')}</p>
+      </section>
+      <div class="kl-grid">
+        <section class="kl-card kb-raid">
+          <div class="kl-sec-h"><h4>⚔️ ${L('Nájezd na bosse', 'Boss raid')}</h4><small>${L('dnes zbývá', 'left today')} ${s.raids_left}/3</small></div>
+          <p class="kl-hint">${L('Vyraz s armádou přímo proti bestii. Démoní hordy ji chrání – prober se k ní a uber jí co nejvíc životů. Vyhrát nemusíš, počítá se každé zranění!', 'March your army straight at the beast. Demon hordes guard it – fight through and take as much life as you can. You do not have to win, every point of damage counts!')}</p>
+          <div class="kb-mine"><span>${L('Tvoje zranění tento týden', 'Your damage this week')}<b>${fmt(s.mine)}</b></span><span>${L('Nejlepší nájezd', 'Best raid')}<b>${fmt(s.best)}</b></span></div>
+          <button class="btn btn-gold btn-big" data-kbraid ${s.raids_left > 0 && !dead ? '' : 'disabled'}>${dead ? L('Bestie je poražená', 'The beast is defeated') : s.raids_left > 0 ? '⚔️ ' + L('Vyrazit na nájezd', 'Start the raid') : L('Další nájezdy zítra', 'More raids tomorrow')}</button>
+        </section>
+        <section class="kl-card kb-top">
+          <div class="kl-sec-h"><h4>${L('Hrdinové klanu', 'Clan heroes')}</h4><small>${L('zranění', 'damage')}</small></div>
+          <ol class="kl-mlist">${top.map((m, n) => `<li class="${m.mine ? 'me' : ''}"><span class="kl-pos">${n < 3 ? ['🥇', '🥈', '🥉'][n] : n + 1}</span><span class="kl-mname">${esc(m.name)}<small>${m.raids ? L(`${m.raids}× nájezd`, `${m.raids} raid(s)`) : ''}</small></span><b class="kl-mwins">${fmt(m.dmg)}</b></li>`).join('') || `<p class="muted">${L('Zatím nikdo nezaútočil. Buď první!', 'Nobody has attacked yet. Be the first!')}</p>`}</ol>
+        </section>
+      </div>
+      <section class="kl-card kb-next"><div class="kl-sec-h"><h4>${L('Příští týdny', 'Coming weeks')}</h4></div>
+        <div class="kb-cycle">${[1, 2, 3].map(d => { const N = BOSSES[((s.boss | 0) + d) % 4]; return `<div style="--bc:${N.color}"><span>${N.art}</span><b>${esc(L(N.name[0], N.name[1]).split(',')[0])}</b><small>${L('za', 'in')} ${d} ${L(d === 1 ? 'týden' : 'týdny', d === 1 ? 'week' : 'weeks')}</small></div>`; }).join('')}</div></section>
+    </div>`;
+    const art = body.querySelector('[data-kbart]'); if (art) art.appendChild(portrait(Object.assign({}, B, { id: B.id }), 150));
+    if (window.applyIcons) applyIcons(body);
+    bindClaim.call(this, body);
+    const rb = body.querySelector('[data-kbraid]');
+    if (rb) rb.addEventListener('click', () => { this._close(); startRaid(App, s.boss | 0); });
+  }
+  function bindClaim(body) {
+    const App = this._App, cl = body.querySelector('[data-kbclaim]');
+    if (!cl) return;
+    cl.addEventListener('click', async () => {
+      cl.disabled = true;
+      try {
+        const r = await Ucet.klan('boss_claim');
+        if (r && (r.gold || r.gems)) {
+          App.save.gold += r.gold | 0; App.save.gems += r.gems | 0; App.persist();
+          if (window.Zvuk && Zvuk.play) try { Zvuk.play('coin', 1); } catch (e) { /* nic */ }
+          App.toast(L(`Kořist vyzvednuta: +${fmt(r.gold)} zlata, +${fmt(r.gems)} drahokamů`, `Loot claimed: +${fmt(r.gold)} gold, +${fmt(r.gems)} gems`));
+        }
+      } catch (e) { App.toast(L('Nepodařilo se vyzvednout – zkus to znovu.', 'Could not claim – try again.')); }
+      this._boss = null; this.render();
+    });
+  }
+
+  /* ---------- Nájezd: bitva proti bestii ---------- */
+  function startRaid(App, idx) {
+    const B = BOSSES[idx], save = App.save;
+    const lvl = Math.max(1, Math.min(14, G.calc.castleLevel(save)));
+    App.pickArmy(pf => App.startBattle({
+      playFaction: pf, mode: 'training', klanBoss: idx,
+      title: L(`Nájezd: ${B.name[0].split(',')[0]}`, `Raid: ${B.name[1].split(',')[0]}`),
+      difficulty: Math.min(1.7, 0.85 + lvl * 0.06), enemyUnits: G.factionUnits('demoni'), enemyFaction: 'demoni', theme: B.theme,
+      enemyName: L(B.name[0], B.name[1]).split(',')[0], enemyCastleSkin: 'temna', enemyCastleLevel: Math.max(2, lvl), boss: B.id,
+      tweak: b => { b.o.klanBoss = idx; if (b.bossPlan) b.bossPlan.at = 8; }
+    }));
+  }
+  if (window.Battle) {
+    const P = Battle.prototype;
+    const D0 = P._damage;
+    P._damage = function (target, raw, from, fire) {
+      if (this.o && this.o.klanBoss != null && target && target.def && target.def.boss && from && from.def) {
+        const B = BOSSES[this.o.klanBoss]; if (B && from.def.roleKey === B.weak) raw *= 1.6;
+      }
+      return D0.call(this, target, raw, from, fire);
+    };
+    const U0 = P.update;
+    P.update = function (dt) {
+      U0.call(this, dt);
+      if (this.over || !this.o || this.o.klanBoss == null) return;
+      try { bossSpecial(this, dt); } catch (e) { /* nic */ }
+    };
+  }
+  function bossSpecial(b, dt) {
+    const u = b.bossUnit; if (!u || u.dead) return;
+    b._kbT = (b._kbT == null ? 9 : b._kbT) - dt; if (b._kbT > 0) return;
+    b._kbT = 14;
+    const idx = b.o.klanBoss, B = BOSSES[idx];
+    const mine = b.units.filter(e => e.team === 'player' && !e.dead && Math.abs(e.x - u.x) < 520).sort((a, c) => Math.abs(a.x - u.x) - Math.abs(c.x - u.x)).slice(0, 10);
+    b.texts.push({ x: u.x, y: u.y - 150, txt: L(B.special[0], B.special[1]).split(':')[0], color: B.color, t: 0, life: 1.8 });
+    if (idx === 0) { mine.forEach((e, i) => b.later(i * 0.08, () => { if (e.dead) return; b._damage(e, 55, null); if (b.vfx) b.vfx.explosion(e.x, e.y - 10, 34, 'fire'); })); }
+    else if (idx === 1) { mine.slice(0, 6).forEach(e => { b._damage(e, 30, null); e.stunUntil = Math.max(e.stunUntil || 0, b.time + 2.2); e.frozen = true; if (b.vfx) b.vfx.explosion(e.x, e.y - 10, 30, 'ice'); }); }
+    else if (idx === 2) { mine.forEach(e => { e.dot = { dps: 9, until: b.time + 5, c: 'rgba(155,224,122,.8)' }; b._damage(e, 18, null); if (b.vfx) for (let i = 0; i < 4; i++) b.vfx.spark(e.x, e.y - 20, (Math.random() - 0.5) * 60, -40 - Math.random() * 40, 0.8, 3, '#9be07a', 40); }); }
+    else { for (let i = 0; i < 3; i++) b.later(i * 0.25, () => { if (!b.over) try { b.spawn('enemy', 'bes', true); } catch (e) { /* nic */ } }); }
+    if (b.shake != null) b.shake = Math.max(b.shake, 0.25);
+    if (window.Zvuk) try { Zvuk.play(idx === 1 ? 'magic' : 'boom', 0.5); } catch (e) { /* nic */ }
+  }
+  /* po bitvě: zranění bosse → server */
+  const end0 = K.onBattleEnd;
+  K.onBattleEnd = function (App, cfg, res, goldDelta) {
+    const out = end0.call(this, App, cfg, res, goldDelta) || { rewards: [] };
+    if (cfg && cfg.klanBoss != null && App.battle) {
+      const u = App.battle.bossUnit, dmg = u ? Math.round(Math.max(0, (u.maxHp || RAID_HP) - Math.max(0, u.hp))) : 0;
+      const B = BOSSES[cfg.klanBoss];
+      out.rewards.push(`<span class="pill kl-pill" style="--bc:${B.color}">${B.art} ${fmt(dmg)} ${L('zranění bossovi', 'damage to the boss')}</span>`);
+      out.note = dmg >= RAID_HP ? L(`Porazil jsi ${B.name[0].split(',')[0]} v jediném nájezdu! Tvůj klan to uvidí v kronice.`, `You defeated ${B.name[1].split(',')[0]} in a single raid! Your clan will see it in the chronicle.`)
+        : L('Každé zranění se počítá do společného boje klanu.', 'Every point of damage counts towards your clan’s fight.');
+      Ucet.klan('boss_raid', { p_dmg: dmg }).then(() => { this._boss = null; }).catch(e => {
+        App.toast(e && String(e.msg || '').includes('klan_boss_raids') ? L('Dnešní nájezdy už jsou vyčerpané.', 'No raids left today.') : L('Zranění se nepodařilo odeslat – jsi offline?', 'Could not send the damage – are you offline?'));
+      });
+    }
+    return out;
+  };
+
+  /* ---------- karta Válka o říši ---------- */
+  async function renderValka(body, quiet) {
+    if (!quiet) this._loading(body);
+    let v;
+    try { v = await Ucet.klan('valka', {}, true); } catch (e) { this._offline(body); return; }
+    if (body !== this._body() || this._tab !== 'valka') return;
+    const crest = k => window.Klany && K._crestSrc ? K._crestSrc(k, 36) : '';
+    const can = v.klan && (v.role === 'leader' || v.role === 'officer');
+    const held = v.klan ? (v.provincie || []).filter(p => p.top[0] && p.top[0].id === v.klan).length : 0;
+    body.innerHTML = `<div class="kw">
+      <section class="kl-card kw-head">
+        <div><span class="eyebrow">${L('Válka o říši', 'War for the Realm')} · ⏳ ${left(v.ends)}</span>
+        <h3>${L('Kdo bude vládnout devíti provinciím?', 'Who will rule the nine provinces?')}</h3>
+        <p class="kl-hint">${L('Každá výhra člena klanu = <b>1 bod vlivu</b> v provincii, kterou určí vůdce. V neděli o půlnoci provincii získá klan s nejvíc vlivem a každý, kdo pomáhal, dostane <b>40 drahokamů</b> za každou drženou provincii.', 'Every win by a clan member = <b>1 influence</b> in the province your leader picks. At Sunday midnight the clan with the most influence takes the province and everyone who helped gets <b>40 gems</b> per province held.')}</p></div>
+        ${v.klan ? `<div class="kw-me"><b>${held}</b><small>${L('provincií teď držíte', 'provinces held now')}</small></div>` : ''}
+      </section>
+      <div class="kw-map">
+        <svg class="kw-roads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${[[0, 1], [1, 2], [0, 3], [1, 4], [2, 5], [3, 4], [4, 5], [3, 6], [4, 7], [5, 8], [6, 7], [7, 8]].map(([a, c]) => `<line x1="${PROV[a].x}" y1="${PROV[a].y}" x2="${PROV[c].x}" y2="${PROV[c].y}"/>`).join('')}</svg>
+        ${(v.provincie || []).map(p => {
+          const P2 = PROV[p.id - 1], own = p.top[0], mineT = v.klan && v.cil === p.id, ours = own && own.id === v.klan;
+          return `<button class="kw-prov ${ours ? 'ours' : own ? 'taken' : ''} ${mineT ? 'target' : ''}" style="left:${P2.x}%;top:${P2.y}%;${own ? `--oc:${esc(own.color)}` : ''}" data-kwp="${p.id}">
+            <span class="kw-ico">${P2.ico}</span><b>${esc(L(P2.n[0], P2.n[1]))}</b>
+            <small>${own ? `[${esc(own.tag)}] ${fmt(own.body)}` : L('nikdo', 'nobody')}</small>
+            ${mineT ? `<i class="kw-flag">🚩</i>` : ''}</button>`;
+        }).join('')}
+      </div>
+      <section class="kl-card kw-detail" data-kwd><p class="muted">${L('Klepni na provincii pro podrobnosti.', 'Tap a province for details.')}</p></section>
+    </div>`;
+    const show = id => {
+      const p = (v.provincie || []).find(x => x.id === id), P2 = PROV[id - 1], d = body.querySelector('[data-kwd]');
+      if (!p || !d) return;
+      d.innerHTML = `<div class="kl-sec-h"><h4>${P2.ico} ${esc(L(P2.n[0], P2.n[1]))}</h4>${p.last ? `<small>${L('minulý týden', 'last week')}: [${esc(p.last.tag)}] ${esc(p.last.name)}</small>` : ''}</div>
+        <ol class="kl-mlist">${p.top.map((c, n) => `<li class="${c.id === v.klan ? 'me' : ''}"><span class="kl-pos">${['👑', '2', '3'][n]}</span><span class="kl-mname">[${esc(c.tag)}] ${esc(c.name)}</span><b class="kl-mwins">${fmt(c.body)}</b></li>`).join('') || `<p class="muted">${L('Provincii zatím nikdo nedobývá – snadná kořist!', 'Nobody is fighting for this province yet – easy prey!')}</p>`}</ol>
+        ${v.klan ? (v.cil === id ? `<p class="kl-hint">🚩 ${L('Sem teď míří všechny výhry tvého klanu.', 'All your clan’s wins now go here.')}</p>`
+          : can ? `<button class="btn btn-gold" data-kwset="${id}">🚩 ${L('Zaútočit na tuto provincii', 'Attack this province')}</button>` : `<p class="kl-hint">${L('Cíl války určuje vůdce nebo důstojník.', 'The leader or an officer picks the war target.')}</p>`) : ''}`;
+      const sb = d.querySelector('[data-kwset]');
+      if (sb) sb.addEventListener('click', async () => { sb.disabled = true; try { await Ucet.klan('cil', { p_prov: id }); this._App.toast(L('Klan vyrazil do války! 🚩', 'Your clan marches to war! 🚩')); } catch (e) { this._App.toast(L('Nepodařilo se – zkus to znovu.', 'Failed – try again.')); } this.render(); });
+    };
+    body.querySelectorAll('[data-kwp]').forEach(b => b.addEventListener('click', () => { body.querySelectorAll('.kw-prov.sel').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); show(+b.dataset.kwp); }));
+    if (v.cil) show(v.cil);
+    void crest;
+  }
+
+  window.KlanyBoss = { BOSSES, PROV, bossIdx, startRaid };
+})();
+
+</script>
+<script>
+/* js/core/udalosti.js */
+/* =========================================================================
+   UDÁLOSTI TÝDNE – každý týden jiná živá událost (mimo prosinec, kdy běží Vánoce)
+   1. 🌕 Krvavý měsíc   – rudá noc, nepřátelé zuří (+12 % zranění), každý padlý
+                          nepřítel = krvavý krystal.
+   2. 🐉 Dračí invaze   – nad bojištěm přelétá drak a shazuje vejce. Klepni na vejce
+                          a seber ho; když ho necháš ležet, vylíhne se dráček a spálí
+                          nepřátele kolem.
+   3. 💰 Zlatá horečka  – z nebe padají zlaté valouny (klepni = mince + nugety),
+                          každá výhra +60 zlata navíc.
+   4. 👻 Noc duchů      – přes bojiště plují bludičky; klepnutím je vysvobodíš,
+                          vybuchnou duchovním světlem a omráčí nepřátele kolem.
+   Žetony události → stezka 12 odměn (zlato, drahokamy, na konci trofej události
+   do Síně trofejí). Denní bonus: první výhra dne +10 žetonů.
+   Postup se nemaže: nevyzvednuté odměny z minulého týdne se při změně týdne
+   připíšou samy, trofeje zůstávají navždy (App.save.udalosti).
+   Test: localStorage['cw-udalost'] = '0'..'3' (vynutí událost), 'off' (vypne).
+   ========================================================================= */
+(function () {
+  const G = window.GameData;
+  if (!G) return;
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = n => Math.round(n || 0).toLocaleString('cs-CZ');
+  const ico = n => (window.ico ? window.ico(n) : '');
+  const ls = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const TAU = Math.PI * 2;
+
+  const EVENTS = [
+    { id: 'krev', art: '🌕', tok: '🔴', color: '#ff4a4a', bg: 'linear-gradient(135deg,#3a0408,#120206 60%,#2a0a10)',
+      name: ['Krvavý měsíc', 'Blood Moon'], tokN: ['krvavé krystaly', 'blood crystals'],
+      lore: ['Jednou za sto let vyjde nad říší rudý měsíc. Jeho světlo dohání nepřátele k zuřivosti – bijí silněji, ale z každého padlého zůstane krvavý krystal plný síly. Odvážní velitelé vyrážejí právě teď.',
+        'Once a century a red moon rises over the realm. Its light drives enemies into a frenzy – they hit harder, but every fallen foe leaves a blood crystal full of power. Bold commanders march out right now.'],
+      rule: ['Nepřátelé +12 % zranění · každý padlý nepřítel = 🔴', 'Enemies +12% damage · every fallen foe = 🔴'] },
+    { id: 'drak', art: '🐉', tok: '🥚', color: '#ff8a2a', bg: 'linear-gradient(135deg,#3a1604,#120804 60%,#3a1a06)',
+      name: ['Dračí invaze', 'Dragon Invasion'], tokN: ['dračí vejce', 'dragon eggs'],
+      lore: ['Z Dračích hor přilétá matka draků a nad bojišti klade vejce. Kdo je posbírá, získá vzácné odměny. A kdo je nechá ležet? Vylíhne se dráček – a ten nepřátele rozhodně nešetří.',
+        'The dragon mother flies in from the Dragon Peaks and lays eggs over the battlefields. Whoever gathers them earns rare rewards. And whoever leaves them? A hatchling emerges – and it shows enemies no mercy.'],
+      rule: ['Klepni na vejce = 🥚 + mince · nesebrané vejce se vylíhne a spálí nepřátele', 'Tap an egg = 🥚 + coins · an uncollected egg hatches and burns enemies'] },
+    { id: 'zlato', art: '💰', tok: '🟡', color: '#ffd24a', bg: 'linear-gradient(135deg,#3a2a04,#141004 60%,#3a2e08)',
+      name: ['Zlatá horečka', 'Gold Rush'], tokN: ['zlaté valouny', 'gold nuggets'],
+      lore: ['V horách našli horníci žílu tak bohatou, že zlato padá i z nebe – kupci ho shazují z balonů, aby ho dovezli dřív než konkurence. Kdo je rychlejší, ten bohatne.',
+        'Miners found a vein so rich that gold is falling from the sky – merchants drop it from balloons to beat their rivals to market. The quickest get rich.'],
+      rule: ['Klepni na padající zlato = 🟡 + mince · každá výhra +60 zlata navíc', 'Tap falling gold = 🟡 + coins · every win +60 extra gold'] },
+    { id: 'duchove', art: '👻', tok: '💠', color: '#8fe8ff', bg: 'linear-gradient(135deg,#06243a,#04101a 60%,#0a2a3a)',
+      name: ['Noc duchů', 'Night of Spirits'], tokN: ['duše', 'spirit orbs'],
+      lore: ['Duše padlých hrdinů bloudí nad bojišti a hledají cestu domů. Vysvoboď je dotykem – vděčně se rozzáří a jejich světlo omráčí nepřátele kolem.',
+        'The souls of fallen heroes wander above the battlefields looking for the way home. Free them with a touch – they blaze with gratitude and their light stuns nearby enemies.'],
+      rule: ['Klepni na bludičku = 💠 + omráčení nepřátel kolem', 'Tap a wisp = 💠 + stuns nearby enemies'] }
+  ];
+  const TIERS = [10, 25, 45, 70, 100, 140, 190, 250, 320, 400, 500, 650];
+  const REW = [{ gold: 500 }, { gems: 10 }, { gold: 1200 }, { gems: 20 }, { gold: 2500 }, { gems: 35 }, { gold: 4000 }, { gems: 50 }, { gold: 6000 }, { gems: 80 }, { gold: 10000 }, { gems: 150, trophy: true }];
+
+  /* ---------- kdy a jaká událost ---------- */
+  const W0 = Date.UTC(2026, 0, 5);
+  function weekStart(d) { const t = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()); const wd = (new Date(t).getUTCDay() + 6) % 7; return t - wd * 864e5; }
+  function current() {
+    const f = ls('cw-udalost');
+    if (f === 'off') return null;
+    const now = new Date(), ws = weekStart(now);
+    if (f == null && (now.getMonth() === 11)) return null;   // prosinec patří Vánocům
+    const idx = f != null && /^[0-3]$/.test(f) ? +f : (((Math.round((ws - W0) / (7 * 864e5)) + 2) % 4) + 4) % 4;
+    const endLocal = new Date(new Date(ws).getUTCFullYear(), new Date(ws).getUTCMonth(), new Date(ws).getUTCDate() + 7);
+    return { ev: EVENTS[idx], idx, wk: new Date(ws).toISOString().slice(0, 10), ends: endLocal };
+  }
+  const leftTxt = d => { const ms = d - Date.now(); if (!(ms > 0)) return '0 h'; const dd = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4); return dd ? `${dd} d ${h} h` : h ? `${h} h ${m} min` : `${m} min`; };
+  const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+
+  /* ---------- stav hráče ---------- */
+  function state(save) {
+    const c = current();
+    const S = save.udalosti || (save.udalosti = { wk: null, id: null, tok: 0, got: 0, day: null, trofeje: {} });
+    S.trofeje = S.trofeje || {};
+    if (c && S.wk !== c.wk) {
+      // nevyzvednuté odměny z minulé události se připíšou samy (nic se neztratí)
+      if (S.wk && S.id) grantReached(save, S, EVENTS.find(e => e.id === S.id));
+      S.wk = c.wk; S.id = c.ev.id; S.tok = 0; S.got = 0; S.day = null;
+    }
+    return S;
+  }
+  function grantReached(save, S, ev) {
+    let g = 0, m = 0;
+    TIERS.forEach((t, i) => { if (S.tok >= t && !(S.got & (1 << i))) { const r = REW[i]; g += r.gold || 0; m += r.gems || 0; if (r.trophy && ev) S.trofeje[ev.id] = (S.trofeje[ev.id] || 0) + 1; S.got |= 1 << i; } });
+    save.gold += g; save.gems += m;
+    return { gold: g, gems: m };
+  }
+  function addTok(save, n) { const S = state(save); S.tok += Math.max(0, n | 0); return S.tok; }
+  const claimable = S => TIERS.some((t, i) => S.tok >= t && !(S.got & (1 << i)));
+
+  /* ======================= BITVA ======================= */
+  const okBattle = b => b && b.o && !b.net && !b.film && b.o.mode !== 'online' && b.o.mode !== 'pvp' && b.o.klanBoss == null && !!current() && !!(window.App && App.save);
+  const PICK_R = 52;
+  function init(b) {
+    const c = current();
+    const X = { ev: c.ev, items: [], t: 6 + Math.random() * 6, got: 0, coins: 0, flyer: null };
+    b._ud = X;
+    b._udDown = e => {
+      if (!b._ud || !b._ud.items.length || b.over || b.paused) return;
+      const w = b._toWorld ? b._toWorld(e.clientX, e.clientY) : null; if (!w) return;
+      const r = Math.max(PICK_R, 44 / Math.max(0.2, b.cam.scale || 1));
+      const it = b._ud.items.find(q => q.ready && Math.abs(q.x - w[0]) < r && Math.abs(q.y - 18 - w[1]) < r * 1.2);
+      if (!it) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      collect(b, it);
+    };
+    b.canvas.addEventListener('pointerdown', b._udDown, true);
+    return X;
+  }
+  function collect(b, it) {
+    const X = b._ud; X.items = X.items.filter(q => q !== it);
+    const me = b.side.player, coins = it.coins || 25, tok = it.tok || 2;
+    me.coins = Math.min(me.maxCoins, me.coins + coins); X.got += tok; X.coins += coins;
+    b.texts.push({ x: it.x, y: it.y - 50, txt: `+${tok} ${X.ev.tok}`, color: X.ev.color, t: 0, life: 1.5, big: true });
+    b.texts.push({ x: it.x, y: it.y - 26, txt: `+${coins}`, color: '#ffd54f', t: 0, life: 1.1, coin: true });
+    if (X.ev.id === 'duchove') {   // duchovní světlo omráčí nepřátele kolem
+      b.units.filter(e => e.team === 'enemy' && !e.dead && Math.abs(e.x - it.x) < 170).forEach(e => { e.stunUntil = Math.max(e.stunUntil || 0, b.time + (e.def.boss ? 0.6 : 2)); });
+      if (b.vfx) b.vfx.explosion(it.x, it.y - 10, 60, 'ice');
+    } else if (b.vfx) for (let i = 0; i < 14; i++) b.vfx.spark(it.x, it.y - 14, (Math.random() - 0.5) * 220, -60 - Math.random() * 160, 0.8, 2.6, [X.ev.color, '#ffffff', '#ffd24a'][i % 3], 300);
+    if (window.Zvuk) try { Zvuk.play('coin', 0.9); } catch (e) { /* nic */ }
+  }
+  function update(b, dt) {
+    const X = b._ud || init(b), C = G.battleConfig, ev = X.ev;
+    const viewTop = b.H - (b.cam.viewH || b.H), lane = () => C.laneTop + 8 + Math.random() * (C.laneBottom - C.laneTop - 16);
+    const midX = () => Math.max(C.playerFront + 140, Math.min(C.enemyFront - 220, b.cam.x + b.cam.viewW * (0.3 + Math.random() * 0.45)));
+    X.t -= dt;
+    if (X.t <= 0 && X.items.length < 4) {
+      if (ev.id === 'drak') { X.flyer = { t: 0, dur: 6, x0: b.cam.x + b.cam.viewW + 260, x1: b.cam.x - 260, dropped: false }; X.t = 20 + Math.random() * 10; }
+      else if (ev.id === 'zlato') { X.items.push({ kind: 'zlato', x: midX(), y: viewTop + 40, ty: lane(), vy: 0, ready: false, t: 0, tok: 2, coins: 35 }); X.t = 12 + Math.random() * 8; }
+      else if (ev.id === 'duchove') { const fromL = Math.random() < 0.5; X.items.push({ kind: 'duch', x: fromL ? b.cam.x + 60 : b.cam.x + b.cam.viewW - 60, y: lane() - 70, vx: fromL ? 38 : -38, ready: true, t: 0, tok: 3, coins: 20, ph: Math.random() * 6 }); X.t = 13 + Math.random() * 8; }
+      else X.t = 999;
+    }
+    if (X.flyer) {
+      const f = X.flyer; f.t += dt; const k = f.t / f.dur;
+      f.x = f.x0 + (f.x1 - f.x0) * k; f.y = viewTop + 120 + Math.sin(f.t * 2) * 10;
+      if (!f.dropped && k > 0.45) { f.dropped = true; X.items.push({ kind: 'vejce', x: Math.max(C.playerFront + 140, Math.min(C.enemyFront - 220, f.x)), y: f.y + 30, ty: lane(), ready: false, t: 0, tok: 3, coins: 30 }); }
+      if (k >= 1) X.flyer = null;
+    }
+    for (const it of X.items) {
+      it.t += dt;
+      if (it.kind === 'vejce' || it.kind === 'zlato') { if (!it.ready) { it.y += (it.kind === 'zlato' ? 140 : 100) * dt; if (it.y >= it.ty) { it.y = it.ty; it.ready = true; it.t = 0; } } }
+      if (it.kind === 'duch') { it.x += it.vx * dt; it.y += Math.sin(it.t * 2 + it.ph) * 12 * dt; }
+    }
+    // vejce, které nikdo nesebral, se vylíhne a dráček spálí nepřátele kolem
+    X.items = X.items.filter(it => {
+      if (it.kind === 'vejce' && it.ready && it.t > 9) {
+        b.units.filter(e => e.team === 'enemy' && !e.dead && Math.abs(e.x - it.x) < 200).forEach(e => { b._damage(e, 80, null, true); e.dot = { until: b.time + 3, dps: 12, c: 'rgba(255,120,40,.45)' }; });
+        if (b.vfx) b.vfx.explosion(it.x, it.y - 6, 70, 'fire');
+        b.texts.push({ x: it.x, y: it.y - 60, txt: '🐲', color: '#ff8a2a', t: 0, life: 1.4, big: true });
+        return false;
+      }
+      if (it.kind === 'zlato' && it.ready && it.t > 10) return false;
+      if (it.kind === 'duch' && (it.t > 16 || it.x < b.cam.x - 80 || it.x > b.cam.x + b.cam.viewW + 80)) return false;
+      return true;
+    });
+  }
+  function drawWorld(b, ctx, t) {
+    const X = b._ud; if (!X) return;
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (X.flyer) {
+      const f = X.flyer; ctx.save(); ctx.translate(f.x, f.y); ctx.scale(-1, 1); ctx.font = '86px serif'; ctx.globalAlpha = 0.95; ctx.fillText('🐉', 0, 0); ctx.restore();
+    }
+    for (const it of X.items) {
+      const bob = it.ready ? Math.sin(t * 4 + it.x) * 3 : 0;
+      ctx.globalAlpha = 0.35; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(it.x, (it.ty || it.y + 20) + 4, 16, 5, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+      // zář = vidět, že se na to dá klepnout
+      if (it.ready) { const g = ctx.createRadialGradient(it.x, it.y - 18, 2, it.x, it.y - 18, 34); g.addColorStop(0, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(it.x, it.y - 18, 34, 0, TAU); ctx.fill(); }
+      ctx.save();
+      ctx.font = it.kind === 'duch' ? '40px serif' : '38px serif';
+      if (it.kind === 'duch') ctx.globalAlpha = 0.75 + Math.sin(t * 5 + it.ph) * 0.2;
+      if (it.kind === 'vejce' && it.ready && it.t > 6) ctx.translate(Math.sin(t * 40) * 1.6, 0);   // vejce se třese – brzy se vylíhne
+      ctx.fillText(it.kind === 'vejce' ? '🥚' : it.kind === 'zlato' ? '🪙' : '👻', it.x, it.y - 18 + bob);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  function drawScreen(b, ctx) {
+    const X = b._ud; if (!X || X.ev.id !== 'krev') return;
+    const w = ctx.canvas.width, h = ctx.canvas.height;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const g = ctx.createRadialGradient(w * 0.5, h * 0.4, h * 0.2, w * 0.5, h * 0.5, Math.max(w, h) * 0.75);
+    g.addColorStop(0, 'rgba(120,0,10,0.06)'); g.addColorStop(1, 'rgba(70,0,8,0.32)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+  if (window.Battle) {
+    const P = Battle.prototype;
+    const U0 = P.update;
+    P.update = function (dt) { U0.call(this, dt); if (this.over || !okBattle(this)) return; try { update(this, dt); } catch (e) { /* nic */ } };
+    const WF0 = P._drawWorldFx;
+    P._drawWorldFx = function (ctx, t) { if (WF0) WF0.call(this, ctx, t); if (this._ud) try { drawWorld(this, ctx, t); } catch (e) { /* nic */ } };
+    const SF0 = P._drawScreenFx;
+    P._drawScreenFx = function (ctx) { if (SF0) SF0.call(this, ctx); if (this._ud) try { drawScreen(this, ctx); } catch (e) { /* nic */ } };
+    const D0 = P._damage;
+    P._damage = function (target, raw, from, fire) {
+      if (from && from.team === 'enemy' && this._ud && this._ud.ev.id === 'krev') raw *= 1.12;
+      return D0.call(this, target, raw, from, fire);
+    };
+    const DS0 = P.destroy;
+    P.destroy = function () { if (this._udDown) { try { this.canvas.removeEventListener('pointerdown', this._udDown, true); } catch (e) { /* nic */ } this._udDown = null; } return DS0.apply(this, arguments); };
+  }
+
+  /* ======================= OKNO UDÁLOSTI ======================= */
+  const Udalosti = {
+    EVENTS, TIERS, current, state,
+    active() { return !!current(); },
+    open(App) {
+      const c = current(); if (!c) return;
+      const S = state(App.save), ev = c.ev, tok = S.tok, nextI = TIERS.findIndex(t => tok < t);
+      const rwTxt = r => [r.gold ? `${ico('coin')} ${fmt(r.gold)}` : '', r.gems ? `${ico('gem')} ${fmt(r.gems)}` : '', r.trophy ? '🏆' : ''].filter(Boolean).join(' ');
+      const troph = Object.keys(S.trofeje || {});
+      App.modal(`<div class="ud" style="--ec:${ev.color};--ebg:${ev.bg}">
+        <header class="ud-hero">
+          <div class="ud-art">${ev.art}</div>
+          <div><span class="eyebrow">${L('Událost týdne', 'Event of the week')} · ⏳ ${leftTxt(c.ends)}</span>
+          <h2>${esc(L(ev.name[0], ev.name[1]))}</h2>
+          <p class="ud-lore">${esc(L(ev.lore[0], ev.lore[1]))}</p>
+          <div class="ud-rule">⚔️ ${esc(L(ev.rule[0], ev.rule[1]))}</div></div>
+        </header>
+        <div class="ud-tok"><span class="ud-tok-n">${ev.tok} <b>${fmt(tok)}</b></span><small>${esc(L(ev.tokN[0], ev.tokN[1]))}${nextI >= 0 ? ' · ' + L(`do další odměny ${TIERS[nextI] - tok}`, `${TIERS[nextI] - tok} to the next reward`) : ' · ' + L('stezka dokončena!', 'path complete!')}</small>
+          ${claimable(S) ? `<button class="btn btn-gold" data-udclaim>${L('Vyzvednout odměny', 'Claim rewards')}</button>` : ''}</div>
+        <ol class="ud-path">${TIERS.map((t, i) => {
+          const on = tok >= t, got = !!(S.got & (1 << i)), r = REW[i];
+          return `<li class="${on ? 'on' : ''} ${got ? 'got' : ''} ${r.trophy ? 'big' : ''}"><span class="ud-t">${ev.tok} ${t}</span><span class="ud-r">${rwTxt(r)}</span><i>${got ? '✓' : on ? '🎁' : '🔒'}</i></li>`;
+        }).join('')}</ol>
+        <div class="ud-how">
+          <div><b>🏰 ${L('Jak získat', 'How to earn')} ${ev.tok}</b><span>${L('Každá bitva (mimo online souboje): sbírej na bojišti, výhra +4, prohra +1, první výhra dne +10.', 'Every battle (except online duels): collect on the battlefield, win +4, loss +1, first win of the day +10.')}</span></div>
+          <div><b>🏆 ${L('Síň trofejí', 'Trophy hall')}</b><span>${troph.length ? troph.map(id => { const e = EVENTS.find(x => x.id === id); return e ? `${e.art} ${esc(L(e.name[0], e.name[1]))}${S.trofeje[id] > 1 ? ' ×' + S.trofeje[id] : ''}` : ''; }).join(' · ') : L('Dokonči stezku a získej trofej události navždy.', 'Complete the path to earn the event trophy forever.')}</span></div>
+        </div>
+        <div class="ud-next">${[1, 2, 3].map(d => { const e = EVENTS[(c.idx + d) % 4]; return `<span style="--ec:${e.color}">${e.art} ${esc(L(e.name[0], e.name[1]))}<small>${L('za', 'in')} ${d} ${L(d === 1 ? 'týden' : 'týdny', d === 1 ? 'week' : 'weeks')}</small></span>`; }).join('')}</div>
+        <div class="ud-go"><button class="btn btn-gold btn-big" data-udgo>⚔️ ${L('Do bitvy', 'To battle')}</button><button class="btn" data-close>${L('Zavřít', 'Close')}</button></div>
+      </div>`, (el, close) => {
+        if (window.applyIcons) applyIcons(el);
+        const cb = el.querySelector('[data-udclaim]');
+        if (cb) cb.addEventListener('click', () => {
+          const r = grantReached(App.save, S, ev); App.persist();
+          if (window.Zvuk) try { Zvuk.play('coin', 1); } catch (e) { /* nic */ }
+          App.toast(L(`Odměny události: +${fmt(r.gold)} zlata, +${fmt(r.gems)} drahokamů`, `Event rewards: +${fmt(r.gold)} gold, +${fmt(r.gems)} gems`));
+          this.refreshHome(App); this.open(App);
+        });
+        el.querySelector('[data-udgo]').addEventListener('click', () => {
+          close();
+          const lv = G.campaignHelpers && G.campaignHelpers.currentLevel(App.save);
+          if (lv && App.openLevel) App.openLevel(lv.id); else if (App.go) App.go('pribeh');
+        });
+      });
+    },
+    homeButton(App, el) {
+      const c = current(); if (!c) return;
+      const host = el.querySelector('.hero-live'); if (!host || host.querySelector('.ud-btn')) return;
+      const S = state(App.save);
+      const b = document.createElement('button');
+      b.className = 'daily-btn ud-btn'; b.style.setProperty('--ec', c.ev.color);
+      b.setAttribute('aria-label', L(c.ev.name[0], c.ev.name[1]));
+      b.innerHTML = `<span class="ud-btn-art">${c.ev.art}</span><span class="daily-lbl">${L('Událost', 'Event')}</span>${claimable(S) ? '<i class="daily-dot">!</i>' : ''}`;
+      b.addEventListener('click', () => this.open(App));
+      host.appendChild(b);
+    },
+    refreshHome(App) { const b = document.querySelector('#screen .ud-btn'); if (b) { b.remove(); if (App.current === 'hrad' && !App.battle) this.homeButton(App, App.screenEl); } },
+    /* po bitvě (main.js) */
+    onBattleEnd(App, cfg, res) {
+      const c = current();
+      if (!c || !cfg || cfg.film || cfg.net || cfg.mode === 'online' || cfg.mode === 'pvp' || cfg.klanBoss != null || res.reason === 'spojeni') return null;
+      const save = App.save, S = state(save), b = App.battle, X = b && b._ud;
+      let tok = (X ? X.got : 0) + (res.win ? 4 : 1);
+      if (c.ev.id === 'krev') tok += Math.floor((res.kills || 0) / 2);
+      let bonusNote = '';
+      if (res.win && S.day !== dayKey()) { S.day = dayKey(); tok += 10; bonusNote = L(' (první výhra dne +10)', ' (first win of the day +10)'); }
+      const out = { rewards: [] };
+      if (c.ev.id === 'zlato' && res.win) { const g = 60; save.gold += g; out.rewards.push(`<span class="pill">${ico('coin')} +${g} · ${esc(L(c.ev.name[0], c.ev.name[1]))}</span>`); }
+      const before = S.tok; addTok(save, tok);
+      out.rewards.push(`<span class="pill ud-pill" style="--ec:${c.ev.color}">${c.ev.tok} +${tok}${bonusNote}</span>`);
+      if (TIERS.some(t => before < t && S.tok >= t)) out.note = L(`${c.ev.art} Na stezce události čeká nová odměna!`, `${c.ev.art} A new reward is waiting on the event path!`);
+      return out;
+    }
+  };
+  window.Udalosti = Udalosti;
+})();
+
+</script>
+<script>
 /* js/ui/online_ui.js */
 /* =========================================================================
    OBRAZOVKA ONLINE – vytvoření místnosti, připojení kódem a lobby
@@ -42850,7 +43561,7 @@ GameData.defenseOf = save => {
         c.prepend(x);
       }
       const first = c.querySelector('.btn:not([disabled])');
-      if (first) first.focus();
+      if (first) try { first.focus({ preventScroll: true }); c.scrollTop = 0; } catch (e) { /* nic */ }
       return close;
     },
 
@@ -43385,7 +44096,8 @@ GameData.defenseOf = save => {
       }
       if (window.Sireni) { const ex = Sireni.onBattleEnd(this, cfg, res); if (ex) { rewards.push(...ex.rewards); if (ex.note) note = ex.note; } }
       if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
-      if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) rewards.push(...kx.rewards); }
+      if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) { rewards.push(...kx.rewards); if (kx.note) note = kx.note; } }
+      if (window.Udalosti) { const ux = Udalosti.onBattleEnd(this, cfg, res); if (ux) { rewards.push(...ux.rewards); if (ux.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + ux.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
       /* okno po bitvě je schválně jednoduché: XP do Battle pasu a splněné úkoly hráč uvidí ve hře (odznak na tlačítku) */

@@ -1,0 +1,107 @@
+/* =========================================================================
+   UDÁLOST TÝDNE (js/core/udalosti.js) + KLANOVÝ BOSS a VÁLKA O ŘÍŠI (js/ui/klany_boss.js)
+   ========================================================================= */
+
+/* ---------- tlačítko na domovské obrazovce (vedle klanu) ---------- */
+#screen.home-mode .ud-btn, .ud-btn { left: 330px; top: calc(430px + env(safe-area-inset-top, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) { #screen.home-mode .ud-btn { top: 222px; left: 90px; } }
+.ud-btn-art { display: grid; place-items: center; width: 58px; height: 50px; font-size: 38px; line-height: 1;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,.55)) drop-shadow(0 0 10px var(--ec, #ffd24a)); }
+.ud-btn .daily-lbl { max-width: 96px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; text-shadow: 0 2px 0 #000, 0 0 8px var(--ec, #ffd24a); }
+@media (orientation: landscape) and (max-height: 520px) { .ud-btn-art { width: 46px; height: 40px; font-size: 30px; } }
+
+/* ---------- okno události ---------- */
+#modalCard:has(.ud) { width: min(900px, 96vw); }
+.ud { display: grid; gap: 12px; }
+.ud-hero { display: flex; gap: 16px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--ebg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 45%, transparent), 0 10px 26px -12px var(--ec); }
+.ud-art { flex: none; width: 96px; height: 96px; display: grid; place-items: center; font-size: 66px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--ec) 40%, transparent), transparent 70%); filter: drop-shadow(0 0 16px var(--ec)); }
+.ud-hero h2 { margin: 2px 0 4px; color: #fff; text-shadow: 0 0 14px var(--ec); }
+.ud-lore { margin: 0 0 8px; color: #e8e0cc; font-size: 13.5px; line-height: 1.45; }
+.ud-rule { display: inline-block; padding: 5px 10px; border-radius: 10px; font-weight: 800; font-size: 12.5px; color: #fff; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 60%, transparent); }
+.ud-tok { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border-radius: 12px; background: rgba(0,0,0,.25); }
+.ud-tok-n { font-size: 22px; } .ud-tok-n b { font-family: var(--font-display); color: var(--ec); font-size: 26px; }
+.ud-tok small { color: #c8c0ae; flex: 1; }
+.ud-path { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.ud-path li { position: relative; display: grid; gap: 3px; justify-items: center; padding: 8px 4px; border-radius: 12px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); opacity: .72; text-align: center; }
+.ud-path li.on { opacity: 1; background: color-mix(in srgb, var(--ec) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ec) 70%, transparent); }
+.ud-path li.got { opacity: .55; }
+.ud-path li.big { background: linear-gradient(180deg, rgba(255,210,74,.18), rgba(255,210,74,.04)); }
+.ud-path .ud-t { font-size: 11.5px; color: #c8c0ae; font-weight: 800; }
+.ud-path .ud-r { font-size: 12.5px; font-weight: 900; color: #fff; display: flex; gap: 3px; align-items: center; }
+.ud-path .ud-r svg { width: 14px; height: 14px; }
+.ud-path i { font-style: normal; font-size: 14px; }
+.ud-how { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ud-how > div { display: grid; gap: 3px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.04); font-size: 12.5px; color: #d8d0bc; }
+.ud-how b { color: #fff; }
+.ud-next { display: flex; gap: 8px; flex-wrap: wrap; }
+.ud-next span { flex: 1; min-width: 140px; display: grid; padding: 6px 10px; border-radius: 10px; font-weight: 800; font-size: 12.5px; color: #fff; background: rgba(0,0,0,.25); box-shadow: inset 3px 0 0 var(--ec); }
+.ud-next small { color: #a8a090; font-weight: 700; }
+.ud-go { display: flex; gap: 10px; justify-content: center; }
+.pill.ud-pill { box-shadow: inset 0 0 0 1px var(--ec); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .ud { gap: 8px; } .ud-hero { padding: 8px 10px; gap: 10px; } .ud-art { width: 62px; height: 62px; font-size: 42px; }
+  .ud-lore { font-size: 12px; } .ud-path { grid-template-columns: repeat(12, minmax(54px, 1fr)); overflow-x: auto; }
+  .ud-how { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) { .ud-path { grid-template-columns: repeat(4, 1fr); } .ud-how { grid-template-columns: 1fr; } }
+
+/* ---------- KLANOVÝ BOSS ---------- */
+.kb { display: grid; gap: 12px; }
+.kb-hero { display: flex; gap: 16px; align-items: center; background: radial-gradient(120% 140% at 0% 50%, color-mix(in srgb, var(--bc) 30%, transparent), transparent 60%), var(--kl-card, rgba(255,255,255,.04)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bc) 55%, transparent); }
+.kb-art { flex: none; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, color-mix(in srgb, var(--bc) 35%, transparent), transparent 70%); }
+.kb-art canvas { filter: drop-shadow(0 0 12px var(--bc)); }
+.kb-txt h3 { margin: 2px 0 0; color: #fff; text-shadow: 0 0 14px var(--bc); }
+.kb-sub { display: block; color: var(--bc); font-weight: 800; font-style: normal; margin-bottom: 6px; }
+.kb-lore { margin: 0 0 8px; color: #d8d0bc; font-size: 13px; line-height: 1.45; }
+.kb-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.kb-tags span { padding: 4px 9px; border-radius: 9px; font-size: 12px; font-weight: 800; background: rgba(0,0,0,.3); color: #fff; }
+.kb-weak b { color: #9fffb0; }
+.kb-bar { position: relative; height: 26px; margin: 26px 4px 30px; border-radius: 13px; background: #1a0a0a; box-shadow: inset 0 0 0 2px #05070b, inset 0 3px 8px rgba(0,0,0,.6); }
+.kb-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 80%, #fff), var(--bc) 50%, color-mix(in srgb, var(--bc) 60%, #000)); box-shadow: 0 0 14px var(--bc); transition: width .8s; }
+.kb-ph { position: absolute; top: -24px; transform: translateX(-50%); display: grid; justify-items: center; font-size: 11px; color: #c8c0ae; }
+.kb-ph b { position: absolute; top: 50px; } .kb-ph.on b { color: #ffd77a; }
+.kb-rws { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.kb-rw { display: grid; justify-items: center; gap: 2px; padding: 6px; border-radius: 10px; background: rgba(255,255,255,.04); font-size: 12px; opacity: .7; }
+.kb-rw.on { opacity: 1; background: rgba(255,210,74,.12); box-shadow: inset 0 0 0 1px rgba(255,210,74,.5); }
+.kb-rw span { display: flex; gap: 3px; align-items: center; } .kb-rw svg { width: 13px; height: 13px; }
+.kb-mine { display: flex; gap: 10px; margin: 6px 0 10px; }
+.kb-mine span { flex: 1; display: grid; padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,.25); font-size: 11.5px; color: #c8c0ae; }
+.kb-mine b { font-family: var(--font-display); font-size: 20px; color: #fff; }
+.kb-raid .btn-big { width: 100%; }
+.kb-cycle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kb-cycle div { display: grid; justify-items: center; padding: 8px; border-radius: 12px; background: rgba(0,0,0,.25); box-shadow: inset 0 -3px 0 var(--bc); }
+.kb-cycle span { font-size: 26px; } .kb-cycle b { color: #fff; font-size: 12.5px; } .kb-cycle small { color: #a8a090; font-size: 11px; }
+.kb-teaser { display: flex; gap: 10px; justify-content: center; font-size: 40px; }
+.kb-teaser span { filter: drop-shadow(0 0 10px var(--bc)); }
+.kl-sys-boss { color: #ffd77a; } .kl-sys-raid { color: #ffb07a; } .kl-sys-cil { color: #9fd0ff; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .kb-hero { gap: 10px; } .kb-art { width: 90px; height: 90px; } .kb-art canvas { width: 90px !important; height: 90px !important; }
+  .kb-lore { font-size: 12px; } .kb-rws { gap: 4px; }
+}
+@media (max-width: 600px) { .kb-hero { flex-direction: column; text-align: center; } .kb-tags { justify-content: center; } }
+
+/* ---------- VÁLKA O ŘÍŠI ---------- */
+.kw { display: grid; gap: 12px; }
+.kw-head { display: flex; gap: 14px; align-items: center; }
+.kw-head h3 { margin: 2px 0 4px; color: #fff; }
+.kw-me { flex: none; display: grid; justify-items: center; padding: 8px 14px; border-radius: 14px; background: rgba(255,210,74,.12); box-shadow: inset 0 0 0 1px rgba(255,210,74,.5); }
+.kw-me b { font-family: var(--font-display); font-size: 30px; color: #ffd77a; } .kw-me small { font-size: 11px; color: #c8c0ae; text-align: center; }
+.kw-map { position: relative; height: 340px; border-radius: 18px; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255,236,190,.16), transparent 70%), repeating-linear-gradient(45deg, rgba(255,255,255,.015) 0 10px, transparent 10px 20px), linear-gradient(160deg, #3a4a2a, #2a3420 40%, #3a2e1e);
+  box-shadow: inset 0 0 0 2px rgba(232,184,74,.45), inset 0 0 40px rgba(0,0,0,.6); }
+.kw-roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kw-roads line { stroke: rgba(255,230,170,.35); stroke-width: .6; stroke-dasharray: 1.6 1.2; vector-effect: non-scaling-stroke; }
+.kw-prov { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; min-width: 96px; padding: 6px 8px; border-radius: 14px; border: 0; cursor: pointer; color: #fff;
+  background: rgba(14,18,28,.82); box-shadow: inset 0 0 0 2px var(--oc, rgba(255,255,255,.18)), 0 6px 14px rgba(0,0,0,.45); font: inherit; }
+.kw-prov.taken { background: color-mix(in srgb, var(--oc) 32%, rgba(14,18,28,.88)); }
+.kw-prov.ours { box-shadow: inset 0 0 0 2px #ffd24a, 0 0 18px rgba(255,210,74,.55); }
+.kw-prov.target { outline: 2px dashed #9fd0ff; outline-offset: 3px; }
+.kw-prov.sel { transform: translate(-50%, -50%) scale(1.08); }
+.kw-ico { font-size: 24px; line-height: 1; } .kw-prov b { font-size: 12px; white-space: nowrap; } .kw-prov small { font-size: 10.5px; color: #e8dcc0; }
+.kw-flag { position: absolute; top: -12px; right: -6px; font-style: normal; font-size: 18px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .kw-map { height: 250px; } .kw-prov { min-width: 78px; padding: 3px 6px; } .kw-ico { font-size: 18px; } .kw-prov b { font-size: 10.5px; } .kw-prov small { font-size: 9.5px; }
+  .kw-head { gap: 8px; } .kw-head h3 { font-size: 15px; }
+}
+@media (max-width: 600px) { .kw-prov { min-width: 0; } .kw-prov b { display: none; } }

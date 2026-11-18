@@ -146,7 +146,7 @@
         c.prepend(x);
       }
       const first = c.querySelector('.btn:not([disabled])');
-      if (first) first.focus();
+      if (first) try { first.focus({ preventScroll: true }); c.scrollTop = 0; } catch (e) { /* nic */ }
       return close;
     },
 
@@ -681,7 +681,8 @@
       }
       if (window.Sireni) { const ex = Sireni.onBattleEnd(this, cfg, res); if (ex) { rewards.push(...ex.rewards); if (ex.note) note = ex.note; } }
       if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
-      if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) rewards.push(...kx.rewards); }
+      if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) { rewards.push(...kx.rewards); if (kx.note) note = kx.note; } }
+      if (window.Udalosti) { const ux = Udalosti.onBattleEnd(this, cfg, res); if (ux) { rewards.push(...ux.rewards); if (ux.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + ux.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
       /* okno po bitvě je schválně jednoduché: XP do Battle pasu a splněné úkoly hráč uvidí ve hře (odznak na tlačítku) */

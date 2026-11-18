@@ -279,3 +279,17 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
   #battle .b-squad .obtn.sqb > span:not([data-ico]) { display: none; }
   #battle .b-squad .sq-x { font-size: 12px; padding: 1px 6px; }
 }
+/* okna s vlastním křížkem v hlavičce: zůstane jen jeden (náš přilepený nahoře) */
+#modalCard:has(> .modal-x) .kl-x, #modalCard:has(> .modal-x) .xm-x { display: none; }
+#modalCard:has(> .modal-x) .kl-head { padding-right: 56px; }
+
+/* v186: karta „Testuj na Androidu“ na telefonu nahoře uprostřed, kompaktní – nepřekrývá tlačítko Do bitvy ani Síň slávy */
+@media (orientation: landscape) and (max-height: 520px) {
+  #screen.home-mode .gp-test { top: 54px; bottom: auto !important; left: 200px; right: auto; margin: 0; width: min(430px, calc(100vw - 420px)); padding: 6px 10px; }
+  #screen.home-mode .gp-test .gp-head small { display: none; }
+  #screen.home-mode .gp-test .gp-head b { font-size: 12.5px; }
+  #screen.home-mode .gp-test .gp-head svg { width: 20px; height: 20px; }
+  #screen.home-mode .gp-test .gp-steps { grid-auto-flow: column; gap: 10px; margin-top: 4px; }
+  #screen.home-mode .gp-test .gp-steps a { font-size: 12px; }
+  #screen.home-mode .gp-test .gp-x { width: 26px; height: 26px; font-size: 17px; }
+}

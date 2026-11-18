@@ -490,6 +490,7 @@
       if (window.Pozvi) Pozvi.homeButton(App, el);
       if (window.Vanoce) try { Vanoce.home(App, el); } catch (e) { /* nic */ }   // vánoční událost (js/core/vanoce.js)
       if (window.Klany) Klany.homeButton(App, el);
+      if (window.Udalosti) try { Udalosti.homeButton(App, el); } catch (e) { /* nic */ }   // událost týdne (js/core/udalosti.js)
       if (window.Sireni && Sireni.homeChallenge) Sireni.homeChallenge(App);
       if (location.hash === '#instalovat') { history.replaceState(null, '', location.pathname); setTimeout(() => Instalace.run(App), 800); }
       return;
