@@ -22,5 +22,33 @@ html0 = html
 html = html0.replace('<head>', '<head>' + inj, 1)
 os.makedirs(os.path.join(ROOT, 'cg'), exist_ok=True)
 open(os.path.join(ROOT, 'cg', 'index.html'), 'w', encoding='utf-8').write(html)
-open(os.path.join(fdst, 'index.html'), 'w', encoding='utf-8').write(html0.replace('<head>', '<head>' + inj_flat, 1))
+flat = html0.replace('<head>', '<head>' + inj_flat, 1)
+# RYCHLEJŠÍ START NA MOBILU (plochá sada má víc souborů, HTML je menší):
+# 1) písma jako samostatné .woff2 (font-display:swap → hra se ukáže hned, písmo doskočí)
+import re as _re
+_fi = [0]
+def _font(m):
+    _fi[0] += 1; fn = 'pismo%d.woff2' % _fi[0]
+    open(os.path.join(fdst, fn), 'wb').write(base64.b64decode(m.group(1)))
+    return 'url(' + fn + ')'
+flat = _re.sub(r"url\(data:font/woff2;base64,([A-Za-z0-9+/=]+)\)", _font, flat)
+# 2) překlady de/pl/es/pt jen když je hráč potřebuje (jinak se 700 kB textu vůbec nenačítá)
+LAZY = ['de', 'pl', 'es', 'pt']
+for l in LAZY:
+    m = _re.search(r'<script>\n/\* js/i18n_%s\.js \*/\n(.*?)\n</script>' % l, flat, _re.S)
+    if not m: continue
+    open(os.path.join(fdst, 'i18n_%s.js' % l), 'w', encoding='utf-8').write(m.group(1))
+    flat = flat[:m.start()] + flat[m.end():]
+loader = ("<script>(function(){var need={},L=%s;try{var s=JSON.parse(localStorage.getItem('hrad-proti-hradu-save-v1')||'{}');if(s&&s.lang)need[s.lang]=1;}catch(e){}"
+          "need[String(navigator.language||'').slice(0,2).toLowerCase()]=1;window.CW_LAZYLANG={};"
+          "L.forEach(function(l){if(need[l])document.write('<script src=\"i18n_'+l+'.js\"><\\/script>');else window.CW_LAZYLANG[l]=1;});})();</script>") % json.dumps(LAZY)
+ml = _re.search(r'<script>\n/\* js/i18n_l\.js \*/\n.*?\n</script>', flat, _re.S)
+flat = flat[:ml.end()] + loader + flat[ml.end():]   # až po i18n_l.js (definuje I18N.addLang)
+# když si hráč později přepne na nenačtený jazyk, nejdřív se dotáhne jeho soubor
+hook = ("<script>(function(){var A=window.App;if(!A||!A.setLang)return;var o=A.setLang;A.setLang=function(l){var t=this,a=arguments,z=window.CW_LAZYLANG||{};"
+        "if(z[l]){var sc=document.createElement('script');sc.src='i18n_'+l+'.js';sc.onload=sc.onerror=function(){z[l]=0;o.apply(t,a);};document.head.appendChild(sc);return;}return o.apply(t,a);};})();</script>")
+mm = _re.search(r'<script>\n/\* js/main\.js \*/\n.*?\n</script>', flat, _re.S)
+flat = flat[:mm.end()] + hook + flat[mm.end():]
+open(os.path.join(fdst, 'index.html'), 'w', encoding='utf-8').write(flat)
+print('cg/plochy/index.html', round(len(flat) / 1e6, 2), 'MB,', _fi[0], 'písem')
 print('cg/index.html', round(len(html) / 1e6, 1), 'MB,', len(zv), 'zvuků')

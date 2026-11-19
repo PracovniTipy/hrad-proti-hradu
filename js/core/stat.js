@@ -15,6 +15,7 @@
     } catch (e) { /* nic */ }
   };
   window.Stat = {
+    flush() { if (t) clearTimeout(t); flush(); },
     ev(name, d) {
       const k = String(name + (d && d.p ? ':' + d.p : '')).slice(0, 60);
       q[k] = (q[k] || 0) + 1;

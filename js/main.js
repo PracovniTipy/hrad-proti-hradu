@@ -218,7 +218,7 @@
       const allyF = lv.alliance ? GameData.factionOrder : [lv.faction];
       const fight = () => {
         const go = () => this.startBattle({
-          mode: 'campaign', title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
+          mode: 'campaign', lvId: id, title: `${lv.label} ${lv.name}`, difficulty: lv.diff, enemyUnits: lv.enemyUnits,
           enemyFaction: lv.enemy, theme: lv.theme || EF.theme,
           enemyName: lv.name, enemyCastleSkin: lv.castleSkin, enemyUnitSkin: lv.unitSkin, enemyCastleLevel: Math.round(lv.diff * 4),
           alliance: !!lv.alliance, playFaction: lv._pf || lv.faction, boss: typeof lv.boss === 'string' ? lv.boss : null,
@@ -341,6 +341,9 @@
         cfg.enemyDefense = GameData.enemyDefenseFor(Math.max(0, Math.min(1.2, ((cfg.difficulty || 1) - 0.55) / 1.6)), cfg.enemyCastleCfg && cfg.enemyCastleCfg.big);
       }
       if (window.Stat) Stat.ev('battle', { p: cfg.mode || 'x' });
+      // statistika: kde hráči bitvu opouštějí (odchod z bitvy / zavření hry před koncem) – jen souhrnné počty
+      this._bTrack = { p: String(cfg.lvId ? 'l' + cfg.lvId : (cfg.mode || 'x')).toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 30), t: Date.now(), done: false };
+      if (!this._bTrackHook) { this._bTrackHook = true; addEventListener('pagehide', () => this._bTrackLeave('zavrel')); }
       if (this._stopLive) { this._stopLive(); this._stopLive = null; }
       cancelAnimationFrame(this.previewRaf);
       $('#app').hidden = true;
@@ -580,7 +583,17 @@
       if (Zvuk.bindVol) Zvuk.bindVol(box);
     },
 
+    _bTrackLeave(kind) {
+      const tr = this._bTrack; if (!tr || tr.done || !window.Stat) return;
+      tr.done = true;
+      const sec = (Date.now() - tr.t) / 1000;
+      // název jen z písmen (server přijímá „nazev:detail“): hned <20 s, brzy <1 min, kratce <3 min, pozdeji <10 min, dlouho
+      const b = sec < 20 ? 'hned' : sec < 60 ? 'brzy' : sec < 180 ? 'kratce' : sec < 600 ? 'pozdeji' : 'dlouho';
+      try { Stat.ev(kind + '_' + b, { p: tr.p }); if (kind === 'zavrel' && Stat.flush) Stat.flush(); } catch (e) { /* nic */ }
+    },
+
     _closeBattle() {
+      this._bTrackLeave('odesel');
       if (this.battle) { this.battle.destroy(); this.battle = null; }
       if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');
       $('#battle').hidden = true;
@@ -594,6 +607,7 @@
       const adGold0 = save.gold;   // reklamy za odměnu: kolik zlata bitva dala (pro „Zdvojnásob odměnu“)
       if (!this.battle) return;
       if (cfg.film) { this._closeBattle(); this.go('hrad'); return; }   // natáčecí bitva: žádné odměny ani statistiky
+      if (this._bTrack) this._bTrack.done = true;
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;
       if (res.win) save.stats.wins++; else save.stats.losses++;
