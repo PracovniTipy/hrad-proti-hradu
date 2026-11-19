@@ -1457,3 +1457,6 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
   .ad-mini small { display: none; }
   .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
 }
+
+/* první bitva: klidné zlaté orámování karet vojáků (bez pohybu) */
+#bUnits.coach-hl { outline: 2px solid #e8b84a !important; outline-offset: 2px; box-shadow: 0 0 14px rgba(232,184,74,.55) !important; }

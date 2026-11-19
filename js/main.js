@@ -118,12 +118,12 @@
       });
     },
 
-    toast(msg) {
+    toast(msg, ms) {
       const t = $('#toast');
       t.textContent = msg; t.hidden = false;
       t.classList.toggle('tiny', !!this.battle);   // v bitvě jen malý proužek nahoře, nic nezakrývá
       clearTimeout(this._tt);
-      this._tt = setTimeout(() => (t.hidden = true), 2200);
+      this._tt = setTimeout(() => (t.hidden = true), ms || 2200);
     },
 
     modal(html, onMount) {
@@ -439,8 +439,16 @@
       this.battle = battle;
       if (!(save.tut || {}).battle && !cfg.net) {
         save.tut = save.tut || {}; save.tut.battle = true; Save.save();
-        battle.togglePause(true);
-        setTimeout(() => { if (App.battle !== battle) return; if (!Tutorial.run(Tutorial.BATTLE, () => battle.togglePause(false))) battle.togglePause(false); }, 450);
+        // první bitva BEZ PAUZY a bez tmavého překryvu (z něj hráči nejvíc odcházeli):
+        // hned vyběhne první voják zdarma a dole se postupně ukážou 3 krátké nápovědy
+        setTimeout(() => {
+          if (App.battle !== battle) return;
+          const b0 = document.querySelector('#bUnits [data-spawn]');
+          if (b0) try { battle.spawn('player', b0.dataset.spawn, true); } catch (e) { /* nic */ }
+          const box = $('#bUnits'); if (box) box.classList.add('coach-hl');
+          setTimeout(() => box && box.classList.remove('coach-hl'), 9000);
+        }, 300);
+        [['tut_b_2', 700], ['tut_b_6', 7500], ['tut_b_4', 15000]].forEach(([k, ms]) => setTimeout(() => { if (App.battle === battle && !battle.over) this.toast(t(k), 6000); }, ms));
       }
       this._formUi('utok');
       this._squadUi(0, null);
