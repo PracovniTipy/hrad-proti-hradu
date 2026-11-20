@@ -395,7 +395,7 @@
       const banner = $('#bBanner');
       // nápověda jen v prvních třech bitvách, ať nezakrývá bojiště
       save.hintCount = (save.hintCount || 0) + 1;
-      const showHint = save.hintCount <= 3;
+      const showHint = save.hintCount <= 3 && !!(save.tut || {}).battle;   // v úplně první bitvě ji nahradí návod „klepni na vojáka“
       hint.hidden = !showHint; hint.style.opacity = showHint ? 1 : 0; banner.hidden = false; banner.style.opacity = 1;
       clearTimeout(this._ht);
       this._ht = setTimeout(() => {
@@ -406,12 +406,16 @@
       const stats = GameData.calc.battleStats(save);
       let lastHud = {};
       $('#bBoss').hidden = true;
+      // úplně první bitva: slabší a pomalejší nepřítel, ať nový hráč do ~1,5 minuty vyhraje (dlouhá remíza = odchod ze hry)
+      const firstB = !(save.tut || {}).battle && !cfg.net && cfg.mode === 'campaign';
+      const firstStats = firstB && !cfg.enemyStats ? Object.assign({}, GameData.calc.enemyStats(cfg.difficulty), { hpMult: 0.7, dmgMult: 0.7 }) : null;
+      if (firstStats) firstStats.income *= 0.5;
       const bopts = {
         canvas: $('#bCanvas'), mini: $('#bMini'),
         mode: cfg.mode, difficulty: cfg.difficulty, enemyUnits: cfg.enemyUnits,
-        world: facs.length > 1 ? Object.assign({}, cfg.world || {}, { playerFront: GameData.battleConfig.playerFront + 560 }) : (cfg.world || null), enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: cfg.enemyCastleHpMult || 1,
+        world: facs.length > 1 ? Object.assign({}, cfg.world || {}, { playerFront: GameData.battleConfig.playerFront + 560 }) : (cfg.world || (firstB ? { worldW: 4200, enemyFront: 3730 } : null)), enemyCastleStyle: cfg.enemyCastleStyle || null, enemyCastleHpMult: (cfg.enemyCastleHpMult || 1) * (firstB ? 0.45 : 1),   // první bitva kratší (rychlá první výhra)
         playerUnits: units, boss: cfg.boss || null, hostages: cfg.hostages || 0, allyFactions: facs.length > 1 ? facs : null,
-        general: cfg.general || null, noSkills: !!cfg.noSkills, enemyDefense: cfg.enemyDefense || null, enemyOil: cfg.enemyOil || 0, enemyCastleCfg: cfg.enemyCastleCfg || undefined, enemyStats: cfg.enemyStats || undefined, showEnemyFlag: cfg.showEnemyFlag,
+        general: cfg.general || null, noSkills: !!cfg.noSkills, enemyDefense: cfg.enemyDefense || null, enemyOil: cfg.enemyOil || 0, enemyCastleCfg: cfg.enemyCastleCfg || undefined, enemyStats: cfg.enemyStats || firstStats || undefined, showEnemyFlag: cfg.showEnemyFlag,
         playerFaction: (cfg.playFaction && cfg.playFaction !== 'spojenectvi') ? cfg.playFaction : save.faction, enemyFaction: cfg.enemyFaction || 'kralovstvi', theme: cfg.theme || 'evropa',
         enemyCastleSkin: cfg.enemyCastleSkin, enemyUnitSkin: cfg.enemyUnitSkin, enemyCastleLevel: cfg.enemyCastleLevel,
         speed: save.settings.speed || 1,
@@ -439,16 +443,34 @@
       this.battle = battle;
       if (!(save.tut || {}).battle && !cfg.net) {
         save.tut = save.tut || {}; save.tut.battle = true; Save.save();
-        // první bitva BEZ PAUZY a bez tmavého překryvu (z něj hráči nejvíc odcházeli):
-        // hned vyběhne první voják zdarma a dole se postupně ukážou 3 krátké nápovědy
+        // první bitva: interaktivní návod „klepni sem“ – bitva stojí, ztmavené je všechno kromě karet vojáků;
+        // jakmile hráč klepne na vojáka, bitva se rozběhne a dole se ukážou 2 krátké nápovědy
+        battle.togglePause(true);
         setTimeout(() => {
           if (App.battle !== battle) return;
-          const b0 = document.querySelector('#bUnits [data-spawn]');
-          if (b0) try { battle.spawn('player', b0.dataset.spawn, true); } catch (e) { /* nic */ }
-          const box = $('#bUnits'); if (box) box.classList.add('coach-hl');
-          setTimeout(() => box && box.classList.remove('coach-hl'), 9000);
-        }, 300);
-        [['tut_b_2', 700], ['tut_b_6', 7500], ['tut_b_4', 15000]].forEach(([k, ms]) => setTimeout(() => { if (App.battle === battle && !battle.over) this.toast(t(k), 6000); }, ms));
+          const box = $('#bUnits'); if (!box) { battle.togglePause(false); return; }
+          const ov = document.createElement('div');
+          ov.className = 'coach';
+          ov.innerHTML = `<div class="coach-hole"></div><div class="coach-bub"><b>👇 ${esc(t('tut_b_2'))}</b></div>`;
+          document.body.appendChild(ov);
+          const hole = ov.querySelector('.coach-hole'), bub = ov.querySelector('.coach-bub');
+          const place = () => {
+            const q = (box.querySelector('[data-spawn]') || box).getBoundingClientRect();   // zvýrazní první kartu vojáka
+            Object.assign(hole.style, { left: (q.left - 6) + 'px', top: (q.top - 6) + 'px', width: (q.width + 12) + 'px', height: (q.height + 12) + 'px' });
+            const bw = Math.min(360, innerWidth - 24); bub.style.width = bw + 'px';
+            bub.style.left = Math.max(12, Math.min(innerWidth - bw - 12, q.left)) + 'px';
+            bub.style.top = Math.max(8, q.top - (bub.offsetHeight || 60) - 14) + 'px';
+          };
+          place(); addEventListener('resize', place);
+          const go = () => {
+            box.removeEventListener('pointerdown', go, true);
+            removeEventListener('resize', place); ov.remove();
+            if (App.battle !== battle) return;
+            battle.togglePause(false);
+            [['tut_b_6', 4000], ['tut_b_4', 14000]].forEach(([k, ms]) => setTimeout(() => { if (App.battle === battle && !battle.over) this.toast(t(k), 5000); }, ms));
+          };
+          box.addEventListener('pointerdown', go, true);
+        }, 400);
       }
       this._formUi('utok');
       this._squadUi(0, null);

@@ -1458,5 +1458,8 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
   .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
 }
 
-/* první bitva: klidné zlaté orámování karet vojáků (bez pohybu) */
-#bUnits.coach-hl { outline: 2px solid #e8b84a !important; outline-offset: 2px; box-shadow: 0 0 14px rgba(232,184,74,.55) !important; }
+
+/* první bitva: „klepni sem“ – ztmavení kolem karet vojáků, kliky na karty projdou (nic se nehýbe) */
+.coach { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+.coach-hole { position: fixed; border-radius: 12px; border: 2px solid #e8b84a; box-shadow: 0 0 0 9999px rgba(5,8,14,.62), 0 0 16px rgba(232,184,74,.6); }
+.coach-bub { position: fixed; background: #fff6dd; color: #2a1a05; border: 2px solid #e8b84a; border-radius: 12px; padding: 10px 14px; font-size: 15px; line-height: 1.3; box-shadow: 0 6px 20px rgba(0,0,0,.45); }
