@@ -64,6 +64,7 @@
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
   const pg = () => { const B = window.CW_PG; return B && B.advertisement && B.advertisement.isRewardedSupported ? B : null; };
   const gpx = () => { const G = window.CW_GPX; return window.CW_GPX_READY && G && G.ads && typeof G.ads.reward === 'function' ? G : null; };
+  const gdr = () => (window.CW_PORTAL === 'gamedistribution' && window.gdsdk && typeof gdsdk.showAd === 'function') ? window.gdsdk : null;
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
@@ -73,6 +74,7 @@
     if (poki()) return 'poki';
     if (pg()) return 'playgama';
     if (gpx()) return 'gamepix';
+    if (gdr()) return 'gd';
     if (h5()) return 'h5';
     return '';
   }
@@ -170,6 +172,12 @@
       } catch (e) { end(false); }
       setTimeout(() => end(got), 180000);
     });
+  }
+  async function gdShow() {
+    ui.hideWait();
+    const t0 = Date.now();
+    try { await gdr().showAd('rewarded'); } catch (e) { return !!(window.CW_GD_REWARD && window.CW_GD_REWARD >= t0); }
+    return !!(window.CW_GD_REWARD && window.CW_GD_REWARD >= t0) || true;
   }
   async function gpxShow() {
     ui.hideWait();
@@ -304,7 +312,7 @@
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : prov === 'gamepix' ? gpxShow() : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : prov === 'gamepix' ? gpxShow() : prov === 'gd' ? gdShow() : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;

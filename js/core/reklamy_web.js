@@ -155,6 +155,32 @@
       if (document.readyState === 'complete') setTimeout(ready, 200); else window.addEventListener('load', () => setTimeout(ready, 200));
     };
     if (window.GamePix) go(); else load('https://integration.gamepix.com/sdk/v3/gamepix.sdk.js').then(go).catch(() => {});
+  } else if (portal === 'gamedistribution') {
+    /* GameDistribution SDK: GD_OPTIONS (gameId z buildu – window.CW_GD_ID) + main.min.js.
+       Povinně: pauza a ztlumení při reklamě (SDK_GAME_PAUSE / SDK_GAME_START),
+       pre-roll při prvním „Do bitvy“ (klik hráče), mid-roll mezi bitvami, reklama za odměnu. */
+    const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+    let paused = false;
+    window.CW_GD_EV = window.CW_GD_EV || [];
+    const onEv = ev => {
+      const n = ev && ev.name;
+      if (n === 'SDK_GAME_PAUSE') { mute(true); try { const b = window.App && App.battle; if (b && !b.over && b.setPaused && !paused) { b.setPaused(true); paused = true; } } catch (e) {} }
+      else if (n === 'SDK_GAME_START') { mute(false); try { const b = window.App && App.battle; if (paused && b && b.setPaused) b.setPaused(false); } catch (e) {} paused = false; }
+      else if (n === 'SDK_REWARDED_WATCH_COMPLETE') window.CW_GD_REWARD = Date.now();
+      else if (n === 'SDK_READY') window.CW_GD_READY = true;
+    };
+    window.CW_GD_ON = onEv;
+    if (!window.GD_OPTIONS) window.GD_OPTIONS = { gameId: window.CW_GD_ID || '', advertisementSettings: { autoplay: false }, onEvent: onEv };
+    const hook = () => {
+      const A = window.App;
+      if (!A || !A.startBattle || A._gdHook) return !!(A && A._gdHook);
+      A._gdHook = true;
+      const st = A.startBattle; let pre = false;
+      A.startBattle = function () { const r = st.apply(this, arguments); if (!pre) { pre = true; try { window.gdsdk && gdsdk.showAd && gdsdk.showAd(); } catch (e) {} } return r; };
+      return true;
+    };
+    if (!hook()) window.addEventListener('load', hook);
+    if (!document.getElementById('gamedistribution-jssdk')) load('https://html5.api.gamedistribution.com/main.min.js', { id: 'gamedistribution-jssdk' }).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -239,6 +265,8 @@
         CW_PG.advertisement.showInterstitial('po-bitve');
       } else if (portal === 'gamepix' && window.CW_GPX_READY && window.CW_GPX && CW_GPX.ads) {
         CW_GPX.ads.interstitial().catch(() => {});
+      } else if (portal === 'gamedistribution' && window.gdsdk && typeof gdsdk.showAd === 'function') {
+        try { const r = gdsdk.showAd(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
