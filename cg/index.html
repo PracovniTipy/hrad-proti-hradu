@@ -43515,7 +43515,7 @@ window.PROLOG_TEXTY = {
 
     /* ---------- hlas vypravěče (ElevenLabs nahrávky, žádný hlas prohlížeče) ---------- */
     _voice(key) {
-      if (!this.unlocked || !VOICED.includes(key)) return;
+      if (!VOICED.includes(key)) return;   // zkusí hrát hned; když prohlížeč zvuk zablokuje, rozjede se po prvním klepnutí
       try { if (window.Zvuk && Zvuk.settings && !Zvuk.settings().sfx) return; } catch (e) { /* nic */ }
       const f = 'hlas_' + (window.I18N && I18N.lang === 'cs' ? 'cs' : 'en') + '_' + key + '.mp3';
       const src = (window.CW_ZVUKY && CW_ZVUKY[f]) || (BASE + f);
@@ -43525,8 +43525,13 @@ window.PROLOG_TEXTY = {
         let vol = 1; try { vol = Math.max(0, Math.min(1, ((Zvuk.settings().sfxVol || 100) / 100))); } catch (e) { /* nic */ }
         a.volume = vol;
         a.onerror = () => { /* nahrávka chybí – zůstanou titulky */ };
-        const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+        const pr = a.play();
         this.audio = a; this.played = key;
+        if (pr && pr.catch) pr.catch(() => {
+          if (this.audio !== a) return;
+          this.played = null; this.unlocked = false;
+          if (!this._hinted && this.App && this.App.toast) { this._hinted = true; this.App.toast('🔊 ' + I18N.L('Klepni pro zvuk', 'Tap for sound'), 4000); }
+        });
       } catch (e) { /* jen titulky */ }
     },
     _stopVoice() { try { if (this.audio) this.audio.pause(); } catch (e) { /* nic */ } this.audio = null; },
@@ -43555,15 +43560,15 @@ window.PROLOG_TEXTY = {
       const save = App.save;
       save.tut = save.tut || {};
       save.tut.battle = true; save.tut.quick = 1; Save.save();   // starý návod se už nespouští
-      this.active = true;
-      this.unlocked = false;
+      this.active = true; this.App = App; this._hinted = false;
+      this.unlocked = !!(navigator.userActivation && navigator.userActivation.hasBeenActive);
       const unlock = () => {
-        if (this.unlocked) return;
+        if (!this.active) return;
         this.unlocked = true;
         if (this.active && this.cur && this.played !== this.cur) this._voice(this.cur);   // hlas se rozjede po prvním klepnutí
       };
-      document.addEventListener('pointerdown', unlock, { capture: true, once: true });
-      document.addEventListener('keydown', unlock, { capture: true, once: true });
+      document.addEventListener('pointerdown', unlock, { capture: true });
+      document.addEventListener('keydown', unlock, { capture: true });
       if (window.Stat) try { Stat.ev('prolog_start'); } catch (e) { /* nic */ }
       App.startBattle({
         mode: 'prolog', prolog: true, title: T('title'),
