@@ -76,7 +76,10 @@
           const b = document.createElement('button'); b.id = 'firstFight'; b.className = 'btn btn-gold btn-big first-fight' + (first ? '' : ' play-next');
           b.innerHTML = first ? '⚔️ ' + I18N.L('Do první bitvy!', 'To your first battle!')
             : '⚔️ ' + I18N.L('Do bitvy', 'Battle') + (lv.name ? '<small>' + I18N.L(lv.name, (lv.en && lv.en.name) || lv.name) + '</small>' : '');
-          b.addEventListener('click', () => this.openLevel(lv.id)); host.appendChild(b);
+          b.addEventListener('click', () => {   // nováček bez dohraného úvodu dostane úvodní příběh
+            if (first && window.Prolog && !(this.save.tut || {}).prolog) { Prolog.start(this); return; }
+            this.openLevel(lv.id);
+          }); host.appendChild(b);
         }
       }
       if (name === 'hrad' && window.Sireni) { try { Sireni.home(this); if ((this.save.stats.wins || 0) >= 1) Sireni.notifyAsk(this); } catch (e) { /* nic */ } }
