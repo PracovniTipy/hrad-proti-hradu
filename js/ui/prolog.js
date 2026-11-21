@@ -15,8 +15,8 @@
     const i = ORDER.indexOf((window.I18N && I18N.lang) || 'en');
     return row[i >= 0 ? i : 1] || row[1];
   };
-  const VOICED = ['n1', 'c1', 'n3', 'sc', 'n4', 'c2', 't3', 'n5'];
-  const WHO = { sc: 'w_sc', t1: 'w_tip', tc: 'w_tip', to: 'w_tip', t2: 'w_tip', t3: 'w_cmd', c1: 'w_cmd', c2: 'w_cmd' };
+  const VOICED = ['n1', 'c1', 'k1', 'sc', 'n4', 'c2', 't3', 'n5'];
+  const WHO = { sc: 'w_sc', t1: 'w_tip', tc: 'w_tip', to: 'w_tip', t2: 'w_tip', t3: 'w_cmd', c1: 'w_cmd', c2: 'w_cmd', k1: 'w_king' };
   const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
 
   const P = {
@@ -98,24 +98,36 @@
       const flagX = cfg.playerFront + 640;
       b.setFormation('player', 'formace', flagX);
       const army = [['pesak', 20], ['kopinik', 10], ['lucistnik', 15], ['rytir', 5]];
-      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) b.spawn('player', id, true); });
+      // královská garda: modrá se zlatou zbrojí; král v rudém se zlatou korunou
+      const G = { trim: '#f5d36b', metal: '#e8c45c', metalDark: '#a47a24' };
+      const guardPal = def => Object.assign(Art.unitPalette('player', 'zakladni', 'kralovstvi'), def.pal || {}, G);
+      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) if (b.spawn('player', id, true)) { const u = b.units[b.units.length - 1]; u.pal = guardPal(u.def); } });
       // jízdní hlídka stojí od začátku před šikem
       this.riders = [];
       for (let i = 0; i < 5; i++) {
         if (!b.spawn('player', 'jezdec', true)) continue;
         const u = b.units[b.units.length - 1];
-        u.x = flagX + 150 + (i % 2) * 40; u.y = cfg.laneTop + 18 + i * ((cfg.laneBottom - cfg.laneTop - 36) / 4);
+        u.x = flagX + 230 + (i % 2) * 40; u.y = cfg.laneTop + 18 + i * ((cfg.laneBottom - cfg.laneTop - 36) / 4);
         u.script = v => { v.moving = false; v.face = 1; };
         this.riders.push(u);
+      }
+      // král na koni se zlatou korunou stojí před gardou
+      if (b.spawn('player', 'jezdec', true)) {
+        const k = b.units[b.units.length - 1];
+        k.pal = Object.assign(Art.unitPalette('player', 'zakladni', 'kralovstvi'), k.def.pal || {}, G, { tunic: '#8a1a2a', tunicDark: '#5a0f1a', cape: '#8a1a2a', ornament: 'crown', glow: '#ffe28a' });
+        k.x = flagX + 360; k.y = (cfg.laneTop + cfg.laneBottom) / 2; k.hp = k.maxHp = 1e9;
+        k.script = v => { v.moving = false; v.face = -1; v.hp = v.maxHp; };   // král čelem ke gardě
+        this.king = k;
       }
       // celé vojsko hned srovnané v šiku (žádné pobíhání z brány)
       b._assignSlots('player');
       for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
-      b.camFocus = flagX - 120;
+      b.camFocus = flagX + 60;
       b.later(0.6, () => this._say('n1'));
-      b.later(8.6, () => this._say('c1'));          // velitel posílá hlídku
-      b.later(12.2, () => this._riders());
+      b.later(7.0, () => this._say('c1'));          // velitel gardy se ptá krále
+      b.later(16.4, () => this._say('k1'));         // král posílá jezdce
+      b.later(18.4, () => this._riders());
     },
 
     /* jízdní hlídka vyráží na průzkum */
@@ -136,8 +148,7 @@
         if (lead.length) { b.camFocus = Math.max(...lead.map(r => r.x)); b.later(0.1, follow); return; }
         riders.forEach(r => { r.script = null; r.dead = 9; });   // hlídka zmizela v lese (mrtvé = vypadnou i z hledání cílů)
         b.camFocus = this.flagX + 200;
-        this._say('n3');
-        b.later(2.6, () => this._scout());
+        b.later(1.0, () => this._scout());
       };
       b.later(0.3, follow);
     },
@@ -174,6 +185,9 @@
     _demons() {
       const b = this.b, cfg = GameData.battleConfig;
       this._say('n4');
+      // král se stáhne za vojsko k hradu
+      const k = this.king, home = GameData.battleConfig.playerFront + 70;
+      if (k && !k.dead) k.script = (v, dt) => { v.hp = v.maxHp; if (v.x > home) { v.x -= v.def.speed * (GameData.battleConfig.speedScale || 1) * 1.6 * dt; v.face = -1; v.moving = true; v.walk += dt * v.def.speed * 0.17; } else { v.moving = false; v.face = 1; } };
       b.later(4.6, () => { if (!this.attacked) this._say('c2'); });   // velitel: Do zbraně!
       b.setFormation('enemy', 'utok');   // démoni jdou rovnou na hrad
       const groups = [
