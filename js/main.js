@@ -602,7 +602,7 @@
 
     _closeBattle() {
       this._bTrackLeave('odesel');
-      if (window.Prolog && Prolog.active) { Prolog.active = false; try { Prolog._stopVoice(); } catch (e) { /* nic */ } }
+      if (window.Prolog && Prolog.active) { Prolog.active = false; try { Prolog._stopVoice(); Prolog._clearMarks(); } catch (e) { /* nic */ } }
       { const ps = document.getElementById('prologSub'); if (ps) ps.hidden = true; }
       if (this.battle) { this.battle.destroy(); this.battle = null; }
       if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');

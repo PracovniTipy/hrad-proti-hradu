@@ -58,6 +58,37 @@
       this.cur = key;
       this._voice(key);
     },
+    /* zlatá skákající šipka, která ukazuje na tlačítko (sleduje ho i při změně velikosti okna) */
+    _point(sel, ms) {
+      const el = document.querySelector(sel); if (!el) return;
+      const ar = document.createElement('div');
+      ar.className = 'prolog-arrow';
+      ar.innerHTML = '<svg viewBox="0 0 40 48" aria-hidden="true"><path d="M14 2h12v24h11L20 46 3 26h11z"/></svg>';
+      document.body.appendChild(ar);
+      const place = () => {
+        const r = el.getBoundingClientRect();
+        if (!r.width) { ar.style.display = 'none'; return; }
+        ar.style.display = '';
+        const up = r.top + r.height / 2 < innerHeight / 2;          // tlačítko nahoře → šipka pod ním míří nahoru
+        ar.classList.toggle('up', up);
+        ar.style.left = (r.left + r.width / 2 - 22) + 'px';
+        ar.style.top = (up ? r.bottom + 6 : r.top - 58) + 'px';
+      };
+      place();
+      const iv = setInterval(place, 200);
+      setTimeout(() => { clearInterval(iv); ar.remove(); }, ms);
+      (this.marks = this.marks || []).push(() => { clearInterval(iv); ar.remove(); });
+    },
+    /* ruka, která táhne po bojišti doleva a doprava (ukázka posunu kamery) */
+    _swipe(ms) {
+      const h = document.createElement('div');
+      h.className = 'prolog-swipe';
+      h.innerHTML = '<span class="pl">◀</span><span class="hand">👆</span><span class="pr">▶</span>';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), ms);
+      (this.marks = this.marks || []).push(() => h.remove());
+    },
+    _clearMarks() { (this.marks || []).forEach(f => { try { f(); } catch (e) { /* nic */ } }); this.marks = []; },
     _hl(sel, ms) {
       const el = document.querySelector(sel); if (!el) return;
       el.classList.add('prolog-hl');
@@ -225,14 +256,15 @@
         if (this.attacked) return;
         this._say('t1');
         this._hl('#bUnits', 7000);
+        this._point('#bUnits [data-spawn]', 7000);
         try {
           b.setAuto('kralovstvi', true);
           const btn = document.querySelector('#bUnits [data-auto="kralovstvi"]');
           if (btn) { btn.setAttribute('aria-pressed', true); const g = btn.closest('.ugrp'); if (g) g.classList.add('auto-on'); }
         } catch (e) { /* nic */ }
       });
-      b.later(15.5, () => { if (!this.attacked) this._say('tc'); });
-      b.later(22.5, () => { if (!this.attacked) { this._say('to'); this._hl('#bForm', 7000); } });
+      b.later(15.5, () => { if (!this.attacked) { this._say('tc'); this._swipe(7000); } });
+      b.later(22.5, () => { if (!this.attacked) { this._say('to'); this._hl('#bOrders', 7000); this._point('#bOrders [data-order="utok"]', 7000); } });
       this._tFire = b.time + 29.5;
     },
 
@@ -248,6 +280,7 @@
           this.tipFire = true;
           if (!this.attacked) this._say('t2');
           this._hl('#bAbil [data-abil]', 7000);
+          this._point('#bAbil [data-abil]', 7000);
         }
       }
       let pa = 0, ea = 0;
@@ -256,6 +289,7 @@
         this.attacked = true;
         b.setFormation('player', 'utok');
         if (this.App && this.App._formUi) this.App._formUi('utok');
+        this._clearMarks();
         this._say('t3');
       }
       if (this.allIn && ea === 0 && !this.ending) {
@@ -267,7 +301,7 @@
 
     /* po bitvě: odměna a normální hra */
     finish(App, res) {
-      this.active = false;
+      this.active = false; this._clearMarks();
       this._stopVoice();
       if (this.sub) this.sub.hidden = true;
       const save = App.save;
