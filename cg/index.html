@@ -43457,68 +43457,90 @@ GameData.defenseOf = save => {
 
 </script>
 <script>
+/* js/ui/prolog_texty.js */
+/* Úvodní příběh – titulky ve všech jazycích hry.
+   Pořadí: cs, en, zh, hi, es, fr, ar, bn, pt, ru, ur, id, de, ja, tr, ko, pl
+   Hlas (ElevenLabs) je česky a anglicky: soubory zvuky/hlas_cs_<klíč>.mp3 a zvuky/hlas_en_<klíč>.mp3
+   (texty pro nahrávky jsou v tools/hlas.json – musí odpovídat cs a en tady). */
+window.PROLOG_TEXTY = {
+  n1: ['Hranice Království Lví koruny. Padesát věrných mužů stráží hrad.', 'The border of the Lion Crown kingdom. Fifty loyal men guard the castle.', '狮冠王国的边境。五十名忠诚的士兵守卫着城堡。', 'शेर मुकुट राज्य की सीमा। पचास वफ़ादार सैनिक किले की रक्षा करते हैं।', 'La frontera del reino de la Corona del León. Cincuenta hombres leales custodian el castillo.', 'La frontière du royaume de la Couronne du Lion. Cinquante hommes loyaux gardent le château.', 'حدود مملكة تاج الأسد. خمسون رجلاً مخلصاً يحرسون القلعة.', 'সিংহ মুকুট রাজ্যের সীমান্ত। পঞ্চাশজন বিশ্বস্ত সৈন্য দুর্গ পাহারা দেয়।', 'A fronteira do reino da Coroa do Leão. Cinquenta homens leais guardam o castelo.', 'Граница королевства Львиной короны. Пятьдесят верных воинов охраняют замок.', 'شیر تاج کی سلطنت کی سرحد۔ پچاس وفادار سپاہی قلعے کی حفاظت کرتے ہیں۔', 'Perbatasan kerajaan Mahkota Singa. Lima puluh prajurit setia menjaga kastil.', 'Die Grenze des Königreichs der Löwenkrone. Fünfzig treue Männer bewachen die Burg.', '獅子の王冠王国の国境。五十人の忠実な兵が城を守っている。', 'Aslan Taç krallığının sınırı. Elli sadık asker kaleyi koruyor.', '사자 왕관 왕국의 국경. 충성스러운 병사 오십 명이 성을 지킨다.', 'Granica królestwa Lwiej Korony. Pięćdziesięciu wiernych ludzi strzeże zamku.'],
+  n2: ['Velitel vyslal jízdní hlídku, aby prozkoumala temný les.', 'The commander sent a cavalry patrol to scout the dark forest.', '指挥官派出一支骑兵巡逻队去侦察黑暗森林。', 'सेनापति ने अंधेरे जंगल की टोह लेने के लिए घुड़सवार दस्ता भेजा।', 'El comandante envió una patrulla de caballería a explorar el bosque oscuro.', 'Le commandant a envoyé une patrouille de cavalerie explorer la forêt sombre.', 'أرسل القائد دورية فرسان لاستطلاع الغابة المظلمة.', 'সেনাপতি অন্ধকার বন খুঁজে দেখতে একটি অশ্বারোহী টহল দল পাঠালেন।', 'O comandante enviou uma patrulha de cavalaria para explorar a floresta sombria.', 'Командир отправил конный дозор разведать тёмный лес.', 'سپہ سالار نے تاریک جنگل کی جاسوسی کے لیے گھڑسوار دستہ بھیجا۔', 'Komandan mengirim patroli kavaleri untuk mengintai hutan gelap.', 'Der Kommandant schickte eine Reiterpatrouille, um den dunklen Wald zu erkunden.', '司令官は暗い森を偵察するため、騎兵の斥候隊を送り出した。', 'Komutan karanlık ormanı keşfetmesi için bir süvari devriyesi gönderdi.', '지휘관은 어두운 숲을 정찰하라고 기병 정찰대를 보냈다.', 'Dowódca wysłał patrol kawalerii, by zbadał mroczny las.'],
+  n3: ['Čekali dlouho. Les utichl… až příliš.', 'They waited for a long time. The forest fell silent… far too silent.', '他们等了很久。森林安静了下来……安静得可怕。', 'वे देर तक इंतज़ार करते रहे। जंगल शांत हो गया… बहुत ज़्यादा शांत।', 'Esperaron mucho tiempo. El bosque quedó en silencio… demasiado silencio.', 'Ils ont attendu longtemps. La forêt est devenue silencieuse… bien trop silencieuse.', 'انتظروا طويلاً. ساد الصمت في الغابة… صمت أكثر من اللازم.', 'তারা অনেকক্ষণ অপেক্ষা করল। বন নিস্তব্ধ হয়ে গেল… অস্বাভাবিক নিস্তব্ধ।', 'Esperaram muito tempo. A floresta ficou em silêncio… silêncio demais.', 'Они долго ждали. Лес затих… слишком затих.', 'وہ دیر تک انتظار کرتے رہے۔ جنگل خاموش ہو گیا… حد سے زیادہ خاموش۔', 'Mereka menunggu lama. Hutan menjadi sunyi… terlalu sunyi.', 'Sie warteten lange. Der Wald verstummte… viel zu still.', '彼らは長い間待った。森は静まり返った……あまりにも静かに。', 'Uzun süre beklediler. Orman sessizleşti… fazlasıyla sessiz.', '그들은 오래 기다렸다. 숲이 조용해졌다… 지나치게 조용히.', 'Czekali długo. Las ucichł… zbyt cicho.'],
+  sc: ['Pane… přepadli nás! Démoni… táhnou sem… celá armáda…', 'My lord… we were ambushed! Demons… they are coming… a whole army…', '大人……我们遭到伏击！恶魔……它们来了……整整一支大军……', 'हुज़ूर… हम पर घात लगाकर हमला हुआ! दानव… वे आ रहे हैं… पूरी सेना…', 'Mi señor… ¡nos emboscaron! Demonios… vienen hacia aquí… todo un ejército…', 'Mon seigneur… on nous a tendu une embuscade ! Des démons… ils arrivent… toute une armée…', 'سيدي… لقد نُصب لنا كمين! الشياطين… إنهم قادمون… جيش كامل…', 'প্রভু… আমাদের উপর অতর্কিত হামলা হয়েছে! দানবেরা… তারা আসছে… পুরো একটা বাহিনী…', 'Meu senhor… fomos emboscados! Demônios… estão vindo… um exército inteiro…', 'Мой лорд… на нас напали из засады! Демоны… они идут сюда… целая армия…', 'حضور… ہم پر گھات لگا کر حملہ ہوا! شیطان… وہ آ رہے ہیں… پوری فوج…', 'Tuanku… kami disergap! Iblis… mereka datang… satu pasukan penuh…', 'Herr… wir wurden überfallen! Dämonen… sie kommen hierher… eine ganze Armee…', '閣下……待ち伏せを受けました！悪魔が……こちらへ……大軍が……', 'Efendim… pusuya düşürüldük! İblisler… buraya geliyorlar… koca bir ordu…', '주군… 매복을 당했습니다! 악마들이… 이리로 오고 있습니다… 대군이…', 'Panie… wpadliśmy w zasadzkę! Demony… idą tutaj… cała armia…'],
+  n4: ['Z lesa vyrazila obrovská armáda démonů. Braň hrad!', 'A huge demon army bursts out of the forest. Defend the castle!', '一支庞大的恶魔大军冲出森林。保卫城堡！', 'जंगल से दानवों की विशाल सेना निकल पड़ी। किले की रक्षा करो!', 'Un enorme ejército de demonios sale del bosque. ¡Defiende el castillo!', 'Une immense armée de démons surgit de la forêt. Défends le château !', 'جيش ضخم من الشياطين يندفع من الغابة. دافع عن القلعة!', 'বন থেকে বিশাল দানব বাহিনী বেরিয়ে এল। দুর্গ রক্ষা করো!', 'Um enorme exército de demônios sai da floresta. Defenda o castelo!', 'Из леса вырвалась огромная армия демонов. Защити замок!', 'جنگل سے شیطانوں کی ایک بڑی فوج نکل آئی۔ قلعے کا دفاع کرو!', 'Pasukan iblis yang besar menyerbu keluar dari hutan. Pertahankan kastil!', 'Eine riesige Dämonenarmee bricht aus dem Wald hervor. Verteidige die Burg!', '森から悪魔の大軍が押し寄せてきた。城を守れ！', 'Ormandan devasa bir iblis ordusu çıkıyor. Kaleyi savun!', '숲에서 거대한 악마 군대가 쏟아져 나온다. 성을 지켜라!', 'Z lasu wyrywa się ogromna armia demonów. Broń zamku!'],
+  t1: ['Klepni na vojáka dole a pošli posily. Noví vojáci se přidávají i sami.', 'Tap a soldier below to send reinforcements. New soldiers also join on their own.', '点击下方的士兵派出援军。新士兵也会自动加入。', 'नीचे किसी सैनिक पर टैप करके मदद भेजें। नए सैनिक अपने आप भी जुड़ते हैं।', 'Toca un soldado abajo para enviar refuerzos. Los nuevos soldados también se unen solos.', 'Touche un soldat en bas pour envoyer des renforts. De nouveaux soldats arrivent aussi tout seuls.', 'المس جندياً في الأسفل لإرسال التعزيزات. ينضم جنود جدد تلقائياً أيضاً.', 'নিচের কোনো সৈন্যে ট্যাপ করে সাহায্য পাঠাও। নতুন সৈন্যরা নিজেরাও যোগ দেয়।', 'Toque num soldado abaixo para enviar reforços. Novos soldados também chegam sozinhos.', 'Нажми на воина внизу, чтобы отправить подкрепление. Новые воины присоединяются и сами.', 'نیچے کسی سپاہی پر ٹیپ کر کے کمک بھیجیں۔ نئے سپاہی خود بھی شامل ہوتے ہیں۔', 'Ketuk prajurit di bawah untuk mengirim bala bantuan. Prajurit baru juga datang sendiri.', 'Tippe unten auf einen Krieger, um Verstärkung zu schicken. Neue Krieger kommen auch von selbst.', '下の兵士をタップして援軍を送ろう。新しい兵士は自動でも加わる。', 'Takviye göndermek için aşağıdaki bir askere dokun. Yeni askerler kendiliğinden de katılır.', '아래 병사를 탭해 지원군을 보내세요. 새 병사도 저절로 합류합니다.', 'Stuknij żołnierza na dole, by wysłać posiłki. Nowi żołnierze dołączają też sami.'],
+  tc: ['Táhni prstem po bojišti doleva a doprava – posuneš kameru a uvidíš celé bojiště.', 'Drag across the battlefield left and right to move the camera and see the whole battle.', '在战场上左右拖动即可移动镜头，查看整个战场。', 'कैमरा हिलाने और पूरा युद्धक्षेत्र देखने के लिए मैदान पर बाएँ-दाएँ खींचें।', 'Arrastra por el campo de batalla a izquierda y derecha para mover la cámara y ver toda la batalla.', 'Fais glisser le champ de bataille à gauche et à droite pour déplacer la caméra et tout voir.', 'اسحب على ساحة المعركة يميناً ويساراً لتحريك الكاميرا ورؤية المعركة كلها.', 'ক্যামেরা সরাতে ও পুরো যুদ্ধক্ষেত্র দেখতে মাঠে বাঁয়ে-ডানে টানো।', 'Arraste pelo campo de batalha para a esquerda e direita para mover a câmera e ver tudo.', 'Проведи пальцем по полю боя влево и вправо, чтобы двигать камеру и видеть всю битву.', 'کیمرا ہلانے اور پورا میدان دیکھنے کے لیے میدان پر بائیں دائیں گھسیٹیں۔', 'Geser medan perang ke kiri dan kanan untuk menggerakkan kamera dan melihat seluruh pertempuran.', 'Wische über das Schlachtfeld nach links und rechts, um die Kamera zu bewegen und alles zu sehen.', '戦場を左右にドラッグするとカメラが動き、戦い全体が見える。', 'Kamerayı hareket ettirip tüm savaşı görmek için savaş alanında sola ve sağa sürükle.', '전장을 좌우로 드래그하면 카메라가 움직여 전체 전투를 볼 수 있습니다.', 'Przeciągnij po polu bitwy w lewo i w prawo, by przesuwać kamerę i widzieć całą bitwę.'],
+  to: ['Rozkazy nahoře: Útok pošle všechny na nepřítele, Ústup je stáhne k hradu, Hradby a Střed je seřadí.', 'Orders at the top: Attack sends everyone at the enemy, Retreat pulls them back, Walls and Center line them up.', '上方是命令：进攻让全军冲向敌人，撤退让他们退回城堡，城墙和中央让他们列阵。', 'ऊपर आदेश हैं: हमला सबको दुश्मन पर भेजता है, पीछे हटो किले तक लाता है, दीवारें और केंद्र उन्हें कतार में लगाते हैं।', 'Órdenes arriba: Ataque lanza a todos contra el enemigo, Retirada los repliega, Murallas y Centro los forman.', 'Ordres en haut : Attaque envoie tout le monde sur l’ennemi, Repli les ramène, Remparts et Centre les alignent.', 'الأوامر في الأعلى: هجوم يرسل الجميع نحو العدو، تراجع يعيدهم إلى القلعة، الأسوار والوسط ينظّمانهم.', 'উপরে আদেশ: আক্রমণ সবাইকে শত্রুর দিকে পাঠায়, পিছু হটো দুর্গে ফেরায়, প্রাচীর ও কেন্দ্র সারিতে দাঁড় করায়।', 'Ordens no topo: Ataque manda todos contra o inimigo, Recuar traz de volta, Muralhas e Centro os alinham.', 'Приказы наверху: «Атака» бросает всех на врага, «Отступление» отводит к замку, «Стены» и «Центр» выстраивают их.', 'اوپر احکامات ہیں: حملہ سب کو دشمن پر بھیجتا ہے، پسپائی قلعے تک واپس لاتی ہے، دیواریں اور مرکز صف بندی کرتے ہیں۔', 'Perintah di atas: Serang mengirim semua ke musuh, Mundur menarik mereka kembali, Tembok dan Tengah menyusun barisan.', 'Befehle oben: Angriff schickt alle auf den Feind, Rückzug holt sie zurück, Mauern und Mitte stellen sie auf.', '上の命令：攻撃で全員が敵へ、退却で城へ戻り、城壁と中央で隊列を組む。', 'Emirler üstte: Saldırı herkesi düşmana yollar, Geri çekil onları kaleye çeker, Surlar ve Merkez dizer.', '위쪽 명령: 공격은 모두를 적에게 보내고, 후퇴는 성으로 물리며, 성벽과 중앙은 대열을 갖춥니다.', 'Rozkazy u góry: Atak wysyła wszystkich na wroga, Odwrót cofa ich do zamku, Mury i Środek ustawiają szyk.'],
+  t2: ['Klepni na 🔥 Ohnivý déšť a spal skupinu démonů!', 'Tap 🔥 Fire Rain to burn a group of demons!', '点击🔥火雨，烧毁一群恶魔！', '🔥 अग्नि वर्षा पर टैप करें और दानवों के झुंड को जला दें!', '¡Toca 🔥 Lluvia de fuego para quemar a un grupo de demonios!', 'Touche 🔥 Pluie de feu pour brûler un groupe de démons !', 'المس 🔥 مطر النار لحرق مجموعة من الشياطين!', '🔥 অগ্নিবৃষ্টিতে ট্যাপ করে দানবদের একটি দল পুড়িয়ে দাও!', 'Toque em 🔥 Chuva de fogo para queimar um grupo de demônios!', 'Нажми 🔥 «Огненный дождь», чтобы сжечь группу демонов!', '🔥 آگ کی بارش پر ٹیپ کر کے شیطانوں کے گروہ کو جلا دیں!', 'Ketuk 🔥 Hujan Api untuk membakar sekelompok iblis!', 'Tippe auf 🔥 Feuerregen und verbrenne eine Gruppe Dämonen!', '🔥火の雨をタップして悪魔の群れを焼き払おう！', 'Bir grup iblisi yakmak için 🔥 Ateş Yağmuru’na dokun!', '🔥 불비를 탭해 악마 무리를 불태우세요!', 'Stuknij 🔥 Deszcz ognia, by spalić grupę demonów!'],
+  t3: ['Máme přesilu! Všichni do útoku!', 'We outnumber them! Everyone, attack!', '我们人数占优！全军出击！', 'हम संख्या में ज़्यादा हैं! सब हमला करो!', '¡Los superamos en número! ¡Todos al ataque!', 'Nous sommes plus nombreux ! Tous à l’attaque !', 'نحن أكثر عدداً! الجميع إلى الهجوم!', 'আমরা সংখ্যায় বেশি! সবাই আক্রমণ করো!', 'Estamos em maior número! Todos ao ataque!', 'Нас больше! Все в атаку!', 'ہم تعداد میں زیادہ ہیں! سب حملہ کرو!', 'Jumlah kita lebih banyak! Semua, serang!', 'Wir sind in der Überzahl! Alle zum Angriff!', '数ではこちらが上だ！全軍、突撃！', 'Sayıca üstünüz! Herkes saldırıya!', '우리가 수적으로 우세하다! 전원 공격!', 'Mamy przewagę! Wszyscy do ataku!'],
+  n5: ['Démoni padli a hrad stojí… ale tohle je teprve začátek.', 'The demons have fallen and the castle stands… but this is only the beginning.', '恶魔倒下了，城堡依然屹立……但这只是开始。', 'दानव गिर गए और किला खड़ा है… लेकिन यह तो बस शुरुआत है।', 'Los demonios han caído y el castillo sigue en pie… pero esto es solo el principio.', 'Les démons sont tombés et le château tient bon… mais ce n’est que le début.', 'سقط الشياطين وبقيت القلعة صامدة… لكن هذه مجرد البداية.', 'দানবেরা পরাজিত, দুর্গ দাঁড়িয়ে আছে… কিন্তু এ তো কেবল শুরু।', 'Os demônios caíram e o castelo resiste… mas isto é só o começo.', 'Демоны пали, а замок устоял… но это только начало.', 'شیطان گر گئے اور قلعہ قائم ہے… لیکن یہ تو بس آغاز ہے۔', 'Para iblis telah tumbang dan kastil tetap berdiri… tapi ini baru permulaan.', 'Die Dämonen sind gefallen und die Burg steht… doch das ist erst der Anfang.', '悪魔は倒れ、城は持ちこたえた……だが、これはまだ始まりにすぎない。', 'İblisler düştü ve kale ayakta… ama bu daha başlangıç.', '악마들은 쓰러졌고 성은 굳건하다… 하지만 이것은 시작에 불과하다.', 'Demony padły, a zamek stoi… ale to dopiero początek.'],
+  w_sc: ['Zvěd', 'Scout', '侦察兵', 'गुप्तचर', 'Explorador', 'Éclaireur', 'الكشّاف', 'গুপ্তচর', 'Batedor', 'Разведчик', 'جاسوس', 'Pengintai', 'Späher', '斥候', 'Keşifçi', '정찰병', 'Zwiadowca'],
+  w_tip: ['Návod', 'Tip', '提示', 'सुझाव', 'Consejo', 'Astuce', 'نصيحة', 'পরামর্শ', 'Dica', 'Подсказка', 'مشورہ', 'Tips', 'Tipp', 'ヒント', 'İpucu', '팁', 'Wskazówka'],
+  w_cmd: ['Velitel', 'Commander', '指挥官', 'सेनापति', 'Comandante', 'Commandant', 'القائد', 'সেনাপতি', 'Comandante', 'Командир', 'سپہ سالار', 'Komandan', 'Kommandant', '司令官', 'Komutan', '지휘관', 'Dowódca'],
+  end_h: ['Hrad ubráněn!', 'Castle defended!', '城堡守住了！', 'किला बच गया!', '¡Castillo defendido!', 'Château défendu !', 'تم الدفاع عن القلعة!', 'দুর্গ রক্ষা পেয়েছে!', 'Castelo defendido!', 'Замок защищён!', 'قلعہ بچ گیا!', 'Kastil berhasil dipertahankan!', 'Burg verteidigt!', '城を守り抜いた！', 'Kale savunuldu!', '성을 지켜냈다!', 'Zamek obroniony!'],
+  end_p: ['Démoni se stáhli. Velitel ti svěřil hrad – vylepšuj ho, najímej vojáky a pokračuj v příběhu.', 'The demons retreated. The commander entrusted you with the castle – upgrade it, recruit soldiers and continue the story.', '恶魔撤退了。指挥官把城堡托付给你——升级它、招募士兵并继续故事。', 'दानव पीछे हट गए। सेनापति ने किला तुम्हें सौंप दिया – इसे बेहतर बनाओ, सैनिक भर्ती करो और कहानी आगे बढ़ाओ।', 'Los demonios se retiraron. El comandante te confió el castillo: mejóralo, recluta soldados y continúa la historia.', 'Les démons ont battu en retraite. Le commandant te confie le château : améliore-le, recrute des soldats et poursuis l’histoire.', 'تراجع الشياطين. سلّمك القائد القلعة – طوّرها وجنّد الجنود وتابع القصة.', 'দানবেরা পিছু হটেছে। সেনাপতি দুর্গটি তোমার হাতে দিলেন – উন্নত করো, সৈন্য নিয়োগ করো আর গল্প এগিয়ে নাও।', 'Os demônios recuaram. O comandante confiou-lhe o castelo – melhore-o, recrute soldados e continue a história.', 'Демоны отступили. Командир доверил тебе замок — улучшай его, нанимай воинов и продолжай историю.', 'شیطان پیچھے ہٹ گئے۔ سپہ سالار نے قلعہ آپ کے سپرد کر دیا – اسے بہتر بنائیں، سپاہی بھرتی کریں اور کہانی جاری رکھیں۔', 'Para iblis mundur. Komandan mempercayakan kastil kepadamu – tingkatkan, rekrut prajurit, dan lanjutkan ceritanya.', 'Die Dämonen haben sich zurückgezogen. Der Kommandant vertraut dir die Burg an – baue sie aus, rekrutiere Krieger und setze die Geschichte fort.', '悪魔は退いた。司令官は君に城を託した――城を強化し、兵を集め、物語を進めよう。', 'İblisler geri çekildi. Komutan kaleyi sana emanet etti – geliştir, asker topla ve hikâyeye devam et.', '악마들이 물러났다. 지휘관이 성을 맡겼다 – 성을 강화하고 병사를 모집하며 이야기를 이어가세요.', 'Demony się wycofały. Dowódca powierzył ci zamek – rozbudowuj go, werbuj żołnierzy i kontynuuj historię.'],
+  cont: ['Pokračovat', 'Continue', '继续', 'जारी रखें', 'Continuar', 'Continuer', 'متابعة', 'চালিয়ে যাও', 'Continuar', 'Продолжить', 'جاری رکھیں', 'Lanjutkan', 'Weiter', '続ける', 'Devam', '계속', 'Dalej'],
+  title: ['Obrana hranice', 'Defend the border', '保卫边境', 'सीमा की रक्षा', 'Defiende la frontera', 'Défendre la frontière', 'الدفاع عن الحدود', 'সীমান্ত রক্ষা', 'Defenda a fronteira', 'Защита границы', 'سرحد کا دفاع', 'Pertahankan perbatasan', 'Verteidige die Grenze', '国境を守れ', 'Sınırı savun', '국경을 지켜라', 'Obrona granicy'],
+  demons: ['Démoni', 'Demons', '恶魔', 'दानव', 'Demonios', 'Démons', 'الشياطين', 'দানব', 'Demônios', 'Демоны', 'شیطان', 'Iblis', 'Dämonen', '悪魔', 'İblisler', '악마', 'Demony']
+};
+
+</script>
+<script>
 /* js/ui/prolog.js */
 /* =========================================================================
    ÚVODNÍ PŘÍBĚH (první spuštění hry)
    Vypravěč (hlas + titulky) uvede hráče do hry přímo v bitvě:
    50 vojáků stojí před hradem → jízdní hlídka vyrazí na průzkum → vrátí se
-   jediný zraněný jezdec, varuje před démony a padne → útočí jedna armáda démonů.
-   Hráč brání hrad (krátký návod: posily, AUTO, Ohnivý déšť); jakmile má přesilu,
-   všichni vojáci sami vyrazí do útoku. Po porážce démonů začne normální hra.
-   Hlas: Web Speech API (zdarma, bez souborů); titulky jsou vždy.
+   jediný zraněný jezdec, varuje před démony a padne → útočí velká armáda démonů.
+   Hráč brání hrad (krátký návod: posily, AUTO, kamera, rozkazy, Ohnivý déšť);
+   jakmile má přesilu, všichni vojáci sami vyrazí do útoku. Pak normální hra.
+   Hlas: nahrávky ElevenLabs (zvuky/hlas_cs_*.mp3 a hlas_en_*.mp3, česky a anglicky);
+   titulky ve všech jazycích hry (js/ui/prolog_texty.js). Bez nahrávky jen titulky.
    ========================================================================= */
 (function () {
-  const L = (cs, en) => (window.I18N && I18N.L) ? I18N.L(cs, en) : (window.I18N && I18N.lang === 'cs' ? cs : en);
-  const isCs = () => window.I18N && I18N.lang === 'cs';
-
-  const LINES = {
-    n1: ['Hranice Království Lví koruny. Padesát věrných mužů stráží hrad.', 'The border of the Lion Crown kingdom. Fifty loyal men guard the castle.'],
-    n2: ['Velitel vyslal jízdní hlídku, aby prozkoumala temný les.', 'The commander sent a cavalry patrol to scout the dark forest.'],
-    n3: ['Čekali dlouho. Les utichl… až příliš.', 'They waited for a long time. The forest fell silent… far too silent.'],
-    sc: ['Pane… přepadli nás! Démoni… táhnou sem… celá armáda…', 'My lord… we were ambushed! Demons… they are coming… a whole army…'],
-    n4: ['Z lesa vyrazila armáda démonů. Braň hrad!', 'A demon army bursts out of the forest. Defend the castle!'],
-    t1: ['Klepni na vojáka dole a pošli posily. Noví vojáci se přidávají i sami.', 'Tap a soldier below to send reinforcements. New soldiers also join on their own.'],
-    t2: ['Klepni na 🔥 Ohnivý déšť a spal skupinu démonů!', 'Tap 🔥 Fire Rain to burn a group of demons!'],
-    t3: ['Máme přesilu! Všichni do útoku!', 'We outnumber them! Everyone, attack!'],
-    n5: ['Démoni padli a hrad stojí… ale tohle je teprve začátek.', 'The demons have fallen and the castle stands… but this is only the beginning.']
+  const ORDER = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko', 'pl'];
+  const T = key => {
+    const row = (window.PROLOG_TEXTY || {})[key]; if (!row) return '';
+    const i = ORDER.indexOf((window.I18N && I18N.lang) || 'en');
+    return row[i >= 0 ? i : 1] || row[1];
   };
-  const who = { sc: ['Zvěd', 'Scout'], t1: ['Návod', 'Tip'], t2: ['Návod', 'Tip'], t3: ['Velitel', 'Commander'] };
+  const VOICED = ['n1', 'n2', 'n3', 'sc', 'n4', 't3', 'n5'];
+  const WHO = { sc: 'w_sc', t1: 'w_tip', tc: 'w_tip', to: 'w_tip', t2: 'w_tip', t3: 'w_cmd' };
+  const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
 
   const P = {
     active: false,
 
-    /* ---------- hlas vypravěče ---------- */
-    _voiceOk() {
-      try { return !!window.speechSynthesis && (!window.Zvuk || !Zvuk.settings || Zvuk.settings().sfx !== false); } catch (e) { return false; }
-    },
-    _speak(txt, kind) {
-      if (!this.unlocked || !this._voiceOk()) return;
+    /* ---------- hlas vypravěče (ElevenLabs nahrávky, žádný hlas prohlížeče) ---------- */
+    _voice(key) {
+      if (!this.unlocked || !VOICED.includes(key)) return;
+      try { if (window.Zvuk && Zvuk.settings && !Zvuk.settings().sfx) return; } catch (e) { /* nic */ }
+      const f = 'hlas_' + (window.I18N && I18N.lang === 'cs' ? 'cs' : 'en') + '_' + key + '.mp3';
+      const src = (window.CW_ZVUKY && CW_ZVUKY[f]) || (BASE + f);
       try {
-        const S = window.speechSynthesis;
-        S.cancel();
-        const u = new SpeechSynthesisUtterance(txt.replace(/[🔥]/g, ''));
-        const lang = isCs() ? 'cs-CZ' : 'en-US';
-        u.lang = lang;
-        const vs = S.getVoices().filter(v => String(v.lang || '').toLowerCase().replace('_', '-').startsWith(lang.slice(0, 2)));
-        if (vs.length) u.voice = vs.find(v => /male|muž|daniel|jakub|david|guy|george|google/i.test(v.name) && !/female|žena|zuzana|samantha/i.test(v.name)) || vs[0];
-        const scout = kind === 'sc';
-        u.pitch = scout ? 1.15 : 0.72; u.rate = scout ? 1.08 : 0.9; u.volume = 1;
-        S.speak(u);
-      } catch (e) { /* bez hlasu – titulky stačí */ }
+        if (this.audio) { this.audio.pause(); this.audio = null; }
+        const a = new Audio(src);
+        let vol = 1; try { vol = Math.max(0, Math.min(1, ((Zvuk.settings().sfxVol || 100) / 100))); } catch (e) { /* nic */ }
+        a.volume = vol;
+        a.onerror = () => { /* nahrávka chybí – zůstanou titulky */ };
+        const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+        this.audio = a; this.played = key;
+      } catch (e) { /* jen titulky */ }
     },
+    _stopVoice() { try { if (this.audio) this.audio.pause(); } catch (e) { /* nic */ } this.audio = null; },
 
     /* ---------- titulky ---------- */
     _say(key) {
-      const [cs, en] = LINES[key];
-      const txt = L(cs, en);
-      const w = who[key] ? L(who[key][0], who[key][1]) : '';
+      const txt = T(key);
+      const w = WHO[key] ? T(WHO[key]) : '';
       const el = this.sub; if (!el) return;
-      el.className = 'prolog-sub' + (key[0] === 't' ? ' tip' : '') + (key === 'sc' ? ' scout' : '');
-      el.innerHTML = (w ? `<small>${w}</small>` : '') + `<span></span>`;
+      el.className = 'prolog-sub' + (key[0] === 't' && key !== 't3' ? ' tip' : '') + (key === 'sc' ? ' scout' : '');
+      el.innerHTML = (w ? '<small></small>' : '') + '<span></span>';
+      if (w) el.querySelector('small').textContent = w;
       el.querySelector('span').textContent = txt;
       el.hidden = false;
-      this.cur = { txt, key };
-      if (key[0] !== 't') this._speak(txt, key);   // návod jen titulkem, příběh i hlasem
+      this.cur = key;
+      this._voice(key);
     },
     _hl(sel, ms) {
       const el = document.querySelector(sel); if (!el) return;
@@ -43536,15 +43558,14 @@ GameData.defenseOf = save => {
       const unlock = () => {
         if (this.unlocked) return;
         this.unlocked = true;
-        if (this.cur && this.cur.key[0] !== 't' && this.active) this._speak(this.cur.txt, this.cur.key);
+        if (this.active && this.cur && this.played !== this.cur) this._voice(this.cur);   // hlas se rozjede po prvním klepnutí
       };
       document.addEventListener('pointerdown', unlock, { capture: true, once: true });
       document.addEventListener('keydown', unlock, { capture: true, once: true });
-      try { window.speechSynthesis && speechSynthesis.getVoices(); } catch (e) { /* nic */ }
       if (window.Stat) try { Stat.ev('prolog_start'); } catch (e) { /* nic */ }
       App.startBattle({
-        mode: 'prolog', prolog: true, title: L('Obrana hranice', 'Defend the border'),
-        playFaction: 'kralovstvi', enemyFaction: 'demoni', enemyName: L('Démoni', 'Demons'),
+        mode: 'prolog', prolog: true, title: T('title'),
+        playFaction: 'kralovstvi', enemyFaction: 'demoni', enemyName: T('demons'),
         enemyUnits: ['bes', 'chrlic', 'rohac', 'zatracenec'], difficulty: 0.6, theme: 'evropa',
         enemyCastleLevel: 3, enemyCastleStyle: 'peklo',
         battleOpts: { noAI: true, world: { worldW: 4600, enemyFront: 4130 }, enemyCastleHpMult: 3, onUpdate: dt => this._tick(dt) },
@@ -43554,7 +43575,7 @@ GameData.defenseOf = save => {
 
     _setup(App, b) {
       this.App = App; this.b = b;
-      this.spawned = 0; this.total = 0; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
+      this.spawned = 0; this.total = 0; this.played = null; this.cur = null; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
       const hint = document.getElementById('bHint'); if (hint) hint.hidden = true;
       // titulky
       const B = document.getElementById('battle');
@@ -43566,11 +43587,19 @@ GameData.defenseOf = save => {
       const flagX = cfg.playerFront + 640;
       b.setFormation('player', 'formace', flagX);
       const army = [['pesak', 20], ['kopinik', 10], ['lucistnik', 15], ['rytir', 5]];
-      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
-        if (!b.spawn('player', id, true)) continue;
+      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) b.spawn('player', id, true); });
+      // jízdní hlídka stojí od začátku před šikem
+      this.riders = [];
+      for (let i = 0; i < 5; i++) {
+        if (!b.spawn('player', 'jezdec', true)) continue;
         const u = b.units[b.units.length - 1];
-        u.x = flagX - 40 - Math.random() * 520; u.y = cfg.laneTop + Math.random() * (cfg.laneBottom - cfg.laneTop);
-      } });
+        u.x = flagX + 150 + (i % 2) * 40; u.y = cfg.laneTop + 18 + i * ((cfg.laneBottom - cfg.laneTop - 36) / 4);
+        u.script = v => { v.moving = false; v.face = 1; };
+        this.riders.push(u);
+      }
+      // celé vojsko hned srovnané v šiku (žádné pobíhání z brány)
+      b._assignSlots('player');
+      for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX - 120;
       b.later(0.6, () => this._say('n1'));
@@ -43581,23 +43610,20 @@ GameData.defenseOf = save => {
     _riders() {
       const b = this.b, cfg = GameData.battleConfig;
       this._say('n2');
-      const riders = [];
-      for (let i = 0; i < 5; i++) {
-        if (!b.spawn('player', 'jezdec', true)) continue;
-        const u = b.units[b.units.length - 1];
-        u.x = this.flagX + 40 + i * 26; u.y = cfg.laneTop + 20 + i * ((cfg.laneBottom - cfg.laneTop - 40) / 4);
+      const riders = this.riders || [];
+      riders.forEach(u => {
         u.script = (v, dt) => {
           const sp = v.def.speed * (cfg.speedScale || 1) * 2.6;
           v.x += sp * dt; v.face = 1; v.moving = true; v.walk += dt * v.def.speed * 0.17;
           if (v.x > this.flagX + 1250) v._gone = true;   // zmizí v lese
         };
-        riders.push(u);
-      }
+      });
+      if (window.Zvuk) try { Zvuk.at('horse', this.flagX, b, 0.8); } catch (e) { /* nic */ }
       const follow = () => {
         if (!this.active || this.b !== b) return;
         const lead = riders.filter(r => !r._gone);
         if (lead.length) { b.camFocus = Math.max(...lead.map(r => r.x)); b.later(0.1, follow); return; }
-        b.units = b.units.filter(u => !u._gone);   // hlídka zmizela v lese
+        riders.forEach(r => { r.script = null; r.dead = 9; });   // hlídka zmizela v lese (mrtvé = vypadnou i z hledání cílů)
         b.camFocus = this.flagX + 200;
         this._say('n3');
         b.later(2.6, () => this._scout());
@@ -43639,13 +43665,14 @@ GameData.defenseOf = save => {
       this._say('n4');
       b.setFormation('enemy', 'utok');   // démoni jdou rovnou na hrad
       const groups = [
-        [['bes', 7], ['chrlic', 2]],
-        [['bes', 6], ['rohac', 3], ['chrlic', 2]],
-        [['bes', 6], ['chrlic', 3], ['rohac', 2]],
-        [['zatracenec', 2], ['bes', 5], ['rohac', 2]]
+        [['bes', 10], ['chrlic', 3]],
+        [['bes', 10], ['rohac', 4], ['chrlic', 3]],
+        [['bes', 10], ['chrlic', 4], ['rohac', 4]],
+        [['bes', 8], ['rohac', 4], ['zatracenec', 3]],
+        [['bes', 8], ['chrlic', 4], ['zatracenec', 2]]
       ];
       groups.forEach(g => g.forEach(([, n]) => { this.total += n; }));
-      groups.forEach((g, gi) => b.later(gi * 4.5, () => {
+      groups.forEach((g, gi) => b.later(gi * 4, () => {
         g.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
           if (!b.spawn('enemy', id, true)) continue;
           const u = b.units[b.units.length - 1];
@@ -43662,16 +43689,20 @@ GameData.defenseOf = save => {
         if (b.time - t0 < 4.5) b.later(0.1, () => show(t0)); else b.camFocus = null;
       };
       b.later(0.4, () => show(b.time));
-      // krátký návod: posily + AUTO
+      // krátký návod: posily + AUTO → kamera → rozkazy (Ohnivý déšť hlídá _tick)
       b.later(6.5, () => {
+        if (this.attacked) return;
         this._say('t1');
-        this._hl('#bUnits', 9000);
+        this._hl('#bUnits', 7000);
         try {
           b.setAuto('kralovstvi', true);
           const btn = document.querySelector('#bUnits [data-auto="kralovstvi"]');
           if (btn) { btn.setAttribute('aria-pressed', true); const g = btn.closest('.ugrp'); if (g) g.classList.add('auto-on'); }
         } catch (e) { /* nic */ }
       });
+      b.later(13.5, () => { if (!this.attacked) this._say('tc'); });
+      b.later(20.5, () => { if (!this.attacked) { this._say('to'); this._hl('#bForm', 7000); } });
+      this._tFire = b.time + 27.5;
     },
 
     /* každý snímek: Ohnivý déšť, útok při přesile, konec */
@@ -43680,7 +43711,7 @@ GameData.defenseOf = save => {
       const pc = b.side.player.castle;
       if (pc.hp < pc.maxHp * 0.45) pc.hp = pc.maxHp * 0.45;   // úvod se nedá prohrát
       if (!this.spawned) return;
-      if (!this.tipFire && b.time > (this._t1 || (this._t1 = b.time)) + 13) {
+      if (!this.tipFire && this._tFire && b.time > this._tFire) {
         const st = b.abilityState ? b.abilityState('player', 'ohen') : null;
         if (!st || st.affordable) {
           this.tipFire = true;
@@ -43706,7 +43737,7 @@ GameData.defenseOf = save => {
     /* po bitvě: odměna a normální hra */
     finish(App, res) {
       this.active = false;
-      try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ }
+      this._stopVoice();
       if (this.sub) this.sub.hidden = true;
       const save = App.save;
       save.stats.wins = (save.stats.wins || 0) + 1;
@@ -43716,10 +43747,10 @@ GameData.defenseOf = save => {
       App.persist();
       if (window.Stat) try { Stat.ev('prolog_win'); } catch (e) { /* nic */ }
       App.modal(`<div class="rs prolog-end">
-          <h2>${L('Hrad ubráněn!', 'Castle defended!')}</h2>
-          <p class="muted">${L('Démoni se stáhli. Velitel ti svěřil hrad – vylepšuj ho, najímej vojáky a pokračuj v příběhu.', 'The demons retreated. The commander entrusted you with the castle – upgrade it, recruit soldiers and continue the story.')}</p>
+          <h2>${T('end_h')}</h2>
+          <p class="muted">${T('end_p')}</p>
           <p class="prolog-rew">+300 🪙</p>
-          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${L('Pokračovat', 'Continue')}</button></div>
+          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${T('cont')}</button></div>
         </div>`, m => {
         m.classList.add('res-simple');
         m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
@@ -44458,7 +44489,7 @@ GameData.defenseOf = save => {
 
     _closeBattle() {
       this._bTrackLeave('odesel');
-      if (window.Prolog && Prolog.active) { Prolog.active = false; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ } }
+      if (window.Prolog && Prolog.active) { Prolog.active = false; try { Prolog._stopVoice(); } catch (e) { /* nic */ } }
       { const ps = document.getElementById('prologSub'); if (ps) ps.hidden = true; }
       if (this.battle) { this.battle.destroy(); this.battle = null; }
       if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');

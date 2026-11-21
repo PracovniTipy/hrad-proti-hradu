@@ -2,63 +2,56 @@
    ÚVODNÍ PŘÍBĚH (první spuštění hry)
    Vypravěč (hlas + titulky) uvede hráče do hry přímo v bitvě:
    50 vojáků stojí před hradem → jízdní hlídka vyrazí na průzkum → vrátí se
-   jediný zraněný jezdec, varuje před démony a padne → útočí jedna armáda démonů.
-   Hráč brání hrad (krátký návod: posily, AUTO, Ohnivý déšť); jakmile má přesilu,
-   všichni vojáci sami vyrazí do útoku. Po porážce démonů začne normální hra.
-   Hlas: Web Speech API (zdarma, bez souborů); titulky jsou vždy.
+   jediný zraněný jezdec, varuje před démony a padne → útočí velká armáda démonů.
+   Hráč brání hrad (krátký návod: posily, AUTO, kamera, rozkazy, Ohnivý déšť);
+   jakmile má přesilu, všichni vojáci sami vyrazí do útoku. Pak normální hra.
+   Hlas: nahrávky ElevenLabs (zvuky/hlas_cs_*.mp3 a hlas_en_*.mp3, česky a anglicky);
+   titulky ve všech jazycích hry (js/ui/prolog_texty.js). Bez nahrávky jen titulky.
    ========================================================================= */
 (function () {
-  const L = (cs, en) => (window.I18N && I18N.L) ? I18N.L(cs, en) : (window.I18N && I18N.lang === 'cs' ? cs : en);
-  const isCs = () => window.I18N && I18N.lang === 'cs';
-
-  const LINES = {
-    n1: ['Hranice Království Lví koruny. Padesát věrných mužů stráží hrad.', 'The border of the Lion Crown kingdom. Fifty loyal men guard the castle.'],
-    n2: ['Velitel vyslal jízdní hlídku, aby prozkoumala temný les.', 'The commander sent a cavalry patrol to scout the dark forest.'],
-    n3: ['Čekali dlouho. Les utichl… až příliš.', 'They waited for a long time. The forest fell silent… far too silent.'],
-    sc: ['Pane… přepadli nás! Démoni… táhnou sem… celá armáda…', 'My lord… we were ambushed! Demons… they are coming… a whole army…'],
-    n4: ['Z lesa vyrazila armáda démonů. Braň hrad!', 'A demon army bursts out of the forest. Defend the castle!'],
-    t1: ['Klepni na vojáka dole a pošli posily. Noví vojáci se přidávají i sami.', 'Tap a soldier below to send reinforcements. New soldiers also join on their own.'],
-    t2: ['Klepni na 🔥 Ohnivý déšť a spal skupinu démonů!', 'Tap 🔥 Fire Rain to burn a group of demons!'],
-    t3: ['Máme přesilu! Všichni do útoku!', 'We outnumber them! Everyone, attack!'],
-    n5: ['Démoni padli a hrad stojí… ale tohle je teprve začátek.', 'The demons have fallen and the castle stands… but this is only the beginning.']
+  const ORDER = ['cs', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur', 'id', 'de', 'ja', 'tr', 'ko', 'pl'];
+  const T = key => {
+    const row = (window.PROLOG_TEXTY || {})[key]; if (!row) return '';
+    const i = ORDER.indexOf((window.I18N && I18N.lang) || 'en');
+    return row[i >= 0 ? i : 1] || row[1];
   };
-  const who = { sc: ['Zvěd', 'Scout'], t1: ['Návod', 'Tip'], t2: ['Návod', 'Tip'], t3: ['Velitel', 'Commander'] };
+  const VOICED = ['n1', 'c1', 'n3', 'sc', 'n4', 'c2', 't3', 'n5'];
+  const WHO = { sc: 'w_sc', t1: 'w_tip', tc: 'w_tip', to: 'w_tip', t2: 'w_tip', t3: 'w_cmd', c1: 'w_cmd', c2: 'w_cmd' };
+  const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
 
   const P = {
     active: false,
 
-    /* ---------- hlas vypravěče ---------- */
-    _voiceOk() {
-      try { return !!window.speechSynthesis && (!window.Zvuk || !Zvuk.settings || Zvuk.settings().sfx !== false); } catch (e) { return false; }
-    },
-    _speak(txt, kind) {
-      if (!this.unlocked || !this._voiceOk()) return;
+    /* ---------- hlas vypravěče (ElevenLabs nahrávky, žádný hlas prohlížeče) ---------- */
+    _voice(key) {
+      if (!this.unlocked || !VOICED.includes(key)) return;
+      try { if (window.Zvuk && Zvuk.settings && !Zvuk.settings().sfx) return; } catch (e) { /* nic */ }
+      const f = 'hlas_' + (window.I18N && I18N.lang === 'cs' ? 'cs' : 'en') + '_' + key + '.mp3';
+      const src = (window.CW_ZVUKY && CW_ZVUKY[f]) || (BASE + f);
       try {
-        const S = window.speechSynthesis;
-        S.cancel();
-        const u = new SpeechSynthesisUtterance(txt.replace(/[🔥]/g, ''));
-        const lang = isCs() ? 'cs-CZ' : 'en-US';
-        u.lang = lang;
-        const vs = S.getVoices().filter(v => String(v.lang || '').toLowerCase().replace('_', '-').startsWith(lang.slice(0, 2)));
-        if (vs.length) u.voice = vs.find(v => /male|muž|daniel|jakub|david|guy|george|google/i.test(v.name) && !/female|žena|zuzana|samantha/i.test(v.name)) || vs[0];
-        const scout = kind === 'sc';
-        u.pitch = scout ? 1.15 : 0.72; u.rate = scout ? 1.08 : 0.9; u.volume = 1;
-        S.speak(u);
-      } catch (e) { /* bez hlasu – titulky stačí */ }
+        if (this.audio) { this.audio.pause(); this.audio = null; }
+        const a = new Audio(src);
+        let vol = 1; try { vol = Math.max(0, Math.min(1, ((Zvuk.settings().sfxVol || 100) / 100))); } catch (e) { /* nic */ }
+        a.volume = vol;
+        a.onerror = () => { /* nahrávka chybí – zůstanou titulky */ };
+        const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+        this.audio = a; this.played = key;
+      } catch (e) { /* jen titulky */ }
     },
+    _stopVoice() { try { if (this.audio) this.audio.pause(); } catch (e) { /* nic */ } this.audio = null; },
 
     /* ---------- titulky ---------- */
     _say(key) {
-      const [cs, en] = LINES[key];
-      const txt = L(cs, en);
-      const w = who[key] ? L(who[key][0], who[key][1]) : '';
+      const txt = T(key);
+      const w = WHO[key] ? T(WHO[key]) : '';
       const el = this.sub; if (!el) return;
-      el.className = 'prolog-sub' + (key[0] === 't' ? ' tip' : '') + (key === 'sc' ? ' scout' : '');
-      el.innerHTML = (w ? `<small>${w}</small>` : '') + `<span></span>`;
+      el.className = 'prolog-sub' + (key[0] === 't' && key !== 't3' ? ' tip' : '') + (key === 'sc' ? ' scout' : '');
+      el.innerHTML = (w ? '<small></small>' : '') + '<span></span>';
+      if (w) el.querySelector('small').textContent = w;
       el.querySelector('span').textContent = txt;
       el.hidden = false;
-      this.cur = { txt, key };
-      if (key[0] !== 't') this._speak(txt, key);   // návod jen titulkem, příběh i hlasem
+      this.cur = key;
+      this._voice(key);
     },
     _hl(sel, ms) {
       const el = document.querySelector(sel); if (!el) return;
@@ -76,15 +69,14 @@
       const unlock = () => {
         if (this.unlocked) return;
         this.unlocked = true;
-        if (this.cur && this.cur.key[0] !== 't' && this.active) this._speak(this.cur.txt, this.cur.key);
+        if (this.active && this.cur && this.played !== this.cur) this._voice(this.cur);   // hlas se rozjede po prvním klepnutí
       };
       document.addEventListener('pointerdown', unlock, { capture: true, once: true });
       document.addEventListener('keydown', unlock, { capture: true, once: true });
-      try { window.speechSynthesis && speechSynthesis.getVoices(); } catch (e) { /* nic */ }
       if (window.Stat) try { Stat.ev('prolog_start'); } catch (e) { /* nic */ }
       App.startBattle({
-        mode: 'prolog', prolog: true, title: L('Obrana hranice', 'Defend the border'),
-        playFaction: 'kralovstvi', enemyFaction: 'demoni', enemyName: L('Démoni', 'Demons'),
+        mode: 'prolog', prolog: true, title: T('title'),
+        playFaction: 'kralovstvi', enemyFaction: 'demoni', enemyName: T('demons'),
         enemyUnits: ['bes', 'chrlic', 'rohac', 'zatracenec'], difficulty: 0.6, theme: 'evropa',
         enemyCastleLevel: 3, enemyCastleStyle: 'peklo',
         battleOpts: { noAI: true, world: { worldW: 4600, enemyFront: 4130 }, enemyCastleHpMult: 3, onUpdate: dt => this._tick(dt) },
@@ -94,7 +86,7 @@
 
     _setup(App, b) {
       this.App = App; this.b = b;
-      this.spawned = 0; this.total = 0; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
+      this.spawned = 0; this.total = 0; this.played = null; this.cur = null; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
       const hint = document.getElementById('bHint'); if (hint) hint.hidden = true;
       // titulky
       const B = document.getElementById('battle');
@@ -106,38 +98,43 @@
       const flagX = cfg.playerFront + 640;
       b.setFormation('player', 'formace', flagX);
       const army = [['pesak', 20], ['kopinik', 10], ['lucistnik', 15], ['rytir', 5]];
-      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
-        if (!b.spawn('player', id, true)) continue;
+      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) b.spawn('player', id, true); });
+      // jízdní hlídka stojí od začátku před šikem
+      this.riders = [];
+      for (let i = 0; i < 5; i++) {
+        if (!b.spawn('player', 'jezdec', true)) continue;
         const u = b.units[b.units.length - 1];
-        u.x = flagX - 40 - Math.random() * 520; u.y = cfg.laneTop + Math.random() * (cfg.laneBottom - cfg.laneTop);
-      } });
+        u.x = flagX + 150 + (i % 2) * 40; u.y = cfg.laneTop + 18 + i * ((cfg.laneBottom - cfg.laneTop - 36) / 4);
+        u.script = v => { v.moving = false; v.face = 1; };
+        this.riders.push(u);
+      }
+      // celé vojsko hned srovnané v šiku (žádné pobíhání z brány)
+      b._assignSlots('player');
+      for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX - 120;
       b.later(0.6, () => this._say('n1'));
-      b.later(5.6, () => this._riders());
+      b.later(8.6, () => this._say('c1'));          // velitel posílá hlídku
+      b.later(12.2, () => this._riders());
     },
 
     /* jízdní hlídka vyráží na průzkum */
     _riders() {
       const b = this.b, cfg = GameData.battleConfig;
-      this._say('n2');
-      const riders = [];
-      for (let i = 0; i < 5; i++) {
-        if (!b.spawn('player', 'jezdec', true)) continue;
-        const u = b.units[b.units.length - 1];
-        u.x = this.flagX + 40 + i * 26; u.y = cfg.laneTop + 20 + i * ((cfg.laneBottom - cfg.laneTop - 40) / 4);
+      const riders = this.riders || [];
+      riders.forEach(u => {
         u.script = (v, dt) => {
           const sp = v.def.speed * (cfg.speedScale || 1) * 2.6;
           v.x += sp * dt; v.face = 1; v.moving = true; v.walk += dt * v.def.speed * 0.17;
           if (v.x > this.flagX + 1250) v._gone = true;   // zmizí v lese
         };
-        riders.push(u);
-      }
+      });
+      if (window.Zvuk) try { Zvuk.at('horse', this.flagX, b, 0.8); } catch (e) { /* nic */ }
       const follow = () => {
         if (!this.active || this.b !== b) return;
         const lead = riders.filter(r => !r._gone);
         if (lead.length) { b.camFocus = Math.max(...lead.map(r => r.x)); b.later(0.1, follow); return; }
-        b.units = b.units.filter(u => !u._gone);   // hlídka zmizela v lese
+        riders.forEach(r => { r.script = null; r.dead = 9; });   // hlídka zmizela v lese (mrtvé = vypadnou i z hledání cílů)
         b.camFocus = this.flagX + 200;
         this._say('n3');
         b.later(2.6, () => this._scout());
@@ -177,15 +174,17 @@
     _demons() {
       const b = this.b, cfg = GameData.battleConfig;
       this._say('n4');
+      b.later(4.6, () => { if (!this.attacked) this._say('c2'); });   // velitel: Do zbraně!
       b.setFormation('enemy', 'utok');   // démoni jdou rovnou na hrad
       const groups = [
-        [['bes', 7], ['chrlic', 2]],
-        [['bes', 6], ['rohac', 3], ['chrlic', 2]],
-        [['bes', 6], ['chrlic', 3], ['rohac', 2]],
-        [['zatracenec', 2], ['bes', 5], ['rohac', 2]]
+        [['bes', 10], ['chrlic', 3]],
+        [['bes', 10], ['rohac', 4], ['chrlic', 3]],
+        [['bes', 10], ['chrlic', 4], ['rohac', 4]],
+        [['bes', 8], ['rohac', 4], ['zatracenec', 3]],
+        [['bes', 8], ['chrlic', 4], ['zatracenec', 2]]
       ];
       groups.forEach(g => g.forEach(([, n]) => { this.total += n; }));
-      groups.forEach((g, gi) => b.later(gi * 4.5, () => {
+      groups.forEach((g, gi) => b.later(gi * 4, () => {
         g.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
           if (!b.spawn('enemy', id, true)) continue;
           const u = b.units[b.units.length - 1];
@@ -202,16 +201,20 @@
         if (b.time - t0 < 4.5) b.later(0.1, () => show(t0)); else b.camFocus = null;
       };
       b.later(0.4, () => show(b.time));
-      // krátký návod: posily + AUTO
-      b.later(6.5, () => {
+      // krátký návod: posily + AUTO → kamera → rozkazy (Ohnivý déšť hlídá _tick)
+      b.later(8.5, () => {
+        if (this.attacked) return;
         this._say('t1');
-        this._hl('#bUnits', 9000);
+        this._hl('#bUnits', 7000);
         try {
           b.setAuto('kralovstvi', true);
           const btn = document.querySelector('#bUnits [data-auto="kralovstvi"]');
           if (btn) { btn.setAttribute('aria-pressed', true); const g = btn.closest('.ugrp'); if (g) g.classList.add('auto-on'); }
         } catch (e) { /* nic */ }
       });
+      b.later(15.5, () => { if (!this.attacked) this._say('tc'); });
+      b.later(22.5, () => { if (!this.attacked) { this._say('to'); this._hl('#bForm', 7000); } });
+      this._tFire = b.time + 29.5;
     },
 
     /* každý snímek: Ohnivý déšť, útok při přesile, konec */
@@ -220,7 +223,7 @@
       const pc = b.side.player.castle;
       if (pc.hp < pc.maxHp * 0.45) pc.hp = pc.maxHp * 0.45;   // úvod se nedá prohrát
       if (!this.spawned) return;
-      if (!this.tipFire && b.time > (this._t1 || (this._t1 = b.time)) + 13) {
+      if (!this.tipFire && this._tFire && b.time > this._tFire) {
         const st = b.abilityState ? b.abilityState('player', 'ohen') : null;
         if (!st || st.affordable) {
           this.tipFire = true;
@@ -246,7 +249,7 @@
     /* po bitvě: odměna a normální hra */
     finish(App, res) {
       this.active = false;
-      try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ }
+      this._stopVoice();
       if (this.sub) this.sub.hidden = true;
       const save = App.save;
       save.stats.wins = (save.stats.wins || 0) + 1;
@@ -256,10 +259,10 @@
       App.persist();
       if (window.Stat) try { Stat.ev('prolog_win'); } catch (e) { /* nic */ }
       App.modal(`<div class="rs prolog-end">
-          <h2>${L('Hrad ubráněn!', 'Castle defended!')}</h2>
-          <p class="muted">${L('Démoni se stáhli. Velitel ti svěřil hrad – vylepšuj ho, najímej vojáky a pokračuj v příběhu.', 'The demons retreated. The commander entrusted you with the castle – upgrade it, recruit soldiers and continue the story.')}</p>
+          <h2>${T('end_h')}</h2>
+          <p class="muted">${T('end_p')}</p>
           <p class="prolog-rew">+300 🪙</p>
-          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${L('Pokračovat', 'Continue')}</button></div>
+          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${T('cont')}</button></div>
         </div>`, m => {
         m.classList.add('res-simple');
         m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
