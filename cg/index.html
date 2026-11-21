@@ -18130,7 +18130,7 @@ window.HraConfig = (function () {
   };
   /* ---------- skutečné nahrávky (0 A.D., CC BY-SA 3.0 – viz zvuky/LICENCE.txt) ---------- */
   const SADY = { clash: 12, swing: 5, shieldw: 5, shieldm: 5, flesh: 6, bow: 5, arrowhit: 7, spear: 5, death: 10,
-    siegehit: 4, siegeshot: 1, collapse: 3, cry: 12, horse: 4, horsedeath: 2 };
+    siegehit: 4, siegeshot: 1, collapse: 3, cry: 12, cry_cs: 16, horse: 4, horsedeath: 2 };
   const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
   const BUF = {}; let loading = false, crowd = null;
   function loadSamples() {
@@ -18159,7 +18159,7 @@ window.HraConfig = (function () {
     catapult: v => sample('siegeshot', v),
     boom: v => sample('siegehit', v * 0.9),
     castle: v => sample(Math.random() < 0.3 ? 'collapse' : 'siegehit', v * 0.6, 0.85 + Math.random() * 0.1),
-    cry: v => sample('cry', v),
+    cry: v => sample(window.I18N && I18N.lang === 'cs' && BUF.cry_cs && BUF.cry_cs.length ? 'cry_cs' : 'cry', v),   // česká verze: české pokřiky
     horse: v => sample('horse', v * 0.7),
     spear: v => sample('spear', v * 0.7),
     spawn: v => sample('swing', v * 0.45)
@@ -28075,7 +28075,7 @@ GameData.defenseOf = save => {
       const s = this.side[team], cfg = C();
       s.order = kind || (mode === 'formace' ? 'mapa' : mode);
       if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
-      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný anglický pokřik celé armády
+      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný pokřik celé armády (česky / anglicky)
       s.formation = mode;
       // nový povel (mimo útok): vojáci na chvíli přestanou bojovat a přesunou se, kam velitel chce
       s.calmUntil = mode === 'utok' ? 0 : this.time + 3;
@@ -43848,6 +43848,23 @@ window.PROLOG_TEXTY = {
     ctx.restore();
   }
 
+  /* namluvené repliky (ElevenLabs): zvuky/pribeh_<cs|en>_<scéna>_<stránka>.mp3 – česká hra česky, ostatní jazyky anglicky */
+  const VBASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
+  let voice = null;
+  const stopVoice = () => { try { if (voice) voice.pause(); } catch (e) { /* nic */ } voice = null; };
+  const playVoice = (id, i) => {
+    stopVoice();
+    try { if (window.Zvuk && Zvuk.settings && !Zvuk.settings().sfx) return; } catch (e) { /* nic */ }
+    const f = 'pribeh_' + (window.I18N && I18N.lang === 'cs' ? 'cs' : 'en') + '_' + id + '_' + i + '.mp3';
+    try {
+      const a = new Audio((window.CW_ZVUKY && CW_ZVUKY[f]) || (VBASE + f));
+      let vol = 1; try { vol = Math.max(0, Math.min(1, ((Zvuk.settings().sfxVol || 100) / 100))); } catch (e) { /* nic */ }
+      a.volume = vol; a.onerror = () => {};
+      const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+      voice = a;
+    } catch (e) { /* jen text */ }
+  };
+
   const Story = {
     active: false,
     play(id, onDone) {
@@ -43880,8 +43897,10 @@ window.PROLOG_TEXTY = {
         const box = ov.querySelector('.scene-box');
         box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop');
         requestAnimationFrame(() => paintPortrait(por, pg.who));
+        playVoice(id, i);
       };
       const finish = () => {
+        stopVoice();
         ov.classList.add('out');
         setTimeout(() => ov.remove(), 300);
         this.active = false;

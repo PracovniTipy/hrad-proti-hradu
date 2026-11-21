@@ -84,7 +84,7 @@
   };
   /* ---------- skutečné nahrávky (0 A.D., CC BY-SA 3.0 – viz zvuky/LICENCE.txt) ---------- */
   const SADY = { clash: 12, swing: 5, shieldw: 5, shieldm: 5, flesh: 6, bow: 5, arrowhit: 7, spear: 5, death: 10,
-    siegehit: 4, siegeshot: 1, collapse: 3, cry: 12, horse: 4, horsedeath: 2 };
+    siegehit: 4, siegeshot: 1, collapse: 3, cry: 12, cry_cs: 16, horse: 4, horsedeath: 2 };
   const BASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
   const BUF = {}; let loading = false, crowd = null;
   function loadSamples() {
@@ -113,7 +113,7 @@
     catapult: v => sample('siegeshot', v),
     boom: v => sample('siegehit', v * 0.9),
     castle: v => sample(Math.random() < 0.3 ? 'collapse' : 'siegehit', v * 0.6, 0.85 + Math.random() * 0.1),
-    cry: v => sample('cry', v),
+    cry: v => sample(window.I18N && I18N.lang === 'cs' && BUF.cry_cs && BUF.cry_cs.length ? 'cry_cs' : 'cry', v),   // česká verze: české pokřiky
     horse: v => sample('horse', v * 0.7),
     spear: v => sample('spear', v * 0.7),
     spawn: v => sample('swing', v * 0.45)

@@ -66,6 +66,23 @@
     ctx.restore();
   }
 
+  /* namluvené repliky (ElevenLabs): zvuky/pribeh_<cs|en>_<scéna>_<stránka>.mp3 – česká hra česky, ostatní jazyky anglicky */
+  const VBASE = (/^https?:$/.test(location.protocol) && !/claude|claudeusercontent|anthropic/.test(location.hostname)) ? 'zvuky/' : 'https://pracovnitipy.github.io/hrad-proti-hradu/zvuky/';
+  let voice = null;
+  const stopVoice = () => { try { if (voice) voice.pause(); } catch (e) { /* nic */ } voice = null; };
+  const playVoice = (id, i) => {
+    stopVoice();
+    try { if (window.Zvuk && Zvuk.settings && !Zvuk.settings().sfx) return; } catch (e) { /* nic */ }
+    const f = 'pribeh_' + (window.I18N && I18N.lang === 'cs' ? 'cs' : 'en') + '_' + id + '_' + i + '.mp3';
+    try {
+      const a = new Audio((window.CW_ZVUKY && CW_ZVUKY[f]) || (VBASE + f));
+      let vol = 1; try { vol = Math.max(0, Math.min(1, ((Zvuk.settings().sfxVol || 100) / 100))); } catch (e) { /* nic */ }
+      a.volume = vol; a.onerror = () => {};
+      const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+      voice = a;
+    } catch (e) { /* jen text */ }
+  };
+
   const Story = {
     active: false,
     play(id, onDone) {
@@ -98,8 +115,10 @@
         const box = ov.querySelector('.scene-box');
         box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop');
         requestAnimationFrame(() => paintPortrait(por, pg.who));
+        playVoice(id, i);
       };
       const finish = () => {
+        stopVoice();
         ov.classList.add('out');
         setTimeout(() => ov.remove(), 300);
         this.active = false;

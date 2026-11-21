@@ -614,7 +614,7 @@
       const s = this.side[team], cfg = C();
       s.order = kind || (mode === 'formace' ? 'mapa' : mode);
       if (this.net && this.net.role === 'client' && team === 'player' && !this._forceFm) this.net.cmd({ k: 'fm', m: mode, x: flagX == null ? null : this.net.mx(flagX) });
-      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný anglický pokřik celé armády
+      if (team === 'player' && mode === 'utok' && s.formation !== 'utok' && window.Zvuk) Zvuk.play('cry', 1);   // jeden společný pokřik celé armády (česky / anglicky)
       s.formation = mode;
       // nový povel (mimo útok): vojáci na chvíli přestanou bojovat a přesunou se, kam velitel chce
       s.calmUntil = mode === 'utok' ? 0 : this.time + 3;

@@ -19,3 +19,9 @@ Válečné pokřiky (cry_0.mp3 – cry_11.mp3)
 
 Hudba do bitev: „Battle“ – Wolfgang_ (OpenGameArt.org), licence CC0 1.0 (public domain).
 https://opengameart.org/content/battle-theme-0
+
+České válečné pokřiky (cry_cs_0.mp3 – cry_cs_15.mp3)
+  Hlasy: ElevenLabs Text to Speech (hlasy „Zdeněk – Strong and Deep“ a „Jakub – Deep manly movie“),
+  řev armády: ElevenLabs Sound Effects. Povely: „Do útoku!“, „Vpřed!“, „Za krále!“, „Za čest!“,
+  „Stůjte a bojujte!“, „K vítězství!“, „Nepovolíme!“, „Za naši zem!“.
+  Úpravy: ořez, zdvojení hlasu, ozvěna, podklad řevu armády, vyrovnání hlasitosti.
