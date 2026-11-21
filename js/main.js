@@ -53,7 +53,12 @@
           /* úplný nováček: hned do první bitvy – bez prohlídky hradu, příběhové scény a okna úrovně
              (na mobilu dřív třetina hráčů odešla, než vůbec začala hrát). Prohlídka hradu přijde po první bitvě. */
           tut.quick = 1; Save.save();
-          setTimeout(() => { if (!this.battle && !Tutorial.active) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true }); } }, 350);
+          setTimeout(() => {
+            if (this.battle || Tutorial.active) return;
+            // úvodní příběh s vypravěčem (obrana hradu proti démonům); kdyby chyběl, klasická první bitva
+            if (window.Prolog && !tut.prolog) { Prolog.start(this); return; }
+            const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true });
+          }, 350);
         } else if (name === 'hrad' && !tut.home && !(fresh && tut.quick)) {
           // prohlídka hradu – u rychlého startu až po první bitvě, nikdy přes běžící bitvu
           const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
@@ -594,6 +599,8 @@
 
     _closeBattle() {
       this._bTrackLeave('odesel');
+      if (window.Prolog && Prolog.active) { Prolog.active = false; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ } }
+      { const ps = document.getElementById('prologSub'); if (ps) ps.hidden = true; }
       if (this.battle) { this.battle.destroy(); this.battle = null; }
       if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');
       $('#battle').hidden = true;
@@ -607,6 +614,7 @@
       const adGold0 = save.gold;   // reklamy za odměnu: kolik zlata bitva dala (pro „Zdvojnásob odměnu“)
       if (!this.battle) return;
       if (cfg.film) { this._closeBattle(); this.go('hrad'); return; }   // natáčecí bitva: žádné odměny ani statistiky
+      if (cfg.prolog && window.Prolog) { if (this._bTrack) this._bTrack.done = true; Prolog.finish(this, res); return; }   // úvodní příběh
       if (this._bTrack) this._bTrack.done = true;
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;

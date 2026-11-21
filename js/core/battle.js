@@ -927,7 +927,7 @@
           }
         }
       }
-      if (!this.net || (this.net.role === 'host' && this.net.ai)) this._ai(dt);
+      if (!this.o.noAI && (!this.net || (this.net.role === 'host' && this.net.ai))) this._ai(dt);   // noAI: nepřítele řídí scénář (úvodní příběh)
       this._autoPlayer(dt);
       this._updateDefense(dt);
       if (this.bossPlan && !this.bossPlan.spawned && this.time >= this.bossPlan.at && !(this.net && this.net.role === 'client')) {
@@ -957,6 +957,7 @@
           if (u.dotTick <= 0) { u.dotTick = 0.5; this._damage(u, u.dot.dps * 0.5, null, true); if (u.dead) continue; }
         }
         const slowK = (u.slowUntil > this.time ? 0.5 : 1) * ((this.side[u.team].hornUntil || 0) > this.time ? 1.3 : 1);
+        if (u.script) { u.script(u, dt); continue; }   // scénované postavy (úvodní příběh) – pohyb řídí scénář
         if (u === this.hero) { this._updateHero(u, dt); continue; }
         if (u.rctl && this.rctrl) { const keep = this.ctrl; this.ctrl = this.rctrl[u.rctl] || { mx: 0, my: 0 }; try { this._updateHero(u, dt); } finally { this.ctrl = keep; } continue; }
         if (u.gen && this._updateGeneral) { this._updateGeneral(u, dt, slowK); continue; }
@@ -1131,6 +1132,8 @@
 
       this._updateFx(dt);
       this._camera(dt);
+      if (this.o.onUpdate) this.o.onUpdate(dt);   // scénář (úvodní příběh)
+      if (this.over) return;
 
       // konec hry (online rozhoduje jen hostitel)
       if (this.net && this.net.role === 'client') return;
@@ -1331,6 +1334,7 @@
 
     _camera(dt) {
       if (!this.panEnabled || this.time < this.cam.manualUntil || performance.now() < (this.cam.manualReal || 0)) return;
+      if (this.camFocus != null && performance.now() >= (this.cam.manualReal || 0)) { const w = this._clampCam(this.camFocus - this.cam.viewW * 0.5); this.cam.x += (w - this.cam.x) * Math.min(1, dt * 1.6); return; }   // scénář řídí kameru
       if (this.hero) {
         const want = this._clampCam(this.hero.x - this.cam.viewW * 0.45);
         this.cam.x += (want - this.cam.x) * Math.min(1, dt * 4);

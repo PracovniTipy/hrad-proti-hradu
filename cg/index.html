@@ -2498,6 +2498,25 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
   .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
 }
 
+/* ===== Úvodní příběh: filmové titulky a klidné zvýraznění (nic se nehýbe) ===== */
+#prologSub { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(150px + env(safe-area-inset-bottom, 0px)); z-index: 40; width: min(720px, 86vw); text-align: center; pointer-events: none;
+  background: linear-gradient(180deg, rgba(8,10,16,.82), rgba(8,10,16,.9)); border: 1px solid rgba(232,184,74,.45); border-radius: 12px; padding: 10px 16px 12px; color: #f6eedb; font-size: 18px; line-height: 1.35; box-shadow: 0 8px 26px rgba(0,0,0,.5); }
+#prologSub small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #e8b84a; margin-bottom: 3px; }
+#prologSub.tip { background: linear-gradient(180deg, rgba(255,246,221,.96), rgba(250,232,190,.96)); color: #2a1a05; border-color: #e8b84a; }
+#prologSub.tip small { color: #8a5a10; }
+#prologSub.scout span { font-style: italic; }
+.prolog-hl { outline: 2px solid #e8b84a !important; outline-offset: 2px; box-shadow: 0 0 16px rgba(232,184,74,.6) !important; border-radius: 10px; }
+.prolog-end h2 { margin-bottom: 6px; }
+.prolog-rew { font-size: 22px; font-weight: 700; text-align: center; margin: 8px 0; }
+@media (max-height: 520px) { #prologSub { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); font-size: 14px; padding: 7px 12px 8px; width: min(620px, 80vw); } #prologSub small { font-size: 10px; } }
+/* domovská obrazovka na nízkých displejích (telefon na šířku, Android se systémovými lištami):
+   všechna tlačítka po stranách a dole se úměrně zmenší i s rozestupy, ať nic nepřetéká dolů
+   (margin-top drží horní řadu pod hlavičkou: 58 px × (1 − zoom) / zoom) */
+@media (orientation: landscape) and (max-height: 440px) { #screen.home-mode .daily-btn { zoom: .9; margin-top: 6px; } }
+@media (orientation: landscape) and (max-height: 400px) { #screen.home-mode .daily-btn { zoom: .82; margin-top: 13px; } }
+@media (orientation: landscape) and (max-height: 360px) { #screen.home-mode .daily-btn { zoom: .74; margin-top: 20px; } }
+@media (orientation: landscape) and (max-height: 320px) { #screen.home-mode .daily-btn { zoom: .66; margin-top: 30px; } }
+
 </style>
 <style>
 /* Cinzel a Inter (SIL OFL) – vložené, fungují bez internetu */
@@ -3951,6 +3970,32 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
       if (document.readyState === 'complete') setTimeout(ready, 200); else window.addEventListener('load', () => setTimeout(ready, 200));
     };
     if (window.GamePix) go(); else load('https://integration.gamepix.com/sdk/v3/gamepix.sdk.js').then(go).catch(() => {});
+  } else if (portal === 'gamedistribution') {
+    /* GameDistribution SDK: GD_OPTIONS (gameId z buildu – window.CW_GD_ID) + main.min.js.
+       Povinně: pauza a ztlumení při reklamě (SDK_GAME_PAUSE / SDK_GAME_START),
+       pre-roll při prvním „Do bitvy“ (klik hráče), mid-roll mezi bitvami, reklama za odměnu. */
+    const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
+    let paused = false;
+    window.CW_GD_EV = window.CW_GD_EV || [];
+    const onEv = ev => {
+      const n = ev && ev.name;
+      if (n === 'SDK_GAME_PAUSE') { mute(true); try { const b = window.App && App.battle; if (b && !b.over && b.setPaused && !paused) { b.setPaused(true); paused = true; } } catch (e) {} }
+      else if (n === 'SDK_GAME_START') { mute(false); try { const b = window.App && App.battle; if (paused && b && b.setPaused) b.setPaused(false); } catch (e) {} paused = false; }
+      else if (n === 'SDK_REWARDED_WATCH_COMPLETE') window.CW_GD_REWARD = Date.now();
+      else if (n === 'SDK_READY') window.CW_GD_READY = true;
+    };
+    window.CW_GD_ON = onEv;
+    if (!window.GD_OPTIONS) window.GD_OPTIONS = { gameId: window.CW_GD_ID || '', advertisementSettings: { autoplay: false }, onEvent: onEv };
+    const hook = () => {
+      const A = window.App;
+      if (!A || !A.startBattle || A._gdHook) return !!(A && A._gdHook);
+      A._gdHook = true;
+      const st = A.startBattle; let pre = false;
+      A.startBattle = function () { const r = st.apply(this, arguments); if (!pre) { pre = true; try { window.gdsdk && gdsdk.showAd && gdsdk.showAd(); } catch (e) {} } return r; };
+      return true;
+    };
+    if (!hook()) window.addEventListener('load', hook);
+    if (!document.getElementById('gamedistribution-jssdk')) load('https://html5.api.gamedistribution.com/main.min.js', { id: 'gamedistribution-jssdk' }).catch(() => {});
   } else if (portal === 'poki') {
     load('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {
       try { window.PokiSDK && PokiSDK.init().then(() => { try { PokiSDK.gameLoadingFinished(); } catch (e) {} }).catch(() => {}); } catch (e) {}
@@ -4035,6 +4080,8 @@ window.addEventListener('load',function(){setTimeout(window.__ldDone,200)});setT
         CW_PG.advertisement.showInterstitial('po-bitve');
       } else if (portal === 'gamepix' && window.CW_GPX_READY && window.CW_GPX && CW_GPX.ads) {
         CW_GPX.ads.interstitial().catch(() => {});
+      } else if (portal === 'gamedistribution' && window.gdsdk && typeof gdsdk.showAd === 'function') {
+        try { const r = gdsdk.showAd(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
       } else if (portal === 'poki' && window.PokiSDK) {
         mute(true); PokiSDK.commercialBreak().then(() => mute(false), () => mute(false));
       }
@@ -28341,7 +28388,7 @@ GameData.defenseOf = save => {
           }
         }
       }
-      if (!this.net || (this.net.role === 'host' && this.net.ai)) this._ai(dt);
+      if (!this.o.noAI && (!this.net || (this.net.role === 'host' && this.net.ai))) this._ai(dt);   // noAI: nepřítele řídí scénář (úvodní příběh)
       this._autoPlayer(dt);
       this._updateDefense(dt);
       if (this.bossPlan && !this.bossPlan.spawned && this.time >= this.bossPlan.at && !(this.net && this.net.role === 'client')) {
@@ -28371,6 +28418,7 @@ GameData.defenseOf = save => {
           if (u.dotTick <= 0) { u.dotTick = 0.5; this._damage(u, u.dot.dps * 0.5, null, true); if (u.dead) continue; }
         }
         const slowK = (u.slowUntil > this.time ? 0.5 : 1) * ((this.side[u.team].hornUntil || 0) > this.time ? 1.3 : 1);
+        if (u.script) { u.script(u, dt); continue; }   // scénované postavy (úvodní příběh) – pohyb řídí scénář
         if (u === this.hero) { this._updateHero(u, dt); continue; }
         if (u.rctl && this.rctrl) { const keep = this.ctrl; this.ctrl = this.rctrl[u.rctl] || { mx: 0, my: 0 }; try { this._updateHero(u, dt); } finally { this.ctrl = keep; } continue; }
         if (u.gen && this._updateGeneral) { this._updateGeneral(u, dt, slowK); continue; }
@@ -28545,6 +28593,8 @@ GameData.defenseOf = save => {
 
       this._updateFx(dt);
       this._camera(dt);
+      if (this.o.onUpdate) this.o.onUpdate(dt);   // scénář (úvodní příběh)
+      if (this.over) return;
 
       // konec hry (online rozhoduje jen hostitel)
       if (this.net && this.net.role === 'client') return;
@@ -28745,6 +28795,7 @@ GameData.defenseOf = save => {
 
     _camera(dt) {
       if (!this.panEnabled || this.time < this.cam.manualUntil || performance.now() < (this.cam.manualReal || 0)) return;
+      if (this.camFocus != null && performance.now() >= (this.cam.manualReal || 0)) { const w = this._clampCam(this.camFocus - this.cam.viewW * 0.5); this.cam.x += (w - this.cam.x) * Math.min(1, dt * 1.6); return; }   // scénář řídí kameru
       if (this.hero) {
         const want = this._clampCam(this.hero.x - this.cam.viewW * 0.45);
         this.cam.x += (want - this.cam.x) * Math.min(1, dt * 4);
@@ -35025,6 +35076,7 @@ GameData.defenseOf = save => {
   const poki = () => (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') ? window.PokiSDK : null;
   const pg = () => { const B = window.CW_PG; return B && B.advertisement && B.advertisement.isRewardedSupported ? B : null; };
   const gpx = () => { const G = window.CW_GPX; return window.CW_GPX_READY && G && G.ads && typeof G.ads.reward === 'function' ? G : null; };
+  const gdr = () => (window.CW_PORTAL === 'gamedistribution' && window.gdsdk && typeof gdsdk.showAd === 'function') ? window.gdsdk : null;
   const h5 = () => { const H = window.CW_H5; return H && H.on && H.avail ? H : null; };
   function provider() {
     if (admob()) return 'admob';
@@ -35034,6 +35086,7 @@ GameData.defenseOf = save => {
     if (poki()) return 'poki';
     if (pg()) return 'playgama';
     if (gpx()) return 'gamepix';
+    if (gdr()) return 'gd';
     if (h5()) return 'h5';
     return '';
   }
@@ -35131,6 +35184,12 @@ GameData.defenseOf = save => {
       } catch (e) { end(false); }
       setTimeout(() => end(got), 180000);
     });
+  }
+  async function gdShow() {
+    ui.hideWait();
+    const t0 = Date.now();
+    try { await gdr().showAd('rewarded'); } catch (e) { return !!(window.CW_GD_REWARD && window.CW_GD_REWARD >= t0); }
+    return !!(window.CW_GD_REWARD && window.CW_GD_REWARD >= t0) || true;
   }
   async function gpxShow() {
     ui.hideWait();
@@ -35265,7 +35324,7 @@ GameData.defenseOf = save => {
       mute(true);
       try {
         stat('ad_req', place);
-        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : prov === 'gamepix' ? gpxShow() : pokiShow();
+        const run = prov === 'admob' ? admobShow(tok) : prov === 'crazygames' ? crazyShow() : prov === 'h5' ? (ui.hideWait(), window.CW_H5.play()) : prov === 'playgama' ? pgShow() : prov === 'gamepix' ? gpxShow() : prov === 'gd' ? gdShow() : pokiShow();
         run.catch(() => {});
         const r = await Promise.race([run, cancelled]);
         if (r === 'cancel') return false;
@@ -43398,6 +43457,280 @@ GameData.defenseOf = save => {
 
 </script>
 <script>
+/* js/ui/prolog.js */
+/* =========================================================================
+   ÚVODNÍ PŘÍBĚH (první spuštění hry)
+   Vypravěč (hlas + titulky) uvede hráče do hry přímo v bitvě:
+   50 vojáků stojí před hradem → jízdní hlídka vyrazí na průzkum → vrátí se
+   jediný zraněný jezdec, varuje před démony a padne → útočí jedna armáda démonů.
+   Hráč brání hrad (krátký návod: posily, AUTO, Ohnivý déšť); jakmile má přesilu,
+   všichni vojáci sami vyrazí do útoku. Po porážce démonů začne normální hra.
+   Hlas: Web Speech API (zdarma, bez souborů); titulky jsou vždy.
+   ========================================================================= */
+(function () {
+  const L = (cs, en) => (window.I18N && I18N.L) ? I18N.L(cs, en) : (window.I18N && I18N.lang === 'cs' ? cs : en);
+  const isCs = () => window.I18N && I18N.lang === 'cs';
+
+  const LINES = {
+    n1: ['Hranice Království Lví koruny. Padesát věrných mužů stráží hrad.', 'The border of the Lion Crown kingdom. Fifty loyal men guard the castle.'],
+    n2: ['Velitel vyslal jízdní hlídku, aby prozkoumala temný les.', 'The commander sent a cavalry patrol to scout the dark forest.'],
+    n3: ['Čekali dlouho. Les utichl… až příliš.', 'They waited for a long time. The forest fell silent… far too silent.'],
+    sc: ['Pane… přepadli nás! Démoni… táhnou sem… celá armáda…', 'My lord… we were ambushed! Demons… they are coming… a whole army…'],
+    n4: ['Z lesa vyrazila armáda démonů. Braň hrad!', 'A demon army bursts out of the forest. Defend the castle!'],
+    t1: ['Klepni na vojáka dole a pošli posily. Noví vojáci se přidávají i sami.', 'Tap a soldier below to send reinforcements. New soldiers also join on their own.'],
+    t2: ['Klepni na 🔥 Ohnivý déšť a spal skupinu démonů!', 'Tap 🔥 Fire Rain to burn a group of demons!'],
+    t3: ['Máme přesilu! Všichni do útoku!', 'We outnumber them! Everyone, attack!'],
+    n5: ['Démoni padli a hrad stojí… ale tohle je teprve začátek.', 'The demons have fallen and the castle stands… but this is only the beginning.']
+  };
+  const who = { sc: ['Zvěd', 'Scout'], t1: ['Návod', 'Tip'], t2: ['Návod', 'Tip'], t3: ['Velitel', 'Commander'] };
+
+  const P = {
+    active: false,
+
+    /* ---------- hlas vypravěče ---------- */
+    _voiceOk() {
+      try { return !!window.speechSynthesis && (!window.Zvuk || !Zvuk.settings || Zvuk.settings().sfx !== false); } catch (e) { return false; }
+    },
+    _speak(txt, kind) {
+      if (!this.unlocked || !this._voiceOk()) return;
+      try {
+        const S = window.speechSynthesis;
+        S.cancel();
+        const u = new SpeechSynthesisUtterance(txt.replace(/[🔥]/g, ''));
+        const lang = isCs() ? 'cs-CZ' : 'en-US';
+        u.lang = lang;
+        const vs = S.getVoices().filter(v => String(v.lang || '').toLowerCase().replace('_', '-').startsWith(lang.slice(0, 2)));
+        if (vs.length) u.voice = vs.find(v => /male|muž|daniel|jakub|david|guy|george|google/i.test(v.name) && !/female|žena|zuzana|samantha/i.test(v.name)) || vs[0];
+        const scout = kind === 'sc';
+        u.pitch = scout ? 1.15 : 0.72; u.rate = scout ? 1.08 : 0.9; u.volume = 1;
+        S.speak(u);
+      } catch (e) { /* bez hlasu – titulky stačí */ }
+    },
+
+    /* ---------- titulky ---------- */
+    _say(key) {
+      const [cs, en] = LINES[key];
+      const txt = L(cs, en);
+      const w = who[key] ? L(who[key][0], who[key][1]) : '';
+      const el = this.sub; if (!el) return;
+      el.className = 'prolog-sub' + (key[0] === 't' ? ' tip' : '') + (key === 'sc' ? ' scout' : '');
+      el.innerHTML = (w ? `<small>${w}</small>` : '') + `<span></span>`;
+      el.querySelector('span').textContent = txt;
+      el.hidden = false;
+      this.cur = { txt, key };
+      if (key[0] !== 't') this._speak(txt, key);   // návod jen titulkem, příběh i hlasem
+    },
+    _hl(sel, ms) {
+      const el = document.querySelector(sel); if (!el) return;
+      el.classList.add('prolog-hl');
+      setTimeout(() => el.classList.remove('prolog-hl'), ms);
+    },
+
+    /* ---------- spuštění ---------- */
+    start(App) {
+      const save = App.save;
+      save.tut = save.tut || {};
+      save.tut.battle = true; save.tut.quick = 1; Save.save();   // starý návod se už nespouští
+      this.active = true;
+      this.unlocked = false;
+      const unlock = () => {
+        if (this.unlocked) return;
+        this.unlocked = true;
+        if (this.cur && this.cur.key[0] !== 't' && this.active) this._speak(this.cur.txt, this.cur.key);
+      };
+      document.addEventListener('pointerdown', unlock, { capture: true, once: true });
+      document.addEventListener('keydown', unlock, { capture: true, once: true });
+      try { window.speechSynthesis && speechSynthesis.getVoices(); } catch (e) { /* nic */ }
+      if (window.Stat) try { Stat.ev('prolog_start'); } catch (e) { /* nic */ }
+      App.startBattle({
+        mode: 'prolog', prolog: true, title: L('Obrana hranice', 'Defend the border'),
+        playFaction: 'kralovstvi', enemyFaction: 'demoni', enemyName: L('Démoni', 'Demons'),
+        enemyUnits: ['bes', 'chrlic', 'rohac', 'zatracenec'], difficulty: 0.6, theme: 'evropa',
+        enemyCastleLevel: 3, enemyCastleStyle: 'peklo',
+        battleOpts: { noAI: true, world: { worldW: 4600, enemyFront: 4130 }, enemyCastleHpMult: 3, onUpdate: dt => this._tick(dt) },
+        tweak: b => this._setup(App, b)
+      });
+    },
+
+    _setup(App, b) {
+      this.App = App; this.b = b;
+      this.spawned = 0; this.total = 0; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
+      const hint = document.getElementById('bHint'); if (hint) hint.hidden = true;
+      // titulky
+      const B = document.getElementById('battle');
+      let el = document.getElementById('prologSub');
+      if (!el) { el = document.createElement('div'); el.id = 'prologSub'; B.appendChild(el); }
+      el.hidden = true; this.sub = el;
+      const cfg = GameData.battleConfig, s = b.side.player;
+      // 50 vojáků seřazených před hradem
+      const flagX = cfg.playerFront + 640;
+      b.setFormation('player', 'formace', flagX);
+      const army = [['pesak', 20], ['kopinik', 10], ['lucistnik', 15], ['rytir', 5]];
+      army.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
+        if (!b.spawn('player', id, true)) continue;
+        const u = b.units[b.units.length - 1];
+        u.x = flagX - 40 - Math.random() * 520; u.y = cfg.laneTop + Math.random() * (cfg.laneBottom - cfg.laneTop);
+      } });
+      this.flagX = flagX;
+      b.camFocus = flagX - 120;
+      b.later(0.6, () => this._say('n1'));
+      b.later(5.6, () => this._riders());
+    },
+
+    /* jízdní hlídka vyráží na průzkum */
+    _riders() {
+      const b = this.b, cfg = GameData.battleConfig;
+      this._say('n2');
+      const riders = [];
+      for (let i = 0; i < 5; i++) {
+        if (!b.spawn('player', 'jezdec', true)) continue;
+        const u = b.units[b.units.length - 1];
+        u.x = this.flagX + 40 + i * 26; u.y = cfg.laneTop + 20 + i * ((cfg.laneBottom - cfg.laneTop - 40) / 4);
+        u.script = (v, dt) => {
+          const sp = v.def.speed * (cfg.speedScale || 1) * 2.6;
+          v.x += sp * dt; v.face = 1; v.moving = true; v.walk += dt * v.def.speed * 0.17;
+          if (v.x > this.flagX + 1250) v._gone = true;   // zmizí v lese
+        };
+        riders.push(u);
+      }
+      const follow = () => {
+        if (!this.active || this.b !== b) return;
+        const lead = riders.filter(r => !r._gone);
+        if (lead.length) { b.camFocus = Math.max(...lead.map(r => r.x)); b.later(0.1, follow); return; }
+        b.units = b.units.filter(u => !u._gone);   // hlídka zmizela v lese
+        b.camFocus = this.flagX + 200;
+        this._say('n3');
+        b.later(2.6, () => this._scout());
+      };
+      b.later(0.3, follow);
+    },
+
+    /* vrací se jediný zraněný jezdec */
+    _scout() {
+      const b = this.b, cfg = GameData.battleConfig;
+      if (!b.spawn('player', 'jezdec', true)) { this._demons(); return; }
+      const u = b.units[b.units.length - 1];
+      u.x = this.flagX + 1250; u.y = (cfg.laneTop + cfg.laneBottom) / 2; u.hp = u.maxHp * 0.12; u.hurt = 0.4;
+      const stopX = this.flagX + 300;
+      let arrived = false;
+      u.script = (v, dt) => {
+        if (v.x > stopX) {
+          const sp = v.def.speed * (cfg.speedScale || 1) * 1.8;
+          v.x -= sp * dt; v.face = -1; v.moving = true; v.walk += dt * v.def.speed * 0.17;
+          b.camFocus = v.x;
+          if (Math.random() < dt * 3) b.particles.push({ x: v.x, y: v.y - 30, vx: 0, vy: -10, g: 300, t: 0, life: 0.6, r: 2.5, color: '#b0101a' });
+        } else {
+          v.moving = false; v.face = -1;
+          if (!arrived) {
+            arrived = true;
+            this._say('sc');
+            b.later(4.2, () => {
+              if (!v.dead) { v.script = null; b._damage(v, 1e7); }
+              b.later(1.4, () => this._demons());
+            });
+          }
+        }
+      };
+    },
+
+    /* útok jedné armády démonů */
+    _demons() {
+      const b = this.b, cfg = GameData.battleConfig;
+      this._say('n4');
+      b.setFormation('enemy', 'utok');   // démoni jdou rovnou na hrad
+      const groups = [
+        [['bes', 7], ['chrlic', 2]],
+        [['bes', 6], ['rohac', 3], ['chrlic', 2]],
+        [['bes', 6], ['chrlic', 3], ['rohac', 2]],
+        [['zatracenec', 2], ['bes', 5], ['rohac', 2]]
+      ];
+      groups.forEach(g => g.forEach(([, n]) => { this.total += n; }));
+      groups.forEach((g, gi) => b.later(gi * 4.5, () => {
+        g.forEach(([id, n]) => { for (let i = 0; i < n; i++) {
+          if (!b.spawn('enemy', id, true)) continue;
+          const u = b.units[b.units.length - 1];
+          u.x = cfg.enemyFront - 260 - Math.random() * 360; u.y = cfg.laneTop + Math.random() * (cfg.laneBottom - cfg.laneTop);
+          this.spawned++;
+        } });
+        if (gi === groups.length - 1) this.allIn = true;
+      }));
+      // kamera ukáže démony, pak se vrátí k vlastní frontě
+      const show = t0 => {
+        if (!this.active || this.b !== b) return;
+        let ex = null; for (const u of b.units) if (!u.dead && u.team === 'enemy') ex = ex == null ? u.x : Math.min(ex, u.x);
+        if (ex != null) b.camFocus = ex;
+        if (b.time - t0 < 4.5) b.later(0.1, () => show(t0)); else b.camFocus = null;
+      };
+      b.later(0.4, () => show(b.time));
+      // krátký návod: posily + AUTO
+      b.later(6.5, () => {
+        this._say('t1');
+        this._hl('#bUnits', 9000);
+        try {
+          b.setAuto('kralovstvi', true);
+          const btn = document.querySelector('#bUnits [data-auto="kralovstvi"]');
+          if (btn) { btn.setAttribute('aria-pressed', true); const g = btn.closest('.ugrp'); if (g) g.classList.add('auto-on'); }
+        } catch (e) { /* nic */ }
+      });
+    },
+
+    /* každý snímek: Ohnivý déšť, útok při přesile, konec */
+    _tick() {
+      const b = this.b; if (!this.active || !b || b.over) return;
+      const pc = b.side.player.castle;
+      if (pc.hp < pc.maxHp * 0.45) pc.hp = pc.maxHp * 0.45;   // úvod se nedá prohrát
+      if (!this.spawned) return;
+      if (!this.tipFire && b.time > (this._t1 || (this._t1 = b.time)) + 13) {
+        const st = b.abilityState ? b.abilityState('player', 'ohen') : null;
+        if (!st || st.affordable) {
+          this.tipFire = true;
+          if (!this.attacked) this._say('t2');
+          this._hl('#bAbil [data-abil]', 7000);
+        }
+      }
+      let pa = 0, ea = 0;
+      for (const u of b.units) if (!u.dead) { if (u.team === 'player') pa++; else ea++; }
+      if (this.allIn && !this.attacked && ea > 0 && (pa >= ea * 1.6 || ea <= 6)) {
+        this.attacked = true;
+        b.setFormation('player', 'utok');
+        if (this.App && this.App._formUi) this.App._formUi('utok');
+        this._say('t3');
+      }
+      if (this.allIn && ea === 0 && !this.ending) {
+        this.ending = true;
+        this._say('n5');
+        b.later(4.4, () => { if (!b.over) b._end(true, 'prolog'); });
+      }
+    },
+
+    /* po bitvě: odměna a normální hra */
+    finish(App, res) {
+      this.active = false;
+      try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ }
+      if (this.sub) this.sub.hidden = true;
+      const save = App.save;
+      save.stats.wins = (save.stats.wins || 0) + 1;
+      save.stats.kills = (save.stats.kills || 0) + (res.kills || 0);
+      save.gold += 300;
+      save.tut.prolog = 1;
+      App.persist();
+      if (window.Stat) try { Stat.ev('prolog_win'); } catch (e) { /* nic */ }
+      App.modal(`<div class="rs prolog-end">
+          <h2>${L('Hrad ubráněn!', 'Castle defended!')}</h2>
+          <p class="muted">${L('Démoni se stáhli. Velitel ti svěřil hrad – vylepšuj ho, najímej vojáky a pokračuj v příběhu.', 'The demons retreated. The commander entrusted you with the castle – upgrade it, recruit soldiers and continue the story.')}</p>
+          <p class="prolog-rew">+300 🪙</p>
+          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${L('Pokračovat', 'Continue')}</button></div>
+        </div>`, m => {
+        m.classList.add('res-simple');
+        m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
+      });
+    }
+  };
+  window.Prolog = P;
+})();
+
+</script>
+<script>
 /* js/ui/scene.js */
 /* =========================================================================
    PŘÍBĚHOVÉ SCÉNY – rozhovory mezi akty (GameData.scenes)
@@ -43579,7 +43912,12 @@ GameData.defenseOf = save => {
           /* úplný nováček: hned do první bitvy – bez prohlídky hradu, příběhové scény a okna úrovně
              (na mobilu dřív třetina hráčů odešla, než vůbec začala hrát). Prohlídka hradu přijde po první bitvě. */
           tut.quick = 1; Save.save();
-          setTimeout(() => { if (!this.battle && !Tutorial.active) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true }); } }, 350);
+          setTimeout(() => {
+            if (this.battle || Tutorial.active) return;
+            // úvodní příběh s vypravěčem (obrana hradu proti démonům); kdyby chyběl, klasická první bitva
+            if (window.Prolog && !tut.prolog) { Prolog.start(this); return; }
+            const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id, { quick: true });
+          }, 350);
         } else if (name === 'hrad' && !tut.home && !(fresh && tut.quick)) {
           // prohlídka hradu – u rychlého startu až po první bitvě, nikdy přes běžící bitvu
           const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
@@ -44120,6 +44458,8 @@ GameData.defenseOf = save => {
 
     _closeBattle() {
       this._bTrackLeave('odesel');
+      if (window.Prolog && Prolog.active) { Prolog.active = false; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { /* nic */ } }
+      { const ps = document.getElementById('prologSub'); if (ps) ps.hidden = true; }
       if (this.battle) { this.battle.destroy(); this.battle = null; }
       if (window.Zvuk) Zvuk.music(this.save.faction, 'menu');
       $('#battle').hidden = true;
@@ -44133,6 +44473,7 @@ GameData.defenseOf = save => {
       const adGold0 = save.gold;   // reklamy za odměnu: kolik zlata bitva dala (pro „Zdvojnásob odměnu“)
       if (!this.battle) return;
       if (cfg.film) { this._closeBattle(); this.go('hrad'); return; }   // natáčecí bitva: žádné odměny ani statistiky
+      if (cfg.prolog && window.Prolog) { if (this._bTrack) this._bTrack.done = true; Prolog.finish(this, res); return; }   // úvodní příběh
       if (this._bTrack) this._bTrack.done = true;
       if (window.Stat) Stat.ev(res.win ? 'win' : 'loss', { p: cfg.mode || 'x' });
       save.stats.kills += res.kills;

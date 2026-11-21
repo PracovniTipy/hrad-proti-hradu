@@ -1457,3 +1457,22 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
   .ad-mini small { display: none; }
   .rs .modal-actions .btn { padding: 6px 10px; font-size: 13.5px; }
 }
+
+/* ===== Úvodní příběh: filmové titulky a klidné zvýraznění (nic se nehýbe) ===== */
+#prologSub { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(150px + env(safe-area-inset-bottom, 0px)); z-index: 40; width: min(720px, 86vw); text-align: center; pointer-events: none;
+  background: linear-gradient(180deg, rgba(8,10,16,.82), rgba(8,10,16,.9)); border: 1px solid rgba(232,184,74,.45); border-radius: 12px; padding: 10px 16px 12px; color: #f6eedb; font-size: 18px; line-height: 1.35; box-shadow: 0 8px 26px rgba(0,0,0,.5); }
+#prologSub small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #e8b84a; margin-bottom: 3px; }
+#prologSub.tip { background: linear-gradient(180deg, rgba(255,246,221,.96), rgba(250,232,190,.96)); color: #2a1a05; border-color: #e8b84a; }
+#prologSub.tip small { color: #8a5a10; }
+#prologSub.scout span { font-style: italic; }
+.prolog-hl { outline: 2px solid #e8b84a !important; outline-offset: 2px; box-shadow: 0 0 16px rgba(232,184,74,.6) !important; border-radius: 10px; }
+.prolog-end h2 { margin-bottom: 6px; }
+.prolog-rew { font-size: 22px; font-weight: 700; text-align: center; margin: 8px 0; }
+@media (max-height: 520px) { #prologSub { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); font-size: 14px; padding: 7px 12px 8px; width: min(620px, 80vw); } #prologSub small { font-size: 10px; } }
+/* domovská obrazovka na nízkých displejích (telefon na šířku, Android se systémovými lištami):
+   všechna tlačítka po stranách a dole se úměrně zmenší i s rozestupy, ať nic nepřetéká dolů
+   (margin-top drží horní řadu pod hlavičkou: 58 px × (1 − zoom) / zoom) */
+@media (orientation: landscape) and (max-height: 440px) { #screen.home-mode .daily-btn { zoom: .9; margin-top: 6px; } }
+@media (orientation: landscape) and (max-height: 400px) { #screen.home-mode .daily-btn { zoom: .82; margin-top: 13px; } }
+@media (orientation: landscape) and (max-height: 360px) { #screen.home-mode .daily-btn { zoom: .74; margin-top: 20px; } }
+@media (orientation: landscape) and (max-height: 320px) { #screen.home-mode .daily-btn { zoom: .66; margin-top: 30px; } }
