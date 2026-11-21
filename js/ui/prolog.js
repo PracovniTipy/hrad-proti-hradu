@@ -85,6 +85,24 @@
       setTimeout(() => h.remove(), ms);
       (this.marks = this.marks || []).push(() => h.remove());
     },
+    /* počká na klepnutí na prvek (nebo vyprší čas) a pak zavolá done – jen jednou */
+    _waitFor(sel, ms, done) {
+      let fired = false;
+      const fin = () => { if (fired) return; fired = true; document.removeEventListener('pointerdown', on, true); clearTimeout(tm); if (this.active) done(); };
+      const on = e => { if (e.target && e.target.closest && e.target.closest(sel)) setTimeout(fin, 0); };
+      document.addEventListener('pointerdown', on, true);
+      const tm = setTimeout(fin, ms);
+    },
+    /* velké blikající šipky směru přes bojiště (odkud jdou démoni / kam útočit) */
+    _dir(where, label, ms) {
+      const d = document.createElement('div');
+      d.className = 'prolog-dir ' + where;
+      d.innerHTML = '<i>›</i><i>›</i><i>›</i>' + (label ? '<b></b>' : '');
+      if (label) d.querySelector('b').textContent = label;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), ms);
+      (this.marks = this.marks || []).push(() => d.remove());
+    },
     _clearMarks() { (this.marks || []).forEach(f => { try { f(); } catch (e) { /* nic */ } }); this.marks = []; },
     _hl(sel, ms) {
       const el = document.querySelector(sel); if (!el) return;
@@ -119,7 +137,7 @@
 
     _setup(App, b) {
       this.App = App; this.b = b;
-      this.spawned = 0; this.total = 0; this.played = null; this.cur = null; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false;
+      this.spawned = 0; this.total = 0; this.played = null; this.cur = null; this.allIn = false; this.attacked = false; this.ending = false; this.tipFire = false; this.tutDone = false;
       const hint = document.getElementById('bHint'); if (hint) hint.hidden = true;
       // titulky
       const B = document.getElementById('battle');
@@ -239,6 +257,7 @@
     _demons() {
       const b = this.b, cfg = GameData.battleConfig;
       this._say('n4');
+      this._dir('foe', I18N.L('Démoni!', 'Demons!'), 6000);
       // král se stáhne za vojsko k hradu
       const k = this.king, home = GameData.battleConfig.playerFront + 70;
       if (k && !k.dead) k.script = (v, dt) => { v.hp = v.maxHp; if (v.x > home) { v.x -= v.def.speed * (GameData.battleConfig.speedScale || 1) * 1.6 * dt; v.face = -1; v.moving = true; v.walk += dt * v.def.speed * 0.17; } else { v.moving = false; v.face = 1; } };
@@ -269,21 +288,36 @@
         if (b.time - t0 < 4.5) b.later(0.1, () => show(t0)); else b.camFocus = null;
       };
       b.later(0.4, () => show(b.time));
-      // krátký návod: posily + AUTO → kamera → rozkazy (Ohnivý déšť hlídá _tick)
-      b.later(8.5, () => {
-        if (this.attacked) return;
-        this._say('t1');
-        this._hl('#bUnits', 7000);
-        this._point('#bUnits [data-spawn]', 7000);
+      // krátký návod krok za krokem – každý krok ukáže šipku a počká, až to hráč udělá (nebo chvíli uplyne)
+      const autoOn = () => {
         try {
           b.setAuto('kralovstvi', true);
           const btn = document.querySelector('#bUnits [data-auto="kralovstvi"]');
           if (btn) { btn.setAttribute('aria-pressed', true); const g = btn.closest('.ugrp'); if (g) g.classList.add('auto-on'); }
         } catch (e) { /* nic */ }
+      };
+      const step3 = () => {
+        this._say('to'); this._hl('#bOrders', 9000); this._point('#bOrders [data-order="utok"]', 9000);
+        this._waitFor('#bOrders [data-order]', 9000, () => { this._clearMarks(); this.tutDone = true; this._tFire = b.time + 1.5; });
+      };
+      const step2 = () => {
+        this._say('tc'); this._swipe(9000);
+        const m0 = b.cam.manualReal || 0;
+        const t0 = performance.now();
+        const watch = () => {
+          if (!this.active) return;
+          if ((b.cam.manualReal || 0) !== m0 || performance.now() - t0 > 8000) { this._clearMarks(); setTimeout(step3, 700); return; }
+          setTimeout(watch, 150);
+        };
+        watch();
+      };
+      b.later(7.5, () => {
+        this._say('t1');
+        this._hl('#bUnits', 10000);
+        this._point('#bUnits [data-spawn]', 10000);
+        this._waitFor('#bUnits [data-spawn]', 10000, () => { this._clearMarks(); autoOn(); setTimeout(step2, 900); });
       });
-      b.later(15.5, () => { if (!this.attacked) { this._say('tc'); this._swipe(7000); } });
-      b.later(22.5, () => { if (!this.attacked) { this._say('to'); this._hl('#bOrders', 7000); this._point('#bOrders [data-order="utok"]', 7000); } });
-      this._tFire = b.time + 29.5;
+      this._tFire = 0;
     },
 
     /* každý snímek: Ohnivý déšť, útok při přesile, konec */
@@ -294,7 +328,7 @@
       if (!this.spawned) return;
       if (!this.tipFire && this._tFire && b.time > this._tFire) {
         const st = b.abilityState ? b.abilityState('player', 'ohen') : null;
-        if (!st || st.affordable) {
+        if (!st || st.affordable || b.time > this._tFire + 6) {
           this.tipFire = true;
           if (!this.attacked) this._say('t2');
           this._hl('#bAbil [data-abil]', 7000);
@@ -303,12 +337,13 @@
       }
       let pa = 0, ea = 0;
       for (const u of b.units) if (!u.dead) { if (u.team === 'player') pa++; else ea++; }
-      if (this.allIn && !this.attacked && ea > 0 && (pa >= ea * 1.6 || ea <= 6)) {
+      if (this.allIn && this.tutDone && this.tipFire && !this.attacked && ea > 0 && (pa >= ea * 1.6 || ea <= 6)) {
         this.attacked = true;
         b.setFormation('player', 'utok');
         if (this.App && this.App._formUi) this.App._formUi('utok');
         this._clearMarks();
         this._say('t3');
+        this._dir('go', I18N.L('Do útoku!', 'Attack!'), 4500);
       }
       if (this.allIn && ea === 0 && !this.ending) {
         this.ending = true;
