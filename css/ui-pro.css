@@ -1487,3 +1487,7 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .prolog-swipe .pl, .prolog-swipe .pr { animation: plBlink 1.6s ease-in-out infinite; }
 @keyframes plSwipe { 0% { transform: translateX(-90px); } 50% { transform: translateX(40px); } 100% { transform: translateX(-90px); } }
 @keyframes plBlink { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+
+.prolog-start { position: fixed; z-index: 70; left: 50%; top: 46%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 14px; padding: 16px 28px 16px 20px; border-radius: 18px; border: 2px solid #e8b84a; background: linear-gradient(180deg, #3a2a10, #1c1306); color: #ffe9b0; font: 700 22px/1.2 inherit; cursor: pointer; box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 0 rgba(232,184,74,.6); animation: plStart 1.4s ease-in-out infinite; }
+.prolog-start span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #e8b84a; color: #2a1a05; font-size: 24px; padding-left: 4px; }
+@keyframes plStart { 0%,100% { box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 0 rgba(232,184,74,.55); } 50% { box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 14px rgba(232,184,74,0); } }

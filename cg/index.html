@@ -2528,6 +2528,10 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 @keyframes plSwipe { 0% { transform: translateX(-90px); } 50% { transform: translateX(40px); } 100% { transform: translateX(-90px); } }
 @keyframes plBlink { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
 
+.prolog-start { position: fixed; z-index: 70; left: 50%; top: 46%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 14px; padding: 16px 28px 16px 20px; border-radius: 18px; border: 2px solid #e8b84a; background: linear-gradient(180deg, #3a2a10, #1c1306); color: #ffe9b0; font: 700 22px/1.2 inherit; cursor: pointer; box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 0 rgba(232,184,74,.6); animation: plStart 1.4s ease-in-out infinite; }
+.prolog-start span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #e8b84a; color: #2a1a05; font-size: 24px; padding-left: 4px; }
+@keyframes plStart { 0%,100% { box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 0 rgba(232,184,74,.55); } 50% { box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 14px rgba(232,184,74,0); } }
+
 </style>
 <style>
 /* Cinzel a Inter (SIL OFL) – vložené, fungují bez internetu */
@@ -43538,11 +43542,8 @@ window.PROLOG_TEXTY = {
         a.onerror = () => { /* nahrávka chybí – zůstanou titulky */ };
         const pr = a.play();
         this.audio = a; this.played = key;
-        if (pr && pr.catch) pr.catch(() => {
-          if (this.audio !== a) return;
-          this.played = null; this.unlocked = false;
-          if (!this._hinted && this.App && this.App.toast) { this._hinted = true; this.App.toast('🔊 ' + I18N.L('Klepni pro zvuk', 'Tap for sound'), 4000); }
-        });
+        this._pr = pr && pr.then ? pr : null;
+        if (pr && pr.catch) pr.catch(() => { if (this.audio === a) { this.played = null; this.unlocked = false; } });
       } catch (e) { /* jen titulky */ }
     },
     _stopVoice() { try { if (this.audio) this.audio.pause(); } catch (e) { /* nic */ } this.audio = null; },
@@ -43662,10 +43663,31 @@ window.PROLOG_TEXTY = {
       for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX + 60;
-      b.later(0.6, () => this._say('n1'));
-      b.later(7.0, () => this._say('c1'));          // velitel gardy se ptá krále
-      b.later(16.4, () => this._say('k1'));         // král posílá jezdce
-      b.later(18.4, () => this._riders());
+      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh počká na „Klepni a začni"
+      const timeline = () => {
+        b.later(6.4, () => this._say('c1'));          // velitel gardy se ptá krále
+        b.later(15.8, () => this._say('k1'));         // král posílá jezdce
+        b.later(17.8, () => this._riders());
+      };
+      this._pr = null;
+      this._say('n1');
+      const pr = this._pr;
+      if (!pr) { timeline(); return; }
+      pr.then(timeline, () => {
+        const ov = document.createElement('button');
+        ov.className = 'prolog-start';
+        ov.innerHTML = '<span>▶</span><b></b>';
+        ov.querySelector('b').textContent = I18N.L('Klepni a začni příběh', 'Tap to start the story');
+        document.body.appendChild(ov);
+        (this.marks = this.marks || []).push(() => ov.remove());
+        ov.addEventListener('pointerdown', e => {
+          e.preventDefault(); e.stopPropagation();
+          ov.remove();
+          this.unlocked = true; this.played = null;
+          this._say('n1');                            // přímo v klepnutí → zvuk se smí přehrát
+          timeline();
+        }, { once: true });
+      });
     },
 
     /* jízdní hlídka vyráží na průzkum */

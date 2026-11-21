@@ -36,11 +36,8 @@
         a.onerror = () => { /* nahrávka chybí – zůstanou titulky */ };
         const pr = a.play();
         this.audio = a; this.played = key;
-        if (pr && pr.catch) pr.catch(() => {
-          if (this.audio !== a) return;
-          this.played = null; this.unlocked = false;
-          if (!this._hinted && this.App && this.App.toast) { this._hinted = true; this.App.toast('🔊 ' + I18N.L('Klepni pro zvuk', 'Tap for sound'), 4000); }
-        });
+        this._pr = pr && pr.then ? pr : null;
+        if (pr && pr.catch) pr.catch(() => { if (this.audio === a) { this.played = null; this.unlocked = false; } });
       } catch (e) { /* jen titulky */ }
     },
     _stopVoice() { try { if (this.audio) this.audio.pause(); } catch (e) { /* nic */ } this.audio = null; },
@@ -160,10 +157,31 @@
       for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX + 60;
-      b.later(0.6, () => this._say('n1'));
-      b.later(7.0, () => this._say('c1'));          // velitel gardy se ptá krále
-      b.later(16.4, () => this._say('k1'));         // král posílá jezdce
-      b.later(18.4, () => this._riders());
+      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh počká na „Klepni a začni"
+      const timeline = () => {
+        b.later(6.4, () => this._say('c1'));          // velitel gardy se ptá krále
+        b.later(15.8, () => this._say('k1'));         // král posílá jezdce
+        b.later(17.8, () => this._riders());
+      };
+      this._pr = null;
+      this._say('n1');
+      const pr = this._pr;
+      if (!pr) { timeline(); return; }
+      pr.then(timeline, () => {
+        const ov = document.createElement('button');
+        ov.className = 'prolog-start';
+        ov.innerHTML = '<span>▶</span><b></b>';
+        ov.querySelector('b').textContent = I18N.L('Klepni a začni příběh', 'Tap to start the story');
+        document.body.appendChild(ov);
+        (this.marks = this.marks || []).push(() => ov.remove());
+        ov.addEventListener('pointerdown', e => {
+          e.preventDefault(); e.stopPropagation();
+          ov.remove();
+          this.unlocked = true; this.played = null;
+          this._say('n1');                            // přímo v klepnutí → zvuk se smí přehrát
+          timeline();
+        }, { once: true });
+      });
     },
 
     /* jízdní hlídka vyráží na průzkum */
