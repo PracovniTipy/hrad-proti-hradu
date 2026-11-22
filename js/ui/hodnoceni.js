@@ -2,6 +2,8 @@
    ŽÁDOST O HODNOCENÍ – po 3. vyhrané bitvě (a když hráč dá „Později“,
    znovu po dalších 10 výhrách). Nejvýš 2×, nikdy během bitvy.
    Microsoft Store: otevře oficiální okno hodnocení ve Storu.
+   Android (Google Play): rovnou oficiální okno hodnocení od Googlu,
+   bez naší otázky předem (pravidla Google Play to tak vyžadují).
    Jinde: stránka hry na itch.io.
    ========================================================================= */
 (function () {
@@ -9,6 +11,7 @@
   const ITCH = 'https://battlecastle.itch.io/castle-wars';
   const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;   // překlad: js/i18n_l.js
   let pending = false;
+  const nativeReview = () => { try { const C = window.Capacitor; return (C && C.isNativePlatform && C.isNativePlatform() && C.Plugins && C.Plugins.InAppReview) || null; } catch (e) { return null; } };
 
   const Hodnoceni = {
     state(save) { save.rate = save.rate || { done: false, asked: 0, nextWin: 3 }; return save.rate; },
@@ -23,6 +26,12 @@
       const s = this.state(App.save);
       s.asked++; s.nextWin = App.save.stats.wins + 10;
       Save.save();
+      const nr = nativeReview();
+      if (nr) {
+        if (window.Stat) try { Stat.ev('rate', { native: 1 }); } catch (e) {}
+        try { const p = nr.requestReview(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+        return;
+      }
       App.modal(`<div class="eyebrow">Castle WARS</div>
         <h2>${L('Baví tě Castle WARS?', 'Enjoying Castle WARS?')}</h2>
         <p>${L('Ohodnoť hru, zabere to 10 vteřin. Hodně nám to pomůže, aby hru našli další hráči.', 'Rate the game, it takes 10 seconds. It really helps other players find it.')}</p>
