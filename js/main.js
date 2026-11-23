@@ -707,6 +707,7 @@
       if (window.Sireni) { const ex = Sireni.onBattleEnd(this, cfg, res); if (ex) { rewards.push(...ex.rewards); if (ex.note) note = ex.note; } }
       if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
       if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) { rewards.push(...kx.rewards); if (kx.note) note = kx.note; } }
+      if (window.Zitra) try { const zx = Zitra.onBattleEnd(this, cfg, res); if (zx && zx.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + zx.note; } catch (e) { /* nic */ }   // truhla hrdiny na zítra
       if (window.Udalosti) { const ux = Udalosti.onBattleEnd(this, cfg, res); if (ux) { rewards.push(...ux.rewards); if (ux.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + ux.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
@@ -961,7 +962,8 @@
       } else {
         this.go('hrad');   // po spuštění vždy hrad
         // denní odměna zdarma: hráč, který už má tutoriál za sebou, ji uvidí hned
-        if ((this.save.tut || {}).home && Denni.available(this.save)) setTimeout(() => { if (!this.battle && !Tutorial.active) Denni.open(this); }, 700);
+        if (window.Zitra && Zitra.ready(this.save)) setTimeout(() => { if (!this.battle && !Tutorial.active) Zitra.open(this); }, 700);   // truhla hrdiny (js/ui/zitra.js)
+        else if ((this.save.tut || {}).home && Denni.available(this.save)) setTimeout(() => { if (!this.battle && !Tutorial.active) Denni.open(this); }, 700);
       }
       // fonty se načítají asynchronně – po načtení překresli plátna s textem
       if (window.Pozvi) Pozvi.boot(this);   // dárek pro kamaráda, který přišel přes pozvánku
