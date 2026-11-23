@@ -3599,6 +3599,14 @@ body:has(#battle:not([hidden])) #firstFight, #app:not(:has(#screen.home-mode)) #
 .kb-rel-u.own small { color: #9fffb0; }
 @media (max-width: 900px), (orientation: landscape) and (max-height: 520px) { .kb-rel { grid-template-columns: repeat(3, 1fr); } .kb-rel-u canvas { width: 54px; height: 54px; } }
 
+/* Série bitev (js/ui/serie.js) */
+.sr { display: inline-block; font-weight: 700; }
+.sr-dots { display: inline-flex; gap: 4px; margin-top: 4px; }
+.sr-d { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.18); border: 1px solid rgba(0,0,0,.35); display: inline-grid; place-items: center; font-size: 10px; line-height: 1; }
+.sr-d.on { background: #ffb02e; box-shadow: 0 0 6px #ffb02e; }
+.sr-d.gift { width: 18px; height: 18px; font-size: 12px; background: rgba(255,215,100,.25); }
+.sr-d.gift.on { background: #ffd04a; }
+
 </style>
 </head>
 <body>
@@ -43162,6 +43170,60 @@ GameData.defenseOf = save => {
 
 </script>
 <script>
+/* js/ui/serie.js */
+/* =========================================================================
+   SÉRIE BITEV – odměna za víc bitev v jednom hraní (delší doba hraní).
+   Každá dohraná bitva (výhra i prohra) posune sérii. Po 3., 5. a 8. bitvě
+   v jednom hraní padne odměna. Série se nuluje po 30 min bez bitvy.
+   Postup hráče se nikdy nemaže – jde jen o bonus navíc.
+   ========================================================================= */
+(function () {
+  const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;
+  const STEPS = [
+    { n: 3, gold: 400, gems: 25 },
+    { n: 5, gold: 800, gems: 50, random: { count: 1, odds: [0.2, 0.5, 0.3, 0] } },
+    { n: 8, gold: 1500, gems: 100, random: { count: 1, odds: [0, 0.2, 0.5, 0.3] } }
+  ];
+  const GAP = 30 * 60 * 1000;
+  let count = 0, last = 0;
+
+  function dots(c) {
+    const max = STEPS[STEPS.length - 1].n;
+    let h = '';
+    for (let i = 1; i <= max; i++) {
+      const st = STEPS.find(s => s.n === i);
+      h += `<span class="sr-d${i <= c ? ' on' : ''}${st ? ' gift' : ''}">${st ? '🎁' : ''}</span>`;
+    }
+    return `<span class="sr-dots">${h}</span>`;
+  }
+
+  window.Serie = {
+    onBattleEnd(App, cfg, res) {
+      if (!res || !cfg || cfg.film || cfg.prolog || cfg.net) return null;
+      const now = Date.now();
+      if (now - last > GAP) count = 0;
+      last = now; count++;
+      const hit = STEPS.find(s => s.n === count);
+      const rewards = [];
+      if (hit) {
+        const give = { gold: hit.gold, gems: hit.gems };
+        if (hit.random) give.random = hit.random;
+        try { Shop.grant(App, give); } catch (e) { /* nic */ }
+        rewards.push(`<span class="pill">🪙 +${hit.gold.toLocaleString()}</span>`, `<span class="pill">💎 +${hit.gems}</span>`);
+        if (hit.random) rewards.push(`<span class="pill">🎁 ${L('výbava', 'gear')}</span>`);
+        if (window.Stat) try { Stat.ev('serie', { n: count }); } catch (e) { /* nic */ }
+      }
+      const nx = STEPS.find(s => s.n > count);
+      const head = hit ? L(`🔥 Série ${count} bitev – odměna!`, `🔥 ${count}-battle streak – reward!`)
+        : L(`🔥 Série bitev: ${count}`, `🔥 Battle streak: ${count}`);
+      const tail = nx ? L(` · další odměna po ${nx.n}. bitvě`, ` · next reward after battle ${nx.n}`) : '';
+      return { rewards, note: `<span class="sr">${head}${tail}<br>${dots(count)}</span>` };
+    }
+  };
+})();
+
+</script>
+<script>
 /* js/ui/online_ui.js */
 /* =========================================================================
    OBRAZOVKA ONLINE – vytvoření místnosti, připojení kódem a lobby
@@ -43774,7 +43836,7 @@ window.PROLOG_TEXTY = {
       for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX + 60;
-      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh počká na „Klepni a začni"
+      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh jede dál s titulky
       const timeline = () => {
         b.later(6.4, () => this._say('c1'));          // velitel gardy se ptá krále
         b.later(15.8, () => this._say('k1'));         // král posílá jezdce
@@ -43785,19 +43847,12 @@ window.PROLOG_TEXTY = {
       const pr = this._pr;
       if (!pr) { timeline(); return; }
       pr.then(timeline, () => {
-        const ov = document.createElement('button');
-        ov.className = 'prolog-start';
-        ov.innerHTML = '<span>▶</span><b></b>';
-        ov.querySelector('b').textContent = I18N.L('Klepni a začni příběh', 'Tap to start the story');
-        document.body.appendChild(ov);
-        (this.marks = this.marks || []).push(() => ov.remove());
-        ov.addEventListener('pointerdown', e => {
-          e.preventDefault(); e.stopPropagation();
-          ov.remove();
-          this.unlocked = true; this.played = null;
-          this._say('n1');                            // přímo v klepnutí → zvuk se smí přehrát
-          timeline();
-        }, { once: true });
+        // prohlížeč nepustil zvuk bez klepnutí → příběh běží hned dál (titulky),
+        // hlas se zapne od prvního dotyku hráče (žádné čekací tlačítko – hráči odcházeli)
+        timeline();
+        const un = () => { this.unlocked = true; this.played = null; if (this.active && this.cur) this._voice(this.cur); };
+        document.addEventListener('pointerdown', un, { once: true, capture: true });
+        (this.marks = this.marks || []).push(() => document.removeEventListener('pointerdown', un, { capture: true }));
       });
     },
 
@@ -44834,6 +44889,7 @@ window.PROLOG_TEXTY = {
       if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
       if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) { rewards.push(...kx.rewards); if (kx.note) note = kx.note; } }
       if (window.Zitra) try { const zx = Zitra.onBattleEnd(this, cfg, res); if (zx && zx.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + zx.note; } catch (e) { /* nic */ }   // truhla hrdiny na zítra
+      if (window.Serie) try { const sx = Serie.onBattleEnd(this, cfg, res); if (sx) { rewards.push(...sx.rewards); note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + sx.note; } } catch (e) { /* nic */ }   // série bitev v jednom hraní
       if (window.Udalosti) { const ux = Udalosti.onBattleEnd(this, cfg, res); if (ux) { rewards.push(...ux.rewards); if (ux.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + ux.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;

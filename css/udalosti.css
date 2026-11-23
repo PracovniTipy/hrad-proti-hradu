@@ -118,3 +118,11 @@
 .kb-rel-u b { font-size: 11px; color: #fff; line-height: 1.15; } .kb-rel-u small { font-size: 10.5px; color: #c8c0ae; }
 .kb-rel-u.own small { color: #9fffb0; }
 @media (max-width: 900px), (orientation: landscape) and (max-height: 520px) { .kb-rel { grid-template-columns: repeat(3, 1fr); } .kb-rel-u canvas { width: 54px; height: 54px; } }
+
+/* Série bitev (js/ui/serie.js) */
+.sr { display: inline-block; font-weight: 700; }
+.sr-dots { display: inline-flex; gap: 4px; margin-top: 4px; }
+.sr-d { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.18); border: 1px solid rgba(0,0,0,.35); display: inline-grid; place-items: center; font-size: 10px; line-height: 1; }
+.sr-d.on { background: #ffb02e; box-shadow: 0 0 6px #ffb02e; }
+.sr-d.gift { width: 18px; height: 18px; font-size: 12px; background: rgba(255,215,100,.25); }
+.sr-d.gift.on { background: #ffd04a; }

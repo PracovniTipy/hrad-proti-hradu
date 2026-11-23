@@ -175,7 +175,7 @@
       for (const u of b.units) if (u.team === 'player' && !u.script && u.slotX != null) { u.x = u.slotX; u.y = u.slotY; u.moving = false; u.face = 1; }
       this.flagX = flagX;
       b.camFocus = flagX + 60;
-      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh počká na „Klepni a začni"
+      // vypravěč začne hned; když prohlížeč nepustí zvuk bez klepnutí, příběh jede dál s titulky
       const timeline = () => {
         b.later(6.4, () => this._say('c1'));          // velitel gardy se ptá krále
         b.later(15.8, () => this._say('k1'));         // král posílá jezdce
@@ -186,19 +186,12 @@
       const pr = this._pr;
       if (!pr) { timeline(); return; }
       pr.then(timeline, () => {
-        const ov = document.createElement('button');
-        ov.className = 'prolog-start';
-        ov.innerHTML = '<span>▶</span><b></b>';
-        ov.querySelector('b').textContent = I18N.L('Klepni a začni příběh', 'Tap to start the story');
-        document.body.appendChild(ov);
-        (this.marks = this.marks || []).push(() => ov.remove());
-        ov.addEventListener('pointerdown', e => {
-          e.preventDefault(); e.stopPropagation();
-          ov.remove();
-          this.unlocked = true; this.played = null;
-          this._say('n1');                            // přímo v klepnutí → zvuk se smí přehrát
-          timeline();
-        }, { once: true });
+        // prohlížeč nepustil zvuk bez klepnutí → příběh běží hned dál (titulky),
+        // hlas se zapne od prvního dotyku hráče (žádné čekací tlačítko – hráči odcházeli)
+        timeline();
+        const un = () => { this.unlocked = true; this.played = null; if (this.active && this.cur) this._voice(this.cur); };
+        document.addEventListener('pointerdown', un, { once: true, capture: true });
+        (this.marks = this.marks || []).push(() => document.removeEventListener('pointerdown', un, { capture: true }));
       });
     },
 

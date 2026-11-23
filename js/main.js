@@ -708,6 +708,7 @@
       if (window.Vanoce) { const vx = Vanoce.onBattleEnd(this, cfg, res); if (vx) { rewards.push(...vx.rewards); if (vx.note) note = vx.replace ? vx.note : (note ? note + '<br>' : '') + vx.note; } }   // vánoční vločky
       if (window.Klany) { const kx = Klany.onBattleEnd(this, cfg, res, save.gold - klGold0); if (kx) { rewards.push(...kx.rewards); if (kx.note) note = kx.note; } }
       if (window.Zitra) try { const zx = Zitra.onBattleEnd(this, cfg, res); if (zx && zx.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + zx.note; } catch (e) { /* nic */ }   // truhla hrdiny na zítra
+      if (window.Serie) try { const sx = Serie.onBattleEnd(this, cfg, res); if (sx) { rewards.push(...sx.rewards); note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + sx.note; } } catch (e) { /* nic */ }   // série bitev v jednom hraní
       if (window.Udalosti) { const ux = Udalosti.onBattleEnd(this, cfg, res); if (ux) { rewards.push(...ux.rewards); if (ux.note) note = (note && note !== t('note_tip') && note !== t('note_training') ? note + '<br>' : '') + ux.note; } }
       const qDone = window.Ukoly ? Ukoly.onBattle(save, cfg, res, stars) : 0;
       const bp = window.Pas ? Pas.onBattle(save, cfg, res) : null;
