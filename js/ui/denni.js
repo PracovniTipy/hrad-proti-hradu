@@ -49,6 +49,21 @@
       return { streak: L.streak, claimedToday: L.lastClaim === today(), day: L.lastClaim === today() ? L.streak : L.streak + 1 };
     },
     available(save) { return !this.state(save).claimedToday; },
+    /* krátký text odměny, např. „20 💎“ */
+    rewardText(r) {
+      if (r.skin) return t('exclusive') + ' skin';
+      const p = [];
+      if (r.gold) p.push(fmt(r.gold) + ' 🪙');
+      if (r.gems) p.push(r.gems + ' 💎');
+      if (r.randomGear) p.push(t(r.randomGear.minTier ? 'rar_1' : 'rar_0') + ' ⚔️');
+      return p.join(' + ');
+    },
+    /* co hráč dostane zítra (když dnes vyzvedne / už vyzvedl) */
+    tomorrow(save) {
+      const st = this.state(save);
+      const n = st.claimedToday ? st.streak + 1 : st.streak + 2;
+      return { day: n, text: this.rewardText(reward(n)) };
+    },
 
     /* Okno s kalendářem */
     open(App) {

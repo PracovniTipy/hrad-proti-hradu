@@ -1500,3 +1500,8 @@ body.paid-off .big-buy [data-offer], body.paid-off .buy-czk:not([data-chest]) { 
 .prolog-dir.go { left: 50%; transform: translate(-50%, -50%); }
 @keyframes plChev { 0%,100% { opacity: .2; transform: translateX(0); } 50% { opacity: 1; transform: translateX(10px); } }
 @media (max-height: 520px) { .prolog-dir i { font-size: 60px; } .prolog-dir b { font-size: 18px; } }
+
+.daily-next { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 2px; white-space: nowrap; font-style: normal; font: 800 10.5px/1.2 var(--font-body); color: #ffe9a0; background: rgba(10,8,4,.78); border: 1px solid rgba(255,215,122,.5); border-radius: 8px; padding: 2px 6px; pointer-events: none; }
+.tmrw-card { margin: 10px auto 4px; max-width: 360px; padding: 10px 14px; border-radius: 12px; background: linear-gradient(180deg, rgba(255,215,122,.16), rgba(255,215,122,.06)); border: 1px solid rgba(255,215,122,.55); display: grid; gap: 4px; text-align: center; }
+.tmrw-card b { color: #ffe9a0; font-size: 16px; }
+.tmrw-card small { color: #d9cfb8; }

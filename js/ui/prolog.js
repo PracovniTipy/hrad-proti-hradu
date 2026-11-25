@@ -368,10 +368,13 @@
           <h2>${T('end_h')}</h2>
           <p class="muted">${T('end_p')}</p>
           <p class="prolog-rew">+300 🪙</p>
-          <div class="modal-actions"><button class="btn btn-gold btn-big" data-close>${T('cont')}</button></div>
+          ${window.Denni ? `<div class="tmrw-card"><b>${t('tomorrow_gets', { r: Denni.tomorrow(save).text })}</b><small>${t('come_back')}</small></div>` : ''}
+          <div class="modal-actions">${window.Denni && Denni.available(save) ? `<button class="btn btn-gold btn-big" data-claim>🎁 ${t('claim_day1')}</button>` : ''}<button class="btn ${window.Denni && Denni.available(save) ? '' : 'btn-gold btn-big'}" data-close>${T('cont')}</button></div>
         </div>`, m => {
         m.classList.add('res-simple');
         m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
+        const cb = m.querySelector('[data-claim]');
+        if (cb) cb.addEventListener('click', () => { App._closeBattle(); App.go('hrad'); setTimeout(() => Denni.claim(App), 60); }, { once: true });
       });
     }
   };
