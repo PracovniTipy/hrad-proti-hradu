@@ -438,7 +438,7 @@
           <button class="daily-btn" id="dailyBtn" aria-label="${t('daily_title')}">
             <span class="daily-chest">${Icons.navObchod ? '' : ''}<svg viewBox="0 0 120 100"><path d="M14 46h92v40a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#8a5a32" stroke="#1a0e06" stroke-width="4"/><path d="M14 46c0-20 20-30 46-30s46 10 46 30z" fill="#5a3a1e" stroke="#1a0e06" stroke-width="4"/><path d="M14 46h92" stroke="#ffd77a" stroke-width="7"/><path d="M30 18v74M90 18v74" stroke="#ffd77a" stroke-width="7"/><rect x="49" y="39" width="22" height="24" rx="3" fill="#ffd77a" stroke="#1a0e06" stroke-width="3"/></svg></span>
             <span class="daily-lbl">${t('daily_short')}</span>
-            ${Denni.available(save) ? '<i class="daily-dot">!</i>' : ''}
+            ${Denni.available(save) ? '<i class="daily-dot">!</i>' : `<i class="daily-next">${I18N.L('Zítra', 'Tomorrow')}: ${Denni.tomorrow(save).text}</i>`}
           </button>
           <button class="daily-btn pass-btn" id="passBtn" aria-label="${t('tab_pas')}">
             <span class="daily-chest"><svg viewBox="0 0 120 100"><path d="M24 14h72l-6 74-30-14-30 14z" fill="#2a3a52" stroke="#0e1420" stroke-width="4" stroke-linejoin="round"/><path d="M24 14h72l-2 22H26z" fill="#bfe6ff" stroke="#0e1420" stroke-width="4" stroke-linejoin="round"/><path d="M60 40l7 14 15 2-11 10 3 15-14-8-14 8 3-15-11-10 15-2z" fill="#ffd24a" stroke="#0e1420" stroke-width="3" stroke-linejoin="round"/></svg></span>
