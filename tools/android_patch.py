@@ -26,6 +26,9 @@ if 'com.google.android.gms.ads.APPLICATION_ID' not in m:
     m, n = re.subn(r'(<application\b[^>]*>)', r'\1\n        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="' + admob_id + '"/>', m, count=1)
     if not n:
         raise SystemExit('AndroidManifest: nenalezen <application> pro AdMob ID')
+# 1d) AdMob používá inzertní ID – Google Play vyžaduje oprávnění AD_ID v manifestu (Android 13+)
+if 'com.google.android.gms.permission.AD_ID' not in m:
+    m = m.replace('<application', '<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>\n    <application', 1)
 man.write_text(m)
 print('AdMob ID aplikace:', admob_id)
 
