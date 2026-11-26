@@ -362,12 +362,19 @@
           <p class="muted">${T('end_p')}</p>
           <p class="prolog-rew">+300 🪙</p>
           ${window.Denni ? `<div class="tmrw-card"><b>${t('tomorrow_gets', { r: Denni.tomorrow(save).text })}</b><small>${t('come_back')}</small></div>` : ''}
-          <div class="modal-actions">${window.Denni && Denni.available(save) ? `<button class="btn btn-gold btn-big" data-claim>🎁 ${t('claim_day1')}</button>` : ''}<button class="btn ${window.Denni && Denni.available(save) ? '' : 'btn-gold btn-big'}" data-close>${T('cont')}</button></div>
-        </div>`, m => {
+          <div class="modal-actions">${window.Denni && Denni.available(save) ? `<button class="btn" data-claim>🎁 ${t('claim_day1')}</button>` : ''}<button class="btn" data-close>${T('cont')}</button><button class="btn btn-gold btn-big" data-next>⚔️ ${I18N.L('Další bitva', 'Next battle')}</button></div>
+        </div>`, (m, close) => {
         m.classList.add('res-simple');
         m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
+        m.querySelector('[data-next]').addEventListener('click', () => {
+          App._noHomeTut = true;   // výuka hradu počká, až se hráč do hradu opravdu vrátí
+          close(); App._closeBattle(); App.go('hrad');
+          const lv = GameData.campaignHelpers.currentLevel(App.save);
+          setTimeout(() => { if (lv && !App.battle) App.openLevel(lv.id); }, 60);
+          setTimeout(() => { App._noHomeTut = false; }, 1500);
+        }, { once: true });
         const cb = m.querySelector('[data-claim]');
-        if (cb) cb.addEventListener('click', () => { App._closeBattle(); App.go('hrad'); setTimeout(() => Denni.claim(App), 60); }, { once: true });
+        if (cb) cb.addEventListener('click', () => { close(); App._closeBattle(); App.go('hrad'); setTimeout(() => Denni.claim(App), 60); }, { once: true });
       });
     }
   };

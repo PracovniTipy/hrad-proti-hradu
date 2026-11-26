@@ -62,7 +62,7 @@
         } else if (name === 'hrad' && !tut.home && !(fresh && tut.quick)) {
           // prohlídka hradu – u rychlého startu až po první bitvě, nikdy přes běžící bitvu
           const first = () => { const st = this.save.stats || {}; if (!this.battle && (st.wins || 0) + (st.losses || 0) === 0) { const lv = GameData.campaignHelpers.currentLevel(this.save); if (lv) this.openLevel(lv.id); } };
-          setTimeout(() => { if (this.battle || Tutorial.active || this.current !== 'hrad') return; tut.home = true; Save.save(); Tutorial.run(Tutorial.HOME, first); }, 600);
+          setTimeout(() => { if (this.battle || this._noHomeTut || Tutorial.active || this.current !== 'hrad') return; tut.home = true; Save.save(); Tutorial.run(Tutorial.HOME, first); }, 600);
         }
         if (name === 'stavitel' && !tut.editor) { tut.editor = true; Save.save(); setTimeout(() => Tutorial.run(Tutorial.EDITOR), 500); }
       }
@@ -718,6 +718,8 @@
       const back = cfg.net || cfg.mode === 'online_ai' ? 'online' : cfg.mode === 'pvp' ? 'pvp' : cfg.mode === 'tower' ? 'vez' : (cfg.mode === 'campaign' ? 'pribeh' : 'hrad');
       /* rovnou do další bitvy příběhu (výhra) / znovu (prohra) – hráč nemusí přes menu */
       const nextLv = cfg.mode === 'campaign' && !cfg.net && !cfg.film && !cfg.afterScene ? GameData.campaignHelpers.currentLevel(save) : null;
+      /* ve Věži taky rovnou další patro (výhra) / znovu (prohra) */
+      const nextFloor = !nextLv && cfg.mode === 'tower' && !cfg.net && !cfg.weekly && cfg.floor ? (res.win ? GameData.tower.state(save).cur : cfg.floor.n) : null;
       this.modal(`
         <div class="rs ${res.win ? 'win' : 'loss'}">
           <div class="rs-emb" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4l24 8v18c0 16-11 26-24 30C19 56 8 46 8 30V12z" fill="${res.win ? '#c8902a' : '#7a2a24'}" stroke="#1a0e06" stroke-width="3"/><path d="M32 9l19 6v15c0 13-9 21-19 25-10-4-19-12-19-25V15z" fill="${res.win ? '#ffd77a' : '#c0564a'}" opacity=".35"/>${res.win ? '<path d="M18 18l26 26M46 18L20 44" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M16 42l6 6M48 42l-6 6" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>' : '<path d="M22 20l10 12M36 38l8 9" stroke="#f4f0e6" stroke-width="5" stroke-linecap="round"/><path d="M42 18L22 46" stroke="#5a3a14" stroke-width="5" stroke-linecap="round"/>'}</svg></div>
@@ -727,8 +729,9 @@
           ${note && note !== t('note_tip') && note !== t('note_training') ? `<p class="rs-note">${note}</p>` : ''}
           ${window.Reklamy ? Reklamy.battleHtml(this, cfg, res, save.gold - adGold0) : ''}
           <div class="modal-actions">
-            <button class="btn ${nextLv ? '' : 'btn-gold'}" id="resBack">${t('continue')}</button>
+            <button class="btn ${nextLv || nextFloor ? '' : 'btn-gold'}" id="resBack">${t('continue')}</button>
             ${nextLv ? `<button class="btn btn-gold" id="resNext">${res.win ? '⚔️ ' + I18N.L('Další bitva', 'Next battle') : '🔁 ' + I18N.L('Zkusit znovu', 'Try again')}</button>` : ''}
+            ${nextFloor ? `<button class="btn btn-gold" id="resNext">${res.win ? '⚔️ ' + I18N.L('Další patro', 'Next floor') : '🔁 ' + I18N.L('Zkusit znovu', 'Try again')}</button>` : ''}
           </div>
         </div>`, (c, close) => {
         c.classList.add('res-simple');
@@ -736,7 +739,7 @@
         const nx = c.querySelector('#resNext');
         if (nx) nx.addEventListener('click', () => {
           close(); this._closeBattle(); this.go(back);
-          const go = () => this.openLevel(nextLv.id);
+          const go = () => nextLv ? this.openLevel(nextLv.id) : this.startTower(nextFloor);
           if (window.CW_AdBetween) setTimeout(() => { window.CW_AdBetween(); setTimeout(go, 300); }, 300); else go();
         });
         c.querySelector('#resBack').addEventListener('click', () => {
