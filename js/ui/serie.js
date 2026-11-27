@@ -1,12 +1,13 @@
 /* =========================================================================
    SÉRIE BITEV – odměna za víc bitev v jednom hraní (delší doba hraní).
-   Každá dohraná bitva (výhra i prohra) posune sérii. Po 3., 5. a 8. bitvě
+   Každá dohraná bitva (výhra i prohra) posune sérii. Po 2., 3., 5. a 8. bitvě
    v jednom hraní padne odměna. Série se nuluje po 30 min bez bitvy.
    Postup hráče se nikdy nemaže – jde jen o bonus navíc.
    ========================================================================= */
 (function () {
   const L = (c, e) => (window.I18N && I18N.L) ? I18N.L(c, e) : e;
   const STEPS = [
+    { n: 2, gold: 150, gems: 10 },
     { n: 3, gold: 400, gems: 25 },
     { n: 5, gold: 800, gems: 50, random: { count: 1, odds: [0.2, 0.5, 0.3, 0] } },
     { n: 8, gold: 1500, gems: 100, random: { count: 1, odds: [0, 0.2, 0.5, 0.3] } }
