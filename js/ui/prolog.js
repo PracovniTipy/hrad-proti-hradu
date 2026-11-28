@@ -338,6 +338,16 @@
         this._say('t3');
         this._dir('go', I18N.L('Do útoku!', 'Attack!'), 4500);
       }
+      /* pojistka: úvod musí vždy skončit – když garda padne, přijdou posily
+         a po 2,5 min dostanou démoni „poslední ránu“ (dřív se dalo zaseknout) */
+      if (this.allIn && this.tutDone && ea > 0 && !this.ending) {
+        if (!this._t0) this._t0 = b.time;
+        if (pa < Math.max(6, ea * 0.7) && b.time - (this._resc || 0) > 10) {
+          this._resc = b.time;
+          for (let i = 0; i < 14; i++) b.spawn('player', i % 2 ? 'rytir' : 'kopinik', true);
+        }
+        if (b.time - this._t0 > 150) for (const u of b.units) if (!u.dead && u.team !== 'player' && u.hp > 1) u.hp = 1;
+      }
       if (this.allIn && ea === 0 && !this.ending) {
         this.ending = true;
         this._say('n5');
@@ -365,12 +375,13 @@
           <div class="modal-actions">${window.Denni && Denni.available(save) ? `<button class="btn" data-claim>🎁 ${t('claim_day1')}</button>` : ''}<button class="btn" data-close>${T('cont')}</button><button class="btn btn-gold btn-big" data-next>⚔️ ${I18N.L('Další bitva', 'Next battle')}</button></div>
         </div>`, (m, close) => {
         m.classList.add('res-simple');
-        m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); }, { once: true });
+        m.querySelector('[data-close]').addEventListener('click', () => { App._closeBattle(); App.go('hrad'); if (window.CW_AdBetween) setTimeout(() => window.CW_AdBetween(), 400); }, { once: true });
         m.querySelector('[data-next]').addEventListener('click', () => {
           App._noHomeTut = true;   // výuka hradu počká, až se hráč do hradu opravdu vrátí
           close(); App._closeBattle(); App.go('hrad');
           const lv = GameData.campaignHelpers.currentLevel(App.save);
-          setTimeout(() => { if (lv && !App.battle) App.openLevel(lv.id); }, 60);
+          if (window.CW_AdBetween) setTimeout(() => window.CW_AdBetween(), 30);
+          setTimeout(() => { if (lv && !App.battle) App.openLevel(lv.id); }, 330);
           setTimeout(() => { App._noHomeTut = false; }, 1500);
         }, { once: true });
         const cb = m.querySelector('[data-claim]');
