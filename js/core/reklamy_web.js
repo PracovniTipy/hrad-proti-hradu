@@ -93,6 +93,26 @@
       if (!B || !B.initialize) return;
       B.initialize().then(() => {
         window.CW_PG = B;
+        /* Ukládání postupu přes Playgama Bridge (podmínka katalogu Playgama):
+           každé uložení se pošle i do B.storage; při startu se načte a když je
+           v Bridge víc odehráno než v prohlížeči, převezme se (jednou reload). */
+        const pgStore = () => { try {
+          const S = window.Save, KEY = 'hrad-proti-hradu-save-v1';
+          if (B.storage && S && S.save && !S._pgStore) {
+            S._pgStore = true;
+            const push = () => { try { const r = B.storage.set(KEY, JSON.stringify(S.data)); if (r && r.catch) r.catch(() => {}); } catch (e) {} };
+            const orig = S.save; let tm = null;
+            S.save = function () { const r = orig.apply(this, arguments); clearTimeout(tm); tm = setTimeout(push, 800); return r; };
+            Promise.resolve(B.storage.get(KEY)).then(v => {
+              let d = null; try { d = typeof v === 'string' ? JSON.parse(v) : v; } catch (e) { d = null; }
+              if (d && typeof d === 'object' && S.score && S.score(d) > S.score(S.data)) {
+                let again = false; try { again = !!sessionStorage.getItem('cw-pg-load'); sessionStorage.setItem('cw-pg-load', '1'); } catch (e) { again = true; }
+                if (!again) { S.replace(d, 'playgama'); location.reload(); return; }
+              }
+              push();
+            }).catch(() => push());
+          }
+        } catch (e) { /* ukládání nikdy nesmí shodit hru */ } };
         const E = B.EVENT_NAME || {};
         const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
         let paused = false;
@@ -115,6 +135,7 @@
           return true;
         };
         const ready = () => {
+          pgStore();
           hook();
           try { B.platform.sendMessage('game_ready'); } catch (e) {}
           /* první bitva (tutoriál) může běžet dřív, než se hook nainstaluje */
