@@ -272,8 +272,9 @@
       if (!App || !App.save) return;
       if (window.Reklamy && Reklamy.ADS && Reklamy.ADS.adFreeProducts.some(id => ((App.save.purchases || {})[id] || 0) > 0)) return;
       const wins = ((App.save.stats || {}).wins || 0) + ((App.save.stats || {}).losses || 0);
-      if (wins < 3) return;                                   // nové hráče nerušit
-      if (Date.now() - lastBreak < 4 * 60 * 1000) return;     // nejvýš jednou za 4 minuty
+      const pgw = portal === 'playgama';                       // Playgama si rozestupy hlídá sama (minimumDelay v bridge configu)
+      if (wins < (pgw ? 1 : 3)) return;                       // nové hráče nerušit
+      if (!pgw && Date.now() - lastBreak < 4 * 60 * 1000) return;     // nejvýš jednou za 4 minuty
       lastBreak = Date.now();
       const mute = on => { try { window.Reklamy && Reklamy._mute && Reklamy._mute(on); } catch (e) {} };
       if (H5.on && H5.ready) {
